@@ -1,0 +1,4 @@
+configuration.yml
+configuration-user.yml
+.ssh
+.vagrant

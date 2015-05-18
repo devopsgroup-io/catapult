@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>PowerYaml</id>
+    <version>1.0.3</version>
+    <title>PowerYaml</title>
+    <description>A module to help parse YAML documents</description>
+    <tags>powershell yaml</tags>
+    <authors>Scott Muc</authors>
+    <projectUrl>https://github.com/scottmuc/PowerYaml</projectUrl>
+    <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0.html</licenseUrl>
+  </metadata>
+  <files>
+    <file src="PowerYaml.psm1" target="tools" />
+    <file src="Functions\**\*.*" target="tools\Functions" />
+    <file src="Libs\*.dll" target="tools\Libs" />
+  </files>
+</package>
