@@ -1,12 +1,12 @@
-# Release Management #
+# devopsgroup.io Release Management #
 
 Copyright (c) 2015 devopsgroup.io - Seth Reeser
 
-Welcome to Release Management; the pre-configured, full-stack, development, test, qc, and production environments.
+Welcome to devopsgroup.io Release Management; the pre-configured, full-stack, development, test, quality control, and production environments.
 
-## Setup ##
+## Services Setup ##
 
-Release Management uses several APIs to pull everything off - below is a list of the required accounts and setup steps. All of the configuration is placed in configuration.yml, which is initialized from configuration.yml.example
+devopsgroup.io Release Management uses several third-party services to pull everything off - below is a list of the required services and setup steps. All of the configuration is placed in configuration.yml, which is initialized from configuration.yml.example
 
 1. DigitalOcean Sign-Up and Configuration
     1. Create an account at http://digitalocean.com
@@ -30,6 +30,24 @@ Release Management uses several APIs to pull everything off - below is a list of
     3. Go to your Elastic Bamboo configuration https://[your-name-here].atlassian.net/builds/admin/elastic/editElasticConfig.action
         1. Set your AWS EC2 "Bamboo" Access Key ID and Secret Access Key
 
+## Developer Setup ##
+
+devopsgroup.io Release Management is controlled via Vagrant and the command line - below is a list of required software.
+
+1. Vagrant
+    1. Please download and install from https://www.vagrantup.com/downloads.html
+2. VirtualBox
+    1. Please download and install from https://www.virtualbox.org/wiki/Downloads
+3. SourceTree
+    1. Please download and install from https://www.sourcetreeapp.com/
+4. Sublime Text 3
+    1. Please download and install from http://www.sublimetext.com/3
+
 ## Usage ##
 
-Release Management is centered around web and database servers. The web and database servers are provisioned (created) via Vagrant and automatically continuously integrated (when new code is detected) via Bamboo.
+devopsgroup.io Release Management is centered around web and database servers. The web and database servers are provisioned (created) via Vagrant and continuously integrated (when new code is detected) via Bamboo. *Please Note: It is advised to turn off any antivirus software that you may installed during Developer Setup and Usage of devopsgroup.io Release Management as necessary tasks such as forwarding ports and writing hosts files may be blocked.
+
+1. Clone devopsgroup.io Release Management
+    1. Clone https://github.com/devopsgroup-io/release-management via SourceTree or the git utility of your choice.
+2. Once the devopsgroup.io Release Management repository is cloned, open your command line of choice and cd into the newly cloned ~/release-management repository (~ stands for your home folder, i.e. /Users/reeser/)
+3. From here, you will need to install any of the required Vagrant plugins. To see these, run the vagrant status command and any Vagrant plugins that you do not have installed, will be displayed with the command to install.
