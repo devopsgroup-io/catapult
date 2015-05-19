@@ -4,6 +4,20 @@ Copyright (c) 2015 devopsgroup.io - Seth Reeser
 
 Welcome to devopsgroup.io Release Management; the pre-configured, full-stack, development, test, quality control, and production environments.
 
+## Supported Software ##
+
+devopsgroup.io Release Management currently supports the following software:
+
+* CodeIgniter 2.x
+* Drupal 6.x, Drupal 7.x
+    * as required by Drush 7.0.0-rc1
+* WordPress 3.5.2+, WordPress 4.x
+    * as required by WP-CLI
+
+# Setup #
+
+devopsgroup.io Release Management requires a Services Setup and Developer Setup as described in the following two sections.
+
 ## Services Setup ##
 
 devopsgroup.io Release Management uses several third-party services to pull everything off - below is a list of the required services and setup steps. All of the configuration is placed in configuration.yml, which is initialized from configuration.yml.example
@@ -43,7 +57,7 @@ devopsgroup.io Release Management is controlled via Vagrant and the command line
 4. Sublime Text 3
     1. Please download and install from http://www.sublimetext.com/3
 
-## Usage ##
+# Usage #
 
 devopsgroup.io Release Management is centered around web and database servers. The web and database servers are provisioned (created) via Vagrant and continuously integrated (when new code is detected) via Bamboo. **Please Note:** It is advised to turn off any antivirus software that you may installed during Developer Setup and Usage of devopsgroup.io Release Management as necessary tasks such as forwarding ports and writing hosts files may be blocked.
 
