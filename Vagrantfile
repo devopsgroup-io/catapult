@@ -235,9 +235,9 @@ Vagrant.configure("2") do |config|
       provider.memory = 512
       provider.cpus = 1
     end
-    config.vm.synced_folder ".", "/vagrant"
     config.vm.provision :hostmanager
     config.hostmanager.aliases = redhathostsfile
+    config.vm.synced_folder ".", "/vagrant"
     config.vm.provision "shell", path: "provisioners/redhat/provision.sh", args: ["dev","#{configuration_user["settings"]["git_pull"]}","#{configuration_user["settings"]["production_rsync"]}","#{configuration_user["settings"]["software_validation"]}"]
   end
 
@@ -255,7 +255,44 @@ Vagrant.configure("2") do |config|
       provider.ipv6 = true
       provider.backups_enabled = true
     end
-    config.vm.provision "shell", path: "provisioners/redhat/provision.sh", args: ["test",true,false,true]
+    config.vm.synced_folder ".", "/vagrant", type: "rsync"
+    config.vm.provision "shell", path: "provisioners/redhat/provision.sh", args: ["test","true","false","true"]
+  end
+
+
+  # quality control servers
+  config.vm.define "#{configuration["company"]["name"]}-qc-redhat" do |config|
+    config.vm.provider :digital_ocean do |provider,override|
+      override.ssh.private_key_path = "provisioners/.ssh/id_rsa"
+      override.vm.box = "digital_ocean"
+      override.vm.box_url = "https://github.com/smdahlen/vagrant-digitalocean/raw/master/box/digital_ocean.box"
+      provider.token = configuration["company"]["digitalocean_personal_access_token"]
+      provider.image = "centos-7-0-x64"
+      provider.region = "nyc3"
+      provider.size = "512mb"
+      provider.ipv6 = true
+      provider.backups_enabled = true
+    end
+    config.vm.synced_folder ".", "/vagrant", type: "rsync"
+    config.vm.provision "shell", path: "provisioners/redhat/provision.sh", args: ["qc","true","false","true"]
+  end
+
+
+  # production servers
+  config.vm.define "#{configuration["company"]["name"]}-production-redhat" do |config|
+    config.vm.provider :digital_ocean do |provider,override|
+      override.ssh.private_key_path = "provisioners/.ssh/id_rsa"
+      override.vm.box = "digital_ocean"
+      override.vm.box_url = "https://github.com/smdahlen/vagrant-digitalocean/raw/master/box/digital_ocean.box"
+      provider.token = configuration["company"]["digitalocean_personal_access_token"]
+      provider.image = "centos-7-0-x64"
+      provider.region = "nyc3"
+      provider.size = "512mb"
+      provider.ipv6 = true
+      provider.backups_enabled = true
+    end
+    config.vm.synced_folder ".", "/vagrant", type: "rsync"
+    config.vm.provision "shell", path: "provisioners/redhat/provision.sh", args: ["production","true","false","true"]
   end
 
 

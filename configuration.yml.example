@@ -40,7 +40,7 @@ environments:
       wordpress:
         admin_password: "password"
   test:
-    branch: "master"
+    branch: "develop"
   qc:
     branch: "master"
   production:

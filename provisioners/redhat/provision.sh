@@ -38,54 +38,6 @@ end=$(date +%s)
 echo "[$(date)] Configuring time ($(($end - $start)) seconds" >> /vagrant/provisioners/redhat_mysql/logs/provision.log
 
 
-echo -e "\n\n==> Configuring git repositories (This may take a while...)"
-start=$(date +%s)
-# clone/pull necessary repos
-# the commented ssh commands was an attempt, which worked, but was slow and setting up git ssh on windows was not practical
-#sudo touch ~/.ssh/known_hosts
-#sudo ssh-keyscan bitbucket.org >> ~/.ssh/known_hosts
-# link repositories to webroot
-ln -s /vagrant/repositories /var/www/repositories
-while IFS='' read -r -d '' key; do
-    domain=$(echo "$key" | grep -w "domain" | cut -d ":" -f 2 | tr -d " ")
-    repo=$(echo "$key" | grep -w "repo" | cut -d ":" -f 2,3 | tr -d " ")
-    repo=$(echo "$repo" | sed -r "s/:\/\//:\/\/$(cat /vagrant/configuration.yml | shyaml get-value company.bitbucket_user):$(cat /vagrant/configuration.yml | shyaml get-value company.bitbucket_user_password)@/g")
-    echo "NOTICE: $domain"
-    if [ -d "/vagrant/repositories/apache/$domain/.git" ]; then
-        if [ "$(cd /vagrant/repositories/apache/$domain && git config --get remote.origin.url)" != "$repo" ]; then
-            echo "the repo has changed in configuration.yml, removing and cloning the new repository." | sed "s/^/\t/"
-            sudo rm -rf /vagrant/repositories/apache/$domain
-            git clone --recursive -b $(cat /vagrant/configuration.yml | shyaml get-value environments.$1.branch) $repo /vagrant/repositories/apache/$domain | sed "s/^/\t/"
-        elif [ "$settings_git_pull" = true ]; then
-            #cd /vagrant/repositories/apache/$domain && sudo ssh-agent bash -c "ssh-add /vagrant/provisioners/release-management; git pull origin $(cat /vagrant/configuration.yml | shyaml get-value environments.$1.branch)"
-            cd /vagrant/repositories/apache/$domain && git pull origin $(cat /vagrant/configuration.yml | shyaml get-value environments.$1.branch) | sed "s/^/\t/"
-        elif [ "$settings_git_pull" = false ]; then
-            echo "[provisioner argument false!] skipping git pull" | sed "s/^/\t/"
-        fi
-    else
-        #sudo ssh-agent bash -c "ssh-add /vagrant/provisioners/release-management; git clone --recursive -b $(cat /vagrant/configuration.yml | shyaml get-value environments.$1.branch) $repo /vagrant/repositories/apache/$domain"
-        git clone --recursive -b $(cat /vagrant/configuration.yml | shyaml get-value environments.$1.branch) $repo /vagrant/repositories/apache/$domain
-    fi
-done < <(cat /vagrant/configuration.yml | shyaml get-values-0 websites.apache)
-
-# create an array of domains
-domains=()
-while IFS='' read -r -d '' key; do
-    domain=$(echo "$key" | grep -w "domain" | cut -d ":" -f 2 | tr -d " ")
-    domains+=($domain)
-done < <(cat /vagrant/configuration.yml | shyaml get-values-0 websites.apache)
-# cleanup directories from domains array
-for directory in /vagrant/repositories/apache/*/; do
-    domain=$(basename $directory)
-    if ! [[ ${domains[*]} =~ $domain ]]; then
-        echo "Website does not exist in configuration.yaml, removing $directory ..."
-        sudo rm -rf $directory
-    fi
-done
-end=$(date +%s)
-echo "[$(date)] Configuring git repositories ($(($end - $start)) seconds" >> /vagrant/provisioners/redhat_mysql/logs/provision.log
-
-
 echo -e "\n\n==> Installing PHP"
 start=$(date +%s)
 #@todo think about having directive per website that lists php module dependancies
@@ -127,6 +79,54 @@ end=$(date +%s)
 echo "[$(date)] Installing Apache ($(($end - $start)) seconds)" >> /vagrant/provisioners/redhat/logs/provision.log
 
 
+echo -e "\n\n==> Configuring git repositories (This may take a while...)"
+start=$(date +%s)
+# clone/pull necessary repos
+# the commented ssh commands was an attempt, which worked, but was slow and setting up git ssh on windows was not practical
+#sudo touch ~/.ssh/known_hosts
+#sudo ssh-keyscan bitbucket.org >> ~/.ssh/known_hosts
+# link /vagrant/repositories to webroot
+sudo ln -s /vagrant/repositories /var/www/repositories
+while IFS='' read -r -d '' key; do
+    domain=$(echo "$key" | grep -w "domain" | cut -d ":" -f 2 | tr -d " ")
+    repo=$(echo "$key" | grep -w "repo" | cut -d ":" -f 2,3 | tr -d " ")
+    repo=$(echo "$repo" | sed -r "s/:\/\//:\/\/$(cat /vagrant/configuration.yml | shyaml get-value company.bitbucket_user):$(cat /vagrant/configuration.yml | shyaml get-value company.bitbucket_user_password)@/g")
+    echo "NOTICE: $domain"
+    if [ -d "/var/www/repositories/apache/$domain/.git" ]; then
+        if [ "$(cd /var/www/repositories/apache/$domain && git config --get remote.origin.url)" != "$repo" ]; then
+            echo "the repo has changed in configuration.yml, removing and cloning the new repository." | sed "s/^/\t/"
+            sudo rm -rf /var/www/repositories/apache/$domain
+            git clone --recursive -b $(cat /vagrant/configuration.yml | shyaml get-value environments.$1.branch) $repo /var/www/repositories/apache/$domain | sed "s/^/\t/"
+        elif [ "$settings_git_pull" = true ]; then
+            #cd /var/www/repositories/apache/$domain && sudo ssh-agent bash -c "ssh-add /vagrant/provisioners/release-management; git pull origin $(cat /vagrant/configuration.yml | shyaml get-value environments.$1.branch)"
+            cd /var/www/repositories/apache/$domain && git pull origin $(cat /vagrant/configuration.yml | shyaml get-value environments.$1.branch) | sed "s/^/\t/"
+        elif [ "$settings_git_pull" = false ]; then
+            echo "[provisioner argument false!] skipping git pull" | sed "s/^/\t/"
+        fi
+    else
+        #sudo ssh-agent bash -c "ssh-add /vagrant/provisioners/release-management; git clone --recursive -b $(cat /vagrant/configuration.yml | shyaml get-value environments.$1.branch) $repo /var/www/repositories/apache/$domain"
+        git clone --recursive -b $(cat /vagrant/configuration.yml | shyaml get-value environments.$1.branch) $repo /var/www/repositories/apache/$domain
+    fi
+done < <(cat /vagrant/configuration.yml | shyaml get-values-0 websites.apache)
+
+# create an array of domains
+domains=()
+while IFS='' read -r -d '' key; do
+    domain=$(echo "$key" | grep -w "domain" | cut -d ":" -f 2 | tr -d " ")
+    domains+=($domain)
+done < <(cat /vagrant/configuration.yml | shyaml get-values-0 websites.apache)
+# cleanup directories from domains array
+for directory in /var/www/repositories/apache/*/; do
+    domain=$(basename $directory)
+    if ! [[ ${domains[*]} =~ $domain ]]; then
+        echo "Website does not exist in configuration.yaml, removing $directory ..."
+        sudo rm -rf $directory
+    fi
+done
+end=$(date +%s)
+echo "[$(date)] Configuring git repositories ($(($end - $start)) seconds" >> /vagrant/provisioners/redhat_mysql/logs/provision.log
+
+
 echo -e "\n\n==> Configuring Apache"
 start=$(date +%s)
 # set variables from configuration.yml
@@ -158,7 +158,7 @@ fi
 sudo mkdir -p /etc/httpd/sites-available
 sudo mkdir -p /etc/httpd/sites-enabled
 if ! grep -q "IncludeOptional sites-enabled/*.conf" "/etc/httpd/conf/httpd.conf"; then
-   sudo bash -c 'echo "IncludeOptional sites-enabled/*.conf" >> /etc/httpd/conf/httpd.conf'
+   sudo bash -c 'echo "IncludeOptional sites-enabled/*.conf" >> "/etc/httpd/conf/httpd.conf"'
 fi
 # supress the following message
 # httpd: Could not reliably determine the server's fully qualified domain name, using localhost.localdomain. Set the 'ServerName' directive globally to suppress this message
@@ -175,6 +175,10 @@ sudo rm -rf /var/log/httpd/*
 sudo rm -rf /etc/httpd/sites-available/*
 sudo rm -rf /etc/httpd/sites-enabled/*
 sudo cat /dev/null > /etc/httpd/conf.d/welcome.conf
+sudo apachectl stop
+sudo apachectl start
+sudo apachectl configtest
+sudo systemctl is-active httpd.service
 
 cat /vagrant/configuration.yml | shyaml get-values-0 websites.apache |
 while IFS='' read -r -d '' key; do
@@ -186,11 +190,6 @@ while IFS='' read -r -d '' key; do
     fi
     domainvaliddbname=$(echo "$key" | grep -w "domain" | cut -d ":" -f 2 | tr -d " " | tr "." "_")
     software=$(echo "$key" | grep -w "software" | cut -d ":" -f 2 | tr -d " ")
-    if [ "$software" = "veeva" ]; then
-        options="+Indexes +FollowSymlinks"
-    else
-        options="-Indexes +FollowSymlinks"
-    fi
     software_dbprefix=$(echo "$key" | grep -w "software_dbprefix" | cut -d ":" -f 2 | tr -d " ")
     webroot=$(echo "$key" | grep -w "webroot" | cut -d ":" -f 2 | tr -d " ")
 
@@ -211,7 +210,6 @@ while IFS='' read -r -d '' key; do
         ServerName $domain_environment
         ServerAlias www.$domain_environment
         DocumentRoot /var/www/repositories/apache/$domain/$webroot
-        Options $options
         ErrorLog /var/log/httpd/$domain_environment/error.log
         CustomLog /var/log/httpd/$domain_environment/access.log combined
 
@@ -224,7 +222,6 @@ while IFS='' read -r -d '' key; do
             ServerName $domain_environment
             ServerAlias www.$domain_environment
             DocumentRoot /var/www/repositories/apache/$domain/$webroot
-            Options $options
             ErrorLog /var/log/httpd/$domain_environment/error.log
             CustomLog /var/log/httpd/$domain_environment/access.log combined
 
@@ -244,7 +241,7 @@ while IFS='' read -r -d '' key; do
     # allow .htaccess in apache 2.4+
     <Directory "/var/www/repositories/apache/$domain/$webroot">
         AllowOverride All
-        Options $options
+        Options -Indexes +FollowSymlinks
     </Directory>
 
 EOF
@@ -266,14 +263,14 @@ EOF
               echo -e "\t[not connected to rackspace vpn!] skipping $software ~/sites/default/files/ file sync"
             else
               echo -e "\tconnected to rackspace vpn - rysncing $software ~/sites/default/files/"
-              rsync -rz -e "ssh -oStrictHostKeyChecking=no -i /vagrant/provisioners/.ssh/id_rsa" $(cat /vagrant/configuration.yml | shyaml get-value environments.production.servers.rackspace.web1_ssh_user)@$(cat /vagrant/configuration.yml | shyaml get-value environments.production.servers.rackspace.web1_ip):/var/www/html/$domain/sites/default/files/ /vagrant/repositories/apache/$domain/sites/default/files/
+              rsync -rz -e "ssh -oStrictHostKeyChecking=no -i /vagrant/provisioners/.ssh/id_rsa" $(cat /vagrant/configuration.yml | shyaml get-value environments.production.servers.rackspace.web1_ssh_user)@$(cat /vagrant/configuration.yml | shyaml get-value environments.production.servers.rackspace.web1_ip):/var/www/html/$domain/sites/default/files/ /var/www/repositories/apache/$domain/sites/default/files/
             fi
             if [ "$settings_software_validation" = false ]; then
                 echo -e "\t[provisioner argument false!] skipping $software information"
             else
                 echo -e "\t$software information"
-                cd "/vagrant/repositories/apache/$domain/" && drush core-status --field-labels=0 --fields=drupal-version | sed "s/^/\t/"
-                cd "/vagrant/repositories/apache/$domain/" && drush pm-updatestatus --format=table | sed "s/^/\t/"
+                cd "/var/www/repositories/apache/$domain/" && drush core-status --field-labels=0 --fields=drupal-version | sed "s/^/\t/"
+                cd "/var/www/repositories/apache/$domain/" && drush pm-updatestatus --format=table | sed "s/^/\t/"
             fi
     elif [ "$software" = "drupal7" ]; then
             echo -e "\tgenerating $software database configuration file"
@@ -285,14 +282,14 @@ EOF
               echo -e "\t[not connected to rackspace vpn!] skipping $software ~/sites/default/files/ file sync"
             else
               echo -e "\tconnected to rackspace vpn - rysncing $software ~/sites/default/files/"
-              rsync -rz -e "ssh -oStrictHostKeyChecking=no -i /vagrant/provisioners/.ssh/id_rsa" $(cat /vagrant/configuration.yml | shyaml get-value environments.production.servers.rackspace.web1_ssh_user)@$(cat /vagrant/configuration.yml | shyaml get-value environments.production.servers.rackspace.web1_ip):/var/www/html/$domain/sites/default/files/ /vagrant/repositories/apache/$domain/sites/default/files/
+              rsync -rz -e "ssh -oStrictHostKeyChecking=no -i /vagrant/provisioners/.ssh/id_rsa" $(cat /vagrant/configuration.yml | shyaml get-value environments.production.servers.rackspace.web1_ssh_user)@$(cat /vagrant/configuration.yml | shyaml get-value environments.production.servers.rackspace.web1_ip):/var/www/html/$domain/sites/default/files/ /var/www/repositories/apache/$domain/sites/default/files/
             fi
             if [ "$settings_software_validation" = false ]; then
                 echo -e "\t[provisioner argument false!] skipping $software information"
             else
                 echo -e "\t$software information"
-                cd "/vagrant/repositories/apache/$domain/" && drush core-status --field-labels=0 --fields=drupal-version | sed "s/^/\t/"
-                cd "/vagrant/repositories/apache/$domain/" && drush pm-updatestatus --format=table | sed "s/^/\t/"
+                cd "/var/www/repositories/apache/$domain/" && drush core-status --field-labels=0 --fields=drupal-version | sed "s/^/\t/"
+                cd "/var/www/repositories/apache/$domain/" && drush pm-updatestatus --format=table | sed "s/^/\t/"
             fi
     elif [ "$software" = "wordpress" ]; then
             echo -e "\tgenerating $software database configuration file"
@@ -303,16 +300,16 @@ EOF
               echo -e "\t[not connected to rackspace vpn!] skipping $software ~/sites/default/files/ file sync"
             else
               echo -e "\tconnected to rackspace vpn - rysncing $software ~/wp-content/"
-              rsync -rz -e "ssh -oStrictHostKeyChecking=no -i /vagrant/provisioners/.ssh/id_rsa" $(cat /vagrant/configuration.yml | shyaml get-value environments.production.servers.rackspace.web1_ssh_user)@$(cat /vagrant/configuration.yml | shyaml get-value environments.production.servers.rackspace.web1_ip):/var/www/html/$domain/wp-content/ /vagrant/repositories/apache/$domain/wp-content/
+              rsync -rz -e "ssh -oStrictHostKeyChecking=no -i /vagrant/provisioners/.ssh/id_rsa" $(cat /vagrant/configuration.yml | shyaml get-value environments.production.servers.rackspace.web1_ssh_user)@$(cat /vagrant/configuration.yml | shyaml get-value environments.production.servers.rackspace.web1_ip):/var/www/html/$domain/wp-content/ /var/www/repositories/apache/$domain/wp-content/
             fi
             if [ "$settings_software_validation" = false ]; then
                 echo -e "\t[provisioner argument false!] skipping $software information"
             else
                 echo -e "\t$software information"
-                php /vagrant/provisioners/redhat/installers/wp-cli.phar --path="/vagrant/repositories/apache/$domain/" core version | sed "s/^/\t/"
-                php /vagrant/provisioners/redhat/installers/wp-cli.phar --path="/vagrant/repositories/apache/$domain/" core verify-checksums | sed "s/^/\t/"
-                php /vagrant/provisioners/redhat/installers/wp-cli.phar --path="/vagrant/repositories/apache/$domain/" plugin list | sed "s/^/\t/"
-                php /vagrant/provisioners/redhat/installers/wp-cli.phar --path="/vagrant/repositories/apache/$domain/" theme list | sed "s/^/\t/"
+                php /vagrant/provisioners/redhat/installers/wp-cli.phar --path="/var/www/repositories/apache/$domain/" core version | sed "s/^/\t/"
+                php /vagrant/provisioners/redhat/installers/wp-cli.phar --path="/var/www/repositories/apache/$domain/" core verify-checksums | sed "s/^/\t/"
+                php /vagrant/provisioners/redhat/installers/wp-cli.phar --path="/var/www/repositories/apache/$domain/" plugin list | sed "s/^/\t/"
+                php /vagrant/provisioners/redhat/installers/wp-cli.phar --path="/var/www/repositories/apache/$domain/" theme list | sed "s/^/\t/"
             fi
     fi
 
