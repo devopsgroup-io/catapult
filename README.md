@@ -45,7 +45,7 @@ devopsgroup.io Release Management is controlled via Vagrant and the command line
 
 ## Usage ##
 
-devopsgroup.io Release Management is centered around web and database servers. The web and database servers are provisioned (created) via Vagrant and continuously integrated (when new code is detected) via Bamboo. *Please Note:* It is advised to turn off any antivirus software that you may installed during Developer Setup and Usage of devopsgroup.io Release Management as necessary tasks such as forwarding ports and writing hosts files may be blocked.
+devopsgroup.io Release Management is centered around web and database servers. The web and database servers are provisioned (created) via Vagrant and continuously integrated (when new code is detected) via Bamboo. **Please Note:** It is advised to turn off any antivirus software that you may installed during Developer Setup and Usage of devopsgroup.io Release Management as necessary tasks such as forwarding ports and writing hosts files may be blocked.
 
 1. Clone devopsgroup.io Release Management
     1. Clone https://github.com/devopsgroup-io/release-management via SourceTree or the git utility of your choice.
