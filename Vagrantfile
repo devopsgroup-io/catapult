@@ -3,6 +3,9 @@
 
 
 # check for vagrant plugins
+unless Vagrant.has_plugin?("vagrant-digitalocean")
+  raise 'vagrant-hostmanager is not installed, please run "vagrant plugin install vagrant-digitalocean"'
+end
 unless Vagrant.has_plugin?("vagrant-hostmanager")
   raise 'vagrant-hostmanager is not installed, please run "vagrant plugin install vagrant-hostmanager"'
 end
