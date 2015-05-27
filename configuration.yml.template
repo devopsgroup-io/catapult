@@ -1,5 +1,4 @@
 # Release Management Configuration File
-# @todo gpg encrypt this file - install gpg on redhat*/windows*
 
 software:
   name: "devopsgroup.io Release Management"
@@ -9,7 +8,7 @@ company:
   name: "devopsgroup.io"
   bitbucket_user: ""
   bitbucket_user_password: ""
-  digitalocean_personal_access_token: "" #https://cloud.digitalocean.com/settings/applications
+  digitalocean_personal_access_token: ""
   credit: "Seth Reeser"
   email: "blackhole@devopsgroup.io"
   timezone_redhat: "America/New_York" #timedatectl list-timezones
@@ -58,7 +57,6 @@ environments:
 #         "drupal6"       generates drupal6 db config file ~/sites/default/settings.php, resets drupal6 admin password, rsyncs ~/sites/default/files from production source, restores database from the repos ~/_sql folder
 #         "drupal7"       generates drupal7 db config file ~/sites/default/settings.php, resets drupal7 admin password, rsyncs ~/sites/default/files from production source, restores database from the repos ~/_sql folder
 #         "wordpress"     generates wordpress db config file ~/installers/wp-config.php, resets wordpress admin password, rsyncs ~/wp-content/uploads from production source, restores database from the repos ~/_sql folder
-#         "veeva"         allows directory browsing from the webroot
 #       software_dbprefix:
 #         "main_"         usually used in drupal for multisite installations
 #       webroot:

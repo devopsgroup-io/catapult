@@ -4,7 +4,7 @@
 
 # check for vagrant plugins
 unless Vagrant.has_plugin?("vagrant-hostmanager")
-  raise 'vagrant-hostmanager is not installed, please run vagrant plugin install vagrant-hostmanager'
+  raise 'vagrant-hostmanager is not installed, please run "vagrant plugin install vagrant-hostmanager"'
 end
 
 
@@ -17,20 +17,55 @@ if ["up","provision"].include?(ARGV[0])
 end
 
 
+# bootstrap configuration-user.yml
+require "fileutils"
+require "yaml"
+# generate configuration-user.yml file if it does not exist
+if not File.exist?("configuration-user.yml")
+  FileUtils.cp("configuration-user.yml.template", "configuration-user.yml")
+end
+# parse configuration-user.yml and configuration-user.yml.template file
+configuration_user = YAML.load_file("configuration-user.yml")
+configuration_user_example = YAML.load_file("configuration-user.yml.template")
+# ensure version is up-to-date
+if configuration_user["settings"]["version"] != configuration_user_example["settings"]["version"]
+  puts "\nYour configuration-user.yml file is out of date. To retain your settings please manually merge entries from configuration-user.yml.template to configuration-user.yml with your specific settings."
+  puts "*You may also delete your configuration-user.yml and re-run any vagrant command to have a vanilla version created.\n\n"
+  exit 1
+end
+# check for required fields
+if configuration_user["settings"]["gpg_key"] == "" || configuration_user["settings"]["gpg_key"].match(/\s/) || configuration_user["settings"]["gpg_key"].length < 20
+  puts "\nPlease set your team's gpg_key in configuration-user.yml - spaces are not permitted and must be at least 20 characters.\n\n"
+  exit 1
+end
+
+
 # bootstrap configuration.yml
 require "fileutils"
 require "yaml"
-# generate configuration.yml file if it does not exist
-if not File.exist?("configuration.yml")
-  FileUtils.cp("configuration.yml.example", "configuration.yml")
+# initialize configuration.yml.gpg
+if File.zero?("configuration.yml.gpg")
+  `gpg2 --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output configuration.yml.gpg --armor --symmetric configuration.yml.template`
 end
-# parse configuration.yml file
-configuration = YAML.load_file("configuration.yml")
-configuration_example = YAML.load_file("configuration.yml.example")
+if configuration_user["settings"]["gpg_edit"]
+  # encrypt configuration.yml as configuration.yml.gpg
+  `gpg2 --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output configuration.yml.gpg --armor --symmetric configuration.yml`
+else
+  # decrypt configuration.yml.gpg as configuration.yml
+  `gpg2 --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output configuration.yml --decrypt configuration.yml.gpg`
+end
+# parse configuration.yml file and configuration.yml.template
+configuration = YAML.load(`gpg2 --batch --passphrase "#{configuration_user["settings"]["gpg_key"]}" --decrypt configuration.yml.gpg`)
+configuration_example = YAML.load_file("configuration.yml.template")
 # ensure version is up-to-date
 if configuration["software"]["version"] != configuration_example["software"]["version"]
-  puts "\nYour configuration.yml file is out of date. To retain your settings please manually duplicate entries from configuration.yml.example with your specific settings."
+  puts "\nYour configuration.yml file is out of date. To retain your settings please manually duplicate entries from configuration.yml.template with your specific settings."
   puts "*You may also delete your configuration.yml and re-run any vagrant command to have a vanilla version created.\n\n"
+  exit 1
+end
+# check for required fields
+if configuration["company"]["digitalocean_personal_access_token"] == ""
+  puts "\nPlease set your company's digitalocean_personal_access_token in configuration.yml.\n\n"
   exit 1
 end
 # ensure domains are in alpha order
@@ -46,24 +81,6 @@ configuration["websites"].each do |service,data|
     puts "\nThe domains in configuration.yml are not in alpha order for //websites//#{service} - please adjust.\n\n"
     exit 1
   end
-end
-
-
-# bootstrap configuration-user.yml
-require "fileutils"
-require "yaml"
-# generate configuration-user.yml file if it does not exist
-if not File.exist?("configuration-user.yml")
-  FileUtils.cp("configuration-user.yml.example", "configuration-user.yml")
-end
-# parse configuration-user.yml and configuration-user.yml.example file
-configuration_user = YAML.load_file("configuration-user.yml")
-configuration_user_example = YAML.load_file("configuration-user.yml.example")
-# ensure version is up-to-date
-if configuration_user["settings"]["version"] != configuration_user_example["settings"]["version"]
-  puts "\nYour configuration-user.yml file is out of date. To retain your settings please manually duplicate entries from configuration-user.yml.example with your specific settings."
-  puts "*You may also delete your configuration-user.yml and re-run any vagrant command to have a vanilla version created.\n\n"
-  exit 1
 end
 
 
@@ -237,7 +254,8 @@ Vagrant.configure("2") do |config|
     end
     config.vm.provision :hostmanager
     config.hostmanager.aliases = redhathostsfile
-    config.vm.synced_folder ".", "/vagrant"
+    config.vm.synced_folder ".", "/vagrant", type: "nfs"
+    config.vm.synced_folder "repositories", "/var/www/repositories", type: "nfs"
     config.vm.provision "shell", path: "provisioners/redhat/provision.sh", args: ["dev","#{configuration_user["settings"]["git_pull"]}","#{configuration_user["settings"]["production_rsync"]}","#{configuration_user["settings"]["software_validation"]}"]
   end
 
