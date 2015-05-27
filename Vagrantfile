@@ -87,6 +87,23 @@ configuration["websites"].each do |service,data|
 end
 
 
+# bootstrap ssh keys
+# id_rsa.gpg and id_rsa.pub.gpg will be blank initially
+if File.zero?("provisioners/.ssh/id_rsa.gpg") && File.zero?("provisioners/.ssh/id_rsa.pub.gpg")
+  # once the ssh keys are placed, encrypt them
+  if File.exist?("provisioners/.ssh/id_rsa") && File.exist?("provisioners/.ssh/id_rsa.pub")
+    `gpg2 --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output provisioners/.ssh/id_rsa.gpg --armor --symmetric provisioners/.ssh/id_rsa`
+    `gpg2 --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output provisioners/.ssh/id_rsa.pub.gpg --armor --symmetric provisioners/.ssh/id_rsa.pub`
+  else
+    puts "\nPlease place your team's ssh public (id_rsa.pub) and private key (id_rsa.pub) in provisioners/.ssh\n\n"
+    exit 1
+  end
+elsif
+  `gpg2 --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output provisioners/.ssh/id_rsa --decrypt provisioners/.ssh/id_rsa.gpg`
+  `gpg2 --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output provisioners/.ssh/id_rsa.pub --decrypt provisioners/.ssh/id_rsa.pub`
+end
+
+
 # print intro
 puts "\n"
 title = "#{configuration["software"]["name"]}"
