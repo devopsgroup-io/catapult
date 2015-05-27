@@ -100,7 +100,7 @@ if File.zero?("provisioners/.ssh/id_rsa.gpg") && File.zero?("provisioners/.ssh/i
   end
 elsif
   `gpg2 --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output provisioners/.ssh/id_rsa --decrypt provisioners/.ssh/id_rsa.gpg`
-  `gpg2 --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output provisioners/.ssh/id_rsa.pub --decrypt provisioners/.ssh/id_rsa.pub`
+  `gpg2 --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output provisioners/.ssh/id_rsa.pub --decrypt provisioners/.ssh/id_rsa.pub.gpg`
 end
 
 
