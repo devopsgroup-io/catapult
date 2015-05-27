@@ -120,6 +120,7 @@ for directory in /var/www/repositories/apache/*/; do
     domain=$(basename $directory)
     if ! [[ ${domains[*]} =~ $domain ]]; then
         echo "Website does not exist in configuration.yaml, removing $directory ..."
+        sudo chmod 0777 -R $directory
         sudo rm -rf $directory
     fi
 done
