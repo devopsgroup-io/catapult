@@ -278,6 +278,17 @@ Vagrant.configure("2") do |config|
     config.vm.synced_folder "repositories", "/var/www/repositories", type: "nfs"
     config.vm.provision "shell", path: "provisioners/redhat/provision.sh", args: ["dev","#{configuration_user["settings"]["git_pull"]}","#{configuration_user["settings"]["production_rsync"]}","#{configuration_user["settings"]["software_validation"]}"]
   end
+  config.vm.define "#{configuration["company"]["name"]}-dev-redhat_mysql" do |config|
+    config.vm.box = "chef/centos-7.0"
+    config.vm.network "private_network", ip: configuration["environments"]["dev"]["servers"]["redhat_mysql"]["ip"]
+    config.vm.provider :virtualbox do |provider|
+      provider.memory = 512
+      provider.cpus = 1
+    end
+    config.vm.synced_folder ".", "/vagrant", type: "nfs"
+    config.vm.provision :hostmanager
+    config.vm.provision "shell", path: "provisioners/redhat_mysql/provision.sh", args: ["dev"]
+  end
 
 
   # test servers
@@ -295,6 +306,21 @@ Vagrant.configure("2") do |config|
     end
     config.vm.synced_folder ".", "/vagrant", type: "rsync"
     config.vm.provision "shell", path: "provisioners/redhat/provision.sh", args: ["test","true","false","true"]
+  end
+  config.vm.define "#{configuration["company"]["name"]}-test-redhat_mysql" do |config|
+    config.vm.provider :digital_ocean do |provider,override|
+      override.ssh.private_key_path = "provisioners/.ssh/id_rsa"
+      override.vm.box = "digital_ocean"
+      override.vm.box_url = "https://github.com/smdahlen/vagrant-digitalocean/raw/master/box/digital_ocean.box"
+      provider.token = configuration["company"]["digitalocean_personal_access_token"]
+      provider.image = "centos-7-0-x64"
+      provider.region = "nyc3"
+      provider.size = "512mb"
+      provider.ipv6 = true
+      provider.backups_enabled = true
+    end
+    config.vm.synced_folder ".", "/vagrant", type: "rsync"
+    config.vm.provision "shell", path: "provisioners/redhat_mysql/provision.sh", args: ["test"]
   end
 
 
@@ -314,6 +340,21 @@ Vagrant.configure("2") do |config|
     config.vm.synced_folder ".", "/vagrant", type: "rsync"
     config.vm.provision "shell", path: "provisioners/redhat/provision.sh", args: ["qc","true","false","true"]
   end
+  config.vm.define "#{configuration["company"]["name"]}-qc-redhat_mysql" do |config|
+    config.vm.provider :digital_ocean do |provider,override|
+      override.ssh.private_key_path = "provisioners/.ssh/id_rsa"
+      override.vm.box = "digital_ocean"
+      override.vm.box_url = "https://github.com/smdahlen/vagrant-digitalocean/raw/master/box/digital_ocean.box"
+      provider.token = configuration["company"]["digitalocean_personal_access_token"]
+      provider.image = "centos-7-0-x64"
+      provider.region = "nyc3"
+      provider.size = "512mb"
+      provider.ipv6 = true
+      provider.backups_enabled = true
+    end
+    config.vm.synced_folder ".", "/vagrant", type: "rsync"
+    config.vm.provision "shell", path: "provisioners/redhat_mysql/provision.sh", args: ["qc"]
+  end
 
 
   # production servers
@@ -332,19 +373,22 @@ Vagrant.configure("2") do |config|
     config.vm.synced_folder ".", "/vagrant", type: "rsync"
     config.vm.provision "shell", path: "provisioners/redhat/provision.sh", args: ["production","true","false","true"]
   end
-
-
-  config.vm.define "redhat_mysql" do |config|
-    config.vm.box = "chef/centos-7.0"
-    config.vm.network "private_network", ip: configuration["environments"]["dev"]["servers"]["redhat_mysql"]["ip"]
-    config.vm.provider :virtualbox do |provider|
-      provider.memory = 512
-      provider.cpus = 1
+  config.vm.define "#{configuration["company"]["name"]}-production-redhat_mysql" do |config|
+    config.vm.provider :digital_ocean do |provider,override|
+      override.ssh.private_key_path = "provisioners/.ssh/id_rsa"
+      override.vm.box = "digital_ocean"
+      override.vm.box_url = "https://github.com/smdahlen/vagrant-digitalocean/raw/master/box/digital_ocean.box"
+      provider.token = configuration["company"]["digitalocean_personal_access_token"]
+      provider.image = "centos-7-0-x64"
+      provider.region = "nyc3"
+      provider.size = "512mb"
+      provider.ipv6 = true
+      provider.backups_enabled = true
     end
-    config.vm.synced_folder ".", "/vagrant", type: "nfs"
-    config.vm.provision :hostmanager
-    config.vm.provision "shell", path: "provisioners/redhat_mysql/provision.sh", args: ["dev"]
+    config.vm.synced_folder ".", "/vagrant", type: "rsync"
+    config.vm.provision "shell", path: "provisioners/redhat_mysql/provision.sh", args: ["production"]
   end
+
 
   config.vm.define "windows" do |config|
     config.vm.box = "opentable/win-2008r2-standard-amd64-nocm"
