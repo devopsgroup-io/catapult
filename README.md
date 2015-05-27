@@ -17,6 +17,7 @@ devopsgroup.io Release Management currently supports the following software:
 # Setup #
 
 devopsgroup.io Release Management requires a Developer Setup, Instance Setup, and Services Setup as described in the following sections.
+**Please Note:** It is advised to turn off any antivirus software that you may have installed during Developer Setup and Usage of devopsgroup.io Release Management as necessary tasks such as forwarding ports and writing hosts files may be blocked.
 
 ## Developer Setup ##
 
@@ -78,4 +79,4 @@ devopsgroup.io Release Management uses several third-party services to pull ever
 
 # Usage #
 
-devopsgroup.io Release Management is centered around web and database servers. The web and database servers are provisioned (created) via Vagrant and continuously integrated (when new code is detected) via Bamboo. **Please Note:** It is advised to turn off any antivirus software that you may have installed during Developer Setup and Usage of devopsgroup.io Release Management as necessary tasks such as forwarding ports and writing hosts files may be blocked.
+devopsgroup.io Release Management is centered around web and database servers. The web and database servers are provisioned (created) via Vagrant and continuously integrated (when new code is detected) via Bamboo.
