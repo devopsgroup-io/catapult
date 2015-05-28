@@ -115,7 +115,7 @@ while IFS='' read -r -d '' key; do
             if [ -d "/vagrant/repositories/apache/$domain/_sql" ]; then
                 echo -e "NOTICE: $1.$domain"
                 echo -e "\t/repositories/$domain/_sql directory exists"
-                filenewest=$(ls "/vagrant/repositories/apache/$domain/_sql" | sort -n | tail -1)
+                filenewest=$(ls "/vagrant/repositories/apache/$domain/_sql" | grep \.sql$ | sort -n | tail -1)
                 for file in /vagrant/repositories/apache/$domain/_sql/*.*; do
                     filename=$(basename "$file")
                     filename="${filename%.*}"
