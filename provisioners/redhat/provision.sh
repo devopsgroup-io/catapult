@@ -74,7 +74,10 @@ echo "[$(date)] Installing Drush and WP-CLI ($(($end - $start)) seconds)" >> /va
 
 echo -e "\n\n==> Installing Apache"
 start=$(date +%s)
+# install httpd
 sudo yum install -y httpd
+sudo systemctl enable httpd.service
+sudo systemctl start httpd.service
 end=$(date +%s)
 echo "[$(date)] Installing Apache ($(($end - $start)) seconds)" >> /vagrant/provisioners/redhat/logs/provision.log
 
@@ -136,11 +139,6 @@ mysql_user_password="$(cat /vagrant/configuration.yml | shyaml get-value environ
 mysql_root_password="$(cat /vagrant/configuration.yml | shyaml get-value environments.$1.servers.redhat_mysql.mysql.root_password)"
 redhat_mysql_ip="$(cat /vagrant/configuration.yml | shyaml get-value environments.$1.servers.redhat_mysql.ip)"
 company_email="$(cat /vagrant/configuration.yml | shyaml get-value company.email)"
-
-# enable httpd at startup
-sudo systemctl enable httpd.service
-# start httpd
-sudo systemctl start httpd.service
 
 # rackspace web1 - are we connected to do rsync of drupal and wordpress files?
 # one time copy ssh key to rackspace web1 while vagrant ssh redhat
