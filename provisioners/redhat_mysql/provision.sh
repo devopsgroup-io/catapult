@@ -26,7 +26,7 @@ echo -e "\n\n==> Configuring time"
 start=$(date +%s)
 # set timezone
 sudo timedatectl set-timezone "$(cat /vagrant/configuration.yml | shyaml get-value company.timezone_redhat)"
-# configure ntp
+# install ntp
 sudo yum install -y ntp
 sudo systemctl enable ntpd.service
 sudo systemctl start ntpd.service
@@ -38,8 +38,10 @@ echo "[$(date)] Configuring time ($(($end - $start)) seconds" >> /vagrant/provis
 
 echo -e "\n\n==> Installing MySQL"
 start=$(date +%s)
-sudo rpm -Uvh http://dev.mysql.com/get/mysql-community-release-el7-5.noarch.rpm
-sudo yum install -y mysql-server
+# install mariadb
+sudo yum -y install mariadb mariadb-server
+sudo systemctl enable mariadb.service
+sudo systemctl start mariadb.service
 end=$(date +%s)
 echo "[$(date)] Installing MySQL ($(($end - $start)) seconds)" >> /vagrant/provisioners/redhat_mysql/logs/provision.log
 
@@ -53,11 +55,6 @@ mysql_root_password="$(cat /vagrant/configuration.yml | shyaml get-value environ
 drupal_admin_password="$(cat /vagrant/configuration.yml | shyaml get-value environments.$1.software.drupal.admin_password)"
 wordpress_admin_password="$(cat /vagrant/configuration.yml | shyaml get-value environments.$1.software.wordpress.admin_password)"
 company_email="$(cat /vagrant/configuration.yml | shyaml get-value company.email)"
-
-# enable mysqld at startup
-sudo systemctl enable mysqld.service
-# start mysqld
-sudo systemctl start mysqld.service
 
 # configure mysql conf so user/pass isn't logged in shell history or memory
 sudo cat > "/vagrant/provisioners/redhat_mysql/installers/$1.cnf" << EOF
