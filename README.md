@@ -32,7 +32,8 @@ devopsgroup.io Release Management is controlled via Vagrant and the command line
 4. Sublime Text 3
     1. Please download and install from http://www.sublimetext.com/3
 5. GPG2
-    1. By default, GPG2 is available on OS X and Linux. If you're developing on Windows, please download and install Gpg4win from http://gpg4win.org/download.html
+    * Using OSX ? Please download and install GPG Suite https://gpgtools.org
+    1. Using Windows? Please download and install Gpg4win from http://gpg4win.org/download.html
 
 ## Instance Setup ##
 
