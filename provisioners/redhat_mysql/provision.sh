@@ -64,9 +64,12 @@ user = "root"
 password = "$mysql_root_password"
 EOF
 dbconf="/vagrant/provisioners/redhat_mysql/installers/$1.cnf"
-# set root password
-# @todo this will error out on every provision past the first
-sudo mysqladmin -u root password "$mysql_root_password"
+
+# only set root password on fresh install of mysql
+if mysqladmin --defaults-extra-file=$dbconf ping 2>&1 | grep -q "failed"; then
+    sudo mysqladmin -u root password "$mysql_root_password"
+fi
+
 # disable remote root login
 mysql --defaults-extra-file=$dbconf -e "DELETE FROM mysql.user WHERE user='root' AND host NOT IN ('localhost', '127.0.0.1', '::1')"
 # remove anonymous user
@@ -158,7 +161,8 @@ while IFS='' read -r -d '' key; do
     fi
 
 done
-
+# remove .cnf file after usage
+sudo rm -f /vagrant/provisioners/redhat_mysql/installers/$1.cnf
 end=$(date +%s)
 echo "[$(date)] Configuring MySQL ($(($end - $start)) seconds)" >> /vagrant/provisioners/redhat_mysql/logs/provision.log
 
