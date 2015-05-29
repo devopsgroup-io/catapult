@@ -86,6 +86,6 @@ devopsgroup.io Release Management is centered around web and database servers. T
 
 To keep your fork updated with the latest from devopsgroup.io Release Management, please do the following.
 
-1. git remote add upstream git@github.com:devopsgroup-io/release-management.git
+1. git remote add upstream https://github.com/devopsgroup-io/release-management.git
 2. git fetch upstream
 3. git pull upstream master
