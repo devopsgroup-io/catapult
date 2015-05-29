@@ -51,7 +51,7 @@ if File.zero?("configuration.yml.gpg")
   `gpg --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output configuration.yml.gpg --armor --symmetric configuration.yml.template`
 end
 if configuration_user["settings"]["gpg_edit"]
-  if File.zero?("configuration.yml")
+  if not File.exist?("configuration.yml")
     # decrypt configuration.yml.gpg as configuration.yml
     `gpg --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output configuration.yml --decrypt configuration.yml.gpg`
   end
