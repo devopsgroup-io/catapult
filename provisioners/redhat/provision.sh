@@ -85,30 +85,30 @@ echo "[$(date)] Installing Apache ($(($end - $start)) seconds)" >> /vagrant/prov
 echo -e "\n\n==> Configuring git repositories (This may take a while...)"
 start=$(date +%s)
 # clone/pull necessary repos
-# the commented ssh commands was an attempt, which worked, but was slow and setting up git ssh on windows was not practical
-#sudo touch ~/.ssh/known_hosts
-#sudo ssh-keyscan bitbucket.org >> ~/.ssh/known_hosts
-# link /vagrant/repositories to webroot
-sudo ln -s /vagrant/repositories /var/www/repositories
+sudo mkdir -p ~/.ssh
+sudo touch ~/.ssh/known_hosts
+sudo ssh-keyscan bitbucket.org > ~/.ssh/known_hosts
+sudo ssh-keyscan github.com >> ~/.ssh/known_hosts
+# link /vagrant/repositories to webroot if not in dev, otherwise dev will use vagrant synced folder
+if [ "$1" != "dev" ]; then
+    sudo ln -s /vagrant/repositories /var/www/repositories
+fi
 while IFS='' read -r -d '' key; do
     domain=$(echo "$key" | grep -w "domain" | cut -d ":" -f 2 | tr -d " ")
     repo=$(echo "$key" | grep -w "repo" | cut -d ":" -f 2,3 | tr -d " ")
-    repo=$(echo "$repo" | sed -r "s/:\/\//:\/\/$(cat /vagrant/configuration.yml | shyaml get-value company.bitbucket_user):$(cat /vagrant/configuration.yml | shyaml get-value company.bitbucket_user_password)@/g")
     echo "NOTICE: $domain"
     if [ -d "/var/www/repositories/apache/$domain/.git" ]; then
         if [ "$(cd /var/www/repositories/apache/$domain && git config --get remote.origin.url)" != "$repo" ]; then
             echo "the repo has changed in configuration.yml, removing and cloning the new repository." | sed "s/^/\t/"
             sudo rm -rf /var/www/repositories/apache/$domain
-            git clone --recursive -b $(cat /vagrant/configuration.yml | shyaml get-value environments.$1.branch) $repo /var/www/repositories/apache/$domain | sed "s/^/\t/"
+            sudo ssh-agent bash -c "ssh-add /vagrant/provisioners/.ssh/id_rsa; git clone --recursive -b $(cat /vagrant/configuration.yml | shyaml get-value environments.$1.branch) $repo /var/www/repositories/apache/$domain" | sed "s/^/\t/"
         elif [ "$settings_git_pull" = true ]; then
-            #cd /var/www/repositories/apache/$domain && sudo ssh-agent bash -c "ssh-add /vagrant/provisioners/release-management; git pull origin $(cat /vagrant/configuration.yml | shyaml get-value environments.$1.branch)"
-            cd /var/www/repositories/apache/$domain && git pull origin $(cat /vagrant/configuration.yml | shyaml get-value environments.$1.branch) | sed "s/^/\t/"
+            cd /var/www/repositories/apache/$domain && sudo ssh-agent bash -c "ssh-add /vagrant/provisioners/.ssh/id_rsa; git pull origin $(cat /vagrant/configuration.yml | shyaml get-value environments.$1.branch)" | sed "s/^/\t/"
         elif [ "$settings_git_pull" = false ]; then
             echo "[provisioner argument false!] skipping git pull" | sed "s/^/\t/"
         fi
     else
-        #sudo ssh-agent bash -c "ssh-add /vagrant/provisioners/release-management; git clone --recursive -b $(cat /vagrant/configuration.yml | shyaml get-value environments.$1.branch) $repo /var/www/repositories/apache/$domain"
-        git clone --recursive -b $(cat /vagrant/configuration.yml | shyaml get-value environments.$1.branch) $repo /var/www/repositories/apache/$domain
+        sudo ssh-agent bash -c "ssh-add /vagrant/provisioners/.ssh/id_rsa; git clone --recursive -b $(cat /vagrant/configuration.yml | shyaml get-value environments.$1.branch) $repo /var/www/repositories/apache/$domain" | sed "s/^/\t/"
     fi
 done < <(cat /vagrant/configuration.yml | shyaml get-values-0 websites.apache)
 
@@ -166,8 +166,6 @@ if ! grep -q "ServerName localhost" "/etc/httpd/conf/httpd.conf"; then
 fi
 
 # @todo mod_ssl functionality: need certificate configured
-# @todo mod_rewrite functionality
-# sudo a2enmod rewrite
 
 # start fresh remove all logs, vhosts, and kill the welcome file
 sudo rm -rf /var/log/httpd/*

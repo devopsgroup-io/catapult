@@ -82,6 +82,39 @@ devopsgroup.io Release Management uses several third-party services to pull ever
 
 devopsgroup.io Release Management is centered around web and database servers. The web and database servers are provisioned (created) via Vagrant and continuously integrated (when new code is detected) via Bamboo.
 
+## Adding Websites ##
+
+Adding websites to devopsgroup.io is easy. Each website needs to be contained in its own repo on GitHub or Bitbucket. Websites are added to configuration.yml, a minimal addition looks like this:
+
+```
+- domain: "devopsgroup.io"
+  repo: "git@github.com:devopsgroup-io/devopsgroup-io.git"
+```
+
+The following options are available:
+
+* domain:
+    * "example.com"
+        * the domain name of what the website is/will be in production
+* repo:
+    * "git@github.com:devopsgroup-io/devopsgroup-io.git"
+        * GitHub and Bitbucket over SSH are supported, HTTPS is not supported
+* software:
+    * "codeigniter2"
+        * generates codeigniter2 db config file ~/application/config/database.php, restores database
+    * "drupal6"
+        * generates drupal6 db config file ~/sites/default/settings.php, resets drupal6 admin password, rsyncs ~/sites/default/files from production source, restores database
+    * "drupal7"
+        * generates drupal7 db config file ~/sites/default/settings.php, resets drupal7 admin password, rsyncs ~/sites/default/files from production source, restores database
+    * "wordpress"
+        * generates wordpress db config file ~/installers/wp-config.php, resets wordpress admin password, rsyncs ~/wp-content/uploads from production source, restores database
+* software_dbprefix:
+    * "wp_"
+        * usually used in drupal for multisite installations ("wp_ is required for base Wordpress installs, Drupal has no prefix by default")
+* webroot:
+    * "www"
+        * if the webroot differs from the repo root, specify it here
+
 ## Syncing Your Fork ##
 
 To keep your fork updated with the latest from devopsgroup.io Release Management, please do the following.
