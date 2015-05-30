@@ -78,6 +78,8 @@ start=$(date +%s)
 sudo yum install -y httpd
 sudo systemctl enable httpd.service
 sudo systemctl start httpd.service
+sudo yum install -y mod_ssl
+sudo bash /etc/ssl/certs/make-dummy-cert "/etc/ssl/certs/httpd-dummy-cert.key.cert"
 end=$(date +%s)
 echo "[$(date)] Installing Apache ($(($end - $start)) seconds)" >> /vagrant/provisioners/redhat/logs/provision.log
 
@@ -222,9 +224,9 @@ while IFS='' read -r -d '' key; do
             ErrorLog /var/log/httpd/$domain_environment/error.log
             CustomLog /var/log/httpd/$domain_environment/access.log combined
 
-            #SSLEngine on
-            #SSLCertificateFile /etc/ssl/certs/ssl-cert-snakeoil.pem
-            #SSLCertificateKeyFile /etc/ssl/private/ssl-cert-snakeoil.key
+            SSLEngine on
+            SSLCertificateFile /etc/ssl/certs/httpd-dummy-cert.key.cert
+            SSLCertificateKeyFile /etc/ssl/certs/httpd-dummy-cert.key.cert
             #<FilesMatch "\.(cgi|shtml|phtml|php)$">
             #    SSLOptions +StdEnvVars
             #</FilesMatch>
