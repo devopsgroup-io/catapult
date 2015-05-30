@@ -82,6 +82,12 @@ configuration["websites"].each do |service,data|
   configuration["websites"]["#{service}"].each do |instance|
     domains.push("#{instance["domain"]}")
     domains_sorted.push("#{instance["domain"]}")
+    if not "#{instance["webroot"]}" == ""
+      if not "#{instance["webroot"]}"[-1,1] == "/"
+        puts "\nThe webroot for #{instance["domain"]} must include a trailing slash - please adjust.\n\n"
+        exit 1
+      end
+    end
   end
   domains_sorted = domains_sorted.sort
   if domains != domains_sorted

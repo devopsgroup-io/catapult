@@ -114,6 +114,7 @@ The following options are available:
 * webroot:
     * "www"
         * if the webroot differs from the repo root, specify it here
+        * must include the trailing slash
 
 ## Syncing Your Fork ##
 
