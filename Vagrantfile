@@ -53,13 +53,13 @@ end
 if configuration_user["settings"]["gpg_edit"]
   if not File.exist?("configuration.yml")
     # decrypt configuration.yml.gpg as configuration.yml
-    `gpg --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output configuration.yml --decrypt configuration.yml.gpg`
+    `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output configuration.yml --decrypt configuration.yml.gpg`
   end
   # encrypt configuration.yml as configuration.yml.gpg
-  `gpg --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output configuration.yml.gpg --armor --cipher-algo AES256 --symmetric configuration.yml`
+  `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output configuration.yml.gpg --armor --cipher-algo AES256 --symmetric configuration.yml`
 else
   # decrypt configuration.yml.gpg as configuration.yml
-  `gpg --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output configuration.yml --decrypt configuration.yml.gpg`
+  `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output configuration.yml --decrypt configuration.yml.gpg`
 end
 # parse configuration.yml file and configuration.yml.template
 configuration = YAML.load(`gpg --batch --passphrase "#{configuration_user["settings"]["gpg_key"]}" --decrypt configuration.yml.gpg`)
@@ -97,16 +97,16 @@ if File.zero?("provisioners/.ssh/id_rsa.gpg") && File.zero?("provisioners/.ssh/i
   # once the ssh keys are placed, encrypt them
   if File.exist?("provisioners/.ssh/id_rsa") && File.exist?("provisioners/.ssh/id_rsa.pub")
     # encrypt id_rsa and id_rsa.pub
-    `gpg --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output provisioners/.ssh/id_rsa.gpg --armor --cipher-algo AES256 --symmetric provisioners/.ssh/id_rsa`
-    `gpg --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output provisioners/.ssh/id_rsa.pub.gpg --armor --cipher-algo AES256 --symmetric provisioners/.ssh/id_rsa.pub`
+    `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output provisioners/.ssh/id_rsa.gpg --armor --cipher-algo AES256 --symmetric provisioners/.ssh/id_rsa`
+    `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output provisioners/.ssh/id_rsa.pub.gpg --armor --cipher-algo AES256 --symmetric provisioners/.ssh/id_rsa.pub`
   else
     puts "\nPlease place your team's ssh public (id_rsa.pub) and private key (id_rsa.pub) in provisioners/.ssh\n\n"
     exit 1
   end
 elsif
   # decrypt id_rsa and id_rsa.pub
-  `gpg --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output provisioners/.ssh/id_rsa --decrypt provisioners/.ssh/id_rsa.gpg`
-  `gpg --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output provisioners/.ssh/id_rsa.pub --decrypt provisioners/.ssh/id_rsa.pub.gpg`
+  `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output provisioners/.ssh/id_rsa --decrypt provisioners/.ssh/id_rsa.gpg`
+  `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output provisioners/.ssh/id_rsa.pub --decrypt provisioners/.ssh/id_rsa.pub.gpg`
 end
 
 
