@@ -19,7 +19,8 @@ sudo yum update -y
 sudo yum install -y git
 # parse yaml
 sudo easy_install pip
-sudo pip install shyaml
+sudo pip install --upgrade pip
+sudo pip install shyaml --upgrade
 end=$(date +%s)
 echo "[$(date)] Updating existing packages and installing utilities ($(($end - $start)) seconds)" >> /vagrant/provisioners/redhat/logs/provision.log
 
