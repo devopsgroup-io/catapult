@@ -203,7 +203,8 @@ while IFS='' read -r -d '' key; do
 
     RewriteEngine On
 
-    <VirtualHost $domain_environment:80>
+    # must listen * to support cloudflare
+    <VirtualHost *:80>
 
         ServerAdmin $company_email
         ServerName $domain_environment
@@ -215,7 +216,8 @@ while IFS='' read -r -d '' key; do
     </VirtualHost> 
 
     <IfModule mod_ssl.c>
-        <VirtualHost $domain_environment:443>
+        # must listen * to support cloudflare
+        <VirtualHost *:443>
 
             ServerAdmin $company_email
             ServerName $domain_environment
