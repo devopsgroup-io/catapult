@@ -96,6 +96,9 @@ The following options are available:
 * domain:
     * "example.com"
         * the domain name of what the website is/will be in production
+* force_https:
+    * true
+        * rewrite all http traffic to https
 * repo:
     * "git@github.com:devopsgroup-io/devopsgroup-io.git"
         * GitHub and Bitbucket over SSH are supported, HTTPS is not supported

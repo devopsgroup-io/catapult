@@ -188,6 +188,7 @@ while IFS='' read -r -d '' key; do
         domain_environment=$1.$domain_environment
     fi
     domainvaliddbname=$(echo "$key" | grep -w "domain" | cut -d ":" -f 2 | tr -d " " | tr "." "_")
+    force_https=$(echo "$key" | grep -w "force_https" | cut -d ":" -f 2 | tr -d " ")
     software=$(echo "$key" | grep -w "software" | cut -d ":" -f 2 | tr -d " ")
     software_dbprefix=$(echo "$key" | grep -w "software_dbprefix" | cut -d ":" -f 2 | tr -d " ")
     webroot=$(echo "$key" | grep -w "webroot" | cut -d ":" -f 2 | tr -d " ")
@@ -199,6 +200,12 @@ while IFS='' read -r -d '' key; do
     sudo mkdir -p /var/log/httpd/$domain_environment
     sudo touch /var/log/httpd/$domain_environment/access.log
     sudo touch /var/log/httpd/$domain_environment/error.log
+    if [ "$force_https" = true ]; then
+        # rewrite all http traffic to https
+        force_https_value="Redirect Permanent / https://$domain_environment"
+    else
+        force_https_value=""
+    fi
     sudo cat > /etc/httpd/sites-available/$domain_environment.conf << EOF
 
     RewriteEngine On
@@ -212,6 +219,8 @@ while IFS='' read -r -d '' key; do
         DocumentRoot /var/www/repositories/apache/$domain/$webroot
         ErrorLog /var/log/httpd/$domain_environment/error.log
         CustomLog /var/log/httpd/$domain_environment/access.log combined
+
+        $force_https_value
 
     </VirtualHost> 
 
