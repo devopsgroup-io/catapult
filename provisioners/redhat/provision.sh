@@ -281,6 +281,8 @@ EOF
             else
                 echo "$software core version:" | sed "s/^/\t/"
                 cd "/vagrant/repositories/apache/$domain/" && drush core-status --field-labels=0 --fields=drupal-version 2>&1 | sed "s/^/\t\t/"
+                echo "$software core-requirements:" | sed "s/^/\t/"
+                cd "/vagrant/repositories/apache/$domain/" && drush core-requirements --severity=2 --format=table 2>&1 | sed "s/^/\t\t/"
                 echo "$software pm-updatestatus:" | sed "s/^/\t/"
                 cd "/vagrant/repositories/apache/$domain/" && drush pm-updatestatus --format=table 2>&1 | sed "s/^/\t\t/"
             fi
@@ -301,6 +303,8 @@ EOF
             else
                 echo "$software core version:" | sed "s/^/\t/"
                 cd "/vagrant/repositories/apache/$domain/" && drush core-status --field-labels=0 --fields=drupal-version 2>&1 | sed "s/^/\t\t/"
+                echo "$software core-requirements:" | sed "s/^/\t/"
+                cd "/vagrant/repositories/apache/$domain/" && drush core-requirements --severity=2 --format=table 2>&1 | sed "s/^/\t\t/"
                 echo "$software pm-updatestatus:" | sed "s/^/\t/"
                 cd "/vagrant/repositories/apache/$domain/" && drush pm-updatestatus --format=table 2>&1 | sed "s/^/\t\t/"
             fi
