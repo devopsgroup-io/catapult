@@ -279,9 +279,10 @@ EOF
             if [ "$settings_software_validation" = false ]; then
                 echo -e "\t[provisioner argument false!] skipping $software information"
             else
-                echo -e "\t$software information"
-                cd "/var/www/repositories/apache/$domain/" && drush core-status --field-labels=0 --fields=drupal-version | sed "s/^/\t/"
-                cd "/var/www/repositories/apache/$domain/" && drush pm-updatestatus --format=table | sed "s/^/\t/"
+                echo "$software core version:" | sed "s/^/\t/"
+                cd "/vagrant/repositories/apache/$domain/" && drush core-status --field-labels=0 --fields=drupal-version 2>&1 | sed "s/^/\t\t/"
+                echo "$software pm-updatestatus:" | sed "s/^/\t/"
+                cd "/vagrant/repositories/apache/$domain/" && drush pm-updatestatus --format=table 2>&1 | sed "s/^/\t\t/"
             fi
     elif [ "$software" = "drupal7" ]; then
             echo -e "\tgenerating $software database configuration file"
@@ -298,9 +299,10 @@ EOF
             if [ "$settings_software_validation" = false ]; then
                 echo -e "\t[provisioner argument false!] skipping $software information"
             else
-                echo -e "\t$software information"
-                cd "/var/www/repositories/apache/$domain/" && drush core-status --field-labels=0 --fields=drupal-version | sed "s/^/\t/"
-                cd "/var/www/repositories/apache/$domain/" && drush pm-updatestatus --format=table | sed "s/^/\t/"
+                echo "$software core version:" | sed "s/^/\t/"
+                cd "/vagrant/repositories/apache/$domain/" && drush core-status --field-labels=0 --fields=drupal-version 2>&1 | sed "s/^/\t\t/"
+                echo "$software pm-updatestatus:" | sed "s/^/\t/"
+                cd "/vagrant/repositories/apache/$domain/" && drush pm-updatestatus --format=table 2>&1 | sed "s/^/\t\t/"
             fi
     elif [ "$software" = "wordpress" ]; then
             echo -e "\tgenerating $software database configuration file"
@@ -316,11 +318,16 @@ EOF
             if [ "$settings_software_validation" = false ]; then
                 echo -e "\t[provisioner argument false!] skipping $software information"
             else
-                echo -e "\t$software information"
-                php /vagrant/provisioners/redhat/installers/wp-cli.phar --path="/var/www/repositories/apache/$domain/" core version | sed "s/^/\t/"
-                php /vagrant/provisioners/redhat/installers/wp-cli.phar --path="/var/www/repositories/apache/$domain/" core verify-checksums | sed "s/^/\t/"
-                php /vagrant/provisioners/redhat/installers/wp-cli.phar --path="/var/www/repositories/apache/$domain/" plugin list | sed "s/^/\t/"
-                php /vagrant/provisioners/redhat/installers/wp-cli.phar --path="/var/www/repositories/apache/$domain/" theme list | sed "s/^/\t/"
+                echo "$software core version:" | sed "s/^/\t/"
+                php /vagrant/provisioners/redhat/installers/wp-cli.phar --path="/vagrant/repositories/apache/$domain/" core version 2>&1 | sed "s/^/\t\t/"
+                echo "$software core verify-checksums:" | sed "s/^/\t/"
+                php /vagrant/provisioners/redhat/installers/wp-cli.phar --path="/vagrant/repositories/apache/$domain/" core verify-checksums 2>&1 | sed "s/^/\t\t/"
+                echo "$software core check-update:" | sed "s/^/\t/"
+                php /vagrant/provisioners/redhat/installers/wp-cli.phar --path="/vagrant/repositories/apache/$domain/" core check-update 2>&1 | sed "s/^/\t\t/"
+                echo "$software plugin list:" | sed "s/^/\t/"
+                php /vagrant/provisioners/redhat/installers/wp-cli.phar --path="/vagrant/repositories/apache/$domain/" plugin list 2>&1 | sed "s/^/\t\t/"
+                echo "$software theme list:" | sed "s/^/\t/"
+                php /vagrant/provisioners/redhat/installers/wp-cli.phar --path="/vagrant/repositories/apache/$domain/" theme list 2>&1 | sed "s/^/\t\t/"
             fi
     fi
 
