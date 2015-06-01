@@ -263,10 +263,16 @@ EOF
     # configure software
     if [ "$software" = "codeigniter2" ]; then
             echo -e "\tgenerating $software database configuration file"
+            if [ -f "/var/www/repositories/apache/${domain}/${webroot}application/config/database.php" ]; then
+                sudo chmod 0777 "/var/www/repositories/apache/${domain}/${webroot}application/config/database.php"
+            fi
             sed -e "s/\$db\['default'\]\['hostname'\]\s=\s'localhost';/\$db\['default'\]\['hostname'\] = '${redhat_mysql_ip}';/g" -e "s/\$db\['default'\]\['username'\]\s=\s'';/\$db\['default'\]\['username'\] = '${mysql_user}';/g" -e "s/\$db\['default'\]\['password'\]\s=\s'';/\$db\['default'\]\['password'\] = '${mysql_user_password}';/g" -e "s/\$db\['default'\]\['database'\]\s=\s'';/\$db\['default'\]\['database'\] = '${1}_${domainvaliddbname}';/g" -e "s/\$db\['default'\]\['dbprefix'\]\s=\s'';/\$db\['default'\]\['dbprefix'\] = '${software_dbprefix}';/g" /vagrant/provisioners/redhat/installers/codeigniter2_database.php > "/var/www/repositories/apache/${domain}/${webroot}application/config/database.php"
     elif [ "$software" = "drupal6" ]; then
             echo -e "\tgenerating $software database configuration file"
             connectionstring="mysql:\/\/${mysql_user}:${mysql_user_password}@${redhat_mysql_ip}\/${1}_${domainvaliddbname}"
+            if [ -f "/var/www/repositories/apache/${domain}/${webroot}sites/default/settings.php" ]; then
+                sudo chmod 0777 "/var/www/repositories/apache/${domain}/${webroot}sites/default/settings.php"
+            fi
             sed -e "s/mysql:\/\/username:password@localhost\/databasename/${connectionstring}/g" /vagrant/provisioners/redhat/installers/drupal6_settings.php > "/var/www/repositories/apache/${domain}/${webroot}sites/default/settings.php"
             if [ "$settings_production_rsync" = false ]; then
               echo -e "\t[provisioner argument false!] skipping $software ~/sites/default/files/ file sync"
@@ -289,6 +295,9 @@ EOF
     elif [ "$software" = "drupal7" ]; then
             echo -e "\tgenerating $software database configuration file"
             connectionstring="\$databases['default']['default'] = array('driver' => 'mysql','database' => '${1}_${domainvaliddbname}','username' => '${mysql_user}','password' => '${mysql_user_password}','host' => '${redhat_mysql_ip}','prefix' => '${software_dbprefix}');"
+            if [ -f "/var/www/repositories/apache/${domain}/${webroot}sites/default/settings.php" ]; then
+                sudo chmod 0777 "/var/www/repositories/apache/${domain}/${webroot}sites/default/settings.php"
+            fi
             sed -e "s/\$databases\s=\sarray();/${connectionstring}/g" /vagrant/provisioners/redhat/installers/drupal7_settings.php > "/var/www/repositories/apache/${domain}/${webroot}sites/default/settings.php"
             if [ "$settings_production_rsync" = false ]; then
               echo -e "\t[provisioner argument false!] skipping $software ~/sites/default/files/ file sync"
@@ -310,6 +319,9 @@ EOF
             fi
     elif [ "$software" = "wordpress" ]; then
             echo -e "\tgenerating $software database configuration file"
+            if [ -f "/var/www/repositories/apache/${domain}/${webroot}wp-config.php" ]; then
+                sudo chmod 0777 "/var/www/repositories/apache/${domain}/${webroot}wp-config.php"
+            fi
             sed -e "s/database_name_here/${1}_${domainvaliddbname}/g" -e "s/username_here/${mysql_user}/g" -e "s/password_here/${mysql_user_password}/g" -e "s/localhost/${redhat_mysql_ip}/g" -e "s/'wp_'/'${software_dbprefix}'/g" /vagrant/provisioners/redhat/installers/wp-config.php > "/var/www/repositories/apache/${domain}/${webroot}wp-config.php"
             if [ "$settings_production_rsync" = false ]; then
               echo -e "\t[provisioner argument false!] skipping $software ~/sites/default/files/ file sync"
