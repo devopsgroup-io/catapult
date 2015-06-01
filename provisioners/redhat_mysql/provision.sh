@@ -128,7 +128,6 @@ while IFS='' read -r -d '' key; do
                     else
                         echo -e "\t[valid]   [x].sql [x]YYYYMMDD.sql [x]newest => $file"
                         echo -e "\t\trestoring..."
-                        # @todo wp_options, wp_postmeta contain some urls in a serialized array that has specifies string length, so during replace, this needs changed as well.
                         # match http:// and optionally www. then replace with http:// + optionally www. + either dev., test., or the production domain
                         if [[ "$software" != "wordpress" ]]; then
                             sed -r -e "s/:\/\/(www\.)?${domain}/:\/\/\1${1}\.${domain}/g" "/vagrant/repositories/apache/$domain/_sql/$(basename "$file")" > "/vagrant/repositories/apache/$domain/_sql/$1.$(basename "$file")"
@@ -150,6 +149,9 @@ while IFS='' read -r -d '' key; do
                             mysql --defaults-extra-file=$dbconf $1_$domainvaliddbname -e "UPDATE ${software_dbprefix}users SET user_login='admin', user_email='$company_email', user_pass=MD5('$wordpress_admin_password'), user_status='0' WHERE id = 1;"
                             echo -e "\t\tupdating $software database with ${1}.${domainvaliddbname} URL"
                             php /vagrant/provisioners/redhat/installers/wp-cli.phar --path="/vagrant/repositories/apache/$domain/" search-replace "$domain" "$1.$domain" | sed "s/^/\t\t/"
+                            mysql --defaults-extra-file=$dbconf $1_$domainvaliddbname -e "UPDATE ${software_dbprefix}options SET option_value='$company_email' WHERE option_name = 'admin_email';"
+                            mysql --defaults-extra-file=$dbconf $1_$domainvaliddbname -e "UPDATE ${software_dbprefix}options SET option_value='http://$1.$domain' WHERE option_name = 'home';"
+                            mysql --defaults-extra-file=$dbconf $1_$domainvaliddbname -e "UPDATE ${software_dbprefix}options SET option_value='http://$1.$domain' WHERE option_name = 'siteurl';"
                         fi
                     fi
                 done
