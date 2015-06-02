@@ -111,6 +111,10 @@ while IFS='' read -r -d '' key; do
             echo "[provisioner argument false!] skipping git pull" | sed "s/^/\t/"
         fi
     else
+        if [ -d "/vagrant/repositories/apache/$domain" ]; then
+            echo "the .git folder is missing, removing the directory and re-cloning the repository." | sed "s/^/\t/"
+            sudo rm -rf /vagrant/repositories/apache/$domain
+        fi
         sudo ssh-agent bash -c "ssh-add /vagrant/provisioners/.ssh/id_rsa; git clone --recursive -b $(cat /vagrant/configuration.yml | shyaml get-value environments.$1.branch) $repo /var/www/repositories/apache/$domain" | sed "s/^/\t/"
     fi
 done < <(cat /vagrant/configuration.yml | shyaml get-values-0 websites.apache)
