@@ -133,3 +133,17 @@ To keep your fork updated with the latest from devopsgroup.io Catapult Release M
 1. git remote add upstream https://github.com/devopsgroup-io/release-management.git
 2. git fetch upstream
 3. git pull upstream master
+
+# Contributing #
+
+The open source community is an awesome thing, we hope devopsgroup.io Catapult Release Management is of use to you, and if you develop a feature that you think would benefit everyone, please submit a pull request.
+
+## Versioning ##
+
+Given a version number MAJOR.MINOR.PATCH, increment the:
+
+1. MAJOR version when you make incompatible API changes,
+2. MINOR version when you add functionality in a backwards-compatible manner, and
+3. PATCH version when you make backwards-compatible bug fixes.
+
+See http://semver.org/ for more information.
