@@ -2,6 +2,12 @@
 export DEBIAN_FRONTEND=noninteractive
 
 
+if ! [ -e "/vagrant/configuration.yml" ]; then
+    echo -e "Cannot read from /vagrant/configuration.yml, please vagrant reload the virtual machine."
+    exit 1
+fi
+
+
 provisionstart=$(date +%s)
 sudo touch /vagrant/provisioners/redhat_mysql/logs/provision.log
 

@@ -2,6 +2,12 @@
 export DEBIAN_FRONTEND=noninteractive
 
 
+if ! [ -e "/vagrant/configuration.yml" ]; then
+    echo -e "Cannot read from /vagrant/configuration.yml, please vagrant reload the virtual machine."
+    exit 1
+fi
+
+
 provisionstart=$(date +%s)
 sudo touch /vagrant/provisioners/redhat/logs/provision.log
 
@@ -147,6 +153,8 @@ mysql_user_password="$(cat /vagrant/configuration.yml | shyaml get-value environ
 mysql_root_password="$(cat /vagrant/configuration.yml | shyaml get-value environments.$1.servers.redhat_mysql.mysql.root_password)"
 redhat_mysql_ip="$(cat /vagrant/configuration.yml | shyaml get-value environments.$1.servers.redhat_mysql.ip)"
 company_email="$(cat /vagrant/configuration.yml | shyaml get-value company.email)"
+cloudflare_api_key="$(cat /vagrant/configuration.yml | shyaml get-value company.cloudflare_api_key)"
+cloudflare_email="$(cat /vagrant/configuration.yml | shyaml get-value company.cloudflare_email)"
 
 # rackspace web1 - are we connected to do rsync of drupal and wordpress files?
 # one time copy ssh key to rackspace web1 while vagrant ssh redhat
@@ -198,6 +206,22 @@ while IFS='' read -r -d '' key; do
     software=$(echo "$key" | grep -w "software" | cut -d ":" -f 2 | tr -d " ")
     software_dbprefix=$(echo "$key" | grep -w "software_dbprefix" | cut -d ":" -f 2 | tr -d " ")
     webroot=$(echo "$key" | grep -w "webroot" | cut -d ":" -f 2 | tr -d " ")
+
+    curl https://www.cloudflare.com/api_json.html \
+      -d "a=full_zone_set" \
+      -d "tkn=$cloudflare_api_key" \
+      -d "email=$cloudflare_email" \
+      -d "zone_name=$domain"
+
+    curl https://www.cloudflare.com/api_json.html \
+      -d "a=rec_new" \
+      -d "tkn=$cloudflare_api_key" \
+      -d "email=$cloudflare_email" \
+      -d "z=$domain" \
+      -d "type=A" \
+      -d "name=$domain" \
+      -d "content=45.55.231.36" \
+      -d "ttl=1"
 
     # configure apache
     echo -e "NOTICE: $1.$domain"
