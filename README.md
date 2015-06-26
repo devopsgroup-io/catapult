@@ -2,11 +2,11 @@
 
 Copyright (c) 2015 devopsgroup.io - Seth Reeser
 
-Welcome to devopsgroup.io Catapult Release Management. A full stack software and workflow solution.
+Welcome to devopsgroup.io Catapult Release Management, a full stack software and workflow solution. Herein known as Catapult.
 
 ## Supported Software ##
 
-devopsgroup.io Catapult Release Management currently supports the following software:
+Catapult currently supports the following software:
 
 * CodeIgniter 2.x
 * Drupal 6.x, Drupal 7.x
@@ -16,12 +16,12 @@ devopsgroup.io Catapult Release Management currently supports the following soft
 
 # Setup #
 
-devopsgroup.io Catapult Release Management requires a Developer Setup, Instance Setup, and Services Setup as described in the following sections.
-**Please Note:** It is advised to turn off any antivirus software that you may have installed during Developer Setup and Usage of devopsgroup.io Catapult Release Management as necessary tasks such as forwarding ports and writing hosts files may be blocked.
+Catapult requires a Developer Setup, Instance Setup, and Services Setup as described in the following sections.
+**Please Note:** It is advised to turn off any antivirus software that you may have installed during Developer Setup and Usage of Catapult as necessary tasks such as forwarding ports and writing hosts files may be blocked.
 
 ## Developer Setup ##
 
-devopsgroup.io Catapult Release Management is controlled via Vagrant and the command line of a Developer's computer - below is a list of required software.
+Catapult is controlled via Vagrant and the command line of a Developer's computer - below is a list of required software.
 
 1. Vagrant
     1. Please download and install from https://www.vagrantup.com/downloads.html
@@ -37,7 +37,7 @@ devopsgroup.io Catapult Release Management is controlled via Vagrant and the com
 
 ## Instance Setup ##
 
-devopsgroup.io Catapult Release Management is quick to setup. Fork the Github repository and start adding your configuration.
+Catapult is quick to setup. Fork the Github repository and start adding your configuration.
 
 1. Fork https://github.com/devopsgroup-io/release-management and clone via SourceTree or the git utility of your choice.
 2. Open your command line and cd into the newly cloned repository.
@@ -54,7 +54,7 @@ devopsgroup.io Catapult Release Management is quick to setup. Fork the Github re
 
 ## Services Setup ##
 
-devopsgroup.io Catapult Release Management uses several third-party services to pull everything off - below is a list of the required services and setup steps.
+Catapult uses several third-party services to pull everything off - below is a list of the required services and setup steps.
 
 1. DigitalOcean Sign-Up and Configuration
     1. Create an account at http://digitalocean.com
@@ -79,7 +79,7 @@ devopsgroup.io Catapult Release Management uses several third-party services to 
         1. Set your AWS EC2 "Bamboo" Access Key ID and Secret Access Key
 
 5. [*Optional] CloudFlare
-    * CloudFlare is optional, however, it provides two major components - free SSL certificate functionality (https) and DNS management - just update the name servers to clark.ns.cloudflare.com and liv.ns.cloudflare.com from the registrar where you purchased the domain name and devopsgroup.io Catapult Release Management will handle the rest.
+    * CloudFlare is optional, however, it provides two major components - free SSL certificate functionality (https) and DNS management - just update the name servers to clark.ns.cloudflare.com and liv.ns.cloudflare.com from the registrar where you purchased the domain name and Catapult will handle the rest.
     1. Create a CloudFlare account at https://www.cloudflare.com
     2. Sign in your new CloudFlare account
     3. Vist your My Account section at https://www.cloudflare.com/a/account/my-account and scroll down to your API Key and place the token value in ~/configuration.yml at ["company"]["cloudflare_api_key"]
@@ -87,7 +87,7 @@ devopsgroup.io Catapult Release Management uses several third-party services to 
 
 # Usage #
 
-devopsgroup.io Catapult Release Management is centered around web and database servers. The web and database servers are provisioned (created) via Vagrant and continuously integrated (when new code is detected) via Bamboo.
+Catapult is centered around web and database servers. The web and database servers are provisioned (created) via Vagrant and continuously integrated (when new code is detected) via Bamboo.
 
 ## Adding Websites ##
 
@@ -128,7 +128,7 @@ The following options are available:
 
 ## Syncing Your Fork ##
 
-To keep your fork updated with the latest from devopsgroup.io Catapult Release Management, please do the following.
+To keep your fork updated with the latest from Catapult, please do the following.
 
 1. git remote add upstream https://github.com/devopsgroup-io/release-management.git
 2. git fetch upstream
@@ -136,7 +136,7 @@ To keep your fork updated with the latest from devopsgroup.io Catapult Release M
 
 # Contributing #
 
-The open source community is an awesome thing, we hope devopsgroup.io Catapult Release Management is of use to you, and if you develop a feature that you think would benefit everyone, please submit a pull request.
+The open source community is an awesome thing, we hope Catapult is of use to you, and if you develop a feature that you think would benefit everyone, please submit a pull request.
 
 ## Versioning ##
 
