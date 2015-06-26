@@ -126,6 +126,12 @@ The following options are available:
         * if the webroot differs from the repo root, specify it here
         * must include the trailing slash
 
+## Provisioning ##
+
+|                | DEV     | TEST    | QC     | PRD    |
+|----------------|---------|---------|--------|--------|
+| Running Branch | Develop | Develop | Master | Master |
+
 ## Syncing Your Fork ##
 
 To keep your fork updated with the latest from Catapult, please do the following.
