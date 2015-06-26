@@ -1,1 +1,3 @@
-*/installers/ linguist-vendored
+provisioners/redhat/installers/* linguist-vendored
+provisioners/redhat_mysql/installers/* linguist-vendored
+provisioners/redhat_windows/installers/* linguist-vendored
