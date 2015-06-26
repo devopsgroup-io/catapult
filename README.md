@@ -128,12 +128,13 @@ The following options are available:
 
 ## Environments ##
 
-|                      | DEV                                                         | TEST                                                          | QC                                                            | PRD                                                           |
-|----------------------|-------------------------------------------------------------|---------------------------------------------------------------|---------------------------------------------------------------|---------------------------------------------------------------|
-| **Running Branch**   | *develop*                                                   | *develop*                                                     | *master*                                                      | *master*                                                      |
-| **Provisioning**     | Manually via Vagrant                                        | Automatically via Bamboo (watch for new commits to *develop*) | Automatically via Bamboo (watch for new commits to *master*)  | Manually via Bamboo                                           |
-| **New Website**      | Restore from *develop* ~/_sql folder of website repo        | Daily backup to *develop* ~/_sql folder of website repo       | Restore from *master* ~/_sql folder of website repo           | Restore from *master* ~/_sql folder of website repo           |
-| **Existing Website** | Restore from *develop* ~/_sql folder of website repo        | Restore from *develop* ~/_sql folder of website repo          | Restore from *master* ~/_sql folder of website repo           | Daily backup to *develop* ~/_sql folder of website repo       |
+|                               | DEV                                                         | TEST                                                          | QC                                                            | PRD                                                           |
+|-------------------------------|-------------------------------------------------------------|---------------------------------------------------------------|---------------------------------------------------------------|---------------------------------------------------------------|
+| **Running Branch**            | *develop*                                                   | *develop*                                                     | *master*                                                      | *master*                                                      |
+| **Server Provisioning**       | Manually via Vagrant                                        | Manually via Vagrant                                          | Manually via Vagrant                                          | Manually via Vagrant                                          |
+| **New Website Database**      | Restore from *develop* ~/_sql folder of website repo        | Daily backup to *develop* ~/_sql folder of website repo       | Restore from *master* ~/_sql folder of website repo           | Restore from *master* ~/_sql folder of website repo           |
+| **Existing Website Database** | Restore from *develop* ~/_sql folder of website repo        | Restore from *develop* ~/_sql folder of website repo          | Restore from *master* ~/_sql folder of website repo           | Daily backup to *develop* ~/_sql folder of website repo       |
+| **Automated Deployments**     | Manually via Vagrant                                        | Automatically via Bamboo (watch for new commits to *develop*) | Automatically via Bamboo (watch for new commits to *master*)  | Manually via Bamboo                                           |
 
 ## Syncing Your Fork ##
 
