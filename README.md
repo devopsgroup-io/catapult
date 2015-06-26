@@ -126,14 +126,12 @@ The following options are available:
         * if the webroot differs from the repo root, specify it here
         * must include the trailing slash
 
-## Provisioning ##
+## Environments ##
 
-|                    | DEV                                | TEST                               | QC                                 | PRD                                |
-|--------------------|------------------------------------|------------------------------------|------------------------------------|------------------------------------|
-| **Running Branch** | develop                            | develop                            | master                             | master                             |
-|--------------------|------------------------------------|------------------------------------|------------------------------------|------------------------------------|
-| **Provisioning**   | Manually via Vagrant               | Automatically via Bamboo           | Automatically via Bamboo           | Manually via Bamboo                |
-|                    |                                    | (watch for new commits to develop) | (watch for new commits to master)  |                                    |
+|                    | DEV                                                         | TEST                                                        | QC                                                          | PRD                                                         |
+|--------------------|-------------------------------------------------------------|-------------------------------------------------------------|-------------------------------------------------------------|-------------------------------------------------------------|
+| **Running Branch** | develop                                                     | develop                                                     | master                                                      | master                                                      |
+| **Provisioning**   | Manually via Vagrant                                        | Automatically via Bamboo (watch for new commits to develop) | Automatically via Bamboo (watch for new commits to master)  | Manually via Bamboo                                         |
 
 ## Syncing Your Fork ##
 
