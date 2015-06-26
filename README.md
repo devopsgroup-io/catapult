@@ -56,13 +56,13 @@ Catapult is quick to setup. Fork the Github repository and start adding your con
 
 Catapult uses several third-party services to pull everything off - below is a list of the required services and setup steps.
 
-1. DigitalOcean Sign-Up and Configuration
+1. **Hosting:** DigitalOcean Sign-Up and Configuration
     1. Create an account at http://digitalocean.com
     2. Create a Personal Access Token at https://cloud.digitalocean.com/settings/applications named "Vagrant" and place the token value in ~/configuration.yml at ["company"]["digitalocean_personal_access_token"]
     3. Create an SSH Key https://www.digitalocean.com/community/tutorials/how-to-use-ssh-keys-with-digitalocean-droplets and place in ~/provisioners/.ssh
     4. Add the newly created id_rsa.pub key in https://cloud.digitalocean.com/settings/security named "Vagrant"
 
-3. Amazon Web Services (AWS) EC2 Sign-Up and Configuration (Required for Bamboo)
+3. **Automated Deployments:** Amazon Web Services (AWS) EC2 Sign-Up and Configuration (Required for Bamboo)
     1. Create an AWS account https://portal.aws.amazon.com/gp/aws/developer/registration
     2. Sign in to your new AWS console https://console.aws.amazon.com
     3. Go to your AWS Identity and Access Management (IAM) Users Dashboard https://console.aws.amazon.com/iam/home#users
@@ -72,13 +72,13 @@ Catapult uses several third-party services to pull everything off - below is a l
         1. Create a "Bamboo" group.
         2. Attach the "AmazonEC2FullAccess" policy to the "Bamboo" group.
 
-4. Atlassian Bamboo Sign-Up and Configuration
+4. **Automated Deployments:** Atlassian Bamboo Sign-Up and Configuration
     1. Create a Bamboo Cloud account at https://www.atlassian.com/software/bamboo
     2. Sign in to your new custom Bamboo instance https://[your-name-here].atlassian.net
     3. Go to your Elastic Bamboo configuration https://[your-name-here].atlassian.net/builds/admin/elastic/editElasticConfig.action
         1. Set your AWS EC2 "Bamboo" Access Key ID and Secret Access Key
 
-5. [*Optional] CloudFlare
+5. **DNS:** [*Optional] CloudFlare
     * CloudFlare is optional, however, it provides two major components - free SSL certificate functionality (https) and DNS management - just update the name servers to clark.ns.cloudflare.com and liv.ns.cloudflare.com from the registrar where you purchased the domain name and Catapult will handle the rest.
     1. Create a CloudFlare account at https://www.cloudflare.com
     2. Sign in your new CloudFlare account
