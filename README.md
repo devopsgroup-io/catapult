@@ -16,7 +16,7 @@ Catapult currently supports the following software:
 
 # Setup #
 
-Catapult requires a Developer Setup, Instance Setup, and Services Setup as described in the following sections.
+Catapult requires a [Developer Setup](#developer-setup), [Instance Setup](#instance-setup), and [Services Setup](#services-setup) as described in the following sections.
 **Please Note:** It is advised to turn off any antivirus software that you may have installed during Developer Setup and Usage of Catapult as necessary tasks such as forwarding ports and writing hosts files may be blocked.
 
 ## Developer Setup ##
