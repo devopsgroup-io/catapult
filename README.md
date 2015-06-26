@@ -128,9 +128,12 @@ The following options are available:
 
 ## Provisioning ##
 
-|                | DEV     | TEST    | QC     | PRD    |
-|----------------|---------|---------|--------|--------|
-| Running Branch | Develop | Develop | Master | Master |
+|                    | DEV                                | TEST                               | QC                                 | PRD                                |
+|--------------------|------------------------------------|------------------------------------|------------------------------------|------------------------------------|
+| **Running Branch** | develop                            | develop                            | master                             | master                             |
+|--------------------|------------------------------------|------------------------------------|------------------------------------|------------------------------------|
+| **Provisioning**   | Manually via Vagrant               | Automatically via Bamboo           | Automatically via Bamboo           | Manually via Bamboo                |
+|                    |                                    | (watch for new commits to develop) | (watch for new commits to master)  |                                    |
 
 ## Syncing Your Fork ##
 
