@@ -50,6 +50,7 @@ if File.exist?('C:\Program Files (x86)\Git\bin\git.exe')
       `"C:\\Program Files (x86)\\Git\\bin\\git.exe remote add upstream https://github.com/devopsgroup-io/catapult-release-management.git`
     end
     `"C:\\Program Files (x86)\\Git\\bin\\git.exe pull upstream master`
+    `"C:\\Program Files (x86)\\Git\\bin\\git.exe push origin master`
     puts "\n"
   end
 else
@@ -72,6 +73,7 @@ else
       `git remote add upstream https://github.com/devopsgroup-io/catapult-release-management.git`
     end
     `git pull upstream master`
+    `git push origin master`
     puts "\n"
   end
 end
