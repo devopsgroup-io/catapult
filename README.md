@@ -136,14 +136,6 @@ The following options are available:
 | **Existing Website Database** | Restore from *develop* ~/_sql folder of website repo        | Restore from *develop* ~/_sql folder of website repo          | Restore from *master* ~/_sql folder of website repo           | Daily backup to *develop* ~/_sql folder of website repo       |
 | **Automated Deployments**     | Manually via Vagrant                                        | Automatically via Bamboo (watch for new commits to *develop*) | Automatically via Bamboo (watch for new commits to *master*)  | Manually via Bamboo                                           |
 
-## Syncing Your Fork ##
-
-To keep your fork updated with the latest from Catapult, please do the following.
-
-1. git remote add upstream https://github.com/devopsgroup-io/release-management.git
-2. git fetch upstream
-3. git pull upstream master
-
 # Contributing #
 
 The open source community is an awesome thing, we hope Catapult is of use to you, and if you develop a feature that you think would benefit everyone, please submit a pull request.
