@@ -48,8 +48,8 @@ environments:
 websites:
   apache:
     - domain: "devopsgroup.io"
-      repo: "https://github.com/devopsgroup-io/devopsgroup-io.git"
+      repo: "git@github.com:devopsgroup-io/devopsgroup-io.git"
       webroot: "dist/"
   iis:
     - domain: "devopsgroup.io"
-      repo: "https://github.com/devopsgroup-io/devopsgroup-io.git"
+      repo: "git@github.com:devopsgroup-io/devopsgroup-io.git"
