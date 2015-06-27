@@ -288,6 +288,12 @@ while IFS='' read -r -d '' key; do
         Options -Indexes +FollowSymlinks
     </Directory>
 
+    # deny access to _sql folders
+    <Directory "/var/www/repositories/apache/$domain/$webroot_sql">
+        Order Deny,Allow
+        Deny From All
+    </Directory>
+
 EOF
 
     # enable vhost
