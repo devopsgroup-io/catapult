@@ -41,8 +41,8 @@ if File.exist?('C:\Program Files (x86)\Git\bin\git.exe')
     repo_this = `"C:\\Program Files (x86)\\Git\\bin\\git.exe config --get remote.origin.url`
     repo_this_upstream = `"C:\\Program Files (x86)\\Git\\bin\\git.exe config --get remote.upstream.url`
     repo_upstream = "https://github.com/devopsgroup-io/catapult-release-management.git"
-    puts "\nThis repository: #{repo_this}"
-    puts "Syncing from: #{repo_upstream}\n\n"
+    puts "\nYour repository: #{repo_this}"
+    puts "Will sync from: #{repo_upstream}\n\n"
     if repo_this_upstream.empty?
       `"C:\\Program Files (x86)\\Git\\bin\\git.exe remote add upstream https://github.com/devopsgroup-io/catapult-release-management.git`
     else
@@ -64,8 +64,8 @@ else
     repo_this = `git config --get remote.origin.url`
     repo_this_upstream = `git config --get remote.upstream.url`
     repo_upstream = "https://github.com/devopsgroup-io/catapult-release-management.git"
-    puts "\nThis repository: #{repo_this}"
-    puts "Syncing from: #{repo_upstream}\n\n"
+    puts "\nYour repository: #{repo_this}"
+    puts "Will sync from: #{repo_upstream}\n\n"
     if repo_this_upstream.empty?
       `git remote add upstream https://github.com/devopsgroup-io/catapult-release-management.git`
     else
@@ -155,7 +155,6 @@ end
 require "net/ssh"
 # validate digitalocean_personal_access_token
 if configuration["company"]["digitalocean_personal_access_token"] == ""
-  puts "\nThere is an error in your configuration.yml file."
   puts "\nPlease set your company's digitalocean_personal_access_token in configuration.yml.\n\n"
   exit 1
 end
