@@ -38,7 +38,18 @@ if File.exist?('C:\Program Files (x86)\Git\bin\git.exe')
     exit 1
   else
     puts "Self updating Catapult Release Management..."
-    `"C:\\Program Files (x86)\\Git\\bin\\git.exe" pull origin master`
+    repo_this = `"C:\\Program Files (x86)\\Git\\bin\\git.exe config --get remote.origin.url`
+    repo_this_upstream = `"C:\\Program Files (x86)\\Git\\bin\\git.exe config --get remote.upstream.url`
+    repo_upstream = "https://github.com/devopsgroup-io/catapult-release-management.git"
+    puts "\nThis repository: #{repo_this}"
+    puts "Syncing from: #{repo_upstream}\n\n"
+    if repo_this_upstream.empty?
+      `"C:\\Program Files (x86)\\Git\\bin\\git.exe remote add upstream https://github.com/devopsgroup-io/catapult-release-management.git`
+    else
+      `"C:\\Program Files (x86)\\Git\\bin\\git.exe remote rm upstream`
+      `"C:\\Program Files (x86)\\Git\\bin\\git.exe remote add upstream https://github.com/devopsgroup-io/catapult-release-management.git`
+    end
+    `"C:\\Program Files (x86)\\Git\\bin\\git.exe pull upstream master`
     puts "\n"
   end
 else
@@ -49,7 +60,18 @@ else
     exit 1
   else
     puts "Self updating Catapult Release Management..."
-    `git pull origin master`
+    repo_this = `git config --get remote.origin.url`
+    repo_this_upstream = `git config --get remote.upstream.url`
+    repo_upstream = "https://github.com/devopsgroup-io/catapult-release-management.git"
+    puts "\nThis repository: #{repo_this}"
+    puts "Syncing from: #{repo_upstream}\n\n"
+    if repo_this_upstream.empty?
+      `git remote add upstream https://github.com/devopsgroup-io/catapult-release-management.git`
+    else
+      `git remote rm upstream`
+      `git remote add upstream https://github.com/devopsgroup-io/catapult-release-management.git`
+    end
+    `git pull upstream master`
     puts "\n"
   end
 end
