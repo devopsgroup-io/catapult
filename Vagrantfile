@@ -20,6 +20,41 @@ if ["up","provision"].include?(ARGV[0])
 end
 
 
+# print intro
+puts "\n"
+title = "Catapult Release Management - https://github.com/devopsgroup-io/catapult-release-management"
+length = title.size
+padding = 5
+puts "+".ljust(padding,"-") + "".ljust(length,"-") + "+".rjust(padding,"-")
+puts "|".ljust(padding)     + title                + "|".rjust(padding)
+puts "+".ljust(padding,"-") + "".ljust(length,"-") + "+".rjust(padding,"-")
+# self update release management
+puts "\n"
+if File.exist?('C:\Program Files (x86)\Git\bin\git.exe')
+  remote = `"C:\\Program Files (x86)\\Git\\bin\\git.exe" config --get remote.origin.url`
+  if remote.include?("devopsgroup-io/release-management.git") || remote.include?("devopsgroup-io/catapult-release-management.git")
+    puts "In order to use Catapult Release Management, you must fork the repository so that the committed and encrypted configuration is unique to you! See https://github.com/devopsgroup-io/catapult-release-management for more information."
+    puts "\n"
+    exit 1
+  else
+    puts "Self updating Catapult Release Management..."
+    `"C:\\Program Files (x86)\\Git\\bin\\git.exe" pull origin master`
+    puts "\n"
+  end
+else
+  remote = `git config --get remote.origin.url`
+  if remote.include?("devopsgroup-io/release-management.git") || remote.include?("devopsgroup-io/catapult-release-management.git")
+    puts "In order to use Catapult Release Management, you must fork the repository so that the committed and encrypted configuration is unique to you! See https://github.com/devopsgroup-io/catapult-release-management for more information."
+    puts "\n"
+    exit 1
+  else
+    puts "Self updating Catapult Release Management..."
+    `git pull origin master`
+    puts "\n"
+  end
+end
+
+
 # bootstrap configuration-user.yml
 require "fileutils"
 require "yaml"
@@ -70,31 +105,6 @@ if configuration["software"]["version"] != configuration_example["software"]["ve
   puts "*You may also delete your configuration.yml and re-run any vagrant command to have a vanilla version created.\n\n"
   exit 1
 end
-# check for required fields
-if configuration["company"]["digitalocean_personal_access_token"] == ""
-  puts "\nPlease set your company's digitalocean_personal_access_token in configuration.yml.\n\n"
-  exit 1
-end
-# ensure domains are in alpha order
-configuration["websites"].each do |service,data|
-  domains = Array.new
-  domains_sorted = Array.new
-  configuration["websites"]["#{service}"].each do |instance|
-    domains.push("#{instance["domain"]}")
-    domains_sorted.push("#{instance["domain"]}")
-    if not "#{instance["webroot"]}" == ""
-      if not "#{instance["webroot"]}"[-1,1] == "/"
-        puts "\nThe webroot for #{instance["domain"]} must include a trailing slash - please adjust.\n\n"
-        exit 1
-      end
-    end
-  end
-  domains_sorted = domains_sorted.sort
-  if domains != domains_sorted
-    puts "\nThe domains in configuration.yml are not in alpha order for //websites//#{service} - please adjust.\n\n"
-    exit 1
-  end
-end
 
 
 # bootstrap ssh keys
@@ -116,23 +126,61 @@ elsif
 end
 
 
-# print intro
-puts "\n"
-title = "#{configuration["software"]["name"]}"
-length = title.size
-padding = 5
-puts "+".ljust(padding,"-") + "".ljust(length,"-") + "+".rjust(padding,"-")
-puts "|".ljust(padding)     + title                + "|".rjust(padding)
-puts "+".ljust(padding,"-") + "".ljust(length,"-") + "+".rjust(padding,"-")
-# self update release management
-puts "\n"
-puts "Self updating #{configuration["software"]["name"]}..."
-if File.exist?('C:\Program Files (x86)\Git\bin\git.exe')
-  `"C:\\Program Files (x86)\\Git\\bin\\git.exe" pull origin master`
-else
-  `git pull origin master`
+# configuration.yml validation
+# check for required fields
+require "net/ssh"
+# validate digitalocean_personal_access_token
+if configuration["company"]["digitalocean_personal_access_token"] == ""
+  puts "\nThere is an error in your configuration.yml file."
+  puts "\nPlease set your company's digitalocean_personal_access_token in configuration.yml.\n\n"
+  exit 1
 end
-puts "\n"
+configuration["websites"].each do |service,data|
+  domains = Array.new
+  domains_sorted = Array.new
+  configuration["websites"]["#{service}"].each do |instance|
+    domains.push("#{instance["domain"]}")
+    domains_sorted.push("#{instance["domain"]}")
+    # validate repo user
+    repo = instance["repo"].split("@")
+    if repo[0] != "git"
+      puts "\nThere is an error in your configuration.yml file."
+      puts "\nThe repo for websites => #{service} => domain => #{instance["domain"]} is invalid, the format must be git@github.com:devopsgroup-io/devopsgroup-io.git\n\n"
+      exit 1
+    end
+    # validate repo bitbucket.org or github.com
+    repo = repo[1].split(":")
+    if "#{repo[0]}" != "bitbucket.org" && "#{repo[0]}" != "github.com"
+      puts "\nThere is an error in your configuration.yml file."
+      puts "\nThe repo for websites => #{service} => domain => #{instance["domain"]} is invalid, it must either be a bitbucket.org or github.com repository.\n\n"
+      exit 1
+    end
+    # validate repo connection
+    Net::SSH.start(
+      "github.com","git",
+      :host_key => "ssh-rsa",
+      :keys => ["provisioners/.ssh/id_rsa"],
+      #:verbose => :debug
+    ) do |session|
+      #puts session.inspect
+    end
+    # validate webroot
+    if not "#{instance["webroot"]}" == ""
+      if not "#{instance["webroot"]}"[-1,1] == "/"
+        puts "\nThere is an error in your configuration.yml file."
+        puts "\nThe webroot for websites => #{service} => domain => #{instance["domain"]} is invalid, it must include a trailing slash.\n\n"
+        exit 1
+      end
+    end
+  end
+  # ensure domains are in alpha order
+  domains_sorted = domains_sorted.sort
+  if domains != domains_sorted
+    puts "\nThere is an error in your configuration.yml file."
+    puts "\nThe domains in configuration.yml are not in alpha order for websites => #{service} - please adjust.\n\n"
+    exit 1
+  end
+end
 
 
 # create arrays of domains for localdev hosts file
