@@ -28,54 +28,34 @@ padding = 5
 puts "+".ljust(padding,"-") + "".ljust(length,"-") + "+".rjust(padding,"-")
 puts "|".ljust(padding)     + title                + "|".rjust(padding)
 puts "+".ljust(padding,"-") + "".ljust(length,"-") + "+".rjust(padding,"-")
-# self update release management
+# self update catapult
 puts "\n"
 if File.exist?('C:\Program Files (x86)\Git\bin\git.exe')
-  remote = `"C:\\Program Files (x86)\\Git\\bin\\git.exe" config --get remote.origin.url`
-  if remote.include?("devopsgroup-io/release-management.git") || remote.include?("devopsgroup-io/catapult-release-management.git")
-    puts "In order to use Catapult Release Management, you must fork the repository so that the committed and encrypted configuration is unique to you! See https://github.com/devopsgroup-io/catapult-release-management for more information."
-    puts "\n"
-    exit 1
-  else
-    puts "Self updating Catapult Release Management..."
-    repo_this = `"C:\\Program Files (x86)\\Git\\bin\\git.exe config --get remote.origin.url`
-    repo_this_upstream = `"C:\\Program Files (x86)\\Git\\bin\\git.exe config --get remote.upstream.url`
-    repo_upstream = "https://github.com/devopsgroup-io/catapult-release-management.git"
-    puts "\nYour repository: #{repo_this}"
-    puts "Will sync from: #{repo_upstream}\n\n"
-    if repo_this_upstream.empty?
-      `"C:\\Program Files (x86)\\Git\\bin\\git.exe remote add upstream https://github.com/devopsgroup-io/catapult-release-management.git`
-    else
-      `"C:\\Program Files (x86)\\Git\\bin\\git.exe remote rm upstream`
-      `"C:\\Program Files (x86)\\Git\\bin\\git.exe remote add upstream https://github.com/devopsgroup-io/catapult-release-management.git`
-    end
-    `"C:\\Program Files (x86)\\Git\\bin\\git.exe pull upstream master`
-    `"C:\\Program Files (x86)\\Git\\bin\\git.exe push origin master`
-    puts "\n"
-  end
+  git = "\"C:\\Program Files (x86)\\Git\\bin\\git.exe\""
 else
-  remote = `git config --get remote.origin.url`
-  if remote.include?("devopsgroup-io/release-management.git") || remote.include?("devopsgroup-io/catapult-release-management.git")
-    puts "In order to use Catapult Release Management, you must fork the repository so that the committed and encrypted configuration is unique to you! See https://github.com/devopsgroup-io/catapult-release-management for more information."
-    puts "\n"
-    exit 1
+  git = "git"
+end
+remote = `#{git} config --get remote.origin.url`
+if remote.include?("devopsgroup-io/release-management.git") || remote.include?("devopsgroup-io/catapult-release-management.git")
+  puts "In order to use Catapult Release Management, you must fork the repository so that the committed and encrypted configuration is unique to you! See https://github.com/devopsgroup-io/catapult-release-management for more information."
+  puts "\n"
+  exit 1
+else
+  puts "Self updating Catapult:"
+  repo_this = `#{git} config --get remote.origin.url`
+  repo_this_upstream = `#{git} config --get remote.upstream.url`
+  repo_upstream = "https://github.com/devopsgroup-io/catapult-release-management.git"
+  puts "\nYour repository: #{repo_this}"
+  puts "Will sync from: #{repo_upstream}\n\n"
+  if repo_this_upstream.empty?
+    `#{git} remote add upstream https://github.com/devopsgroup-io/catapult-release-management.git`
   else
-    puts "Self updating Catapult Release Management..."
-    repo_this = `git config --get remote.origin.url`
-    repo_this_upstream = `git config --get remote.upstream.url`
-    repo_upstream = "https://github.com/devopsgroup-io/catapult-release-management.git"
-    puts "\nYour repository: #{repo_this}"
-    puts "Will sync from: #{repo_upstream}\n\n"
-    if repo_this_upstream.empty?
-      `git remote add upstream https://github.com/devopsgroup-io/catapult-release-management.git`
-    else
-      `git remote rm upstream`
-      `git remote add upstream https://github.com/devopsgroup-io/catapult-release-management.git`
-    end
-    `git pull upstream master`
-    `git push origin master`
-    puts "\n"
+    `#{git} remote rm upstream`
+    `#{git} remote add upstream https://github.com/devopsgroup-io/catapult-release-management.git`
   end
+  `#{git} pull upstream master`
+  `#{git} push origin master`
+  puts "\n"
 end
 
 
@@ -102,7 +82,7 @@ if configuration_user["settings"]["gpg_key"] == "" || configuration_user["settin
 end
 
 
-puts "\nEncryption and decryption of files..."
+puts "\nEncryption and decryption of Catapult configuration files:"
 puts "\n"
 # bootstrap configuration.yml
 require "fileutils"
