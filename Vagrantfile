@@ -102,6 +102,8 @@ if configuration_user["settings"]["gpg_key"] == "" || configuration_user["settin
 end
 
 
+puts "\nEncryption and decryption of files..."
+puts "\n"
 # bootstrap configuration.yml
 require "fileutils"
 require "yaml"
@@ -148,6 +150,7 @@ elsif
   `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output provisioners/.ssh/id_rsa --decrypt provisioners/.ssh/id_rsa.gpg`
   `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output provisioners/.ssh/id_rsa.pub --decrypt provisioners/.ssh/id_rsa.pub.gpg`
 end
+puts "\n"
 
 
 # configuration.yml validation
@@ -228,14 +231,14 @@ if ["status"].include?(ARGV[0])
   require "openssl"  # required for ssl cert lookup
   totalwebsites = 0
   # start a new row
-  puts "Available websites legend:"
+  puts "\nAvailable websites legend:"
+  puts "\n"
   puts "[http response codes]"
-  puts " 200 ok, 301 moved permanently, 302 found, 400 bad request, 401 unauthorized, 403 forbidden, 404 not found"
-  puts " 500 internal server error, 502 bad gateway, 503 service unavailable, 504 gateway timeout"
+  puts " 200 ok, 301 moved permanently, 302 found, 400 bad request, 401 unauthorized, 403 forbidden, 404 not found, 500 internal server error, 502 bad gateway, 503 service unavailable, 504 gateway timeout"
   puts " http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html"
   puts "[cert signature algorithm]"
   puts " https://www.openssl.org/docs/apps/ciphers.html"
-  puts "\n"
+  puts "\n\n"
   puts "Available websites:"
   puts "".ljust(30) + "[software]".ljust(15) + "[dev.]".ljust(8) + "[test.]".ljust(8) + "[qc.]".ljust(8) + "[production / nslookup / cert expiry, signature algorithm, common name]".ljust(82) + "[alexa rank, 3m delta]".ljust(26)
 
@@ -331,7 +334,7 @@ if ["status"].include?(ARGV[0])
   puts "[total]"
   row.push("#{totalwebsites}")
   puts row.join(" ")
-  puts "\n"
+  puts "\n\n"
 end
 
 
