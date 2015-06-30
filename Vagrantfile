@@ -41,6 +41,8 @@ if remote.include?("devopsgroup-io/release-management.git") || remote.include?("
   exit 1
 else
   puts "Self updating Catapult:"
+  branch = `#{git} rev-parse --abbrev-ref HEAD`
+  branch = branch.strip
   repo_this = `#{git} config --get remote.origin.url`
   repo_this_upstream = `#{git} config --get remote.upstream.url`
   repo_upstream = "https://github.com/devopsgroup-io/catapult-release-management.git"
@@ -52,8 +54,19 @@ else
     `#{git} remote rm upstream`
     `#{git} remote add upstream https://github.com/devopsgroup-io/catapult-release-management.git`
   end
+  repo_this_develop = `#{git} config --get branch.develop.remote`
+  if repo_this_develop.empty?
+    `#{git} fetch upstream`
+    `#{git} checkout -b develop --track upstream/master`
+    `#{git} pull upstream master`
+  else
+    `#{git} checkout develop`
+    `#{git} pull upstream master`
+  end
+  `#{git} checkout master`
   `#{git} pull upstream master`
   `#{git} push origin master`
+  `#{git} checkout #{branch}`
   puts "\n"
 end
 FileUtils.mkdir_p(".git/hooks")
@@ -67,9 +80,11 @@ else
 end
 
 branch = `#{git} rev-parse --abbrev-ref HEAD`
+branch = branch.strip
 staged = `#{git} diff --name-only --staged --word-diff=porcelain`
+staged = staged.split($/)
 
-if branch != "master"
+if "#{branch}" != "master"
   if staged.include?("configuration.yml.gpg")
     puts "Please commit configuration.yml.gpg to your fork\'s repository on the master branch."
     exit 1
@@ -117,10 +132,10 @@ puts "\n"
 require "fileutils"
 require "yaml"
 # initialize configuration.yml.gpg
-if File.zero?("configuration.yml.gpg")
+if File.zero?("configuration.yml.gpg") && "#{branch}" == "master"
   `gpg --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output configuration.yml.gpg --armor --cipher-algo AES256 --symmetric configuration.yml.template`
 end
-if configuration_user["settings"]["gpg_edit"]
+if configuration_user["settings"]["gpg_edit"] && "#{branch}" == "master"
   if not File.exist?("configuration.yml")
     # decrypt configuration.yml.gpg as configuration.yml
     `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output configuration.yml --decrypt configuration.yml.gpg`
