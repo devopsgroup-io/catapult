@@ -28,7 +28,6 @@ padding = 5
 puts "+".ljust(padding,"-") + "".ljust(length,"-") + "+".rjust(padding,"-")
 puts "|".ljust(padding)     + title                + "|".rjust(padding)
 puts "+".ljust(padding,"-") + "".ljust(length,"-") + "+".rjust(padding,"-")
-# self update catapult
 puts "\n"
 if File.exist?('C:\Program Files (x86)\Git\bin\git.exe')
   git = "\"C:\\Program Files (x86)\\Git\\bin\\git.exe\""
