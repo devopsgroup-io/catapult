@@ -20,7 +20,7 @@ if ["up","provision"].include?(ARGV[0])
 end
 
 
-# print intro
+# configure catapult and git
 puts "\n"
 title = "Catapult Release Management - https://github.com/devopsgroup-io/catapult-release-management"
 length = title.size
