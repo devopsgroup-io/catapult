@@ -57,11 +57,35 @@ else
   puts "\n"
 end
 FileUtils.mkdir_p(".git/hooks")
-File.write('.git/hooks/pre-commit', '#!/usr/bin/env ruby
-  
-puts "hello world"
-exit 1
+File.write('.git/hooks/pre-commit',
+'#!/usr/bin/env ruby
+
+if File.exist?(\'C:\Program Files (x86)\Git\bin\git.exe\')
+  git = "\"C:\\Program Files (x86)\\Git\\bin\\git.exe\""
+else
+  git = "git"
+end
+
+branch = `#{git} rev-parse --abbrev-ref HEAD`
+staged = `#{git} diff --name-only --staged --word-diff=porcelain`
+
+if branch != "master"
+  if staged.include?("configuration.yml.gpg")
+    puts "Please commit configuration.yml.gpg to your fork\'s repository on the master branch."
+    exit 1
+  end
+  if staged.include?("provisioners/.ssh/id_rsa.gpg")
+    puts "Please commit provisioners/.ssh/id_rsa.gpg to your fork\'s repository on the master branch."
+    exit 1
+  end
+  if staged.include?("provisioners/.ssh/id_rsa.pub.gpg")
+    puts "Please commit provisioners/.ssh/id_rsa.pub.gpg to your fork\'s repository on the master branch."
+    exit 1
+  end
+end
+
 ')
+File.chmod(0777,'.git/hooks/pre-commit')
 
 
 # bootstrap configuration-user.yml
