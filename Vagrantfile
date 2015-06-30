@@ -56,6 +56,13 @@ else
   `#{git} push origin master`
   puts "\n"
 end
+FileUtils.mkdir_p(".git/hooks")
+File.write('.git/hooks/pre-commit', '
+  #!/usr/bin/env ruby
+
+  puts "hello world"
+  exit(1)
+')
 
 
 # bootstrap configuration-user.yml
