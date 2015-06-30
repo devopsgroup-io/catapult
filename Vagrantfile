@@ -58,6 +58,7 @@ else
 end
 FileUtils.mkdir_p(".git/hooks")
 File.write('.git/hooks/pre-commit', '#!/usr/bin/env ruby
+  
 puts "hello world"
 exit 1
 ')
