@@ -228,15 +228,15 @@ while IFS='' read -r -d '' key; do
       -d "ttl=1"
 
     # configure apache
-    echo -e "NOTICE: $1.$domain"
+    echo -e "NOTICE: ${1}.${domain}"
     echo -e "\tconfiguring vhost"
 
-    sudo mkdir -p /var/log/httpd/$domain_environment
-    sudo touch /var/log/httpd/$domain_environment/access.log
-    sudo touch /var/log/httpd/$domain_environment/error.log
-    if [ "$force_https" = true ]; then
+    sudo mkdir -p /var/log/httpd/${domain_environment}
+    sudo touch /var/log/httpd/${domain_environment}/access.log
+    sudo touch /var/log/httpd/${domain_environment}/error.log
+    if [ "${force_https}" = true ]; then
         # rewrite all http traffic to https
-        force_https_value="Redirect Permanent / https://$domain_environment"
+        force_https_value="Redirect Permanent / https://${domain_environment}"
     else
         force_https_value=""
     fi
@@ -283,13 +283,13 @@ while IFS='' read -r -d '' key; do
     </IfModule>
 
     # allow .htaccess in apache 2.4+
-    <Directory "/var/www/repositories/apache/$domain/$webroot">
+    <Directory "/var/www/repositories/apache/$domain/${webroot}">
         AllowOverride All
         Options -Indexes +FollowSymlinks
     </Directory>
 
     # deny access to _sql folders
-    <Directory "/var/www/repositories/apache/$domain/$webroot_sql">
+    <Directory "/var/www/repositories/apache/$domain/${webroot}_sql">
         Order Deny,Allow
         Deny From All
     </Directory>
