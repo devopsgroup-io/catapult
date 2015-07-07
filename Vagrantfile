@@ -63,6 +63,7 @@ else
     `#{git} checkout develop`
     `#{git} pull upstream master`
   end
+  `#{git} push origin develop`
   `#{git} checkout master`
   `#{git} pull upstream master`
   `#{git} push origin master`
@@ -140,8 +141,18 @@ if configuration_user["settings"]["gpg_edit"] && "#{branch}" == "master"
     # decrypt configuration.yml.gpg as configuration.yml
     `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output configuration.yml --decrypt configuration.yml.gpg`
   end
-  # encrypt configuration.yml as configuration.yml.gpg
-  `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output configuration.yml.gpg --armor --cipher-algo AES256 --symmetric configuration.yml`
+  # decrypt configuration.yml.gpg as configuration.yml.compare
+  `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output configuration.yml.compare --decrypt configuration.yml.gpg`
+  if FileUtils.compare_file('configuration.yml', 'configuration.yml.compare')
+    puts "\nconfiguration_user[\"settings\"][\"gpg_edit\"] in configuration-user.yml is set to true."
+    puts "\nThere were no changes to configuration.yml, no need to encrypt as this would create a new cipher to commit.\n\n"
+  else
+    # encrypt configuration.yml as configuration.yml.gpg
+    puts "\nconfiguration_user[\"settings\"][\"gpg_edit\"] in configuration-user.yml is set to true."
+    puts "\nThere were changes to configuration.yml, encrypting configuration.yml as configuration.yml.gpg. Please commit these changes to the master branch for your team to get the changes.\n\n"
+    `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output configuration.yml.gpg --armor --cipher-algo AES256 --symmetric configuration.yml`
+  end
+  FileUtils.rm('configuration.yml.compare')
 else
   # decrypt configuration.yml.gpg as configuration.yml
   `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output configuration.yml --decrypt configuration.yml.gpg`
