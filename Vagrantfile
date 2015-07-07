@@ -70,6 +70,7 @@ else
   `#{git} checkout #{branch}`
   puts "\n"
 end
+# create a git pre-commit hook to ensure no confiuration is committed to develop
 FileUtils.mkdir_p(".git/hooks")
 File.write('.git/hooks/pre-commit',
 '#!/usr/bin/env ruby
@@ -85,17 +86,17 @@ branch = branch.strip
 staged = `#{git} diff --name-only --staged --word-diff=porcelain`
 staged = staged.split($/)
 
-if "#{branch}" != "master"
+if "#{branch}" == "develop"
   if staged.include?("configuration.yml.gpg")
-    puts "Please commit configuration.yml.gpg to your fork\'s repository on the master branch."
+    puts "Please commit configuration.yml.gpg on the master branch. You are on the develop branch, which is meant for contribution back to Catapult."
     exit 1
   end
   if staged.include?("provisioners/.ssh/id_rsa.gpg")
-    puts "Please commit provisioners/.ssh/id_rsa.gpg to your fork\'s repository on the master branch."
+    puts "Please commit provisioners/.ssh/id_rsa.gpg on the master branch. You are on the develop branch, which is meant for contribution back to Catapult."
     exit 1
   end
   if staged.include?("provisioners/.ssh/id_rsa.pub.gpg")
-    puts "Please commit provisioners/.ssh/id_rsa.pub.gpg to your fork\'s repository on the master branch."
+    puts "Please commit provisioners/.ssh/id_rsa.pub.gpg on the master branch. You are on the develop branch, which is meant for contribution back to Catapult."
     exit 1
   end
 end
