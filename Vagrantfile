@@ -274,12 +274,11 @@ if ["status"].include?(ARGV[0])
   totalwebsites = 0
   # start a new row
   puts "\nAvailable websites legend:"
-  puts "\n"
-  puts "[http response codes]"
-  puts " 200 ok, 301 moved permanently, 302 found, 400 bad request, 401 unauthorized, 403 forbidden, 404 not found, 500 internal server error, 502 bad gateway, 503 service unavailable, 504 gateway timeout"
-  puts " http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html"
-  puts "[cert signature algorithm]"
-  puts " https://www.openssl.org/docs/apps/ciphers.html"
+  puts "\n[http response codes]"
+  puts "\n * 200 ok, 301 moved permanently, 302 found, 400 bad request, 401 unauthorized, 403 forbidden, 404 not found, 500 internal server error, 502 bad gateway, 503 service unavailable, 504 gateway timeout"
+  puts " * http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html"
+  puts "\n[cert signature algorithm]"
+  puts "\n * https://www.openssl.org/docs/apps/ciphers.html"
   puts "\n\n"
   puts "Available websites:"
   puts "".ljust(30) + "[software]".ljust(15) + "[dev.]".ljust(8) + "[test.]".ljust(8) + "[qc.]".ljust(8) + "[production / nslookup / cert expiry, signature algorithm, common name]".ljust(82) + "[alexa rank, 3m delta]".ljust(26)
