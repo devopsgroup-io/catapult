@@ -1,55 +1,84 @@
-# Release Management Configuration File
-
+---
 software:
-  name: "devopsgroup.io Release Management"
-  version: "0.1"
-
+  name: devopsgroup.io Release Management
+  version: 0.2
 company:
-  name: "devopsgroup.io"
-  bitbucket_user: ""
-  bitbucket_user_password: ""
-  digitalocean_personal_access_token: ""
-  credit: "Seth Reeser"
-  email: "blackhole@devopsgroup.io"
-  timezone_redhat: "America/New_York" #timedatectl list-timezones
-  timezone_windows: "Eastern Standard Time" #tzutil /l
-
+  name: devopsgroup.io
+  bitbucket_user: 
+  bitbucket_user_password: 
+  digitalocean_personal_access_token: 
+  credit: Seth Reeser
+  email: blackhole@devopsgroup.io
+  timezone_redhat: America/New_York
+  timezone_windows: Eastern Standard Time
 environments:
   dev:
-    branch: "develop"
+    branch: develop
     servers:
       redhat:
-        ip: "192.168.50.101"
+        ip: 192.168.50.101
         port_80: 9101
       redhat_mysql:
-        ip: "192.168.50.102"
+        ip: 192.168.50.102
         mysql:
-          user: "dev"
-          user_password: "password"
-          root_password: "password"
+          user: dev
+          user_password: password
+          root_password: password
       windows:
-        ip: "192.168.50.201"
+        ip: 192.168.50.201
         port_80: 9201
         port_3389: 9200
       windows_mssql:
-        ip: "192.168.50.202"
+        ip: 192.168.50.202
     software:
       drupal:
-        admin_password: "password"
+        admin_password: password
       wordpress:
-        admin_password: "password"
+        admin_password: password
   test:
-    branch: "develop"
+    branch: develop
+    servers:
+      redhat_mysql:
+        mysql:
+          user: test
+          user_password: 
+          root_password: 
+    software:
+      drupal:
+        admin_password: 
+      wordpress:
+        admin_password: 
   qc:
-    branch: "master"
+    branch: master
+    servers:
+      redhat_mysql:
+        mysql:
+          user: qc
+          user_password: 
+          root_password: 
+    software:
+      drupal:
+        admin_password: 
+      wordpress:
+        admin_password: 
   production:
-    branch: "master"
-
+    branch: master
+    servers:
+      redhat_mysql:
+        mysql:
+          user: production
+          user_password: 
+          root_password: 
+    software:
+      drupal:
+        admin_password: 
+      wordpress:
+        admin_password: 
 websites:
   apache:
-    - domain: "devopsgroup.io"
-      repo: "git@github.com:devopsgroup-io/devopsgroup-io.git"
-      webroot: "dist/"
+    - domain: devopsgroup.io
+      repo: git@github.com:devopsgroup-io/devopsgroup-io.git
+      webroot: dist/
   iis:
-    - domain: "devopsgroup.io"
-      repo: "git@github.com:devopsgroup-io/devopsgroup-io.git"
+    - domain: devopsgroup.io
+      repo: git@github.com:devopsgroup-io/devopsgroup-io.git

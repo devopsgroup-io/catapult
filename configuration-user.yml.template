@@ -1,8 +1,7 @@
-# Release Management Configuration-User File
-
+---
 settings:
-  version: "0.1"
-  gpg_key: ""
+  version: 0.2
+  gpg_key: ''
   gpg_edit: false
   git_pull: true
   production_rsync: true
