@@ -133,6 +133,10 @@ require "yaml"
 puts "\nEncryption and decryption of Catapult configuration files:"
 puts "\n"
 if "#{branch}" == "develop"
+  puts " * You are on the develop branch, this branch is automatically synced with Catapult core and is meant to contribute back to the core Catapult project."
+  puts " * confiuration.yml.gpg, provisioners/.ssh/id_rsa.gpg, provisioners/.ssh/id_rsa.pub.gpg is checked out from the master branch so that you're able to develop and test."
+  puts " * After you're finished on the develop branch, switch to the master branch and discard confiuration.yml.gpg, provisioners/.ssh/id_rsa.gpg, provisioners/.ssh/id_rsa.pub.gpg"
+  puts "\n"
   `git checkout --force master -- configuration.yml.gpg`
   `git checkout --force master -- provisioners/.ssh/id_rsa.gpg`
   `git checkout --force master -- provisioners/.ssh/id_rsa.pub.gpg`
@@ -140,6 +144,8 @@ if "#{branch}" == "develop"
   `git reset -- provisioners/.ssh/id_rsa.gpg`
   `git reset -- provisioners/.ssh/id_rsa.pub.gpg`
 elsif "#{branch}" == "master"
+  puts " * You are on the master branch, this branch is automatically synced with Catapult core and is meant to commit your unique configuration."
+  puts "\n"
   # bootstrap configuration.yml
   # initialize configuration.yml.gpg
   if File.zero?("configuration.yml.gpg")
