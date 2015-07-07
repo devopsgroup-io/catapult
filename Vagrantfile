@@ -135,7 +135,7 @@ end
 
 require "fileutils"
 require "yaml"
-puts "\nEncryption and decryption of Catapult configuration files:"
+puts "\n\nEncryption and decryption of Catapult configuration files:"
 puts "\n"
 if "#{branch}" == "develop"
   puts " * You are on the develop branch, this branch is automatically synced with Catapult core and is meant to contribute back to the core Catapult project."
@@ -284,25 +284,24 @@ if ["status"].include?(ARGV[0])
   require "openssl"  # required for ssl cert lookup
   totalwebsites = 0
   # start a new row
-  puts "\nAvailable websites legend:"
+  puts "\n\nAvailable websites legend:"
   puts "\n[http response codes]"
   puts "\n * 200 ok, 301 moved permanently, 302 found, 400 bad request, 401 unauthorized, 403 forbidden, 404 not found, 500 internal server error, 502 bad gateway, 503 service unavailable, 504 gateway timeout"
   puts " * http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html"
   puts "\n[cert signature algorithm]"
   puts "\n * https://www.openssl.org/docs/apps/ciphers.html"
-  puts "\n\n"
-  puts "Available websites:"
+  puts "\n\n\nAvailable websites:"
   puts "".ljust(30) + "[software]".ljust(15) + "[dev.]".ljust(8) + "[test.]".ljust(8) + "[qc.]".ljust(8) + "[production / nslookup / cert expiry, signature algorithm, common name]".ljust(82) + "[alexa rank, 3m delta]".ljust(26)
 
   configuration["websites"].each do |service,data|
-    puts "[#{service}]"
+    puts "\n[#{service}]"
     configuration["websites"]["#{service}"].each do |instance|
       # count websites
       totalwebsites = totalwebsites + 1
       # start a new row
       row = Array.new
       # get domain name
-      row.push(instance["domain"].ljust(29))
+      row.push(" * #{instance["domain"]}".ljust(29))
       # get software
       row.push((instance["software"] || "").ljust(14))
       # get http response code per environment
@@ -383,10 +382,10 @@ if ["status"].include?(ARGV[0])
   end
   # start a new row
   row = Array.new
-  puts "[total]"
-  row.push("#{totalwebsites}")
+  puts "\n[total]"
+  row.push(" #{totalwebsites}")
   puts row.join(" ")
-  puts "\n\n"
+  puts "\n\n\n"
 end
 
 
