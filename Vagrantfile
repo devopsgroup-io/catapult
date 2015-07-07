@@ -127,7 +127,7 @@ if configuration_user["settings"]["version"] != configuration_user_example["sett
   exit 1
 end
 # check for required fields
-if configuration_user["settings"]["gpg_key"] == "" || configuration_user["settings"]["gpg_key"].match(/\s/) || configuration_user["settings"]["gpg_key"].length < 20
+if configuration_user["settings"]["gpg_key"] == nil || configuration_user["settings"]["gpg_key"].match(/\s/) || configuration_user["settings"]["gpg_key"].length < 20
   puts "\nPlease set your team's gpg_key in configuration-user.yml - spaces are not permitted and must be at least 20 characters.\n\n"
   exit 1
 end
@@ -210,9 +210,28 @@ puts "\n"
 # check for required fields
 require "net/ssh"
 # validate digitalocean_personal_access_token
-if configuration["company"]["digitalocean_personal_access_token"] == ""
+if configuration["company"]["digitalocean_personal_access_token"] == nil
   puts "\nPlease set your company's digitalocean_personal_access_token in configuration.yml.\n\n"
   exit 1
+end
+require "securerandom"
+configuration["environments"].each do |environment,data|
+  if not configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["mysql"]["user_password"]
+    configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["mysql"]["user_password"] = SecureRandom.base64(16)
+    File.open('configuration.yml', 'w') {|f| f.write configuration.to_yaml }
+  end
+  if not configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["mysql"]["root_password"]
+    configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["mysql"]["root_password"] = SecureRandom.base64(16)
+    File.open('configuration.yml', 'w') {|f| f.write configuration.to_yaml }
+  end
+  if not configuration["environments"]["#{environment}"]["software"]["drupal"]["admin_password"]
+    configuration["environments"]["#{environment}"]["software"]["drupal"]["admin_password"] = SecureRandom.base64(16)
+    File.open('configuration.yml', 'w') {|f| f.write configuration.to_yaml }
+  end
+  if not configuration["environments"]["#{environment}"]["software"]["wordpress"]["admin_password"]
+    configuration["environments"]["#{environment}"]["software"]["wordpress"]["admin_password"] = SecureRandom.base64(16)
+    File.open('configuration.yml', 'w') {|f| f.write configuration.to_yaml }
+  end
 end
 configuration["websites"].each do |service,data|
   domains = Array.new
@@ -308,7 +327,7 @@ if ["status"].include?(ARGV[0])
       configuration["environments"].each do |environment,data|
         response = nil
         if ["production"].include?("#{environment}")
-          environment = ""
+          environment = nil
         else
           environment = "#{environment}."
         end
