@@ -99,6 +99,11 @@ if "#{branch}" == "develop"
     puts "Please commit provisioners/.ssh/id_rsa.pub.gpg on the master branch. You are on the develop branch, which is meant for contribution back to Catapult and should not contain your configuration files."
     exit 1
   end
+elsif "#{branch}" == "master"
+  unless staged.include?("configuration.yml.gpg") || staged.include?("provisioners/.ssh/id_rsa.gpg") || staged.include?("provisioners/.ssh/id_rsa.pub.gpg")
+    puts "You are on the master branch, which is only meant for your configuration files (configuration.yml.gpg, provisioners/.ssh/id_rsa.gpg, provisioners/.ssh/id_rsa.pub.gpg). To contribute to Catapult, please switch to the develop branch."
+    exit 1
+  end
 end
 
 ')
@@ -133,6 +138,10 @@ require "yaml"
 puts "\nEncryption and decryption of Catapult configuration files:"
 puts "\n"
 if "#{branch}" == "develop"
+  puts " * You are on the develop branch, this branch is automatically synced with Catapult core and is meant to contribute back to the core Catapult project."
+  puts " * confiuration.yml.gpg, provisioners/.ssh/id_rsa.gpg, provisioners/.ssh/id_rsa.pub.gpg is checked out from the master branch so that you're able to develop and test."
+  puts " * After you're finished on the develop branch, switch to the master branch and discard confiuration.yml.gpg, provisioners/.ssh/id_rsa.gpg, provisioners/.ssh/id_rsa.pub.gpg"
+  puts "\n"
   `git checkout --force master -- configuration.yml.gpg`
   `git checkout --force master -- provisioners/.ssh/id_rsa.gpg`
   `git checkout --force master -- provisioners/.ssh/id_rsa.pub.gpg`
@@ -140,6 +149,8 @@ if "#{branch}" == "develop"
   `git reset -- provisioners/.ssh/id_rsa.gpg`
   `git reset -- provisioners/.ssh/id_rsa.pub.gpg`
 elsif "#{branch}" == "master"
+  puts " * You are on the master branch, this branch is automatically synced with Catapult core and is meant to commit your unique configuration."
+  puts "\n"
   # bootstrap configuration.yml
   # initialize configuration.yml.gpg
   if File.zero?("configuration.yml.gpg")
@@ -274,12 +285,11 @@ if ["status"].include?(ARGV[0])
   totalwebsites = 0
   # start a new row
   puts "\nAvailable websites legend:"
-  puts "\n"
-  puts "[http response codes]"
-  puts " 200 ok, 301 moved permanently, 302 found, 400 bad request, 401 unauthorized, 403 forbidden, 404 not found, 500 internal server error, 502 bad gateway, 503 service unavailable, 504 gateway timeout"
-  puts " http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html"
-  puts "[cert signature algorithm]"
-  puts " https://www.openssl.org/docs/apps/ciphers.html"
+  puts "\n[http response codes]"
+  puts "\n * 200 ok, 301 moved permanently, 302 found, 400 bad request, 401 unauthorized, 403 forbidden, 404 not found, 500 internal server error, 502 bad gateway, 503 service unavailable, 504 gateway timeout"
+  puts " * http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html"
+  puts "\n[cert signature algorithm]"
+  puts "\n * https://www.openssl.org/docs/apps/ciphers.html"
   puts "\n\n"
   puts "Available websites:"
   puts "".ljust(30) + "[software]".ljust(15) + "[dev.]".ljust(8) + "[test.]".ljust(8) + "[qc.]".ljust(8) + "[production / nslookup / cert expiry, signature algorithm, common name]".ljust(82) + "[alexa rank, 3m delta]".ljust(26)
