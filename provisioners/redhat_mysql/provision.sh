@@ -110,7 +110,7 @@ while IFS='' read -r -d '' key; do
     software_dbprefix=$(echo "$key" | grep -w "software_dbprefix" | cut -d ":" -f 2 | tr -d " ")
 
     if test -n "$software"; then
-        if [ "$software" = "codeigniter2" ] || [ "$software" = "drupal6" ] || [ "$software" = "drupal7" ] || [ "$software" = "wordpress" ]; then
+        if [ "$software" = "codeigniter2" ] || [ "$software" = "drupal6" ] || [ "$software" = "drupal7" ] || [ "$software" = "wordpress" ] || [ "$software" = "xenforo" ]; then
             # create database
             mysql --defaults-extra-file=$dbconf -e "CREATE DATABASE $1_$domainvaliddbname"
             # grant user to database

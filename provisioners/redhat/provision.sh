@@ -384,6 +384,12 @@ EOF
                 echo "$software theme list:" | sed "s/^/\t/"
                 php /vagrant/provisioners/redhat/installers/wp-cli.phar --path="/vagrant/repositories/apache/$domain/" theme list 2>&1 | sed "s/^/\t\t/"
             fi
+    elif [ "$software" = "xenforo" ]; then
+            echo -e "\tgenerating $software database configuration file"
+            if [ -f "/var/www/repositories/apache/${domain}/${webroot}library/config.php" ]; then
+                sudo chmod 0777 "/var/www/repositories/apache/${domain}/${webroot}library/config.php"
+            fi
+            sed -e "s/\$config\['db'\]\['host'\]\s=\s'localhost';/\$config\['db'\]\['host'\] = '${redhat_mysql_ip}';/g" -e "s/\$config\['db'\]\['username'\]\s=\s'';/\$config\['db'\]\['username'\] = '${mysql_user}';/g" -e "s/\$config\['db'\]\['password'\]\s=\s'';/\$config\['db'\]\['password'\] = '${mysql_user_password}';/g" -e "s/\$config\['db'\]\['dbname'\]\s=\s'';/\$config\['db'\]\['dbname'\] = '${1}_${domainvaliddbname}';/g" /vagrant/provisioners/redhat/installers/xenforo_config.php > "/var/www/repositories/apache/${domain}/${webroot}library/config.php"
     fi
 
 done
