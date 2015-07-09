@@ -257,15 +257,6 @@ configuration["websites"].each do |service,data|
       puts "\nThe repo for websites => #{service} => domain => #{instance["domain"]} is invalid, it must either be a bitbucket.org or github.com repository.\n\n"
       exit 1
     end
-    # validate repo connection
-    Net::SSH.start(
-      "github.com","git",
-      :host_key => "ssh-rsa",
-      :keys => ["provisioners/.ssh/id_rsa"],
-      #:verbose => :debug
-    ) do |session|
-      #puts session.inspect
-    end
     # validate webroot
     if not "#{instance["webroot"]}" == ""
       if not "#{instance["webroot"]}"[-1,1] == "/"
