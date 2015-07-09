@@ -111,13 +111,16 @@ The following options are available:
         * GitHub and Bitbucket over SSH are supported, HTTPS is not supported
 * software:
     * "codeigniter2"
-        * generates codeigniter2 db config file ~/application/config/database.php, restores database
+        * generates codeigniter2 database config file ~/application/config/database.php, restores database
     * "drupal6"
-        * generates drupal6 db config file ~/sites/default/settings.php, resets drupal6 admin password, rsyncs ~/sites/default/files from production source, restores database
+        * generates drupal6 database config file ~/sites/default/settings.php, resets drupal6 admin password, rsyncs ~/sites/default/files from production source, restores database
     * "drupal7"
-        * generates drupal7 db config file ~/sites/default/settings.php, resets drupal7 admin password, rsyncs ~/sites/default/files from production source, restores database
+        * generates drupal7 database config file ~/sites/default/settings.php, resets drupal7 admin password, rsyncs ~/sites/default/files from production source, restores database
     * "wordpress"
-        * generates wordpress db config file ~/installers/wp-config.php, resets wordpress admin password, rsyncs ~/wp-content/uploads from production source, restores database
+        * generates wordpress database config file ~/installers/wp-config.php, resets wordpress admin password, rsyncs ~/wp-content/uploads from production source, restores database
+    * "xenforo"
+        * generates xenforo database config file ~/library/config.php, restores database
+
 * software_dbprefix:
     * "wp_"
         * usually used in drupal for multisite installations ("wp_ is required for base Wordpress installs, Drupal has no prefix by default")
