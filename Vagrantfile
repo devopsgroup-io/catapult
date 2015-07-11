@@ -214,25 +214,30 @@ if configuration["company"]["digitalocean_personal_access_token"] == nil
   puts "\nPlease set your company's digitalocean_personal_access_token in configuration.yml.\n\n"
   exit 1
 end
+# if passwords are blank, generate them
 require "securerandom"
 configuration["environments"].each do |environment,data|
   if not configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["mysql"]["user_password"]
     configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["mysql"]["user_password"] = SecureRandom.base64(16)
+    `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output configuration.yml --decrypt configuration.yml.gpg`
     File.open('configuration.yml', 'w') {|f| f.write configuration.to_yaml }
     `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output configuration.yml.gpg --armor --cipher-algo AES256 --symmetric configuration.yml`
   end
   if not configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["mysql"]["root_password"]
     configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["mysql"]["root_password"] = SecureRandom.base64(16)
+    `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output configuration.yml --decrypt configuration.yml.gpg`
     File.open('configuration.yml', 'w') {|f| f.write configuration.to_yaml }
     `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output configuration.yml.gpg --armor --cipher-algo AES256 --symmetric configuration.yml`
   end
   if not configuration["environments"]["#{environment}"]["software"]["drupal"]["admin_password"]
     configuration["environments"]["#{environment}"]["software"]["drupal"]["admin_password"] = SecureRandom.base64(16)
+    `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output configuration.yml --decrypt configuration.yml.gpg`
     File.open('configuration.yml', 'w') {|f| f.write configuration.to_yaml }
     `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output configuration.yml.gpg --armor --cipher-algo AES256 --symmetric configuration.yml`
   end
   if not configuration["environments"]["#{environment}"]["software"]["wordpress"]["admin_password"]
     configuration["environments"]["#{environment}"]["software"]["wordpress"]["admin_password"] = SecureRandom.base64(16)
+    `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output configuration.yml --decrypt configuration.yml.gpg`
     File.open('configuration.yml', 'w') {|f| f.write configuration.to_yaml }
     `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output configuration.yml.gpg --armor --cipher-algo AES256 --symmetric configuration.yml`
   end
@@ -272,6 +277,42 @@ configuration["websites"].each do |service,data|
     puts "\nThere is an error in your configuration.yml file."
     puts "\nThe domains in configuration.yml are not in alpha order for websites => #{service} - please adjust.\n\n"
     exit 1
+  end
+end
+
+
+# if upstream servers are provisioned, write server ip addresses to configuration.yml for use in database configuration files
+require "json"
+uri = URI("https://api.digitalocean.com/v2/droplets")
+Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => OpenSSL::SSL::VERIFY_NONE) do |http|
+  request = Net::HTTP::Get.new uri.request_uri
+  request.basic_auth "#{configuration["company"]["digitalocean_personal_access_token"]}", ""
+  response = http.request request # Net::HTTPResponse object
+  droplets = JSON.parse(response.body)
+  droplets = droplets["droplets"]
+  configuration["environments"].each do |environment,data|
+    unless environment == "dev"
+      if not configuration["environments"]["#{environment}"]["servers"]["redhat"]["ip"]
+        droplet = droplets.find { |d| d['name'] == "#{configuration["company"]["name"]}-#{environment}-redhat" }
+        unless droplet == nil
+          # puts droplet
+          configuration["environments"]["#{environment}"]["servers"]["redhat"]["ip"] = droplet["networks"]["v4"].first["ip_address"]
+          `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output configuration.yml --decrypt configuration.yml.gpg`
+          File.open('configuration.yml', 'w') {|f| f.write configuration.to_yaml }
+          `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output configuration.yml.gpg --armor --cipher-algo AES256 --symmetric configuration.yml`
+        end
+      end
+      if not configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["ip"]
+        droplet = droplets.find { |d| d['name'] == "#{configuration["company"]["name"]}-#{environment}-redhat_mysql" }
+        unless droplet == nil
+          # puts droplet
+          configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["ip"] = droplet["networks"]["v4"].first["ip_address"]
+          `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output configuration.yml --decrypt configuration.yml.gpg`
+          File.open('configuration.yml', 'w') {|f| f.write configuration.to_yaml }
+          `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output configuration.yml.gpg --armor --cipher-algo AES256 --symmetric configuration.yml`
+        end
+      end
+    end
   end
 end
 

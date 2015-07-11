@@ -1,7 +1,7 @@
 ---
 software:
   name: devopsgroup.io Release Management
-  version: 0.2
+  version: 0.3
 company:
   name: devopsgroup.io
   bitbucket_user: 
@@ -38,7 +38,10 @@ environments:
   test:
     branch: develop
     servers:
+      redhat:
+        ip:
       redhat_mysql:
+        ip:
         mysql:
           user: test
           user_password: 
@@ -51,7 +54,10 @@ environments:
   qc:
     branch: master
     servers:
+      redhat:
+        ip:
       redhat_mysql:
+        ip:
         mysql:
           user: qc
           user_password: 
@@ -64,7 +70,10 @@ environments:
   production:
     branch: master
     servers:
+      redhat:
+        ip:
       redhat_mysql:
+        ip:
         mysql:
           user: production
           user_password: 
