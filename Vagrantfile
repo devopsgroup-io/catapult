@@ -281,6 +281,42 @@ configuration["websites"].each do |service,data|
 end
 
 
+# if upstream servers are provisioned, write server ip addresses to configuration.yml for use in database configuration files
+require "json"
+uri = URI("https://api.digitalocean.com/v2/droplets")
+Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => OpenSSL::SSL::VERIFY_NONE) do |http|
+  request = Net::HTTP::Get.new uri.request_uri
+  request.basic_auth "#{configuration["company"]["digitalocean_personal_access_token"]}", ""
+  response = http.request request # Net::HTTPResponse object
+  droplets = JSON.parse(response.body)
+  droplets = droplets["droplets"]
+  configuration["environments"].each do |environment,data|
+    unless environment == "dev"
+      if not configuration["environments"]["#{environment}"]["servers"]["redhat"]["ip"]
+        droplet = droplets.find { |d| d['name'] == "#{configuration["company"]["name"]}-#{environment}-redhat" }
+        unless droplet == nil
+          # puts droplet
+          configuration["environments"]["#{environment}"]["servers"]["redhat"]["ip"] = droplet["networks"]["v4"].first["ip_address"]
+          `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output configuration.yml --decrypt configuration.yml.gpg`
+          File.open('configuration.yml', 'w') {|f| f.write configuration.to_yaml }
+          `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output configuration.yml.gpg --armor --cipher-algo AES256 --symmetric configuration.yml`
+        end
+      end
+      if not configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["ip"]
+        droplet = droplets.find { |d| d['name'] == "#{configuration["company"]["name"]}-#{environment}-redhat_mysql" }
+        unless droplet == nil
+          # puts droplet
+          configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["ip"] = droplet["networks"]["v4"].first["ip_address"]
+          `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output configuration.yml --decrypt configuration.yml.gpg`
+          File.open('configuration.yml', 'w') {|f| f.write configuration.to_yaml }
+          `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output configuration.yml.gpg --armor --cipher-algo AES256 --symmetric configuration.yml`
+        end
+      end
+    end
+  end
+end
+
+
 # create arrays of domains for localdev hosts file
 redhathostsfile = Array.new
 configuration["websites"]["apache"].each do |instance|
