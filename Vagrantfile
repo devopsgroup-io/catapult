@@ -405,7 +405,7 @@ if ["status"].include?(ARGV[0])
       rescue Timeout::Error
         row.push("no 443 listener".ljust(57))
       rescue OpenSSL::SSL::SSLError
-        row.push("ssl error - cannot read cert".ljust(57))
+        row.push("ssl error - cannot read cert - missing local cipher?".ljust(57))
       rescue Exception => ex
         row.push("error: #{ex.class} #{ex.message}".ljust(57))
       end
