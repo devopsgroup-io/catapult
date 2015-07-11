@@ -303,7 +303,7 @@ Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_m
         end
       end
       if not configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["ip"]
-        droplet = droplets.find { |d| d['name'] == "#{configuration["company"]["name"]}-#{environment}-redhat_mysql" }
+        droplet = droplets.find { |d| d['name'] == "#{configuration["company"]["name"]}-#{environment}-redhat-mysql" }
         unless droplet == nil
           # puts droplet
           configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["ip"] = droplet["networks"]["v4"].first["ip_address"]
@@ -470,7 +470,7 @@ Vagrant.configure("2") do |config|
     config.vm.synced_folder "repositories", "/var/www/repositories", type: "nfs"
     config.vm.provision "shell", path: "provisioners/redhat/provision.sh", args: ["dev","#{configuration_user["settings"]["git_pull"]}","#{configuration_user["settings"]["production_rsync"]}","#{configuration_user["settings"]["software_validation"]}"]
   end
-  config.vm.define "#{configuration["company"]["name"]}-dev-redhat_mysql" do |config|
+  config.vm.define "#{configuration["company"]["name"]}-dev-redhat-mysql" do |config|
     config.vm.box = "chef/centos-7.0"
     config.vm.network "private_network", ip: configuration["environments"]["dev"]["servers"]["redhat_mysql"]["ip"]
     config.vm.provider :virtualbox do |provider|
@@ -499,7 +499,7 @@ Vagrant.configure("2") do |config|
     config.vm.synced_folder ".", "/vagrant", type: "rsync"
     config.vm.provision "shell", path: "provisioners/redhat/provision.sh", args: ["test","true","false","true"]
   end
-  config.vm.define "#{configuration["company"]["name"]}-test-redhat_mysql" do |config|
+  config.vm.define "#{configuration["company"]["name"]}-test-redhat-mysql" do |config|
     config.vm.provider :digital_ocean do |provider,override|
       override.ssh.private_key_path = "provisioners/.ssh/id_rsa"
       override.vm.box = "digital_ocean"
@@ -532,7 +532,7 @@ Vagrant.configure("2") do |config|
     config.vm.synced_folder ".", "/vagrant", type: "rsync"
     config.vm.provision "shell", path: "provisioners/redhat/provision.sh", args: ["qc","true","false","true"]
   end
-  config.vm.define "#{configuration["company"]["name"]}-qc-redhat_mysql" do |config|
+  config.vm.define "#{configuration["company"]["name"]}-qc-redhat-mysql" do |config|
     config.vm.provider :digital_ocean do |provider,override|
       override.ssh.private_key_path = "provisioners/.ssh/id_rsa"
       override.vm.box = "digital_ocean"
@@ -565,7 +565,7 @@ Vagrant.configure("2") do |config|
     config.vm.synced_folder ".", "/vagrant", type: "rsync"
     config.vm.provision "shell", path: "provisioners/redhat/provision.sh", args: ["production","true","false","true"]
   end
-  config.vm.define "#{configuration["company"]["name"]}-production-redhat_mysql" do |config|
+  config.vm.define "#{configuration["company"]["name"]}-production-redhat-mysql" do |config|
     config.vm.provider :digital_ocean do |provider,override|
       override.ssh.private_key_path = "provisioners/.ssh/id_rsa"
       override.vm.box = "digital_ocean"
