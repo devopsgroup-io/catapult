@@ -368,10 +368,23 @@ if ["status"].include?(ARGV[0])
           environment = "#{environment}."
         end
         begin
-          Net::HTTP.start("#{environment}#{instance["domain"]}", 80) {|http|
-            response = http.head("/")
-          }
-          row.push(response.code.ljust(7))
+          def http_repsonse(uri_str, limit = 10)
+            if limit == 0
+              row.push("loop".ljust(7))
+            else
+              response = Net::HTTP.get_response(URI(uri_str))
+              case response
+              when Net::HTTPSuccess then
+                return response.code
+              when Net::HTTPRedirection then
+                location = response['location']
+                http_repsonse(location, limit - 1)
+              else
+                return response.code
+              end
+            end
+          end
+          row.push(http_repsonse("http://#{environment}#{instance["domain"]}").ljust(7))
         rescue
           row.push("down".ljust(7))
         end
