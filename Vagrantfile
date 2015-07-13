@@ -368,10 +368,23 @@ if ["status"].include?(ARGV[0])
           environment = "#{environment}."
         end
         begin
-          Net::HTTP.start("#{environment}#{instance["domain"]}", 80) {|http|
-            response = http.head("/")
-          }
-          row.push(response.code.ljust(7))
+          def http_repsonse(uri_str, limit = 10)
+            if limit == 0
+              row.push("loop".ljust(7))
+            else
+              response = Net::HTTP.get_response(URI(uri_str))
+              case response
+              when Net::HTTPSuccess then
+                return response.code
+              when Net::HTTPRedirection then
+                location = response['location']
+                http_repsonse(location, limit - 1)
+              else
+                return response.code
+              end
+            end
+          end
+          row.push(http_repsonse("http://#{environment}#{instance["domain"]}").ljust(7))
         rescue
           row.push("down".ljust(7))
         end
@@ -405,7 +418,7 @@ if ["status"].include?(ARGV[0])
       rescue Timeout::Error
         row.push("no 443 listener".ljust(57))
       rescue OpenSSL::SSL::SSLError
-        row.push("ssl error - cannot read cert".ljust(57))
+        row.push("ssl error - cannot read cert - missing local cipher?".ljust(57))
       rescue Exception => ex
         row.push("error: #{ex.class} #{ex.message}".ljust(57))
       end
