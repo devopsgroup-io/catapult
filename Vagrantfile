@@ -346,14 +346,14 @@ if ["status"].include?(ARGV[0])
   puts "\n[cert signature algorithm]"
   puts "\n * https://www.openssl.org/docs/apps/ciphers.html"
   puts "\n\n\nAvailable websites:"
-  puts "".ljust(30) + "[software]".ljust(15) + "[dev.]".ljust(8) + "[test.]".ljust(8) + "[qc.]".ljust(8) + "[production / nslookup / cert expiry, signature algorithm, common name]".ljust(82) + "[alexa rank, 3m delta]".ljust(26)
+  puts "".ljust(30) + "[software]".ljust(15) + "[dev.]".ljust(22) + "[test.]".ljust(22) + "[qc.]".ljust(22) + "[production / cert expiry, signature algorithm, common name]".ljust(80) + "[alexa rank, 3m delta]".ljust(26)
 
   configuration["websites"].each do |service,data|
     puts "\n[#{service}]"
     configuration["websites"]["#{service}"].each do |instance|
       # count websites
       totalwebsites = totalwebsites + 1
-      # start a new row
+      # start new row
       row = Array.new
       # get domain name
       row.push(" * #{instance["domain"]}".ljust(29))
@@ -384,16 +384,20 @@ if ["status"].include?(ARGV[0])
               end
             end
           end
-          row.push(http_repsonse("http://#{environment}#{instance["domain"]}").ljust(7))
-        rescue
-          row.push("down".ljust(7))
+          row.push(http_repsonse("http://#{environment}#{instance["domain"]}").ljust(4))
+        rescue SocketError
+          row.push("down".ljust(4))
+        rescue OpenSSL::SSL::SSLError
+          row.push("err".ljust(4))
+        rescue Exception => ex
+          row.push("#{ex.class}".ljust(4))
         end
-      end
-      # nslookup production top-level domain
-      begin
-        row.push((Resolv.getaddress "#{instance["domain"]}").ljust(15))
-      rescue
-        row.push("down".ljust(15))
+        # nslookup production top-level domain
+        begin
+          row.push((Resolv.getaddress "#{environment}#{instance["domain"]}").ljust(16))
+        rescue
+          row.push("down".ljust(16))
+        end
       end
       # ssl cert lookup
       begin 
@@ -418,9 +422,9 @@ if ["status"].include?(ARGV[0])
       rescue Timeout::Error
         row.push("no 443 listener".ljust(57))
       rescue OpenSSL::SSL::SSLError
-        row.push("ssl error - cannot read cert - missing local cipher?".ljust(57))
+        row.push("cannot read cert, missing local cipher?".ljust(57))
       rescue Exception => ex
-        row.push("error: #{ex.class} #{ex.message}".ljust(57))
+        row.push("#{ex.class}".ljust(57))
       end
       # alexa rank and 3 month deviation
       begin
@@ -438,7 +442,7 @@ if ["status"].include?(ARGV[0])
           end
           if "#{response.xpath('//ALEXA//SD//RANK')}" != ""
             response.xpath('//ALEXA//SD//RANK').each do |attribute|
-                row.push(attribute["DELTA"].ljust(13))
+              row.push(attribute["DELTA"].ljust(13))
             end
           else
             row.push("".ljust(13))
