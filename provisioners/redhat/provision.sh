@@ -253,7 +253,7 @@ while IFS='' read -r -d '' key; do
                 -H "X-Auth-Email: ${cloudflare_email}"\
                 -H "X-Auth-Key: ${cloudflare_api_key}"\
                 -H "Content-Type: application/json"\
-                --data "{\"type\":\"A\",\"name\":\"${domain_levels[0]}.${domain_levels[1]}\",\"content\":\"${redhat_ip}\",\"ttl\":1}"\
+                --data "{\"type\":\"A\",\"name\":\"${domain_levels[0]}.${domain_levels[1]}\",\"content\":\"${redhat_ip}\",\"ttl\":1,\"proxied\":true}"\
                 | sed "s/^/\t\t/"
 
                 # set dns a record for www.environment
@@ -261,7 +261,7 @@ while IFS='' read -r -d '' key; do
                 -H "X-Auth-Email: ${cloudflare_email}"\
                 -H "X-Auth-Key: ${cloudflare_api_key}"\
                 -H "Content-Type: application/json"\
-                --data "{\"type\":\"A\",\"name\":\"www\",\"content\":\"${redhat_ip}\",\"ttl\":1}"\
+                --data "{\"type\":\"A\",\"name\":\"www\",\"content\":\"${redhat_ip}\",\"ttl\":1,\"proxied\":true}"\
                 | sed "s/^/\t\t/"
             else
                 # set dns a record for environment
@@ -269,7 +269,7 @@ while IFS='' read -r -d '' key; do
                 -H "X-Auth-Email: ${cloudflare_email}"\
                 -H "X-Auth-Key: ${cloudflare_api_key}"\
                 -H "Content-Type: application/json"\
-                --data "{\"type\":\"A\",\"name\":\"${1}\",\"content\":\"${redhat_ip}\",\"ttl\":1}"\
+                --data "{\"type\":\"A\",\"name\":\"${1}\",\"content\":\"${redhat_ip}\",\"ttl\":1,\"proxied\":true}"\
                 | sed "s/^/\t\t/"
 
                 # set dns a record for www.environment
@@ -277,7 +277,7 @@ while IFS='' read -r -d '' key; do
                 -H "X-Auth-Email: ${cloudflare_email}"\
                 -H "X-Auth-Key: ${cloudflare_api_key}"\
                 -H "Content-Type: application/json"\
-                --data "{\"type\":\"A\",\"name\":\"www.${1}\",\"content\":\"${redhat_ip}\",\"ttl\":1}"\
+                --data "{\"type\":\"A\",\"name\":\"www.${1}\",\"content\":\"${redhat_ip}\",\"ttl\":1,\"proxied\":true}"\
                 | sed "s/^/\t\t/"
             fi
 
@@ -317,7 +317,7 @@ while IFS='' read -r -d '' key; do
                 -H "X-Auth-Email: ${cloudflare_email}"\
                 -H "X-Auth-Key: ${cloudflare_api_key}"\
                 -H "Content-Type: application/json"\
-                --data "{\"type\":\"A\",\"name\":\"${domain_levels[1]}.${domain_levels[2]}\",\"content\":\"${redhat_ip}\",\"ttl\":1}"\
+                --data "{\"type\":\"A\",\"name\":\"${domain_levels[1]}.${domain_levels[2]}\",\"content\":\"${redhat_ip}\",\"ttl\":1,\"proxied\":true}"\
                 | sed "s/^/\t\t/"
 
                 # set dns a record for www.environment
@@ -325,7 +325,7 @@ while IFS='' read -r -d '' key; do
                 -H "X-Auth-Email: ${cloudflare_email}"\
                 -H "X-Auth-Key: ${cloudflare_api_key}"\
                 -H "Content-Type: application/json"\
-                --data "{\"type\":\"A\",\"name\":\"www\",\"content\":\"${redhat_ip}\",\"ttl\":1}"\
+                --data "{\"type\":\"A\",\"name\":\"www\",\"content\":\"${redhat_ip}\",\"ttl\":1,\"proxied\":true}"\
                 | sed "s/^/\t\t/"
             else
                 # set dns a record for environment
@@ -333,7 +333,7 @@ while IFS='' read -r -d '' key; do
                 -H "X-Auth-Email: ${cloudflare_email}"\
                 -H "X-Auth-Key: ${cloudflare_api_key}"\
                 -H "Content-Type: application/json"\
-                --data "{\"type\":\"A\",\"name\":\"${1}.${domain_levels[0]}\",\"content\":\"${redhat_ip}\",\"ttl\":1}"\
+                --data "{\"type\":\"A\",\"name\":\"${1}.${domain_levels[0]}\",\"content\":\"${redhat_ip}\",\"ttl\":1,\"proxied\":true}"\
                 | sed "s/^/\t\t/"
 
                 # set dns a record for www.environment
@@ -341,7 +341,7 @@ while IFS='' read -r -d '' key; do
                 -H "X-Auth-Email: ${cloudflare_email}"\
                 -H "X-Auth-Key: ${cloudflare_api_key}"\
                 -H "Content-Type: application/json"\
-                --data "{\"type\":\"A\",\"name\":\"www.${1}.${domain_levels[0]}\",\"content\":\"${redhat_ip}\",\"ttl\":1}"\
+                --data "{\"type\":\"A\",\"name\":\"www.${1}.${domain_levels[0]}\",\"content\":\"${redhat_ip}\",\"ttl\":1,\"proxied\":true}"\
                 | sed "s/^/\t\t/"
             fi
 
