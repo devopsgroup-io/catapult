@@ -42,15 +42,19 @@ Catapult is quick to setup. Fork the Github repository and start adding your con
 1. Fork https://github.com/devopsgroup-io/release-management and clone via SourceTree or the git utility of your choice.
 2. Open your command line and cd into the newly cloned repository.
 3. From here, you will need to install all of the required Vagrant plugins. To see these, run the vagrant status command and any Vagrant plugins that you do not have installed, will be displayed with the command to install.
-4. Next, you will need to create and add your team's gpg_key to the untracked configuration-user.yml.
+4. Next, you will need to create a passwordless SSH key pair that will drive authentication for Catapult.
+    1. For instructions please see https://confluence.atlassian.com/display/STASH/Creating+SSH+keys
+    2. Place the newly created passwordless SSH key pair id_rsa and id_rsa.pub in the ~/provisioners/.ssh/ folder.
+5. Next, you will need to create and add your team's gpg_key to the untracked configuration-user.yml.
     1. NEVER SHARE THE GPG_KEY WITH ANYONE OTHER THAN YOUR TEAM.
     2. The gpg_key is the single key that encrypts all of your configuration for your instance.
     3. Spaces are not permitted and must be at least 20 characters.
     4. It is recommended to create and print a QR code of the gpg_key to distribute to your team.
     5. Remember; security is 99% process and 1% technology.
-5. Next, you will need to configure gpg_edit mode so that during the Services Setup you can add your secrets to configuration.yml and commit your secrets to configuration.yml.gpg.
+6. Next, you will need to configure gpg_edit mode so that during the Services Setup you can add your secrets to configuration.yml and commit your secrets to configuration.yml.gpg.
     1. To do so, set gpg_edit to true in configuration-user.yml.
     2. This will now allow you to add secrets to configuration.yml and run vagrant status to encrypt the secrets in configuration.yml.gpg
+        1. In addition to encrypting ~/provisioners/.ssh/id_rsa and ~/provisioners/.ssh/id_rsa.pub as ~/provisioners/.ssh/id_rsa.gpb and ~/provisioners/.ssh/id_rsa.pub.gpb, respecfully.
 
 ## Services Setup ##
 
@@ -59,8 +63,7 @@ Catapult uses several third-party services to pull everything off - below is a l
 1. **Hosting:** DigitalOcean Sign-Up and Configuration
     1. Create an account at http://digitalocean.com
     2. Create a Personal Access Token at https://cloud.digitalocean.com/settings/applications named "Vagrant" and place the token value in ~/configuration.yml at ["company"]["digitalocean_personal_access_token"]
-    3. Create an SSH Key https://www.digitalocean.com/community/tutorials/how-to-use-ssh-keys-with-digitalocean-droplets and place in ~/provisioners/.ssh
-    4. Add the newly created id_rsa.pub key in https://cloud.digitalocean.com/settings/security named "Vagrant"
+    3. Add your newly created id_rsa.pub from ~/provisioners/.ssh/id_rsa.pub key in https://cloud.digitalocean.com/settings/security named "Vagrant"
 
 3. **Automated Deployments:** Amazon Web Services (AWS) EC2 Sign-Up and Configuration (Required for Bamboo)
     1. Create an AWS account https://portal.aws.amazon.com/gp/aws/developer/registration
