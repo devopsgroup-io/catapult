@@ -105,7 +105,7 @@ fi
 while IFS='' read -r -d '' key; do
     domain=$(echo "$key" | grep -w "domain" | cut -d ":" -f 2 | tr -d " ")
     repo=$(echo "$key" | grep -w "repo" | cut -d ":" -f 2,3 | tr -d " ")
-    echo "NOTICE: $domain"
+    echo -e "\nNOTICE: $domain"
     if [ -d "/var/www/repositories/apache/$domain/.git" ]; then
         if [ "$(cd /var/www/repositories/apache/$domain && git config --get remote.origin.url)" != "$repo" ]; then
             echo "the repo has changed in configuration.yml, removing and cloning the new repository." | sed "s/^/\t/"
@@ -194,8 +194,6 @@ sudo rm -rf /etc/httpd/sites-enabled/*
 sudo cat /dev/null > /etc/httpd/conf.d/welcome.conf
 sudo apachectl stop
 sudo apachectl start
-sudo apachectl configtest
-sudo systemctl is-active httpd.service
 
 cat /vagrant/configuration.yml | shyaml get-values-0 websites.apache |
 while IFS='' read -r -d '' key; do
@@ -211,26 +209,99 @@ while IFS='' read -r -d '' key; do
     software_dbprefix=$(echo "$key" | grep -w "software_dbprefix" | cut -d ":" -f 2 | tr -d " ")
     webroot=$(echo "$key" | grep -w "webroot" | cut -d ":" -f 2 | tr -d " ")
 
-    curl https://www.cloudflare.com/api_json.html \
-      -d "a=full_zone_set" \
-      -d "tkn=$cloudflare_api_key" \
-      -d "email=$cloudflare_email" \
-      -d "zone_name=$domain"
-
-    curl https://www.cloudflare.com/api_json.html \
-      -d "a=rec_new" \
-      -d "tkn=$cloudflare_api_key" \
-      -d "email=$cloudflare_email" \
-      -d "z=$domain" \
-      -d "type=A" \
-      -d "name=$domain" \
-      -d "content=45.55.231.36" \
-      -d "ttl=1"
-
     # configure apache
-    echo -e "NOTICE: ${1}.${domain}"
-    echo -e "\tconfiguring vhost"
+    echo -e "\nNOTICE: ${1}.${domain}"
 
+    # configure cloudflare dns
+    echo -e "\tconfiguring cloudflare dns"
+    IFS=. read -a domain_levels <<< "$domain"
+    if [ "${#domain_levels[@]}" = "2" ]; then
+
+        # determine if cloudflare zone exists
+        cloudflare_id=$(curl -s -X GET "https://api.cloudflare.com/client/v4/zones?name=${domain_levels[0]}.${domain_levels[1]}"\
+        -H "X-Auth-Email: ${cloudflare_email}"\
+        -H "X-Auth-Key: ${cloudflare_api_key}"\
+        -H "Content-Type: application/json"\
+        | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["result"]')
+
+        if [ "${cloudflare_id}" = "[]" ]; then
+            # create cloudflare zone
+            echo "cloudflare zone does not exist" | sed "s/^/\t\t/"
+            cloudflare_id=$(curl -s -X POST "https://api.cloudflare.com/client/v4/zones"\
+            -H "X-Auth-Email: ${cloudflare_email}"\
+            -H "X-Auth-Key: ${cloudflare_api_key}"\
+            -H "Content-Type: application/json"\
+            --data "{\"name\":\"${domain_levels[0]}.${domain_levels[1]}\",\"jump_start\":false}"\
+            | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["result"]["id"]')
+            echo $cloudflare_id | sed "s/^/\t\t/"
+        else
+            # get cloudflare zone
+            echo "cloudflare zone exists" | sed "s/^/\t\t/"
+            cloudflare_id=$(curl -s -X GET "https://api.cloudflare.com/client/v4/zones?name=${domain_levels[0]}.${domain_levels[1]}"\
+            -H "X-Auth-Email: ${cloudflare_email}"\
+            -H "X-Auth-Key: ${cloudflare_api_key}"\
+            -H "Content-Type: application/json"\
+            | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["result"][0]["id"]')
+            echo $cloudflare_id | sed "s/^/\t\t/"
+        fi
+
+    elif [ "${#domain_levels[@]}" = "3" ]; then
+    
+        # determine if cloudflare zone exists
+        cloudflare_id=$(curl -s -X GET "https://api.cloudflare.com/client/v4/zones?name=${domain_levels[1]}.${domain_levels[2]}"\
+        -H "X-Auth-Email: ${cloudflare_email}"\
+        -H "X-Auth-Key: ${cloudflare_api_key}"\
+        -H "Content-Type: application/json"\
+        | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["result"]')
+
+        if [ "${cloudflare_id}" = "[]" ]; then
+            # create cloudflare zone
+            echo "cloudflare zone does not exist" | sed "s/^/\t\t/"
+            cloudflare_id=$(curl -s -X POST "https://api.cloudflare.com/client/v4/zones"\
+            -H "X-Auth-Email: ${cloudflare_email}"\
+            -H "X-Auth-Key: ${cloudflare_api_key}"\
+            -H "Content-Type: application/json"\
+            --data "{\"name\":\"${domain_levels[1]}.${domain_levels[2]}\",\"jump_start\":false}"\
+            | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["result"]["id"]')
+            echo $cloudflare_id | sed "s/^/\t\t/"
+        else
+            # get cloudflare zone
+            echo "cloudflare zone exists" | sed "s/^/\t\t/"
+            cloudflare_id=$(curl -s -X GET "https://api.cloudflare.com/client/v4/zones?name=${domain_levels[1]}.${domain_levels[2]}"\
+            -H "X-Auth-Email: ${cloudflare_email}"\
+            -H "X-Auth-Key: ${cloudflare_api_key}"\
+            -H "Content-Type: application/json"\
+            | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["result"][0]["id"]')
+            echo $cloudflare_id | sed "s/^/\t\t/"
+        fi
+
+    fi
+
+    # get cloudflare ssl setting per zone
+    curl -s -X GET "https://api.cloudflare.com/client/v4/zones/${cloudflare_id}/settings/ssl"\
+    -H "X-Auth-Email: ${cloudflare_email}"\
+    -H "X-Auth-Key: ${cloudflare_api_key}"\
+    -H "Content-Type: application/json"\
+    | sed "s/^/\t\t/"
+
+    # set cloudflare ssl setting per zone
+    curl -s -X PATCH "https://api.cloudflare.com/client/v4/zones/${cloudflare_id}/settings/ssl"\
+    -H "X-Auth-Email: ${cloudflare_email}"\
+    -H "X-Auth-Key: ${cloudflare_api_key}"\
+    -H "Content-Type: application/json"\
+    --data "{\"value\":\"on\"}"\
+    | sed "s/^/\t\t/"
+
+    # set cloudflare tls setting per zone
+    curl -s -X PATCH "https://api.cloudflare.com/client/v4/zones/${cloudflare_id}/settings/tls_client_auth"\
+    -H "X-Auth-Email: ${cloudflare_email}"\
+    -H "X-Auth-Key: ${cloudflare_api_key}"\
+    -H "Content-Type: application/json"\
+    --data "{\"value\":\"full\"}"\
+    | sed "s/^/\t\t/"
+
+    # configure vhost
+    echo -e "\n\tconfiguring vhost"
     sudo mkdir -p /var/log/httpd/${domain_environment}
     sudo touch /var/log/httpd/${domain_environment}/access.log
     sudo touch /var/log/httpd/${domain_environment}/error.log
@@ -301,91 +372,91 @@ EOF
 
     # configure software
     if [ "$software" = "codeigniter2" ]; then
-            echo -e "\tgenerating $software database configuration file"
+            echo -e "\t\tgenerating $software database configuration file"
             if [ -f "/var/www/repositories/apache/${domain}/${webroot}application/config/database.php" ]; then
                 sudo chmod 0777 "/var/www/repositories/apache/${domain}/${webroot}application/config/database.php"
             fi
             sed -e "s/\$db\['default'\]\['hostname'\]\s=\s'localhost';/\$db\['default'\]\['hostname'\] = '${redhat_mysql_ip}';/g" -e "s/\$db\['default'\]\['username'\]\s=\s'';/\$db\['default'\]\['username'\] = '${mysql_user}';/g" -e "s/\$db\['default'\]\['password'\]\s=\s'';/\$db\['default'\]\['password'\] = '${mysql_user_password}';/g" -e "s/\$db\['default'\]\['database'\]\s=\s'';/\$db\['default'\]\['database'\] = '${1}_${domainvaliddbname}';/g" -e "s/\$db\['default'\]\['dbprefix'\]\s=\s'';/\$db\['default'\]\['dbprefix'\] = '${software_dbprefix}';/g" /vagrant/provisioners/redhat/installers/codeigniter2_database.php > "/var/www/repositories/apache/${domain}/${webroot}application/config/database.php"
     elif [ "$software" = "drupal6" ]; then
-            echo -e "\tgenerating $software database configuration file"
+            echo -e "\t\tgenerating $software database configuration file"
             connectionstring="mysql:\/\/${mysql_user}:${mysql_user_password}@${redhat_mysql_ip}\/${1}_${domainvaliddbname}"
             if [ -f "/var/www/repositories/apache/${domain}/${webroot}sites/default/settings.php" ]; then
                 sudo chmod 0777 "/var/www/repositories/apache/${domain}/${webroot}sites/default/settings.php"
             fi
             sed -e "s/mysql:\/\/username:password@localhost\/databasename/${connectionstring}/g" /vagrant/provisioners/redhat/installers/drupal6_settings.php > "/var/www/repositories/apache/${domain}/${webroot}sites/default/settings.php"
             if [ "$settings_production_rsync" = false ]; then
-              echo -e "\t[provisioner argument false!] skipping $software ~/sites/default/files/ file sync"
+              echo -e "\t\t[provisioner argument false!] skipping $software ~/sites/default/files/ file sync"
             elif [ "$rackspace" = false ]; then
-              echo -e "\t[not connected to rackspace vpn!] skipping $software ~/sites/default/files/ file sync"
+              echo -e "\t\t[not connected to rackspace vpn!] skipping $software ~/sites/default/files/ file sync"
             else
               echo -e "\tconnected to rackspace vpn - rysncing $software ~/sites/default/files/"
               rsync -rz -e "ssh -oStrictHostKeyChecking=no -i /vagrant/provisioners/.ssh/id_rsa" $(cat /vagrant/configuration.yml | shyaml get-value environments.production.servers.rackspace.web1_ssh_user)@$(cat /vagrant/configuration.yml | shyaml get-value environments.production.servers.rackspace.web1_ip):/var/www/html/$domain/sites/default/files/ /var/www/repositories/apache/$domain/sites/default/files/
             fi
             if [ "$settings_software_validation" = false ]; then
-                echo -e "\t[provisioner argument false!] skipping $software information"
+                echo -e "\t\t[provisioner argument false!] skipping $software information"
             else
-                echo "$software core version:" | sed "s/^/\t/"
-                cd "/vagrant/repositories/apache/$domain/" && drush core-status --field-labels=0 --fields=drupal-version 2>&1 | sed "s/^/\t\t/"
-                echo "$software core-requirements:" | sed "s/^/\t/"
-                cd "/vagrant/repositories/apache/$domain/" && drush core-requirements --severity=2 --format=table 2>&1 | sed "s/^/\t\t/"
-                echo "$software pm-updatestatus:" | sed "s/^/\t/"
-                cd "/vagrant/repositories/apache/$domain/" && drush pm-updatestatus --format=table 2>&1 | sed "s/^/\t\t/"
+                echo "$software core version:" | sed "s/^/\t\t/"
+                cd "/vagrant/repositories/apache/$domain/" && drush core-status --field-labels=0 --fields=drupal-version 2>&1 | sed "s/^/\t\t\t/"
+                echo "$software core-requirements:" | sed "s/^/\t\t/"
+                cd "/vagrant/repositories/apache/$domain/" && drush core-requirements --severity=2 --format=table 2>&1 | sed "s/^/\t\t\t/"
+                echo "$software pm-updatestatus:" | sed "s/^/\t\t/"
+                cd "/vagrant/repositories/apache/$domain/" && drush pm-updatestatus --format=table 2>&1 | sed "s/^/\t\t\t/"
             fi
     elif [ "$software" = "drupal7" ]; then
-            echo -e "\tgenerating $software database configuration file"
+            echo -e "\t\tgenerating $software database configuration file"
             connectionstring="\$databases['default']['default'] = array('driver' => 'mysql','database' => '${1}_${domainvaliddbname}','username' => '${mysql_user}','password' => '${mysql_user_password}','host' => '${redhat_mysql_ip}','prefix' => '${software_dbprefix}');"
             if [ -f "/var/www/repositories/apache/${domain}/${webroot}sites/default/settings.php" ]; then
                 sudo chmod 0777 "/var/www/repositories/apache/${domain}/${webroot}sites/default/settings.php"
             fi
             sed -e "s/\$databases\s=\sarray();/${connectionstring}/g" /vagrant/provisioners/redhat/installers/drupal7_settings.php > "/var/www/repositories/apache/${domain}/${webroot}sites/default/settings.php"
             if [ "$settings_production_rsync" = false ]; then
-              echo -e "\t[provisioner argument false!] skipping $software ~/sites/default/files/ file sync"
+                echo -e "\t\t[provisioner argument false!] skipping $software ~/sites/default/files/ file sync"
             elif [ "$rackspace" = false ]; then
-              echo -e "\t[not connected to rackspace vpn!] skipping $software ~/sites/default/files/ file sync"
+                echo -e "\t\t[not connected to rackspace vpn!] skipping $software ~/sites/default/files/ file sync"
             else
-              echo -e "\tconnected to rackspace vpn - rysncing $software ~/sites/default/files/"
-              rsync -rz -e "ssh -oStrictHostKeyChecking=no -i /vagrant/provisioners/.ssh/id_rsa" $(cat /vagrant/configuration.yml | shyaml get-value environments.production.servers.rackspace.web1_ssh_user)@$(cat /vagrant/configuration.yml | shyaml get-value environments.production.servers.rackspace.web1_ip):/var/www/html/$domain/sites/default/files/ /var/www/repositories/apache/$domain/sites/default/files/
+                echo -e "\tconnected to rackspace vpn - rysncing $software ~/sites/default/files/"
+                rsync -rz -e "ssh -oStrictHostKeyChecking=no -i /vagrant/provisioners/.ssh/id_rsa" $(cat /vagrant/configuration.yml | shyaml get-value environments.production.servers.rackspace.web1_ssh_user)@$(cat /vagrant/configuration.yml | shyaml get-value environments.production.servers.rackspace.web1_ip):/var/www/html/$domain/sites/default/files/ /var/www/repositories/apache/$domain/sites/default/files/
             fi
             if [ "$settings_software_validation" = false ]; then
-                echo -e "\t[provisioner argument false!] skipping $software information"
+                echo -e "\t\t[provisioner argument false!] skipping $software information"
             else
-                echo "$software core version:" | sed "s/^/\t/"
-                cd "/vagrant/repositories/apache/$domain/" && drush core-status --field-labels=0 --fields=drupal-version 2>&1 | sed "s/^/\t\t/"
-                echo "$software core-requirements:" | sed "s/^/\t/"
-                cd "/vagrant/repositories/apache/$domain/" && drush core-requirements --severity=2 --format=table 2>&1 | sed "s/^/\t\t/"
-                echo "$software pm-updatestatus:" | sed "s/^/\t/"
-                cd "/vagrant/repositories/apache/$domain/" && drush pm-updatestatus --format=table 2>&1 | sed "s/^/\t\t/"
+                echo "$software core version:" | sed "s/^/\t\t/"
+                cd "/vagrant/repositories/apache/$domain/" && drush core-status --field-labels=0 --fields=drupal-version 2>&1 | sed "s/^/\t\t\t/"
+                echo "$software core-requirements:" | sed "s/^/\t\t/"
+                cd "/vagrant/repositories/apache/$domain/" && drush core-requirements --severity=2 --format=table 2>&1 | sed "s/^/\t\t\t/"
+                echo "$software pm-updatestatus:" | sed "s/^/\t\t/"
+                cd "/vagrant/repositories/apache/$domain/" && drush pm-updatestatus --format=table 2>&1 | sed "s/^/\t\t\t/"
             fi
     elif [ "$software" = "wordpress" ]; then
-            echo -e "\tgenerating $software database configuration file"
+            echo -e "\t\tgenerating $software database configuration file"
             if [ -f "/var/www/repositories/apache/${domain}/${webroot}wp-config.php" ]; then
                 sudo chmod 0777 "/var/www/repositories/apache/${domain}/${webroot}wp-config.php"
             fi
             sed -e "s/database_name_here/${1}_${domainvaliddbname}/g" -e "s/username_here/${mysql_user}/g" -e "s/password_here/${mysql_user_password}/g" -e "s/localhost/${redhat_mysql_ip}/g" -e "s/'wp_'/'${software_dbprefix}'/g" /vagrant/provisioners/redhat/installers/wp-config.php > "/var/www/repositories/apache/${domain}/${webroot}wp-config.php"
             if [ "$settings_production_rsync" = false ]; then
-              echo -e "\t[provisioner argument false!] skipping $software ~/sites/default/files/ file sync"
+                echo -e "\t\t[provisioner argument false!] skipping $software ~/sites/default/files/ file sync"
             elif [ "$rackspace" = false ]; then
-              echo -e "\t[not connected to rackspace vpn!] skipping $software ~/sites/default/files/ file sync"
+                echo -e "\t\t[not connected to rackspace vpn!] skipping $software ~/sites/default/files/ file sync"
             else
-              echo -e "\tconnected to rackspace vpn - rysncing $software ~/wp-content/"
-              rsync -rz -e "ssh -oStrictHostKeyChecking=no -i /vagrant/provisioners/.ssh/id_rsa" $(cat /vagrant/configuration.yml | shyaml get-value environments.production.servers.rackspace.web1_ssh_user)@$(cat /vagrant/configuration.yml | shyaml get-value environments.production.servers.rackspace.web1_ip):/var/www/html/$domain/wp-content/ /var/www/repositories/apache/$domain/wp-content/
+                echo -e "\tconnected to rackspace vpn - rysncing $software ~/wp-content/"
+                rsync -rz -e "ssh -oStrictHostKeyChecking=no -i /vagrant/provisioners/.ssh/id_rsa" $(cat /vagrant/configuration.yml | shyaml get-value environments.production.servers.rackspace.web1_ssh_user)@$(cat /vagrant/configuration.yml | shyaml get-value environments.production.servers.rackspace.web1_ip):/var/www/html/$domain/wp-content/ /var/www/repositories/apache/$domain/wp-content/
             fi
             if [ "$settings_software_validation" = false ]; then
-                echo -e "\t[provisioner argument false!] skipping $software information"
+                echo -e "\t\t[provisioner argument false!] skipping $software information"
             else
-                echo "$software core version:" | sed "s/^/\t/"
-                php /vagrant/provisioners/redhat/installers/wp-cli.phar --path="/vagrant/repositories/apache/$domain/" core version 2>&1 | sed "s/^/\t\t/"
-                echo "$software core verify-checksums:" | sed "s/^/\t/"
-                php /vagrant/provisioners/redhat/installers/wp-cli.phar --path="/vagrant/repositories/apache/$domain/" core verify-checksums 2>&1 | sed "s/^/\t\t/"
-                echo "$software core check-update:" | sed "s/^/\t/"
-                php /vagrant/provisioners/redhat/installers/wp-cli.phar --path="/vagrant/repositories/apache/$domain/" core check-update 2>&1 | sed "s/^/\t\t/"
-                echo "$software plugin list:" | sed "s/^/\t/"
-                php /vagrant/provisioners/redhat/installers/wp-cli.phar --path="/vagrant/repositories/apache/$domain/" plugin list 2>&1 | sed "s/^/\t\t/"
-                echo "$software theme list:" | sed "s/^/\t/"
-                php /vagrant/provisioners/redhat/installers/wp-cli.phar --path="/vagrant/repositories/apache/$domain/" theme list 2>&1 | sed "s/^/\t\t/"
+                echo "$software core version:" | sed "s/^/\t/\t"
+                php /vagrant/provisioners/redhat/installers/wp-cli.phar --path="/vagrant/repositories/apache/$domain/" core version 2>&1 | sed "s/^/\t\t\t/"
+                echo "$software core verify-checksums:" | sed "s/^/\t\t/"
+                php /vagrant/provisioners/redhat/installers/wp-cli.phar --path="/vagrant/repositories/apache/$domain/" core verify-checksums 2>&1 | sed "s/^/\t\t\t/"
+                echo "$software core check-update:" | sed "s/^/\t\t/"
+                php /vagrant/provisioners/redhat/installers/wp-cli.phar --path="/vagrant/repositories/apache/$domain/" core check-update 2>&1 | sed "s/^/\t\t\t/"
+                echo "$software plugin list:" | sed "s/^/\t\t/"
+                php /vagrant/provisioners/redhat/installers/wp-cli.phar --path="/vagrant/repositories/apache/$domain/" plugin list 2>&1 | sed "s/^/\t\t\t/"
+                echo "$software theme list:" | sed "s/^/\t\t/"
+                php /vagrant/provisioners/redhat/installers/wp-cli.phar --path="/vagrant/repositories/apache/$domain/" theme list 2>&1 | sed "s/^/\t\t\t/"
             fi
     elif [ "$software" = "xenforo" ]; then
-            echo -e "\tgenerating $software database configuration file"
+            echo -e "\t\tgenerating $software database configuration file"
             if [ -f "/var/www/repositories/apache/${domain}/${webroot}library/config.php" ]; then
                 sudo chmod 0777 "/var/www/repositories/apache/${domain}/${webroot}library/config.php"
             fi
