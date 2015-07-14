@@ -2,7 +2,7 @@
 
 Copyright (c) 2015 devopsgroup.io - Seth Reeser
 
-Welcome to devopsgroup.io Catapult Release Management, a full stack software and workflow solution. Herein known as Catapult.
+Welcome to devopsgroup.io Catapult Release Management, a complete DevOps Release Management solution featuring automated website deployment and continuous integration following Gitflow and SCRUM workflows. Herein known as Catapult.
 
 ## Supported Software ##
 
