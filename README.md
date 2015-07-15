@@ -81,8 +81,8 @@ Catapult uses several third-party services to pull everything off - below is a l
     3. Go to your Elastic Bamboo configuration https://[your-name-here].atlassian.net/builds/admin/elastic/editElasticConfig.action
         1. Set your AWS EC2 "Bamboo" Access Key ID and Secret Access Key
 
-5. **DNS:** [*Optional] CloudFlare
-    * CloudFlare is optional, however, it provides two major components - free SSL certificate functionality (https) and DNS management - just update the name servers to clark.ns.cloudflare.com and liv.ns.cloudflare.com at the registrar where you purchased the domain name and Catapult will handle the rest.
+5. **DNS:** CloudFlare Sign-Up and Configuration
+    * CloudFlare provides two major components - free SSL certificate functionality (https) and DNS management - just update the name servers to clark.ns.cloudflare.com and liv.ns.cloudflare.com at the registrar where you purchased the domain name and Catapult will handle the rest.
     1. Create a CloudFlare account at https://www.cloudflare.com
     2. Sign in your new CloudFlare account
     3. Vist your My Account section at https://www.cloudflare.com/a/account/my-account and scroll down to your API Key and place the token value in ~/configuration.yml at ["company"]["cloudflare_api_key"]
