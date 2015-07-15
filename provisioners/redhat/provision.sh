@@ -370,6 +370,16 @@ while IFS='' read -r -d '' key; do
         -H "Content-Type: application/json"\
         --data "{\"value\":\"full\"}"\
         | sed "s/^/\t\t/"
+
+        # purge cloudflare cache per zone
+        echo "clearing cloudflare cache" | sed "s/^/\t\t/"
+        curl -s -X DELETE "https://api.cloudflare.com/client/v4/zones/${cloudflare_zone_id}/purge_cache"\
+        -H "X-Auth-Email: ${cloudflare_email}"\
+        -H "X-Auth-Key: ${cloudflare_api_key}"\
+        -H "Content-Type: application/json"\
+        --data "{\"purge_everything\":true}"\
+        | sed "s/^/\t\t/"
+
     fi
 
     # configure vhost
