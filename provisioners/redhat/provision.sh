@@ -116,6 +116,7 @@ while IFS='' read -r -d '' key; do
             sudo rm -rf /vagrant/repositories/apache/$domain
             git clone --recursive -b $(cat /vagrant/configuration.yml | shyaml get-value environments.$1.branch) $repo /vagrant/repositories/apache/$domain | sed "s/^/\t/"
         elif [ "$settings_git_pull" = true ]; then
+            cd /var/www/repositories/apache/$domain && git checkout $(cat /vagrant/configuration.yml | shyaml get-value environments.$1.branch)
             cd /var/www/repositories/apache/$domain && sudo ssh-agent bash -c "ssh-add /vagrant/provisioners/.ssh/id_rsa; git pull origin $(cat /vagrant/configuration.yml | shyaml get-value environments.$1.branch)" | sed "s/^/\t/"
         elif [ "$settings_git_pull" = false ]; then
             echo "[provisioner argument false!] skipping git pull" | sed "s/^/\t/"

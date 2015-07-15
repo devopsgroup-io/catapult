@@ -207,14 +207,32 @@ puts "\n"
 
 
 # configuration.yml validation
-# check for required fields
-require "net/ssh"
-# validate digitalocean_personal_access_token
-if configuration["company"]["digitalocean_personal_access_token"] == nil
-  puts "\nPlease set your company's digitalocean_personal_access_token in configuration.yml.\n\n"
+# validate required company fields
+if configuration["company"]["name"] == nil
+  puts "\nPlease set [\"company\"][\"name\"] in configuration.yml\n\n"
   exit 1
 end
-# if passwords are blank, generate them
+if configuration["company"]["cloudflare_api_key"] == nil
+  puts "\nPlease set [\"company\"][\"cloudflare_api_key\"] in configuration.yml\n\n"
+  exit 1
+end
+if configuration["company"]["cloudflare_email"] == nil
+  puts "\nPlease set [\"company\"][\"cloudflare_email\"] in configuration.yml\n\n"
+  exit 1
+end
+if configuration["company"]["cloudflare_email"] == nil
+  puts "\nPlease set [\"company\"][\"cloudflare_email\"] in configuration.yml\n\n"
+  exit 1
+end
+if configuration["company"]["email"] == nil
+  puts "\nPlease set [\"company\"][\"email\"] in configuration.yml\n\n"
+  exit 1
+end
+if configuration["company"]["digitalocean_personal_access_token"] == nil
+  puts "\nPlease set [\"company\"][\"digitalocean_personal_access_token\"] in configuration.yml\n\n"
+  exit 1
+end
+# validate environments
 require "securerandom"
 configuration["environments"].each do |environment,data|
   if not configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["mysql"]["user_password"]
@@ -242,6 +260,7 @@ configuration["environments"].each do |environment,data|
     `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output configuration.yml.gpg --armor --cipher-algo AES256 --symmetric configuration.yml`
   end
 end
+# validate websites
 configuration["websites"].each do |service,data|
   domains = Array.new
   domains_sorted = Array.new
@@ -283,6 +302,7 @@ end
 
 # if upstream servers are provisioned, write server ip addresses to configuration.yml for use in database configuration files
 require "json"
+require "net/ssh"
 uri = URI("https://api.digitalocean.com/v2/droplets")
 Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => OpenSSL::SSL::VERIFY_NONE) do |http|
   request = Net::HTTP::Get.new uri.request_uri
@@ -599,8 +619,8 @@ Vagrant.configure("2") do |config|
   end
 
 
-  config.vm.define "windows" do |config|
-    config.vm.box = "opentable/win-2008r2-standard-amd64-nocm"
+  config.vm.define "#{configuration["company"]["name"]}-dev-windows" do |config|
+    config.vm.box = "opentable/win-2012r2-standard-amd64-nocm"
     config.vm.network "private_network", ip: configuration["environments"]["dev"]["servers"]["windows"]["ip"]
     config.vm.network "forwarded_port", guest: 80, host: configuration["environments"]["dev"]["servers"]["redhat"]["port_80"]
     config.vm.provider :virtualbox do |provider|
