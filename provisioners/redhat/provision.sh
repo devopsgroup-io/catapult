@@ -211,13 +211,19 @@ while IFS='' read -r -d '' key; do
     webroot=$(echo "$key" | grep -w "webroot" | cut -d ":" -f 2 | tr -d " ")
 
     # configure apache
-    echo -e "\nNOTICE: ${1}.${domain}"
+    if [ "$1" = "production" ]; then
+        echo -e "\nNOTICE: ${domain}"
+    else
+        echo -e "\nNOTICE: ${1}.${domain}"
+    fi
 
     # configure cloudflare dns
     if [ "$1" != "dev" ]; then
         echo -e "\t * configuring cloudflare dns"
         IFS=. read -a domain_levels <<< "$domain"
         if [ "${#domain_levels[@]}" = "2" ]; then
+
+            # ie: $domain_levels[0] => devopsgroup, $domain_levels[1] => io
 
             # determine if cloudflare zone exists
             cloudflare_zone_id=$(curl -s -X GET "https://api.cloudflare.com/client/v4/zones?name=${domain_levels[0]}.${domain_levels[1]}"\
@@ -282,6 +288,8 @@ while IFS='' read -r -d '' key; do
             fi
 
         elif [ "${#domain_levels[@]}" = "3" ]; then
+
+            # ie: $domain_levels[0] => drupal7, $domain_levels[1] => devopsgroup, $domain_levels[2] => io
         
             # determine if cloudflare zone exists
             cloudflare_zone_id=$(curl -s -X GET "https://api.cloudflare.com/client/v4/zones?name=${domain_levels[1]}.${domain_levels[2]}"\
@@ -317,7 +325,7 @@ while IFS='' read -r -d '' key; do
                 -H "X-Auth-Email: ${cloudflare_email}"\
                 -H "X-Auth-Key: ${cloudflare_api_key}"\
                 -H "Content-Type: application/json"\
-                --data "{\"type\":\"A\",\"name\":\"${domain_levels[1]}.${domain_levels[2]}\",\"content\":\"${redhat_ip}\",\"ttl\":1,\"proxied\":true}"\
+                --data "{\"type\":\"A\",\"name\":\"${domain_levels[0]}\",\"content\":\"${redhat_ip}\",\"ttl\":1,\"proxied\":true}"\
                 | sed "s/^/\t\t/"
 
                 # set dns a record for www.environment
@@ -325,7 +333,7 @@ while IFS='' read -r -d '' key; do
                 -H "X-Auth-Email: ${cloudflare_email}"\
                 -H "X-Auth-Key: ${cloudflare_api_key}"\
                 -H "Content-Type: application/json"\
-                --data "{\"type\":\"A\",\"name\":\"www\",\"content\":\"${redhat_ip}\",\"ttl\":1,\"proxied\":true}"\
+                --data "{\"type\":\"A\",\"name\":\"www.${domain_levels[0]}\",\"content\":\"${redhat_ip}\",\"ttl\":1,\"proxied\":true}"\
                 | sed "s/^/\t\t/"
             else
                 # set dns a record for environment
@@ -362,6 +370,16 @@ while IFS='' read -r -d '' key; do
         -H "Content-Type: application/json"\
         --data "{\"value\":\"full\"}"\
         | sed "s/^/\t\t/"
+
+        # purge cloudflare cache per zone
+        echo "clearing cloudflare cache" | sed "s/^/\t\t/"
+        curl -s -X DELETE "https://api.cloudflare.com/client/v4/zones/${cloudflare_zone_id}/purge_cache"\
+        -H "X-Auth-Email: ${cloudflare_email}"\
+        -H "X-Auth-Key: ${cloudflare_api_key}"\
+        -H "Content-Type: application/json"\
+        --data "{\"purge_everything\":true}"\
+        | sed "s/^/\t\t/"
+
     fi
 
     # configure vhost
