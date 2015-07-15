@@ -1,16 +1,13 @@
 ---
 software:
-  name: devopsgroup.io Release Management
-  version: 0.4
+  name: devopsgroup.io Catapult Release Management
+  version: 0.5
 company:
-  name: devopsgroup.io
-  bitbucket_user: 
-  bitbucket_user_password: 
+  name:
   cloudflare_api_key: 
   cloudflare_email: 
-  digitalocean_personal_access_token: 
-  credit: Seth Reeser
-  email: blackhole@devopsgroup.io
+  digitalocean_personal_access_token:
+  email:
   timezone_redhat: America/New_York
   timezone_windows: Eastern Standard Time
 environments:
