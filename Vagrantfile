@@ -407,6 +407,8 @@ if ["status"].include?(ARGV[0])
           row.push(http_repsonse("http://#{environment}#{instance["domain"]}").ljust(4))
         rescue SocketError
           row.push("down".ljust(4))
+        rescue EOFError
+          row.push("down".ljust(4))
         rescue OpenSSL::SSL::SSLError
           row.push("err".ljust(4))
         rescue Exception => ex
