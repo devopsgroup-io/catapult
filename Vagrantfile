@@ -1,6 +1,18 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
+# libraries
+require "fileutils"
+require "json"
+require "net/ssh"
+require "net/http"
+require "nokogiri"
+require "open-uri"
+require "openssl"
+require "securerandom"
+require "socket"
+require "yaml"
+
 
 # check for vagrant plugins
 unless Vagrant.has_plugin?("vagrant-digitalocean")
@@ -70,7 +82,7 @@ else
   `#{git} checkout #{branch}`
   puts "\n"
 end
-# create a git pre-commit hook to ensure no confiuration is committed to develop
+# create a git pre-commit hook to ensure no configuration is committed to develop and only configuration is committed to master
 FileUtils.mkdir_p(".git/hooks")
 File.write('.git/hooks/pre-commit',
 '#!/usr/bin/env ruby
@@ -111,8 +123,6 @@ File.chmod(0777,'.git/hooks/pre-commit')
 
 
 # bootstrap configuration-user.yml
-require "fileutils"
-require "yaml"
 # generate configuration-user.yml file if it does not exist
 if not File.exist?("configuration-user.yml")
   FileUtils.cp("configuration-user.yml.template", "configuration-user.yml")
@@ -133,8 +143,6 @@ if configuration_user["settings"]["gpg_key"] == nil || configuration_user["setti
 end
 
 
-require "fileutils"
-require "yaml"
 puts "\n\nEncryption and decryption of Catapult configuration files:"
 puts "\n"
 if "#{branch}" == "develop"
@@ -233,7 +241,6 @@ if configuration["company"]["digitalocean_personal_access_token"] == nil
   exit 1
 end
 # validate environments
-require "securerandom"
 configuration["environments"].each do |environment,data|
   if not configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["mysql"]["user_password"]
     configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["mysql"]["user_password"] = SecureRandom.urlsafe_base64(16)
@@ -301,8 +308,6 @@ end
 
 
 # if upstream servers are provisioned, write server ip addresses to configuration.yml for use in database configuration files
-require "json"
-require "net/ssh"
 uri = URI("https://api.digitalocean.com/v2/droplets")
 Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => OpenSSL::SSL::VERIFY_NONE) do |http|
   request = Net::HTTP::Get.new uri.request_uri
@@ -352,11 +357,6 @@ end
 
 if ["status"].include?(ARGV[0])
   # vagrant status binding
-  require "nokogiri" # required for alexa
-  require "open-uri" # required for alexa
-  require "net/http" # required for nslookup
-  require "socket"   # required for ssl cert lookup
-  require "openssl"  # required for ssl cert lookup
   totalwebsites = 0
   # start a new row
   puts "\n\nAvailable websites legend:"
