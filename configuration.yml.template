@@ -1,9 +1,12 @@
 ---
 software:
   name: devopsgroup.io Catapult Release Management
-  version: 0.5
+  version: 0.6
 company:
   name:
+  bamboo_base_url:
+  bamboo_username:
+  bamboo_password:
   cloudflare_api_key: 
   cloudflare_email: 
   digitalocean_personal_access_token:
