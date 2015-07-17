@@ -2,6 +2,17 @@
 # vi: set ft=ruby :
 
 
+# puts intro
+puts "\n"
+title = "Catapult Release Management - https://github.com/devopsgroup-io/catapult-release-management"
+length = title.size
+padding = 5
+puts "+".ljust(padding,"-") + "".ljust(length,"-") + "+".rjust(padding,"-")
+puts "|".ljust(padding)     + title                + "|".rjust(padding)
+puts "+".ljust(padding,"-") + "".ljust(length,"-") + "+".rjust(padding,"-")
+puts "\n"
+
+
 # libraries
 require "fileutils"
 require "json"
@@ -21,6 +32,7 @@ def catapult_exception(error)
     raise error
   rescue => exception
     puts "\n\n"
+    puts "Catapult Error:"
     puts exception.message
     puts "\n\n"
     exit 1
@@ -62,14 +74,6 @@ end
 
 
 # configure catapult and git
-puts "\n"
-title = "Catapult Release Management - https://github.com/devopsgroup-io/catapult-release-management"
-length = title.size
-padding = 5
-puts "+".ljust(padding,"-") + "".ljust(length,"-") + "+".rjust(padding,"-")
-puts "|".ljust(padding)     + title                + "|".rjust(padding)
-puts "+".ljust(padding,"-") + "".ljust(length,"-") + "+".rjust(padding,"-")
-puts "\n"
 remote = `#{git} config --get remote.origin.url`
 if remote.include?("devopsgroup-io/release-management.git") || remote.include?("devopsgroup-io/catapult-release-management.git")
   catapult_exception("In order to use Catapult Release Management, you must fork the repository so that the committed and encrypted configuration is unique to you! See https://github.com/devopsgroup-io/catapult-release-management for more information.")
@@ -220,10 +224,6 @@ end
 # decrypt and create objects from configuration.yml file and configuration.yml.template
 configuration = YAML.load(`gpg --batch --passphrase "#{configuration_user["settings"]["gpg_key"]}" --decrypt configuration.yml.gpg`)
 configuration_example = YAML.load_file("configuration.yml.template")
-# ensure version is up-to-date
-if configuration["software"]["version"] != configuration_example["software"]["version"]
-  catapult_exception("Your configuration.yml file is out of date. To retain your settings please manually duplicate entries from configuration.yml.template with your specific settings.\n*You may also delete your configuration.yml and re-run any vagrant command to have a vanilla version created.")
-end
 # decrypt id_rsa and id_rsa.pub
 `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output provisioners/.ssh/id_rsa --decrypt provisioners/.ssh/id_rsa.gpg`
 `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output provisioners/.ssh/id_rsa.pub --decrypt provisioners/.ssh/id_rsa.pub.gpg`
@@ -231,26 +231,52 @@ puts "\n"
 
 
 # configuration.yml validation
-# validate required company fields
+# validate configuration["software"]
+if configuration["software"]["version"] != configuration_example["software"]["version"]
+  catapult_exception("Your configuration.yml file is out of date. To retain your settings please manually duplicate entries from configuration.yml.template with your specific settings.\n*You may also delete your configuration.yml and re-run any vagrant command to have a vanilla version created.")
+end
+# validate configuration["company"]
 if configuration["company"]["name"] == nil
   catapult_exception("Please set [\"company\"][\"name\"] in configuration.yml")
 end
-if configuration["company"]["cloudflare_api_key"] == nil
-  catapult_exception("Please set [\"company\"][\"cloudflare_api_key\"] in configuration.yml")
+if configuration["company"]["cloudflare_api_key"] == nil || configuration["company"]["cloudflare_email"] == nil
+  catapult_exception("Please set [\"company\"][\"cloudflare_api_key\"] and [\"company\"][\"cloudflare_email\"] in configuration.yml")
+else
+  uri = URI("https://api.cloudflare.com/client/v4/zones")
+  Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => OpenSSL::SSL::VERIFY_NONE) do |http|
+    request = Net::HTTP::Get.new uri.request_uri
+    request.add_field "X-Auth-Key", "#{configuration["company"]["cloudflare_api_key"]}"
+    request.add_field "X-Auth-Email", "#{configuration["company"]["cloudflare_email"]}"
+    response = http.request request # Net::HTTPResponse object
+    api_cloudflare = JSON.parse(response.body)
+    if api_cloudflare["success"] == false
+      catapult_exception("The CloudFlare API could not authenticate, please verify [\"company\"][\"cloudflare_api_key\"] and [\"company\"][\"cloudflare_email\"].")
+    else
+      puts "CloudFlare API authenticated successfully."
+    end
+  end
 end
-if configuration["company"]["cloudflare_email"] == nil
-  catapult_exception("Please set [\"company\"][\"cloudflare_email\"] in configuration.yml")
-end
-if configuration["company"]["cloudflare_email"] == nil
-  catapult_exception("Please set [\"company\"][\"cloudflare_email\"] in configuration.yml")
+if configuration["company"]["digitalocean_personal_access_token"] == nil
+  catapult_exception("Please set [\"company\"][\"digitalocean_personal_access_token\"] in configuration.yml")
+else
+  uri = URI("https://api.digitalocean.com/v2/droplets")
+  Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => OpenSSL::SSL::VERIFY_NONE) do |http|
+    request = Net::HTTP::Get.new uri.request_uri
+    request.add_field "Authorization", "Bearer #{configuration["company"]["digitalocean_personal_access_token"]}"
+    response = http.request request # Net::HTTPResponse object
+    api_digitalocean = JSON.parse(response.body)
+    if api_digitalocean["id"] == "unauthorized"
+      catapult_exception("The DigitalOcean API could not authenticate, please verify [\"company\"][\"digitalocean_personal_access_token\"].")
+    else
+      api_digitalocean = api_digitalocean["droplets"]
+      puts "DigitalOcean API authenticated successfully."
+    end
+  end
 end
 if configuration["company"]["email"] == nil
   catapult_exception("Please set [\"company\"][\"email\"] in configuration.yml")
 end
-if configuration["company"]["digitalocean_personal_access_token"] == nil
-  catapult_exception("Please set [\"company\"][\"digitalocean_personal_access_token\"] in configuration.yml")
-end
-# validate environments
+# validate configuration["environments"]
 configuration["environments"].each do |environment,data|
   unless configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["mysql"]["user_password"]
     configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["mysql"]["user_password"] = SecureRandom.urlsafe_base64(16)
@@ -276,8 +302,29 @@ configuration["environments"].each do |environment,data|
     File.open('configuration.yml', 'w') {|f| f.write configuration.to_yaml }
     `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output configuration.yml.gpg --armor --cipher-algo AES256 --symmetric configuration.yml`
   end
+  # if upstream digitalocean droplets are provisioned, get their ip addresses to write to configuration.yml
+  unless environment == "dev"
+    unless configuration["environments"]["#{environment}"]["servers"]["redhat"]["ip"]
+      droplet = api_digitalocean.find { |d| d['name'] == "#{configuration["company"]["name"]}-#{environment}-redhat" }
+      unless droplet == nil
+        configuration["environments"]["#{environment}"]["servers"]["redhat"]["ip"] = droplet["networks"]["v4"].first["ip_address"]
+        `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output configuration.yml --decrypt configuration.yml.gpg`
+        File.open('configuration.yml', 'w') {|f| f.write configuration.to_yaml }
+        `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output configuration.yml.gpg --armor --cipher-algo AES256 --symmetric configuration.yml`
+      end
+    end
+    unless configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["ip"]
+      droplet = api_digitalocean.find { |d| d['name'] == "#{configuration["company"]["name"]}-#{environment}-redhat-mysql" }
+      unless droplet == nil
+        configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["ip"] = droplet["networks"]["v4"].first["ip_address"]
+        `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output configuration.yml --decrypt configuration.yml.gpg`
+        File.open('configuration.yml', 'w') {|f| f.write configuration.to_yaml }
+        `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output configuration.yml.gpg --armor --cipher-algo AES256 --symmetric configuration.yml`
+      end
+    end
+  end
 end
-# validate websites
+# validate configuration["websites"]
 configuration["websites"].each do |service,data|
   domains = Array.new
   domains_sorted = Array.new
@@ -308,39 +355,7 @@ configuration["websites"].each do |service,data|
   end
 end
 
-
-# if upstream servers are provisioned, write server ip addresses to configuration.yml for use in database configuration files
-uri = URI("https://api.digitalocean.com/v2/droplets")
-Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => OpenSSL::SSL::VERIFY_NONE) do |http|
-  request = Net::HTTP::Get.new uri.request_uri
-  request.basic_auth "#{configuration["company"]["digitalocean_personal_access_token"]}", ""
-  response = http.request request # Net::HTTPResponse object
-  droplets = JSON.parse(response.body)
-  droplets = droplets["droplets"]
-  configuration["environments"].each do |environment,data|
-    unless environment == "dev"
-      unless configuration["environments"]["#{environment}"]["servers"]["redhat"]["ip"]
-        droplet = droplets.find { |d| d['name'] == "#{configuration["company"]["name"]}-#{environment}-redhat" }
-        unless droplet == nil
-          configuration["environments"]["#{environment}"]["servers"]["redhat"]["ip"] = droplet["networks"]["v4"].first["ip_address"]
-          `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output configuration.yml --decrypt configuration.yml.gpg`
-          File.open('configuration.yml', 'w') {|f| f.write configuration.to_yaml }
-          `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output configuration.yml.gpg --armor --cipher-algo AES256 --symmetric configuration.yml`
-        end
-      end
-      unless configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["ip"]
-        droplet = droplets.find { |d| d['name'] == "#{configuration["company"]["name"]}-#{environment}-redhat-mysql" }
-        unless droplet == nil
-          configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["ip"] = droplet["networks"]["v4"].first["ip_address"]
-          `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output configuration.yml --decrypt configuration.yml.gpg`
-          File.open('configuration.yml', 'w') {|f| f.write configuration.to_yaml }
-          `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output configuration.yml.gpg --armor --cipher-algo AES256 --symmetric configuration.yml`
-        end
-      end
-    end
-  end
-end
-
+puts "\n\n"
 
 # create arrays of domains for localdev hosts file
 redhathostsfile = Array.new
