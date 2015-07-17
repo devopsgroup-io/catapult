@@ -307,6 +307,22 @@ end
 if configuration["company"]["email"] == nil
   catapult_exception("Please set [\"company\"][\"email\"] in configuration.yml")
 end
+if configuration["company"]["github_username"] == nil || configuration["company"]["github_password"] == nil
+  catapult_exception("Please set [\"company\"][\"github_username\"] and [\"company\"][\"github_password\"] in configuration.yml")
+else
+  uri = URI("https://api.github.com/user")
+  Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => OpenSSL::SSL::VERIFY_NONE) do |http|
+    request = Net::HTTP::Get.new uri.request_uri
+    request.basic_auth "#{configuration["company"]["github_username"]}", "#{configuration["company"]["github_password"]}"
+    response = http.request request
+    if response.code.to_f.between?(399,600)
+      catapult_exception("The GitHub API could not authenticate, please verify [\"company\"][\"github_username\"] and [\"company\"][\"github_password\"].")
+    else
+      puts "GitHub API authenticated successfully."
+      api_bamboo = JSON.parse(response.body)
+    end
+  end
+end
 # validate configuration["environments"]
 configuration["environments"].each do |environment,data|
   unless configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["mysql"]["user_password"]

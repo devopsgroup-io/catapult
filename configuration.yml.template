@@ -1,7 +1,7 @@
 ---
 software:
   name: devopsgroup.io Catapult Release Management
-  version: 0.7
+  version: 0.8
 company:
   name:
   bamboo_base_url:
@@ -10,9 +10,11 @@ company:
   bitbucket_username:
   bitbucket_password:
   cloudflare_api_key: 
-  cloudflare_email: 
+  cloudflare_email:
   digitalocean_personal_access_token:
   email:
+  github_username:
+  github_password:
   timezone_redhat: America/New_York
   timezone_windows: Eastern Standard Time
 environments:
