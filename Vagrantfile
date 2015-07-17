@@ -239,6 +239,38 @@ end
 if configuration["company"]["name"] == nil
   catapult_exception("Please set [\"company\"][\"name\"] in configuration.yml")
 end
+if configuration["company"]["bamboo_base_url"] == nil || configuration["company"]["bamboo_username"] == nil || configuration["company"]["bamboo_password"] == nil
+  catapult_exception("Please set [\"company\"][\"bamboo_base_url\"] and [\"company\"][\"bamboo_username\"] and [\"company\"][\"bamboo_password\"] in configuration.yml")
+else
+  uri = URI("#{configuration["company"]["bamboo_base_url"]}rest/api/latest/plan.json?os_authType=basic")
+  Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => OpenSSL::SSL::VERIFY_NONE) do |http|
+    request = Net::HTTP::Get.new uri.request_uri
+    request.basic_auth "#{configuration["company"]["bamboo_username"]}", "#{configuration["company"]["bamboo_password"]}"
+    response = http.request request
+    if response.code.to_f.between?(399,600)
+      catapult_exception("The Bamboo API could not authenticate, please verify [\"company\"][\"bamboo_base_url\"] and [\"company\"][\"bamboo_username\"] and [\"company\"][\"bamboo_password\"].")
+    else
+      puts "Bamboo API authenticated successfully."
+      api_bamboo = JSON.parse(response.body)
+    end
+  end
+end
+if configuration["company"]["bitbucket_username"] == nil || configuration["company"]["bitbucket_password"] == nil
+  catapult_exception("Please set [\"company\"][\"bitbucket_username\"] and [\"company\"][\"bitbucket_password\"] in configuration.yml")
+else
+  uri = URI("https://api.bitbucket.org/1.0/user/repositories")
+  Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => OpenSSL::SSL::VERIFY_NONE) do |http|
+    request = Net::HTTP::Get.new uri.request_uri
+    request.basic_auth "#{configuration["company"]["bitbucket_username"]}", "#{configuration["company"]["bitbucket_password"]}"
+    response = http.request request
+    if response.code.to_f.between?(399,600)
+      catapult_exception("The Bitbucket API could not authenticate, please verify [\"company\"][\"bitbucket_username\"] and [\"company\"][\"bitbucket_password\"].")
+    else
+      puts "Bitbucket API authenticated successfully."
+      api_bamboo = JSON.parse(response.body)
+    end
+  end
+end
 if configuration["company"]["cloudflare_api_key"] == nil || configuration["company"]["cloudflare_email"] == nil
   catapult_exception("Please set [\"company\"][\"cloudflare_api_key\"] and [\"company\"][\"cloudflare_email\"] in configuration.yml")
 else
@@ -247,12 +279,12 @@ else
     request = Net::HTTP::Get.new uri.request_uri
     request.add_field "X-Auth-Key", "#{configuration["company"]["cloudflare_api_key"]}"
     request.add_field "X-Auth-Email", "#{configuration["company"]["cloudflare_email"]}"
-    response = http.request request # Net::HTTPResponse object
-    api_cloudflare = JSON.parse(response.body)
-    if api_cloudflare["success"] == false
+    response = http.request request
+    if response.code.to_f.between?(399,600)
       catapult_exception("The CloudFlare API could not authenticate, please verify [\"company\"][\"cloudflare_api_key\"] and [\"company\"][\"cloudflare_email\"].")
     else
       puts "CloudFlare API authenticated successfully."
+      api_cloudflare = JSON.parse(response.body)
     end
   end
 end
@@ -263,13 +295,12 @@ else
   Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => OpenSSL::SSL::VERIFY_NONE) do |http|
     request = Net::HTTP::Get.new uri.request_uri
     request.add_field "Authorization", "Bearer #{configuration["company"]["digitalocean_personal_access_token"]}"
-    response = http.request request # Net::HTTPResponse object
-    api_digitalocean = JSON.parse(response.body)
-    if api_digitalocean["id"] == "unauthorized"
+    response = http.request request
+    if response.code.to_f.between?(399,600)
       catapult_exception("The DigitalOcean API could not authenticate, please verify [\"company\"][\"digitalocean_personal_access_token\"].")
     else
-      api_digitalocean = api_digitalocean["droplets"]
       puts "DigitalOcean API authenticated successfully."
+      api_digitalocean = JSON.parse(response.body)
     end
   end
 end
@@ -305,7 +336,7 @@ configuration["environments"].each do |environment,data|
   # if upstream digitalocean droplets are provisioned, get their ip addresses to write to configuration.yml
   unless environment == "dev"
     unless configuration["environments"]["#{environment}"]["servers"]["redhat"]["ip"]
-      droplet = api_digitalocean.find { |d| d['name'] == "#{configuration["company"]["name"]}-#{environment}-redhat" }
+      droplet = api_digitalocean["droplets"].find { |d| d['name'] == "#{configuration["company"]["name"]}-#{environment}-redhat" }
       unless droplet == nil
         configuration["environments"]["#{environment}"]["servers"]["redhat"]["ip"] = droplet["networks"]["v4"].first["ip_address"]
         `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output configuration.yml --decrypt configuration.yml.gpg`
@@ -314,7 +345,7 @@ configuration["environments"].each do |environment,data|
       end
     end
     unless configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["ip"]
-      droplet = api_digitalocean.find { |d| d['name'] == "#{configuration["company"]["name"]}-#{environment}-redhat-mysql" }
+      droplet = api_digitalocean["droplets"].find { |d| d['name'] == "#{configuration["company"]["name"]}-#{environment}-redhat-mysql" }
       unless droplet == nil
         configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["ip"] = droplet["networks"]["v4"].first["ip_address"]
         `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output configuration.yml --decrypt configuration.yml.gpg`
@@ -468,7 +499,7 @@ if ["status"].include?(ARGV[0])
         uri = URI("http://data.alexa.com/data?cli=10&url=#{instance["domain"]}")
         Net::HTTP.start(uri.host, uri.port) do |http|
           request = Net::HTTP::Get.new uri.request_uri
-          response = http.request request # Net::HTTPResponse object
+          response = http.request request
           response = Nokogiri::XML(response.body)
           if "#{response.xpath('//ALEXA//SD//POPULARITY')}" != ""
             response.xpath('//ALEXA//SD//POPULARITY').each do |attribute|
