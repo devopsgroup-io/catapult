@@ -1,6 +1,7 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
+
 # libraries
 require "fileutils"
 require "json"
@@ -14,20 +15,48 @@ require "socket"
 require "yaml"
 
 
+# format errors
+def catapult_exception(error)
+  begin
+    raise error
+  rescue => exception
+    puts "\n\n"
+    puts exception.message
+    puts "\n\n"
+    exit 1
+  end
+end
+
+
+# set variables based on operating system
+if (RbConfig::CONFIG['host_os'] =~ /mswin|mingw|cygwin/)
+  if File.exist?('C:\Program Files (x86)\Git\bin\git.exe')
+    git = "\"C:\\Program Files (x86)\\Git\\bin\\git.exe\""
+  else
+    catapult_exception("Git is not installed at C:\\Program Files (x86)\\Git\\bin\\git.exe")
+  end
+elsif (RbConfig::CONFIG['host_os'] =~ /darwin/)
+  # apple os x
+  git = "git"
+else
+  # linux, etc
+  git = "git"
+end
+
+
 # check for vagrant plugins
 unless Vagrant.has_plugin?("vagrant-digitalocean")
-  raise 'vagrant-hostmanager is not installed, please run "vagrant plugin install vagrant-digitalocean"'
+  catapult_exception('vagrant-hostmanager is not installed, please run "vagrant plugin install vagrant-digitalocean"')
 end
 unless Vagrant.has_plugin?("vagrant-hostmanager")
-  raise 'vagrant-hostmanager is not installed, please run "vagrant plugin install vagrant-hostmanager"'
+  catapult_exception('vagrant-hostmanager is not installed, please run "vagrant plugin install vagrant-hostmanager"')
 end
 
 
 # require vm name on up and provision
 if ["up","provision"].include?(ARGV[0])
   if ARGV.length == 1
-    puts "\nYou must use 'vagrant #{ARGV[0]} <name>', run 'vagrant status' to view VM <name>s.\n\n"
-    exit 1
+    catapult_exception("You must use 'vagrant #{ARGV[0]} <name>', run 'vagrant status' to view VM <name>s.")
   end
 end
 
@@ -41,33 +70,26 @@ puts "+".ljust(padding,"-") + "".ljust(length,"-") + "+".rjust(padding,"-")
 puts "|".ljust(padding)     + title                + "|".rjust(padding)
 puts "+".ljust(padding,"-") + "".ljust(length,"-") + "+".rjust(padding,"-")
 puts "\n"
-if File.exist?('C:\Program Files (x86)\Git\bin\git.exe')
-  git = "\"C:\\Program Files (x86)\\Git\\bin\\git.exe\""
-else
-  git = "git"
-end
 remote = `#{git} config --get remote.origin.url`
 if remote.include?("devopsgroup-io/release-management.git") || remote.include?("devopsgroup-io/catapult-release-management.git")
-  puts "In order to use Catapult Release Management, you must fork the repository so that the committed and encrypted configuration is unique to you! See https://github.com/devopsgroup-io/catapult-release-management for more information."
-  puts "\n"
-  exit 1
+  catapult_exception("In order to use Catapult Release Management, you must fork the repository so that the committed and encrypted configuration is unique to you! See https://github.com/devopsgroup-io/catapult-release-management for more information.")
 else
   puts "Self updating Catapult:"
   branch = `#{git} rev-parse --abbrev-ref HEAD`
   branch = branch.strip
-  repo_this = `#{git} config --get remote.origin.url`
-  repo_this_upstream = `#{git} config --get remote.upstream.url`
+  repo = `#{git} config --get remote.origin.url`
+  repo_upstream = `#{git} config --get remote.upstream.url`
   repo_upstream = "https://github.com/devopsgroup-io/catapult-release-management.git"
-  puts "\nYour repository: #{repo_this}"
+  puts "\nYour repository: #{repo}"
   puts "Will sync from: #{repo_upstream}\n\n"
-  if repo_this_upstream.empty?
+  if repo_upstream.empty?
     `#{git} remote add upstream https://github.com/devopsgroup-io/catapult-release-management.git`
   else
     `#{git} remote rm upstream`
     `#{git} remote add upstream https://github.com/devopsgroup-io/catapult-release-management.git`
   end
-  repo_this_develop = `#{git} config --get branch.develop.remote`
-  if repo_this_develop.empty?
+  repo_develop = `#{git} config --get branch.develop.remote`
+  if repo_develop.empty?
     `#{git} fetch upstream`
     `#{git} checkout -b develop --track upstream/master`
     `#{git} pull upstream master`
@@ -132,14 +154,11 @@ configuration_user = YAML.load_file("configuration-user.yml")
 configuration_user_example = YAML.load_file("configuration-user.yml.template")
 # ensure version is up-to-date
 if configuration_user["settings"]["version"] != configuration_user_example["settings"]["version"]
-  puts "\nYour configuration-user.yml file is out of date. To retain your settings please manually merge entries from configuration-user.yml.template to configuration-user.yml with your specific settings."
-  puts "*You may also delete your configuration-user.yml and re-run any vagrant command to have a vanilla version created.\n\n"
-  exit 1
+  catapult_exception("Your configuration-user.yml file is out of date. To retain your settings please manually merge entries from configuration-user.yml.template to configuration-user.yml with your specific settings.\n*You may also delete your configuration-user.yml and re-run any vagrant command to have a vanilla version created.")
 end
 # check for required fields
 if configuration_user["settings"]["gpg_key"] == nil || configuration_user["settings"]["gpg_key"].match(/\s/) || configuration_user["settings"]["gpg_key"].length < 20
-  puts "\nPlease set your team's gpg_key in configuration-user.yml - spaces are not permitted and must be at least 20 characters.\n\n"
-  exit 1
+  catapult_exception("Please set your team's gpg_key in configuration-user.yml - spaces are not permitted and must be at least 20 characters.")
 end
 
 
@@ -194,8 +213,7 @@ elsif "#{branch}" == "master"
       `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output provisioners/.ssh/id_rsa.gpg --armor --cipher-algo AES256 --symmetric provisioners/.ssh/id_rsa`
       `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output provisioners/.ssh/id_rsa.pub.gpg --armor --cipher-algo AES256 --symmetric provisioners/.ssh/id_rsa.pub`
     else
-      puts "\nPlease place your team's ssh public (id_rsa.pub) and private key (id_rsa.pub) in provisioners/.ssh\n\n"
-      exit 1
+      catapult_exception("Please place your team's ssh public (id_rsa.pub) and private key (id_rsa.pub) in provisioners/.ssh")
     end
   end
 end
@@ -204,9 +222,7 @@ configuration = YAML.load(`gpg --batch --passphrase "#{configuration_user["setti
 configuration_example = YAML.load_file("configuration.yml.template")
 # ensure version is up-to-date
 if configuration["software"]["version"] != configuration_example["software"]["version"]
-  puts "\nYour configuration.yml file is out of date. To retain your settings please manually duplicate entries from configuration.yml.template with your specific settings."
-  puts "*You may also delete your configuration.yml and re-run any vagrant command to have a vanilla version created.\n\n"
-  exit 1
+  catapult_exception("Your configuration.yml file is out of date. To retain your settings please manually duplicate entries from configuration.yml.template with your specific settings.\n*You may also delete your configuration.yml and re-run any vagrant command to have a vanilla version created.")
 end
 # decrypt id_rsa and id_rsa.pub
 `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output provisioners/.ssh/id_rsa --decrypt provisioners/.ssh/id_rsa.gpg`
@@ -217,28 +233,22 @@ puts "\n"
 # configuration.yml validation
 # validate required company fields
 if configuration["company"]["name"] == nil
-  puts "\nPlease set [\"company\"][\"name\"] in configuration.yml\n\n"
-  exit 1
+  catapult_exception("Please set [\"company\"][\"name\"] in configuration.yml")
 end
 if configuration["company"]["cloudflare_api_key"] == nil
-  puts "\nPlease set [\"company\"][\"cloudflare_api_key\"] in configuration.yml\n\n"
-  exit 1
+  catapult_exception("Please set [\"company\"][\"cloudflare_api_key\"] in configuration.yml")
 end
 if configuration["company"]["cloudflare_email"] == nil
-  puts "\nPlease set [\"company\"][\"cloudflare_email\"] in configuration.yml\n\n"
-  exit 1
+  catapult_exception("Please set [\"company\"][\"cloudflare_email\"] in configuration.yml")
 end
 if configuration["company"]["cloudflare_email"] == nil
-  puts "\nPlease set [\"company\"][\"cloudflare_email\"] in configuration.yml\n\n"
-  exit 1
+  catapult_exception("Please set [\"company\"][\"cloudflare_email\"] in configuration.yml")
 end
 if configuration["company"]["email"] == nil
-  puts "\nPlease set [\"company\"][\"email\"] in configuration.yml\n\n"
-  exit 1
+  catapult_exception("Please set [\"company\"][\"email\"] in configuration.yml")
 end
 if configuration["company"]["digitalocean_personal_access_token"] == nil
-  puts "\nPlease set [\"company\"][\"digitalocean_personal_access_token\"] in configuration.yml\n\n"
-  exit 1
+  catapult_exception("Please set [\"company\"][\"digitalocean_personal_access_token\"] in configuration.yml")
 end
 # validate environments
 configuration["environments"].each do |environment,data|
@@ -277,32 +287,24 @@ configuration["websites"].each do |service,data|
     # validate repo user
     repo = instance["repo"].split("@")
     if repo[0] != "git"
-      puts "\nThere is an error in your configuration.yml file."
-      puts "\nThe repo for websites => #{service} => domain => #{instance["domain"]} is invalid, the format must be git@github.com:devopsgroup-io/devopsgroup-io.git\n\n"
-      exit 1
+      catapult_exception("There is an error in your configuration.yml file.\nThe repo for websites => #{service} => domain => #{instance["domain"]} is invalid, the format must be git@github.com:devopsgroup-io/devopsgroup-io.git")
     end
     # validate repo bitbucket.org or github.com
     repo = repo[1].split(":")
     if "#{repo[0]}" != "bitbucket.org" && "#{repo[0]}" != "github.com"
-      puts "\nThere is an error in your configuration.yml file."
-      puts "\nThe repo for websites => #{service} => domain => #{instance["domain"]} is invalid, it must either be a bitbucket.org or github.com repository.\n\n"
-      exit 1
+      catapult_exception("There is an error in your configuration.yml file.\nThe repo for websites => #{service} => domain => #{instance["domain"]} is invalid, it must either be a bitbucket.org or github.com repository.")
     end
     # validate webroot
     unless "#{instance["webroot"]}" == ""
       unless "#{instance["webroot"]}"[-1,1] == "/"
-        puts "\nThere is an error in your configuration.yml file."
-        puts "\nThe webroot for websites => #{service} => domain => #{instance["domain"]} is invalid, it must include a trailing slash.\n\n"
-        exit 1
+        catapult_exception("There is an error in your configuration.yml file.\nThe webroot for websites => #{service} => domain => #{instance["domain"]} is invalid, it must include a trailing slash.")
       end
     end
   end
   # ensure domains are in alpha order
   domains_sorted = domains_sorted.sort
   if domains != domains_sorted
-    puts "\nThere is an error in your configuration.yml file."
-    puts "\nThe domains in configuration.yml are not in alpha order for websites => #{service} - please adjust.\n\n"
-    exit 1
+    catapult_exception("There is an error in your configuration.yml file.\nThe domains in configuration.yml are not in alpha order for websites => #{service} - please adjust.")
   end
 end
 
@@ -320,7 +322,6 @@ Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_m
       unless configuration["environments"]["#{environment}"]["servers"]["redhat"]["ip"]
         droplet = droplets.find { |d| d['name'] == "#{configuration["company"]["name"]}-#{environment}-redhat" }
         unless droplet == nil
-          # puts droplet
           configuration["environments"]["#{environment}"]["servers"]["redhat"]["ip"] = droplet["networks"]["v4"].first["ip_address"]
           `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output configuration.yml --decrypt configuration.yml.gpg`
           File.open('configuration.yml', 'w') {|f| f.write configuration.to_yaml }
@@ -330,7 +331,6 @@ Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_m
       unless configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["ip"]
         droplet = droplets.find { |d| d['name'] == "#{configuration["company"]["name"]}-#{environment}-redhat-mysql" }
         unless droplet == nil
-          # puts droplet
           configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["ip"] = droplet["networks"]["v4"].first["ip_address"]
           `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output configuration.yml --decrypt configuration.yml.gpg`
           File.open('configuration.yml', 'w') {|f| f.write configuration.to_yaml }
