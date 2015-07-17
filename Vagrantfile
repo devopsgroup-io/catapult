@@ -124,7 +124,7 @@ File.chmod(0777,'.git/hooks/pre-commit')
 
 # bootstrap configuration-user.yml
 # generate configuration-user.yml file if it does not exist
-if not File.exist?("configuration-user.yml")
+unless File.exist?("configuration-user.yml")
   FileUtils.cp("configuration-user.yml.template", "configuration-user.yml")
 end
 # parse configuration-user.yml and configuration-user.yml.template file
@@ -165,7 +165,7 @@ elsif "#{branch}" == "master"
     `gpg --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output configuration.yml.gpg --armor --cipher-algo AES256 --symmetric configuration.yml.template`
   end
   if configuration_user["settings"]["gpg_edit"]
-    if not File.exist?("configuration.yml")
+    unless File.exist?("configuration.yml")
       # decrypt configuration.yml.gpg as configuration.yml
       `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output configuration.yml --decrypt configuration.yml.gpg`
     end
@@ -242,25 +242,25 @@ if configuration["company"]["digitalocean_personal_access_token"] == nil
 end
 # validate environments
 configuration["environments"].each do |environment,data|
-  if not configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["mysql"]["user_password"]
+  unless configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["mysql"]["user_password"]
     configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["mysql"]["user_password"] = SecureRandom.urlsafe_base64(16)
     `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output configuration.yml --decrypt configuration.yml.gpg`
     File.open('configuration.yml', 'w') {|f| f.write configuration.to_yaml }
     `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output configuration.yml.gpg --armor --cipher-algo AES256 --symmetric configuration.yml`
   end
-  if not configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["mysql"]["root_password"]
+  unless configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["mysql"]["root_password"]
     configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["mysql"]["root_password"] = SecureRandom.urlsafe_base64(16)
     `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output configuration.yml --decrypt configuration.yml.gpg`
     File.open('configuration.yml', 'w') {|f| f.write configuration.to_yaml }
     `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output configuration.yml.gpg --armor --cipher-algo AES256 --symmetric configuration.yml`
   end
-  if not configuration["environments"]["#{environment}"]["software"]["drupal"]["admin_password"]
+  unless configuration["environments"]["#{environment}"]["software"]["drupal"]["admin_password"]
     configuration["environments"]["#{environment}"]["software"]["drupal"]["admin_password"] = SecureRandom.urlsafe_base64(16)
     `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output configuration.yml --decrypt configuration.yml.gpg`
     File.open('configuration.yml', 'w') {|f| f.write configuration.to_yaml }
     `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output configuration.yml.gpg --armor --cipher-algo AES256 --symmetric configuration.yml`
   end
-  if not configuration["environments"]["#{environment}"]["software"]["wordpress"]["admin_password"]
+  unless configuration["environments"]["#{environment}"]["software"]["wordpress"]["admin_password"]
     configuration["environments"]["#{environment}"]["software"]["wordpress"]["admin_password"] = SecureRandom.urlsafe_base64(16)
     `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output configuration.yml --decrypt configuration.yml.gpg`
     File.open('configuration.yml', 'w') {|f| f.write configuration.to_yaml }
@@ -289,8 +289,8 @@ configuration["websites"].each do |service,data|
       exit 1
     end
     # validate webroot
-    if not "#{instance["webroot"]}" == ""
-      if not "#{instance["webroot"]}"[-1,1] == "/"
+    unless "#{instance["webroot"]}" == ""
+      unless "#{instance["webroot"]}"[-1,1] == "/"
         puts "\nThere is an error in your configuration.yml file."
         puts "\nThe webroot for websites => #{service} => domain => #{instance["domain"]} is invalid, it must include a trailing slash.\n\n"
         exit 1
@@ -317,7 +317,7 @@ Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_m
   droplets = droplets["droplets"]
   configuration["environments"].each do |environment,data|
     unless environment == "dev"
-      if not configuration["environments"]["#{environment}"]["servers"]["redhat"]["ip"]
+      unless configuration["environments"]["#{environment}"]["servers"]["redhat"]["ip"]
         droplet = droplets.find { |d| d['name'] == "#{configuration["company"]["name"]}-#{environment}-redhat" }
         unless droplet == nil
           # puts droplet
@@ -327,7 +327,7 @@ Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_m
           `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output configuration.yml.gpg --armor --cipher-algo AES256 --symmetric configuration.yml`
         end
       end
-      if not configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["ip"]
+      unless configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["ip"]
         droplet = droplets.find { |d| d['name'] == "#{configuration["company"]["name"]}-#{environment}-redhat-mysql" }
         unless droplet == nil
           # puts droplet
