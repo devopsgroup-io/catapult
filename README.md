@@ -58,7 +58,7 @@ Catapult is quick to setup. Fork the Github repository and start adding your con
 6. Next, you will need to configure gpg_edit mode so that during the Services Setup you can add your secrets to configuration.yml and commit your secrets to configuration.yml.gpg.
     1. To do so, set gpg_edit to true in configuration-user.yml.
     2. This will now allow you to add secrets to configuration.yml and run vagrant status to encrypt the secrets in configuration.yml.gpg
-        1. In addition to encrypting ~/provisioners/.ssh/id_rsa and ~/provisioners/.ssh/id_rsa.pub as ~/provisioners/.ssh/id_rsa.gpb and ~/provisioners/.ssh/id_rsa.pub.gpb, respecfully.
+        1. In addition to encrypting ~/provisioners/.ssh/id_rsa and ~/provisioners/.ssh/id_rsa.pub as ~/provisioners/.ssh/id_rsa.gpb and ~/provisioners/.ssh/id_rsa.pub.gpb, respectfully.
 
 ## Services Setup ##
 
@@ -89,7 +89,7 @@ Catapult uses several third-party services to pull everything off - below is a l
     * CloudFlare provides two major components - free SSL certificate functionality (https) and DNS management - just update the name servers to clark.ns.cloudflare.com and liv.ns.cloudflare.com at the registrar where you purchased the domain name and Catapult will handle the rest.
     1. Create a CloudFlare account at https://www.cloudflare.com
     2. Sign in your new CloudFlare account
-    3. Vist your My Account section at https://www.cloudflare.com/a/account/my-account and scroll down to your API Key and place the token value in ~/configuration.yml at ["company"]["cloudflare_api_key"]
+    3. Visit your My Account section at https://www.cloudflare.com/a/account/my-account and scroll down to your API Key and place the token value in ~/configuration.yml at ["company"]["cloudflare_api_key"]
     4. Place the email address of the email address that you used to sign up for CloudFlare at ["company"]["cloudflare_email"]
 
 # Usage #
