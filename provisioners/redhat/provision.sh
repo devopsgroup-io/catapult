@@ -114,8 +114,9 @@ while IFS='' read -r -d '' key; do
         elif [ "$(cd /vagrant/repositories/apache/$domain && git rev-list HEAD | tail -n 1 )" != "$(cd /vagrant/repositories/apache/$domain && git rev-list origin/master | tail -n 1 )" ]; then
             echo "the repo has changed, removing and cloning the new repository." | sed "s/^/\t/"
             sudo rm -rf /vagrant/repositories/apache/$domain
-            git clone --recursive -b $(cat /vagrant/configuration.yml | shyaml get-value environments.$1.branch) $repo /vagrant/repositories/apache/$domain | sed "s/^/\t/"
+            sudo ssh-agent bash -c "ssh-add /vagrant/provisioners/.ssh/id_rsa; git clone --recursive -b $(cat /vagrant/configuration.yml | shyaml get-value environments.$1.branch) $repo /var/www/repositories/apache/$domain" | sed "s/^/\t/"
         elif [ "$settings_git_pull" = true ]; then
+            cd /var/www/repositories/apache/$domain && git checkout $(cat /vagrant/configuration.yml | shyaml get-value environments.$1.branch)
             cd /var/www/repositories/apache/$domain && sudo ssh-agent bash -c "ssh-add /vagrant/provisioners/.ssh/id_rsa; git pull origin $(cat /vagrant/configuration.yml | shyaml get-value environments.$1.branch)" | sed "s/^/\t/"
         elif [ "$settings_git_pull" = false ]; then
             echo "[provisioner argument false!] skipping git pull" | sed "s/^/\t/"
