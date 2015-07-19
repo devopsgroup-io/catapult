@@ -58,7 +58,7 @@ end
 
 # check for vagrant plugins
 unless Vagrant.has_plugin?("vagrant-digitalocean")
-  catapult_exception('vagrant-hostmanager is not installed, please run "vagrant plugin install vagrant-digitalocean"')
+  catapult_exception('vagrant-digitalocean is not installed, please run "vagrant plugin install vagrant-digitalocean"')
 end
 unless Vagrant.has_plugin?("vagrant-hostmanager")
   catapult_exception('vagrant-hostmanager is not installed, please run "vagrant plugin install vagrant-hostmanager"')
@@ -71,6 +71,11 @@ if ["up","provision"].include?(ARGV[0])
     catapult_exception("You must use 'vagrant #{ARGV[0]} <name>', run 'vagrant status' to view VM <name>s.")
   end
 end
+
+# api declarations
+api_bamboo = nil
+api_cloudflare = nil
+api_digitalocean = nil
 
 
 # configure catapult and git
