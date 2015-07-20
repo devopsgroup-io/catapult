@@ -64,33 +64,51 @@ Catapult is quick to setup. Fork the Github repository and start adding your con
 
 Catapult uses several third-party services to pull everything off - below is a list of the required services and setup steps.
 
-1. **Hosting:** DigitalOcean Sign-Up and Configuration
-    1. Create an account at http://digitalocean.com
-    2. Create a Personal Access Token at https://cloud.digitalocean.com/settings/applications named "Vagrant" and place the token value in ~/configuration.yml at ["company"]["digitalocean_personal_access_token"]
-    3. Add your newly created id_rsa.pub from ~/provisioners/.ssh/id_rsa.pub key in https://cloud.digitalocean.com/settings/security named "Vagrant"
+1. **Hosting:** 
+    1. **DigitalOcean** Sign-Up and Configuration
+        1. Create an account at http://digitalocean.com
+        2. Create a Personal Access Token at https://cloud.digitalocean.com/settings/applications named "Vagrant" and place the token value in ~/configuration.yml at ["company"]["digitalocean_personal_access_token"]
+        3. Add your newly created id_rsa.pub from ~/provisioners/.ssh/id_rsa.pub key in https://cloud.digitalocean.com/settings/security named "Vagrant"
 
-3. **Automated Deployments:** Amazon Web Services (AWS) EC2 Sign-Up and Configuration (Required for Bamboo)
-    1. Create an AWS account https://portal.aws.amazon.com/gp/aws/developer/registration
-    2. Sign in to your new AWS console https://console.aws.amazon.com
-    3. Go to your AWS Identity and Access Management (IAM) Users Dashboard https://console.aws.amazon.com/iam/home#users
-        1. Create a "Bamboo" user.
-        2. Please note both the Access Key ID and Secret Access Key.
-    4. Go to your AWS Identity and Access Management (IAM) Groups Dashboard https://console.aws.amazon.com/iam/home#groups
-        1. Create a "Bamboo" group.
-        2. Attach the "AmazonEC2FullAccess" policy to the "Bamboo" group.
+2. **Repositories:**
+    1. **Bitbucket** Sign-Up and Configuration
+        1. Create an account at https://bitbucket.org
+            1. Place the email address that you used to sign up for Bitbucket at ["company"]["bitbucket_username"]
+            2. Place the password of the account for Bitbucket at ["company"]["bitbucket_username"]
+    2. **GitHub** Sign-Up and Configuration
+        1. Create an account at https://github.com
+            1. Place the email address that you used to sign up for GitHub at ["company"]["github_username"]
+            2. Place the password of the account for GitHub at ["company"]["github_password"]
 
-4. **Automated Deployments:** Atlassian Bamboo Sign-Up and Configuration
-    1. Create a Bamboo Cloud account at https://www.atlassian.com/software/bamboo
-    2. Sign in to your new custom Bamboo instance https://[your-name-here].atlassian.net
-    3. Go to your Elastic Bamboo configuration https://[your-name-here].atlassian.net/builds/admin/elastic/editElasticConfig.action
-        1. Set your AWS EC2 "Bamboo" Access Key ID and Secret Access Key
+3. **Automated Deployments:**
+    1. **Amazon Web Services** (AWS) EC2 Sign-Up and Configuration (Required for Bamboo)
+        1. Create an AWS account https://portal.aws.amazon.com/gp/aws/developer/registration
+        2. Sign in to your new AWS console https://console.aws.amazon.com
+        3. Go to your AWS Identity and Access Management (IAM) Users Dashboard https://console.aws.amazon.com/iam/home#users
+            1. Create a "Bamboo" user.
+            2. Please note both the Access Key ID and Secret Access Key.
+        4. Go to your AWS Identity and Access Management (IAM) Groups Dashboard https://console.aws.amazon.com/iam/home#groups
+            1. Create a "Bamboo" group.
+            2. Attach the "AmazonEC2FullAccess" policy to the "Bamboo" group.
+        5. Go back to your AWS Identity and Access Management (IAM) Groups Dashboard https://console.aws.amazon.com/iam/home#groups
+            1. Select your newly created "Bamboo" group.
+            2. Select Add Users to Group and add your newly created "Bamboo" user.
+    2. **Bamboo** Sign-Up and Configuration
+        1. Create a Bamboo Cloud account at https://www.atlassian.com/software/bamboo
+        2. Sign in to your new custom Bamboo instance https://[your-name-here].atlassian.net
+        3. Go to your Elastic Bamboo configuration https://[your-name-here].atlassian.net/builds/admin/elastic/editElasticConfig.action
+            1. Set your AWS EC2 "Bamboo" Access Key ID and Secret Access Key
 
-5. **DNS:** CloudFlare Sign-Up and Configuration
-    * CloudFlare provides two major components - free SSL certificate functionality (https) and DNS management - just update the name servers to clark.ns.cloudflare.com and liv.ns.cloudflare.com at the registrar where you purchased the domain name and Catapult will handle the rest.
-    1. Create a CloudFlare account at https://www.cloudflare.com
-    2. Sign in your new CloudFlare account
-    3. Visit your My Account section at https://www.cloudflare.com/a/account/my-account and scroll down to your API Key and place the token value in ~/configuration.yml at ["company"]["cloudflare_api_key"]
-    4. Place the email address of the email address that you used to sign up for CloudFlare at ["company"]["cloudflare_email"]
+4. **DNS:**
+    1. **CloudFlare** Sign-Up and Configuration
+        * CloudFlare provides two major components - free SSL certificate functionality (https) and DNS management - just update the name servers to clark.ns.cloudflare.com and liv.ns.cloudflare.com at the registrar where you purchased the domain name and Catapult will handle the rest.
+        1. Create a CloudFlare account at https://www.cloudflare.com
+        2. Sign in your new CloudFlare account
+        3. Visit your My Account section at https://www.cloudflare.com/a/account/my-account and scroll down to your API Key and place the token value in ~/configuration.yml at ["company"]["cloudflare_api_key"]
+        4. Place the email address of the email address that you used to sign up for CloudFlare at ["company"]["cloudflare_email"]
+
+5. **Verify Configuration:**
+    1. To verify all of the configuration that you just set, open your command line and cd into your fork of Catapult, then run `vagrant status`. Catapult will confirm connection to all of the Services and inform you of any problems.
 
 # Usage #
 

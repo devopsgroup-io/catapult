@@ -170,8 +170,8 @@ puts "\n\nEncryption and decryption of Catapult configuration files:"
 puts "\n"
 if "#{branch}" == "develop"
   puts " * You are on the develop branch, this branch is automatically synced with Catapult core and is meant to contribute back to the core Catapult project."
-  puts " * confiuration.yml.gpg, provisioners/.ssh/id_rsa.gpg, provisioners/.ssh/id_rsa.pub.gpg is checked out from the master branch so that you're able to develop and test."
-  puts " * After you're finished on the develop branch, switch to the master branch and discard confiuration.yml.gpg, provisioners/.ssh/id_rsa.gpg, provisioners/.ssh/id_rsa.pub.gpg"
+  puts " * configuration.yml.gpg, provisioners/.ssh/id_rsa.gpg, and provisioners/.ssh/id_rsa.pub.gpg are checked out from the master branch so that you're able to develop and test."
+  puts " * After you're finished on the develop branch, switch to the master branch and discard configuration.yml.gpg, provisioners/.ssh/id_rsa.gpg, and provisioners/.ssh/id_rsa.pub.gpg"
   puts "\n"
   `git checkout --force master -- configuration.yml.gpg`
   `git checkout --force master -- provisioners/.ssh/id_rsa.gpg`
@@ -180,7 +180,7 @@ if "#{branch}" == "develop"
   `git reset -- provisioners/.ssh/id_rsa.gpg`
   `git reset -- provisioners/.ssh/id_rsa.pub.gpg`
 elsif "#{branch}" == "master"
-  puts " * You are on the master branch, this branch is automatically synced with Catapult core and is meant to commit your unique configuration."
+  puts " * You are on the master branch, this branch is automatically synced with Catapult core and is meant to commit your unique configuration.yml.gpg, provisioners/.ssh/id_rsa.gpg, and provisioners/.ssh/id_rsa.pub.gpg configuration."
   puts "\n"
   # bootstrap configuration.yml
   # initialize configuration.yml.gpg
@@ -251,7 +251,7 @@ else
       catapult_exception("The Bamboo API could not authenticate, please verify [\"company\"][\"bamboo_base_url\"] and [\"company\"][\"bamboo_username\"] and [\"company\"][\"bamboo_password\"].")
     else
       puts "Bamboo API authenticated successfully."
-      api_bamboo = JSON.parse(response.body)
+      @api_bamboo = JSON.parse(response.body)
     end
   end
 end
@@ -267,7 +267,7 @@ else
       catapult_exception("The Bitbucket API could not authenticate, please verify [\"company\"][\"bitbucket_username\"] and [\"company\"][\"bitbucket_password\"].")
     else
       puts "Bitbucket API authenticated successfully."
-      api_bitbucket = JSON.parse(response.body)
+      @api_bitbucket = JSON.parse(response.body)
     end
   end
 end
@@ -284,7 +284,7 @@ else
       catapult_exception("The CloudFlare API could not authenticate, please verify [\"company\"][\"cloudflare_api_key\"] and [\"company\"][\"cloudflare_email\"].")
     else
       puts "CloudFlare API authenticated successfully."
-      api_cloudflare = JSON.parse(response.body)
+      @api_cloudflare = JSON.parse(response.body)
     end
   end
 end
@@ -319,7 +319,7 @@ else
       catapult_exception("The GitHub API could not authenticate, please verify [\"company\"][\"github_username\"] and [\"company\"][\"github_password\"].")
     else
       puts "GitHub API authenticated successfully."
-      api_github = JSON.parse(response.body)
+      @api_github = JSON.parse(response.body)
     end
   end
 end
