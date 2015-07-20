@@ -394,6 +394,12 @@ configuration["websites"].each do |service,data|
     if "#{repo[0]}" != "bitbucket.org" && "#{repo[0]}" != "github.com"
       catapult_exception("There is an error in your configuration.yml file.\nThe repo for websites => #{service} => domain => #{instance["domain"]} is invalid, it must either be a bitbucket.org or github.com repository.")
     end
+    # validate software
+    unless "#{instance["software"]}" == ""
+      unless ["codeigniter2","drupal6","drupal7","wordpress","xenforo"].include?("#{instance["software"]}")
+        catapult_exception("There is an error in your configuration.yml file.\nThe software for websites => #{service} => domain => #{instance["domain"]} is invalid, it must be one of the following [\"codeigniter2\",\"drupal6\",\"drupal7\",\"wordpress\",\"xenforo\"].")
+      end
+    end
     # validate webroot
     unless "#{instance["webroot"]}" == ""
       unless "#{instance["webroot"]}"[-1,1] == "/"
