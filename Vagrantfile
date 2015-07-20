@@ -328,6 +328,12 @@ else
     end
   end
 end
+if configuration["company"]["timezone_redhat"] == nil
+  catapult_exception("Please set [\"company\"][\"timezone_redhat\"] in configuration.yml")
+end
+if configuration["company"]["timezone_windows"] == nil
+  catapult_exception("Please set [\"company\"][\"timezone_windows\"] in configuration.yml")
+end
 # validate configuration["environments"]
 configuration["environments"].each do |environment,data|
   unless configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["mysql"]["user_password"]
