@@ -98,7 +98,7 @@ Catapult is centered around web and database servers. The web and database serve
 
 ## Adding Websites ##
 
-Adding websites to devopsgroup.io is easy. Each website needs to be contained in its own repo on GitHub or Bitbucket. Websites are added to configuration.yml, a minimal addition looks like this:
+Adding websites to Catapult is easy. The only requirement is that the website needs to be contained in its own repo on GitHub or Bitbucket. Websites are then added to configuration.yml, a minimal addition looks like this:
 
 ```
 - domain: "devopsgroup.io"
