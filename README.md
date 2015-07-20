@@ -45,7 +45,7 @@ Catapult is quick to setup. Fork the Github repository and start adding your con
 
 1. Fork https://github.com/devopsgroup-io/release-management and clone via SourceTree or the git utility of your choice.
 2. Open your command line and cd into the newly cloned repository.
-3. From here, you will need to install all of the required Vagrant plugins. To see these, run the vagrant status command and any Vagrant plugins that you do not have installed, will be displayed with the command to install.
+3. From here, you will need to install all of the required Vagrant plugins. To see these, run the `vagrant status` command and any Vagrant plugins that you do not have installed, will be displayed with the command to install.
 4. Next, you will need to create a passwordless SSH key pair that will drive authentication for Catapult.
     1. For instructions please see https://confluence.atlassian.com/display/STASH/Creating+SSH+keys
     2. Place the newly created passwordless SSH key pair id_rsa and id_rsa.pub in the ~/provisioners/.ssh/ folder.
@@ -57,7 +57,7 @@ Catapult is quick to setup. Fork the Github repository and start adding your con
     5. Remember; security is 99% process and 1% technology.
 6. Next, you will need to configure gpg_edit mode so that during the Services Setup you can add your secrets to configuration.yml and commit your secrets to configuration.yml.gpg.
     1. To do so, set gpg_edit to true in configuration-user.yml.
-    2. This will now allow you to add secrets to configuration.yml and run vagrant status to encrypt the secrets in configuration.yml.gpg
+    2. This will now allow you to add secrets to configuration.yml and run `vagrant status` to encrypt the secrets in configuration.yml.gpg
         1. In addition to encrypting ~/provisioners/.ssh/id_rsa and ~/provisioners/.ssh/id_rsa.pub as ~/provisioners/.ssh/id_rsa.gpb and ~/provisioners/.ssh/id_rsa.pub.gpb, respectfully.
 
 ## Services Setup ##
