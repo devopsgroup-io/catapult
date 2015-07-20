@@ -72,11 +72,6 @@ if ["up","provision"].include?(ARGV[0])
   end
 end
 
-# api declarations
-api_bamboo = nil
-api_cloudflare = nil
-api_digitalocean = nil
-
 
 # configure catapult and git
 remote = `#{git} config --get remote.origin.url`
@@ -305,7 +300,7 @@ else
       catapult_exception("The DigitalOcean API could not authenticate, please verify [\"company\"][\"digitalocean_personal_access_token\"].")
     else
       puts "DigitalOcean API authenticated successfully."
-      api_digitalocean = JSON.parse(response.body)
+      @api_digitalocean = JSON.parse(response.body)
     end
   end
 end
@@ -363,7 +358,7 @@ configuration["environments"].each do |environment,data|
   # if upstream digitalocean droplets are provisioned, get their ip addresses to write to configuration.yml
   unless environment == "dev"
     unless configuration["environments"]["#{environment}"]["servers"]["redhat"]["ip"]
-      droplet = api_digitalocean["droplets"].find { |d| d['name'] == "#{configuration["company"]["name"]}-#{environment}-redhat" }
+      droplet = @api_digitalocean["droplets"].find { |d| d['name'] == "#{configuration["company"]["name"]}-#{environment}-redhat" }
       unless droplet == nil
         configuration["environments"]["#{environment}"]["servers"]["redhat"]["ip"] = droplet["networks"]["v4"].first["ip_address"]
         `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output configuration.yml --decrypt configuration.yml.gpg`
@@ -372,7 +367,7 @@ configuration["environments"].each do |environment,data|
       end
     end
     unless configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["ip"]
-      droplet = api_digitalocean["droplets"].find { |d| d['name'] == "#{configuration["company"]["name"]}-#{environment}-redhat-mysql" }
+      droplet = @api_digitalocean["droplets"].find { |d| d['name'] == "#{configuration["company"]["name"]}-#{environment}-redhat-mysql" }
       unless droplet == nil
         configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["ip"] = droplet["networks"]["v4"].first["ip_address"]
         `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output configuration.yml --decrypt configuration.yml.gpg`
