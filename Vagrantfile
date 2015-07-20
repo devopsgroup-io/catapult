@@ -58,7 +58,7 @@ end
 
 # check for vagrant plugins
 unless Vagrant.has_plugin?("vagrant-digitalocean")
-  catapult_exception('vagrant-hostmanager is not installed, please run "vagrant plugin install vagrant-digitalocean"')
+  catapult_exception('vagrant-digitalocean is not installed, please run "vagrant plugin install vagrant-digitalocean"')
 end
 unless Vagrant.has_plugin?("vagrant-hostmanager")
   catapult_exception('vagrant-hostmanager is not installed, please run "vagrant plugin install vagrant-hostmanager"')
@@ -170,8 +170,8 @@ puts "\n\nEncryption and decryption of Catapult configuration files:"
 puts "\n"
 if "#{branch}" == "develop"
   puts " * You are on the develop branch, this branch is automatically synced with Catapult core and is meant to contribute back to the core Catapult project."
-  puts " * confiuration.yml.gpg, provisioners/.ssh/id_rsa.gpg, provisioners/.ssh/id_rsa.pub.gpg is checked out from the master branch so that you're able to develop and test."
-  puts " * After you're finished on the develop branch, switch to the master branch and discard confiuration.yml.gpg, provisioners/.ssh/id_rsa.gpg, provisioners/.ssh/id_rsa.pub.gpg"
+  puts " * configuration.yml.gpg, provisioners/.ssh/id_rsa.gpg, and provisioners/.ssh/id_rsa.pub.gpg are checked out from the master branch so that you're able to develop and test."
+  puts " * After you're finished on the develop branch, switch to the master branch and discard configuration.yml.gpg, provisioners/.ssh/id_rsa.gpg, and provisioners/.ssh/id_rsa.pub.gpg"
   puts "\n"
   `git checkout --force master -- configuration.yml.gpg`
   `git checkout --force master -- provisioners/.ssh/id_rsa.gpg`
@@ -180,7 +180,7 @@ if "#{branch}" == "develop"
   `git reset -- provisioners/.ssh/id_rsa.gpg`
   `git reset -- provisioners/.ssh/id_rsa.pub.gpg`
 elsif "#{branch}" == "master"
-  puts " * You are on the master branch, this branch is automatically synced with Catapult core and is meant to commit your unique configuration."
+  puts " * You are on the master branch, this branch is automatically synced with Catapult core and is meant to commit your unique configuration.yml.gpg, provisioners/.ssh/id_rsa.gpg, and provisioners/.ssh/id_rsa.pub.gpg configuration."
   puts "\n"
   # bootstrap configuration.yml
   # initialize configuration.yml.gpg
@@ -251,7 +251,7 @@ else
       catapult_exception("The Bamboo API could not authenticate, please verify [\"company\"][\"bamboo_base_url\"] and [\"company\"][\"bamboo_username\"] and [\"company\"][\"bamboo_password\"].")
     else
       puts "Bamboo API authenticated successfully."
-      api_bamboo = JSON.parse(response.body)
+      @api_bamboo = JSON.parse(response.body)
     end
   end
 end
@@ -267,7 +267,7 @@ else
       catapult_exception("The Bitbucket API could not authenticate, please verify [\"company\"][\"bitbucket_username\"] and [\"company\"][\"bitbucket_password\"].")
     else
       puts "Bitbucket API authenticated successfully."
-      api_bamboo = JSON.parse(response.body)
+      @api_bitbucket = JSON.parse(response.body)
     end
   end
 end
@@ -284,7 +284,7 @@ else
       catapult_exception("The CloudFlare API could not authenticate, please verify [\"company\"][\"cloudflare_api_key\"] and [\"company\"][\"cloudflare_email\"].")
     else
       puts "CloudFlare API authenticated successfully."
-      api_cloudflare = JSON.parse(response.body)
+      @api_cloudflare = JSON.parse(response.body)
     end
   end
 end
@@ -300,7 +300,7 @@ else
       catapult_exception("The DigitalOcean API could not authenticate, please verify [\"company\"][\"digitalocean_personal_access_token\"].")
     else
       puts "DigitalOcean API authenticated successfully."
-      api_digitalocean = JSON.parse(response.body)
+      @api_digitalocean = JSON.parse(response.body)
     end
   end
 end
@@ -319,9 +319,15 @@ else
       catapult_exception("The GitHub API could not authenticate, please verify [\"company\"][\"github_username\"] and [\"company\"][\"github_password\"].")
     else
       puts "GitHub API authenticated successfully."
-      api_bamboo = JSON.parse(response.body)
+      @api_github = JSON.parse(response.body)
     end
   end
+end
+if configuration["company"]["timezone_redhat"] == nil
+  catapult_exception("Please set [\"company\"][\"timezone_redhat\"] in configuration.yml")
+end
+if configuration["company"]["timezone_windows"] == nil
+  catapult_exception("Please set [\"company\"][\"timezone_windows\"] in configuration.yml")
 end
 # validate configuration["environments"]
 configuration["environments"].each do |environment,data|
@@ -352,7 +358,7 @@ configuration["environments"].each do |environment,data|
   # if upstream digitalocean droplets are provisioned, get their ip addresses to write to configuration.yml
   unless environment == "dev"
     unless configuration["environments"]["#{environment}"]["servers"]["redhat"]["ip"]
-      droplet = api_digitalocean["droplets"].find { |d| d['name'] == "#{configuration["company"]["name"]}-#{environment}-redhat" }
+      droplet = @api_digitalocean["droplets"].find { |d| d['name'] == "#{configuration["company"]["name"]}-#{environment}-redhat" }
       unless droplet == nil
         configuration["environments"]["#{environment}"]["servers"]["redhat"]["ip"] = droplet["networks"]["v4"].first["ip_address"]
         `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output configuration.yml --decrypt configuration.yml.gpg`
@@ -361,7 +367,7 @@ configuration["environments"].each do |environment,data|
       end
     end
     unless configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["ip"]
-      droplet = api_digitalocean["droplets"].find { |d| d['name'] == "#{configuration["company"]["name"]}-#{environment}-redhat-mysql" }
+      droplet = @api_digitalocean["droplets"].find { |d| d['name'] == "#{configuration["company"]["name"]}-#{environment}-redhat-mysql" }
       unless droplet == nil
         configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["ip"] = droplet["networks"]["v4"].first["ip_address"]
         `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output configuration.yml --decrypt configuration.yml.gpg`
@@ -387,6 +393,12 @@ configuration["websites"].each do |service,data|
     repo = repo[1].split(":")
     if "#{repo[0]}" != "bitbucket.org" && "#{repo[0]}" != "github.com"
       catapult_exception("There is an error in your configuration.yml file.\nThe repo for websites => #{service} => domain => #{instance["domain"]} is invalid, it must either be a bitbucket.org or github.com repository.")
+    end
+    # validate software
+    unless "#{instance["software"]}" == ""
+      unless ["codeigniter2","drupal6","drupal7","wordpress","xenforo"].include?("#{instance["software"]}")
+        catapult_exception("There is an error in your configuration.yml file.\nThe software for websites => #{service} => domain => #{instance["domain"]} is invalid, it must be one of the following [\"codeigniter2\",\"drupal6\",\"drupal7\",\"wordpress\",\"xenforo\"].")
+      end
     end
     # validate webroot
     unless "#{instance["webroot"]}" == ""
@@ -468,6 +480,8 @@ if ["status"].include?(ARGV[0])
           end
           row.push(http_repsonse("http://#{environment}#{instance["domain"]}").ljust(4))
         rescue SocketError
+          row.push("down".ljust(4))
+        rescue Errno::ECONNREFUSED
           row.push("down".ljust(4))
         rescue EOFError
           row.push("down".ljust(4))
