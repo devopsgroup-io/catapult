@@ -272,7 +272,7 @@ else
       catapult_exception("The Bitbucket API could not authenticate, please verify [\"company\"][\"bitbucket_username\"] and [\"company\"][\"bitbucket_password\"].")
     else
       puts "Bitbucket API authenticated successfully."
-      api_bamboo = JSON.parse(response.body)
+      api_bitbucket = JSON.parse(response.body)
     end
   end
 end
@@ -324,7 +324,7 @@ else
       catapult_exception("The GitHub API could not authenticate, please verify [\"company\"][\"github_username\"] and [\"company\"][\"github_password\"].")
     else
       puts "GitHub API authenticated successfully."
-      api_bamboo = JSON.parse(response.body)
+      api_github = JSON.parse(response.body)
     end
   end
 end
