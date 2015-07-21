@@ -1,12 +1,76 @@
-# devopsgroup.io Catapult Release Management #
+# Catapult Release Management #
 
-Copyright (c) 2015 devopsgroup.io - Seth Reeser
+> ![Catapult Release Management Logo](https://avatars0.githubusercontent.com/u/12451107?v=3&amp;s=200)  
+> [devopsgroup.io](https://devopsgroup.io/)   
+> Copyright (c) 2015 devopsgroup.io - Seth Reeser
 
 Welcome to devopsgroup.io Catapult Release Management, a complete DevOps Release Management solution featuring automated website deployment and continuous integration following Gitflow and SCRUM workflows. Built for Developers easy enough to use by non-Developers.
 
 To a non-Developer you may think, "I already have a website.", why do I need Catapult? Over time you will find yourself paying a freelancer or a development company hundreds or even thousands of dollars to manage or interact with the Development Operations (DevOps) of your website i.e. - "Production is down.", "We need a test site.", "Why is this costing so much?", "Is my website safe?", "Is my website backed up?", "Can I easily scale my website for more traffic?" etc. Catapult manages all of this for you and is open-sourced, documented, and free to use. We also provide a service if you need some help getting started, if you do, let us know at https://devopsgroup.io
 
-Catapult only costs $40/month to have a full-stack localDev, Test, Quality Control, and Production environment.
+Catapult only costs $40/month to have a full-stack localDev, Test, Quality Control, and Production environment.  
+
+If you're having issues with Catapult Release Management, [submit an issue here](https://github.com/devopsgroup-io/catapult-release-management/issues/new).
+
+## Table of Contents
+
+- [Supported Software](#supported-software)
+- [Setup](#setup)
+ - [Developer Setup](#developer-setup)
+ - [Instance Setup](#instance-setup)
+ - [Services Setup](#services-setup)
+- [Usage](#usage)
+ - [Spinning up VMs](#spinning-up-vms)
+ - [Provisioning VMs](#provisioning-vms)
+ - [Adding Websites](#adding-websites)
+ - [Environments](#environments)
+ - [Service Costs](#service-costs)
+- [Contributing](#contributing)
+- [Versioning](#versioning)
+
+### What's Included
+
+```
+catapult-release-management/
+├── provisioners/
+│   ├── .ssh/
+│   ├── redhat/
+│   │   ├── installers/
+│   │   │    └── codeigniter2_database.php
+│   │   │    └── drupal6_settings.php
+│   │   │    └── drupal7_settings.php
+│   │   │    └── wp-cli.phar
+│   │   │    └── wp-config.php
+│   │   │    └── xenforo_config.php
+│   │   │ 
+│   │   ├── logs/
+│   │   │
+│   │   └── provision.sh
+│   │
+│   ├── redhat_mysql/
+│   │   ├── installers/
+│   │   ├── logs/
+│   │   └── provision.sh
+│   │
+│   └── windows
+│       ├── installers/
+│       │    └── poweryaml/
+│       │    └── ProcessExplorer/
+│       │    └── dotNetFx40_Full_x86_x64.exe
+│       │    └── Git-1.9.5-preview20141217.exe
+│       │    └── Windows6.1-KB2560289-x64.msu
+│       │    
+│       ├── logs/
+│       └── provision.ps1
+│   
+├── repositories/
+│   ├── apache/
+│   └── iis/
+│   
+├── configuration-user.yml.template
+├── configuration.yml.template
+└── Vagrantfile
+```
 
 ## Supported Software ##
 
@@ -72,18 +136,36 @@ Catapult uses several third-party services to pull everything off - below is a l
 1. **Hosting:** 
     1. **DigitalOcean** Sign-Up and Configuration
         1. Create an account at http://digitalocean.com
+<<<<<<< HEAD
+        2. Create a Personal Access Token at https://cloud.digitalocean.com/settings/applications named "Vagrant" and place the token value in ~/configuration.yml at  
+           **["company"]["digitalocean_personal_access_token"]**
+=======
         2. Create a Personal Access Token at https://cloud.digitalocean.com/settings/applications named "Vagrant" and place the token value in ~/configuration.yml at ["company"]["digitalocean_personal_access_token"]
+>>>>>>> e0f2634cae1f0b00424cb9f36525b9b0db25e9db
         3. Add your newly created id_rsa.pub from ~/provisioners/.ssh/id_rsa.pub key in https://cloud.digitalocean.com/settings/security named "Vagrant"
 
 2. **Repositories:**
     1. **Bitbucket** Sign-Up and Configuration
         1. Create an account at https://bitbucket.org
+<<<<<<< HEAD
+            1. Place the email address that you used to sign up for Bitbucket at  
+            **["company"]["bitbucket_username"]**
+            2. Place the password of the account for Bitbucket at  
+            **["company"]["bitbucket_password"]**
+    2. **GitHub** Sign-Up and Configuration
+        1. Create an account at https://github.com
+            1. Place the email address that you used to sign up for GitHub at  
+            **["company"]["github_username"]**
+            2. Place the password of the account for GitHub at  
+            **["company"]["github_password"]**
+=======
             1. Place the email address that you used to sign up for Bitbucket at ["company"]["bitbucket_username"]
             2. Place the password of the account for Bitbucket at ["company"]["bitbucket_username"]
     2. **GitHub** Sign-Up and Configuration
         1. Create an account at https://github.com
             1. Place the email address that you used to sign up for GitHub at ["company"]["github_username"]
             2. Place the password of the account for GitHub at ["company"]["github_password"]
+>>>>>>> e0f2634cae1f0b00424cb9f36525b9b0db25e9db
 
 3. **Automated Deployments:**
     1. **Amazon Web Services** (AWS) EC2 Sign-Up and Configuration (Required for Bamboo)
@@ -103,17 +185,22 @@ Catapult uses several third-party services to pull everything off - below is a l
         2. Sign in to your new custom Bamboo instance https://[your-name-here].atlassian.net
         3. Go to your Elastic Bamboo configuration https://[your-name-here].atlassian.net/builds/admin/elastic/editElasticConfig.action
             1. Set your AWS EC2 "Bamboo" Access Key ID and Secret Access Key
-        4. Place your Bamboo base URL at ["company"]["bamboo_base_url"], the format should be https://[your-name-here].atlassian.net/builds/
-        5. Place your Bamboo username (usually admin) at ["company"]["bamboo_username"]
-        6. Place your Bamboo password (usually admin) at ["company"]["bamboo_password"]
+        4. Place your Bamboo base URL at  **["company"]["bamboo_base_url"]**, the format should be https://[your-name-here].atlassian.net/builds/
+        5. Place your Bamboo username (usually admin) at  
+        **["company"]["bamboo_username"]**
+        6. Place your Bamboo password (usually admin) at
+        **["company"]["bamboo_password"]**
+
 
 4. **DNS:**
     1. **CloudFlare** Sign-Up and Configuration
         * CloudFlare provides two major components - free SSL certificate functionality (https) and DNS management - just update the name servers to clark.ns.cloudflare.com and liv.ns.cloudflare.com at the registrar where you purchased the domain name and Catapult will handle the rest.
         1. Create a CloudFlare account at https://www.cloudflare.com
         2. Sign in your new CloudFlare account
-        3. Visit your My Account section at https://www.cloudflare.com/a/account/my-account and scroll down to your API Key and place the token value in ~/configuration.yml at ["company"]["cloudflare_api_key"]
-        4. Place the email address of the email address that you used to sign up for CloudFlare at ["company"]["cloudflare_email"]
+        3. Visit your My Account section at https://www.cloudflare.com/a/account/my-account and scroll down to your API Key and place the token value in ~/configuration.yml at  
+        **["company"]["cloudflare_api_key"]**
+        4. Place the email address of the email address that you used to sign up for CloudFlare at  
+         **["company"]["cloudflare_email"]**
 
 5. **Verify Configuration:**
     1. To verify all of the configuration that you just set, open your command line and cd into your fork of Catapult, then run `vagrant status`. Catapult will confirm connection to all of the Services and inform you of any problems.
@@ -121,6 +208,37 @@ Catapult uses several third-party services to pull everything off - below is a l
 # Usage #
 
 Catapult is centered around web and database servers. The web and database servers are provisioned (created) via Vagrant and continuously integrated (when new code is detected) via Bamboo.
+
+## Spinning up VMs ##
+
+To create a virtual machine (defined in the Vagrantfile), open your command line, cd into your fork of Catapult, and run a `vagrant up`:
+> `cd catapult-release-management`
+
+> `vagrant up **machine name**`
+
+The **vagrant up** command creates and configures guest machines according to the Vagrantfile. This is the single most important command in Vagrant, since it is how any Vagrant machine is created. 
+
+
+|  Environment                                 | redhat                                       | redhat-mysql                                         |
+| :--------------------------------------------|----------------------------------------------|------------------------------------------------------|
+| Dev                                          | vagrant up **companyname**-dev-redhat        | vagrant up **companyname**-dev-redhat-mysql          |
+| TEST                                         | vagrant up **companyname**-test-redhat       | vagrant up **companyname**-test-redhat-mysql         |
+| Quality Control                              | vagrant up **companyname**-qc-redhat         | vagrant up **companyname**-qc-redhat-mysql           |
+| Production                                   | vagrant up **companyname**-production-redhat | vagrant up **companyname**-production-redhat-mysql   |
+
+## Provisioning VMs ##
+
+If you want to provision a VM, and it's already running, then you simply run the following command:
+
+> `vagrant provision **machine name**`
+
+|  Environment                                 | redhat                                              | redhat-mysql                                                |
+| :--------------------------------------------|-----------------------------------------------------|-------------------------------------------------------------|
+| Dev                                          | vagrant provision **companyname**-dev-redhat        | vagrant provision **companyname**-dev-redhat-mysql          |
+| TEST                                         | vagrant provision **companyname**-test-redhat       | vagrant provision **companyname**-test-redhat-mysql         |
+| Quality Control                              | vagrant provision **companyname**-qc-redhat         | vagrant provision **companyname**-qc-redhat-mysql           |
+| Production                                   | vagrant provision **companyname**-production-redhat | vagrant provision **companyname**-production-redhat-mysql   |
+
 
 ## Adding Websites ##
 
@@ -150,13 +268,13 @@ The following options are available:
     * "drupal7"
         * generates drupal7 database config file ~/sites/default/settings.php, resets drupal7 admin password, rsyncs ~/sites/default/files from production source, restores database
     * "wordpress"
-        * generates wordpress database config file ~/installers/wp-config.php, resets wordpress admin password, rsyncs ~/wp-content/uploads from production source, restores database
+        * generates WordPress database config file ~/installers/wp-config.php, resets WordPress admin password, rsyncs ~/wp-content/uploads from production source, restores database
     * "xenforo"
         * generates xenforo database config file ~/library/config.php, restores database
 
 * software_dbprefix:
     * "wp_"
-        * usually used in drupal for multisite installations ("wp_ is required for base Wordpress installs, Drupal has no prefix by default")
+        * usually used in Drupal for multisite installations ("wp_ is required for base Wordpress installs, Drupal has no prefix by default")
 * webroot:
     * "www"
         * if the webroot differs from the repo root, specify it here
@@ -172,9 +290,27 @@ The following options are available:
 | **Existing Website Database** | Restore from *develop* ~/_sql folder of website repo        | Restore from *develop* ~/_sql folder of website repo          | Restore from *master* ~/_sql folder of website repo           | Daily backup to *develop* ~/_sql folder of website repo       |
 | **Automated Deployments**     | Manually via Vagrant                                        | Automatically via Bamboo (watch for new commits to *develop*) | Automatically via Bamboo (watch for new commits to *master*)  | Manually via Bamboo                                           |
 
+## Service Costs ##
+
+| Service                                            |        |              | Monthly Costs |
+| :--------------------------------------------------|--------|--------------|---------------:
+| [Bamboo](https://www.atlassian.com/software/bamboo)|        |              | $10.00        |
+| [CloudFlare](https://www.cloudflare.com/)          |        |              | Free          |
+| [Digital Ocean](http://digitalocean.com/)          | Droplet| Droplet      |               |
+| &nbsp;TEST                                         | redhat | redhat mysql | $10.00        |
+| &nbsp;Quality Control                              | redhat | redhat mysql | $10.00        |
+| &nbsp;Production                                   | redhat | redhat mysql | $10.00        |
+|                                                                                            |
+|                                            |       | **Total Monthly Costs** | **$40.00**  |
+
+
 # Contributing #
 
 The open source community is an awesome thing, we hope Catapult is of use to you, and if you develop a feature that you think would benefit everyone, please submit a pull request. When you first setup Catapult a develop branch is created for you under your repository that does not include your configuration along with with an upstream set to https://github.com/devopsgroup-io/catapult-release-management.git so that you can easily create a pull request.
+<<<<<<< HEAD
+
+=======
+>>>>>>> e0f2634cae1f0b00424cb9f36525b9b0db25e9db
 
 ## Versioning ##
 

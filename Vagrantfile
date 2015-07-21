@@ -75,6 +75,11 @@ if ["up","provision"].include?(ARGV[0])
   end
 end
 
+# api declarations
+api_bamboo = nil
+api_cloudflare = nil
+api_digitalocean = nil
+
 
 # configure catapult and git
 remote = `#{git} config --get remote.origin.url`
@@ -157,9 +162,9 @@ unless File.exist?("configuration-user.yml")
 end
 # parse configuration-user.yml and configuration-user.yml.template file
 configuration_user = YAML.load_file("configuration-user.yml")
-configuration_user_template = YAML.load_file("configuration-user.yml.template")
+configuration_user_example = YAML.load_file("configuration-user.yml.template")
 # ensure version is up-to-date
-if configuration_user["settings"]["version"] != configuration_user_template["settings"]["version"]
+if configuration_user["settings"]["version"] != configuration_user_example["settings"]["version"]
   catapult_exception("Your configuration-user.yml file is out of date. To retain your settings please manually merge entries from configuration-user.yml.template to configuration-user.yml with your specific settings.\n*You may also delete your configuration-user.yml and re-run any vagrant command to have a vanilla version created.")
 end
 # check for required fields
@@ -168,12 +173,12 @@ if configuration_user["settings"]["gpg_key"] == nil || configuration_user["setti
 end
 
 
-puts "\n\nVerification of encrypted Catapult configuration files:"
+puts "\n\nEncryption and decryption of Catapult configuration files:"
 puts "\n"
 if "#{branch}" == "develop"
   puts " * You are on the develop branch, this branch is automatically synced with Catapult core and is meant to contribute back to the core Catapult project."
-  puts " * configuration.yml.gpg, provisioners/.ssh/id_rsa.gpg, and provisioners/.ssh/id_rsa.pub.gpg are checked out from the master branch so that you're able to develop and test."
-  puts " * After you're finished on the develop branch, switch to the master branch and discard configuration.yml.gpg, provisioners/.ssh/id_rsa.gpg, and provisioners/.ssh/id_rsa.pub.gpg"
+  puts " * confiuration.yml.gpg, provisioners/.ssh/id_rsa.gpg, provisioners/.ssh/id_rsa.pub.gpg is checked out from the master branch so that you're able to develop and test."
+  puts " * After you're finished on the develop branch, switch to the master branch and discard confiuration.yml.gpg, provisioners/.ssh/id_rsa.gpg, provisioners/.ssh/id_rsa.pub.gpg"
   puts "\n"
   `git checkout --force master -- configuration.yml.gpg`
   `git checkout --force master -- provisioners/.ssh/id_rsa.gpg`
@@ -182,7 +187,7 @@ if "#{branch}" == "develop"
   `git reset -- provisioners/.ssh/id_rsa.gpg`
   `git reset -- provisioners/.ssh/id_rsa.pub.gpg`
 elsif "#{branch}" == "master"
-  puts " * You are on the master branch, this branch is automatically synced with Catapult core and is meant to commit your unique configuration.yml.gpg, provisioners/.ssh/id_rsa.gpg, and provisioners/.ssh/id_rsa.pub.gpg configuration."
+  puts " * You are on the master branch, this branch is automatically synced with Catapult core and is meant to commit your unique configuration."
   puts "\n"
   # bootstrap configuration.yml
   # initialize configuration.yml.gpg
@@ -241,28 +246,19 @@ end
 if configuration["company"]["name"] == nil
   catapult_exception("Please set [\"company\"][\"name\"] in configuration.yml")
 end
-if configuration["company"]["email"] == nil
-  catapult_exception("Please set [\"company\"][\"email\"] in configuration.yml")
-end
-if configuration["company"]["timezone_redhat"] == nil
-  catapult_exception("Please set [\"company\"][\"timezone_redhat\"] in configuration.yml")
-end
-if configuration["company"]["timezone_windows"] == nil
-  catapult_exception("Please set [\"company\"][\"timezone_windows\"] in configuration.yml")
-end
-if configuration["company"]["digitalocean_personal_access_token"] == nil
-  catapult_exception("Please set [\"company\"][\"digitalocean_personal_access_token\"] in configuration.yml")
+if configuration["company"]["bamboo_base_url"] == nil || configuration["company"]["bamboo_username"] == nil || configuration["company"]["bamboo_password"] == nil
+  catapult_exception("Please set [\"company\"][\"bamboo_base_url\"] and [\"company\"][\"bamboo_username\"] and [\"company\"][\"bamboo_password\"] in configuration.yml")
 else
-  uri = URI("https://api.digitalocean.com/v2/droplets")
+  uri = URI("#{configuration["company"]["bamboo_base_url"]}rest/api/latest/plan.json?os_authType=basic")
   Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => OpenSSL::SSL::VERIFY_NONE) do |http|
     request = Net::HTTP::Get.new uri.request_uri
-    request.add_field "Authorization", "Bearer #{configuration["company"]["digitalocean_personal_access_token"]}"
+    request.basic_auth "#{configuration["company"]["bamboo_username"]}", "#{configuration["company"]["bamboo_password"]}"
     response = http.request request
     if response.code.to_f.between?(399,600)
-      catapult_exception("The DigitalOcean API could not authenticate, please verify [\"company\"][\"digitalocean_personal_access_token\"].")
+      catapult_exception("The Bamboo API could not authenticate, please verify [\"company\"][\"bamboo_base_url\"] and [\"company\"][\"bamboo_username\"] and [\"company\"][\"bamboo_password\"].")
     else
-      puts " * DigitalOcean API authenticated successfully."
-      @api_digitalocean = JSON.parse(response.body)
+      puts "Bamboo API authenticated successfully."
+      api_bamboo = JSON.parse(response.body)
     end
   end
 end
@@ -277,40 +273,8 @@ else
     if response.code.to_f.between?(399,600)
       catapult_exception("The Bitbucket API could not authenticate, please verify [\"company\"][\"bitbucket_username\"] and [\"company\"][\"bitbucket_password\"].")
     else
-      puts " * Bitbucket API authenticated successfully."
-      @api_bitbucket = JSON.parse(response.body)
-    end
-  end
-end
-if configuration["company"]["github_username"] == nil || configuration["company"]["github_password"] == nil
-  catapult_exception("Please set [\"company\"][\"github_username\"] and [\"company\"][\"github_password\"] in configuration.yml")
-else
-  uri = URI("https://api.github.com/user")
-  Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => OpenSSL::SSL::VERIFY_NONE) do |http|
-    request = Net::HTTP::Get.new uri.request_uri
-    request.basic_auth "#{configuration["company"]["github_username"]}", "#{configuration["company"]["github_password"]}"
-    response = http.request request
-    if response.code.to_f.between?(399,600)
-      catapult_exception("The GitHub API could not authenticate, please verify [\"company\"][\"github_username\"] and [\"company\"][\"github_password\"].")
-    else
-      puts " * GitHub API authenticated successfully."
-      @api_github = JSON.parse(response.body)
-    end
-  end
-end
-if configuration["company"]["bamboo_base_url"] == nil || configuration["company"]["bamboo_username"] == nil || configuration["company"]["bamboo_password"] == nil
-  catapult_exception("Please set [\"company\"][\"bamboo_base_url\"] and [\"company\"][\"bamboo_username\"] and [\"company\"][\"bamboo_password\"] in configuration.yml")
-else
-  uri = URI("#{configuration["company"]["bamboo_base_url"]}rest/api/latest/plan.json?os_authType=basic")
-  Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => OpenSSL::SSL::VERIFY_NONE) do |http|
-    request = Net::HTTP::Get.new uri.request_uri
-    request.basic_auth "#{configuration["company"]["bamboo_username"]}", "#{configuration["company"]["bamboo_password"]}"
-    response = http.request request
-    if response.code.to_f.between?(399,600)
-      catapult_exception("The Bamboo API could not authenticate, please verify [\"company\"][\"bamboo_base_url\"] and [\"company\"][\"bamboo_username\"] and [\"company\"][\"bamboo_password\"].")
-    else
-      puts " * Bamboo API authenticated successfully."
-      @api_bamboo = JSON.parse(response.body)
+      puts "Bitbucket API authenticated successfully."
+      api_bamboo = JSON.parse(response.body)
     end
   end
 end
@@ -326,8 +290,43 @@ else
     if response.code.to_f.between?(399,600)
       catapult_exception("The CloudFlare API could not authenticate, please verify [\"company\"][\"cloudflare_api_key\"] and [\"company\"][\"cloudflare_email\"].")
     else
-      puts " * CloudFlare API authenticated successfully."
-      @api_cloudflare = JSON.parse(response.body)
+      puts "CloudFlare API authenticated successfully."
+      api_cloudflare = JSON.parse(response.body)
+    end
+  end
+end
+if configuration["company"]["digitalocean_personal_access_token"] == nil
+  catapult_exception("Please set [\"company\"][\"digitalocean_personal_access_token\"] in configuration.yml")
+else
+  uri = URI("https://api.digitalocean.com/v2/droplets")
+  Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => OpenSSL::SSL::VERIFY_NONE) do |http|
+    request = Net::HTTP::Get.new uri.request_uri
+    request.add_field "Authorization", "Bearer #{configuration["company"]["digitalocean_personal_access_token"]}"
+    response = http.request request
+    if response.code.to_f.between?(399,600)
+      catapult_exception("The DigitalOcean API could not authenticate, please verify [\"company\"][\"digitalocean_personal_access_token\"].")
+    else
+      puts "DigitalOcean API authenticated successfully."
+      api_digitalocean = JSON.parse(response.body)
+    end
+  end
+end
+if configuration["company"]["email"] == nil
+  catapult_exception("Please set [\"company\"][\"email\"] in configuration.yml")
+end
+if configuration["company"]["github_username"] == nil || configuration["company"]["github_password"] == nil
+  catapult_exception("Please set [\"company\"][\"github_username\"] and [\"company\"][\"github_password\"] in configuration.yml")
+else
+  uri = URI("https://api.github.com/user")
+  Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => OpenSSL::SSL::VERIFY_NONE) do |http|
+    request = Net::HTTP::Get.new uri.request_uri
+    request.basic_auth "#{configuration["company"]["github_username"]}", "#{configuration["company"]["github_password"]}"
+    response = http.request request
+    if response.code.to_f.between?(399,600)
+      catapult_exception("The GitHub API could not authenticate, please verify [\"company\"][\"github_username\"] and [\"company\"][\"github_password\"].")
+    else
+      puts "GitHub API authenticated successfully."
+      api_bamboo = JSON.parse(response.body)
     end
   end
 end
@@ -359,18 +358,18 @@ configuration["environments"].each do |environment,data|
   end
   # if upstream digitalocean droplets are provisioned, get their ip addresses to write to configuration.yml
   unless environment == "dev"
-    droplet = @api_digitalocean["droplets"].find { |d| d['name'] == "#{configuration["company"]["name"]}-#{environment}-redhat" }
-    unless droplet == nil
-      unless configuration["environments"]["#{environment}"]["servers"]["redhat"]["ip"] == droplet["networks"]["v4"].first["ip_address"]
+    unless configuration["environments"]["#{environment}"]["servers"]["redhat"]["ip"]
+      droplet = api_digitalocean["droplets"].find { |d| d['name'] == "#{configuration["company"]["name"]}-#{environment}-redhat" }
+      unless droplet == nil
         configuration["environments"]["#{environment}"]["servers"]["redhat"]["ip"] = droplet["networks"]["v4"].first["ip_address"]
         `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output configuration.yml --decrypt configuration.yml.gpg`
         File.open('configuration.yml', 'w') {|f| f.write configuration.to_yaml }
         `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output configuration.yml.gpg --armor --cipher-algo AES256 --symmetric configuration.yml`
       end
     end
-    droplet = @api_digitalocean["droplets"].find { |d| d['name'] == "#{configuration["company"]["name"]}-#{environment}-redhat-mysql" }
-    unless droplet == nil
-      unless configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["ip"] == droplet["networks"]["v4"].first["ip_address"]
+    unless configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["ip"]
+      droplet = api_digitalocean["droplets"].find { |d| d['name'] == "#{configuration["company"]["name"]}-#{environment}-redhat-mysql" }
+      unless droplet == nil
         configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["ip"] = droplet["networks"]["v4"].first["ip_address"]
         `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output configuration.yml --decrypt configuration.yml.gpg`
         File.open('configuration.yml', 'w') {|f| f.write configuration.to_yaml }
@@ -396,12 +395,6 @@ configuration["websites"].each do |service,data|
     if "#{repo[0]}" != "bitbucket.org" && "#{repo[0]}" != "github.com"
       catapult_exception("There is an error in your configuration.yml file.\nThe repo for websites => #{service} => domain => #{instance["domain"]} is invalid, it must either be a bitbucket.org or github.com repository.")
     end
-    # validate software
-    unless "#{instance["software"]}" == ""
-      unless ["codeigniter2","drupal6","drupal7","wordpress","xenforo"].include?("#{instance["software"]}")
-        catapult_exception("There is an error in your configuration.yml file.\nThe software for websites => #{service} => domain => #{instance["domain"]} is invalid, it must be one of the following [\"codeigniter2\",\"drupal6\",\"drupal7\",\"wordpress\",\"xenforo\"].")
-      end
-    end
     # validate webroot
     unless "#{instance["webroot"]}" == ""
       unless "#{instance["webroot"]}"[-1,1] == "/"
@@ -416,6 +409,7 @@ configuration["websites"].each do |service,data|
   end
 end
 
+puts "\n\n"
 
 # create arrays of domains for localdev hosts file
 redhathostsfile = Array.new
@@ -430,8 +424,8 @@ configuration["websites"]["iis"].each do |instance|
 end
 
 
-# vagrant status binding
 if ["status"].include?(ARGV[0])
+  # vagrant status binding
   totalwebsites = 0
   # start a new row
   puts "\n\nAvailable websites legend:"
@@ -481,8 +475,6 @@ if ["status"].include?(ARGV[0])
           end
           row.push(http_repsonse("http://#{environment}#{instance["domain"]}").ljust(4))
         rescue SocketError
-          row.push("down".ljust(4))
-        rescue Errno::ECONNREFUSED
           row.push("down".ljust(4))
         rescue EOFError
           row.push("down".ljust(4))
@@ -563,13 +555,15 @@ end
 # server vms
 Vagrant.configure("2") do |config|
 
+
   # vagrant hostmanager plugin configuration
   config.hostmanager.enabled = true
   config.hostmanager.manage_host = true
   config.hostmanager.ignore_private_ip = false
   config.hostmanager.include_offline = true
 
-  # redhat localdev servers
+
+  # localdev servers
   config.vm.define "#{configuration["company"]["name"]}-dev-redhat" do |config|
     config.vm.box = "chef/centos-7.0"
     config.vm.network "private_network", ip: configuration["environments"]["dev"]["servers"]["redhat"]["ip"]
@@ -596,7 +590,8 @@ Vagrant.configure("2") do |config|
     config.vm.provision "shell", path: "provisioners/redhat_mysql/provision.sh", args: ["dev"]
   end
 
-  # redhat test servers
+
+  # test servers
   config.vm.define "#{configuration["company"]["name"]}-test-redhat" do |config|
     config.vm.provider :digital_ocean do |provider,override|
       override.ssh.private_key_path = "provisioners/.ssh/id_rsa"
@@ -628,7 +623,8 @@ Vagrant.configure("2") do |config|
     config.vm.provision "shell", path: "provisioners/redhat_mysql/provision.sh", args: ["test"]
   end
 
-  # redhat quality control servers
+
+  # quality control servers
   config.vm.define "#{configuration["company"]["name"]}-qc-redhat" do |config|
     config.vm.provider :digital_ocean do |provider,override|
       override.ssh.private_key_path = "provisioners/.ssh/id_rsa"
@@ -660,7 +656,8 @@ Vagrant.configure("2") do |config|
     config.vm.provision "shell", path: "provisioners/redhat_mysql/provision.sh", args: ["qc"]
   end
 
-  # redhat production servers
+
+  # production servers
   config.vm.define "#{configuration["company"]["name"]}-production-redhat" do |config|
     config.vm.provider :digital_ocean do |provider,override|
       override.ssh.private_key_path = "provisioners/.ssh/id_rsa"
@@ -692,7 +689,7 @@ Vagrant.configure("2") do |config|
     config.vm.provision "shell", path: "provisioners/redhat_mysql/provision.sh", args: ["production"]
   end
 
-  # windows localdev servers
+
   config.vm.define "#{configuration["company"]["name"]}-dev-windows" do |config|
     config.vm.box = "opentable/win-2012r2-standard-amd64-nocm"
     config.vm.network "private_network", ip: configuration["environments"]["dev"]["servers"]["windows"]["ip"]
@@ -712,5 +709,6 @@ Vagrant.configure("2") do |config|
     config.vm.communicator = "winrm"
     config.vm.network "forwarded_port", guest: 3389, host: configuration["environments"]["dev"]["servers"]["redhat"]["port_3389"]
   end
+
 
 end

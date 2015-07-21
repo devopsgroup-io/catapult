@@ -4,19 +4,19 @@ software:
   version: 0.8
 company:
   name:
-  email:
-  timezone_redhat: America/New_York
-  timezone_windows: Eastern Standard Time
-  digitalocean_personal_access_token:
-  bitbucket_username:
-  bitbucket_password:
-  github_username:
-  github_password:
   bamboo_base_url:
   bamboo_username:
   bamboo_password:
+  bitbucket_username:
+  bitbucket_password:
   cloudflare_api_key: 
   cloudflare_email:
+  digitalocean_personal_access_token:
+  email:
+  github_username:
+  github_password:
+  timezone_redhat: America/New_York
+  timezone_windows: Eastern Standard Time
 environments:
   dev:
     branch: develop
