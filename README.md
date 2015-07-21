@@ -4,7 +4,7 @@
 > [devopsgroup.io](https://devopsgroup.io/)   
 > Copyright (c) 2015 devopsgroup.io - Seth Reeser
 
-*Welcome to devopsgroup.io Catapult Release Management*, a complete DevOps Release Management solution featuring automated website deployment and continuous integration following Gitflow and SCRUM workflows. Built for Developers easy enough to use by non-Developers.
+**Welcome to devopsgroup.io Catapult Release Management**, a complete DevOps Release Management solution featuring automated website deployment and continuous integration following Gitflow and SCRUM workflows. Built for Developers easy enough to use by non-Developers.
 
 To a non-Developer you may think, *I already have a website.*, why do I need Catapult? Over time you will find yourself paying a freelancer or a development company hundreds or even thousands of dollars to manage or interact with the Development Operations (DevOps) of your website and asking yourself these questions:
 
@@ -19,23 +19,26 @@ Catapult manages all of this for you and is open-sourced, documented, and free t
 
 If you're having issues with Catapult Release Management, [submit an issue here](https://github.com/devopsgroup-io/catapult-release-management/issues/new).
 
-## Table of Contents
+## Table of Contents ##
 
-- [Supported Software](#supported-software)
+- [Catapult Release Management](#catapult-release-management)
+    - [Table of Contents](#table-of-contents)
+    - [File Structure](#file-structure)
+    - [Supported Software](#supported-software)
 - [Setup](#setup)
- - [Developer Setup](#developer-setup)
- - [Instance Setup](#instance-setup)
- - [Services Setup](#services-setup)
+    - [Developer Setup](#developer-setup)
+    - [Instance Setup](#instance-setup)
+    - [Services Setup](#services-setup)
 - [Usage](#usage)
- - [Spinning up VMs](#spinning-up-vms)
- - [Provisioning VMs](#provisioning-vms)
- - [Adding Websites](#adding-websites)
- - [Environments](#environments)
- - [Service Costs](#service-costs)
+    - [Spinning up VMs](#spinning-up-vms)
+    - [Provisioning VMs](#provisioning-vms)
+    - [Adding Websites](#adding-websites)
+    - [Environments](#environments)
+    - [Service Costs](#service-costs)
 - [Contributing](#contributing)
-- [Versioning](#versioning)
+    - [Versioning](#versioning)
 
-### What's Included
+## File Structure ##
 
 ```
 catapult-release-management/
@@ -215,10 +218,10 @@ The **vagrant up** command creates and configures guest machines according to th
 
 |  Environment                                 | redhat                                       | redhat-mysql                                         |
 | :--------------------------------------------|----------------------------------------------|------------------------------------------------------|
-| Dev                                          | vagrant up **companyname**-dev-redhat        | vagrant up **companyname**-dev-redhat-mysql          |
+| DEV                                          | vagrant up **companyname**-dev-redhat        | vagrant up **companyname**-dev-redhat-mysql          |
 | TEST                                         | vagrant up **companyname**-test-redhat       | vagrant up **companyname**-test-redhat-mysql         |
-| Quality Control                              | vagrant up **companyname**-qc-redhat         | vagrant up **companyname**-qc-redhat-mysql           |
-| Production                                   | vagrant up **companyname**-production-redhat | vagrant up **companyname**-production-redhat-mysql   |
+| QC                                           | vagrant up **companyname**-qc-redhat         | vagrant up **companyname**-qc-redhat-mysql           |
+| PRD                                          | vagrant up **companyname**-production-redhat | vagrant up **companyname**-production-redhat-mysql   |
 
 ## Provisioning VMs ##
 
@@ -228,10 +231,10 @@ If you want to provision a VM, and it's already running, then you simply run the
 
 |  Environment                                 | redhat                                              | redhat-mysql                                                |
 | :--------------------------------------------|-----------------------------------------------------|-------------------------------------------------------------|
-| Dev                                          | vagrant provision **companyname**-dev-redhat        | vagrant provision **companyname**-dev-redhat-mysql          |
+| DEV                                          | vagrant provision **companyname**-dev-redhat        | vagrant provision **companyname**-dev-redhat-mysql          |
 | TEST                                         | vagrant provision **companyname**-test-redhat       | vagrant provision **companyname**-test-redhat-mysql         |
-| Quality Control                              | vagrant provision **companyname**-qc-redhat         | vagrant provision **companyname**-qc-redhat-mysql           |
-| Production                                   | vagrant provision **companyname**-production-redhat | vagrant provision **companyname**-production-redhat-mysql   |
+| QC                                           | vagrant provision **companyname**-qc-redhat         | vagrant provision **companyname**-qc-redhat-mysql           |
+| PRD                                          | vagrant provision **companyname**-production-redhat | vagrant provision **companyname**-production-redhat-mysql   |
 
 
 ## Adding Websites ##
