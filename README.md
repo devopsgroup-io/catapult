@@ -212,7 +212,7 @@ Catapult uses several third-party services to pull everything off - below is a l
 
 |                               | Service                       |                                             |                               |
 |-------------------------------|-------------------------------|---------------------------------------------|------------------------------:|
-| **Hosting**                   |                               |                                             |                               |
+| **Hosting**                   |||                               |
 |                               | **DigitalOcean**              | ["company"]["name"]-test-redhat             | $5                            |
 |                               | **DigitalOcean**              | ["company"]["name"]-qc-redhat               | $5                            |
 |                               | **DigitalOcean**              | ["company"]["name"]-production-redhat       | $5                            |
