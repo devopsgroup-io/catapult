@@ -208,13 +208,13 @@ The following options are available:
     * "drupal7"
         * generates drupal7 database config file ~/sites/default/settings.php, resets drupal7 admin password, rsyncs ~/sites/default/files from production source, restores database
     * "wordpress"
-        * generates wordpress database config file ~/installers/wp-config.php, resets wordpress admin password, rsyncs ~/wp-content/uploads from production source, restores database
+        * generates WordPress database config file ~/installers/wp-config.php, resets WordPress admin password, rsyncs ~/wp-content/uploads from production source, restores database
     * "xenforo"
         * generates xenforo database config file ~/library/config.php, restores database
 
 * software_dbprefix:
     * "wp_"
-        * usually used in drupal for multisite installations ("wp_ is required for base Wordpress installs, Drupal has no prefix by default")
+        * usually used in Drupal for multisite installations ("wp_ is required for base Wordpress installs, Drupal has no prefix by default")
 * webroot:
     * "www"
         * if the webroot differs from the repo root, specify it here
@@ -232,7 +232,7 @@ The following options are available:
 
 ## Service Costs ##
 
-| Service                        | Monthy Costs
+| Service                        | Monthly Costs
 | :------------------------------| :------------------------------------------------------------
 | [Bamboo](https://www.atlassian.com/software/bamboo)| $10.00 
 | [Digital Ocean](http://digitalocean.com/)|
@@ -246,7 +246,7 @@ The following options are available:
 | &nbsp;&nbsp;redhat            | $5.00
 | &nbsp;&nbsp;redhat mysql      | $5.00
 |                               | $30.00
-| **Total Monthy costs**        | $40.00
+| **Total Monthly costs**        | $40.00
 
 # Contributing #
 
