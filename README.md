@@ -44,7 +44,7 @@ Catapult is controlled via Vagrant and the command line of a Developer's compute
 Catapult is quick to setup. Fork the Github repository and start adding your configuration.
 
 1. **Fork Catapult**
-    1. Fork https://github.com/devopsgroup-io/release-management and clone via SourceTree or the git utility of your choice.
+    1. Fork https://github.com/devopsgroup-io/catapult-release-management and clone via SourceTree or the git utility of your choice.
     2. Open your command line and cd into the newly cloned repository.
 2. **Vagrant Plugins**
     1. To install all of the required Vagrant plugins, run `vagrant status` command and any Vagrant plugins that you do not have installed, will be displayed with the command to install.
