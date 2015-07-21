@@ -12,7 +12,7 @@ Catapult only costs $40/month to have a full-stack localDev, Test, Quality Contr
 
 If you're having issues with Catapult Release Management, [submit an issue here](https://github.com/devopsgroup-io/catapult-release-management/issues/new).
 
-## Table of contents
+## Table of Contents
 
 - [Supported Software](#supported-software)
 - [Setup](#setup)
@@ -28,7 +28,7 @@ If you're having issues with Catapult Release Management, [submit an issue here]
 - [Contributing](#contributing)
 - [Versioning](#versioning)
 
-### What's included
+### What's Included
 
 ```
 catapult-release-management/
