@@ -2,7 +2,7 @@
 
 Copyright (c) 2015 devopsgroup.io - Seth Reeser
 
-Welcome to devopsgroup.io Catapult Release Management, a complete DevOps Release Management solution featuring automated website deployment and continuous integration following Gitflow and SCRUM workflows. 
+Welcome to devopsgroup.io Catapult Release Management, a complete DevOps Release Management solution featuring automated website deployment and continuous integration following Gitflow and SCRUM workflows. Built for Developers easy enough to use by non-Developers.
 
 To a non-Developer you may think, "I already have a website.", why do I need Catapult? Over time you will find yourself paying a freelancer or a development company hundreds or even thousands of dollars to manage or interact with the Development Operations (DevOps) of your website i.e. - "Production is down.", "We need a test site.", "Why is this costing so much?", "Is my website safe?", "Is my website backed up?", "Can I easily scale my website for more traffic?" etc. Catapult manages all of this for you and is open-sourced, documented, and free to use. We also provide a service if you need some help getting started, if you do, let us know at https://devopsgroup.io
 
@@ -36,28 +36,33 @@ Catapult is controlled via Vagrant and the command line of a Developer's compute
 4. Sublime Text 3
     1. Please download and install from http://www.sublimetext.com/3
 5. GPG2
-    * Using OSX ? Please download and install GPG Suite https://gpgtools.org
-    1. Using Windows? Please download and install Gpg4win from http://gpg4win.org/download.html
+    1. Using OSX ? Please download and install GPG Suite https://gpgtools.org
+    2. Using Windows? Please download and install Gpg4win from http://gpg4win.org/download.html
 
 ## Instance Setup ##
 
 Catapult is quick to setup. Fork the Github repository and start adding your configuration.
 
-1. Fork https://github.com/devopsgroup-io/release-management and clone via SourceTree or the git utility of your choice.
-2. Open your command line and cd into the newly cloned repository.
-3. From here, you will need to install all of the required Vagrant plugins. To see these, run the `vagrant status` command and any Vagrant plugins that you do not have installed, will be displayed with the command to install.
-4. Next, you will need to create a passwordless SSH key pair that will drive authentication for Catapult.
-    1. For instructions please see https://confluence.atlassian.com/display/STASH/Creating+SSH+keys
-    2. Place the newly created passwordless SSH key pair id_rsa and id_rsa.pub in the ~/provisioners/.ssh/ folder.
-5. Next, you will need to create and add your team's gpg_key to the untracked configuration-user.yml.
-    1. NEVER SHARE THE GPG_KEY WITH ANYONE OTHER THAN YOUR TEAM.
-    2. The gpg_key is the single key that encrypts all of your configuration for your instance.
-    3. Spaces are not permitted and must be at least 20 characters.
-    4. It is recommended to create and print a QR code of the gpg_key to distribute to your team.
-    5. Remember; security is 99% process and 1% technology.
-6. Next, you will need to configure gpg_edit mode so that during the Services Setup you can add your secrets to configuration.yml and commit your secrets to configuration.yml.gpg.
-    1. To do so, set gpg_edit to true in configuration-user.yml.
-    2. This will now allow you to add secrets to configuration.yml and run `vagrant status` to encrypt the secrets in configuration.yml.gpg
+1. **Fork Catapult**
+    1. Fork https://github.com/devopsgroup-io/catapult-release-management and clone via SourceTree or the git utility of your choice.
+    2. Open your command line and cd into the newly cloned repository.
+2. **Vagrant Plugins**
+    1. To install all of the required Vagrant plugins, run `vagrant status` command and any Vagrant plugins that you do not have installed, will be displayed with the command to install.
+3. **SSH Key Pair**
+    1. To create a *passwordless* SSH key pair that will drive authentication for Catapult.
+        1. For instructions please see https://help.github.com/articles/generating-ssh-keys/
+        2. Place the newly created *passwordless* SSH key pair id_rsa and id_rsa.pub in the ~/provisioners/.ssh/ folder.
+4. **GPG Key**
+    1. You will need to create and add your team's gpg_key to the untracked configuration-user.yml.
+        1. NEVER SHARE THE GPG_KEY WITH ANYONE OTHER THAN YOUR TEAM.
+        2. The gpg_key is the single key that encrypts all of your configuration for your instance.
+        3. Spaces are not permitted and must be at least 20 characters.
+        4. It is recommended to create and print a QR code of the gpg_key to distribute to your team.
+        5. Remember; security is 99% process and 1% technology.
+5. **GPG Edit Mode**
+    1. Next, you will need to configure gpg_edit mode so that during the Services Setup you can add your secrets to configuration.yml and commit your secrets to configuration.yml.gpg.
+    2. To do so, set gpg_edit to true in configuration-user.yml.
+    3. This will now allow you to add secrets to configuration.yml and run `vagrant status` to encrypt the secrets in configuration.yml.gpg
         1. In addition to encrypting ~/provisioners/.ssh/id_rsa and ~/provisioners/.ssh/id_rsa.pub as ~/provisioners/.ssh/id_rsa.gpb and ~/provisioners/.ssh/id_rsa.pub.gpb, respectfully.
 
 ## Services Setup ##
@@ -98,6 +103,9 @@ Catapult uses several third-party services to pull everything off - below is a l
         2. Sign in to your new custom Bamboo instance https://[your-name-here].atlassian.net
         3. Go to your Elastic Bamboo configuration https://[your-name-here].atlassian.net/builds/admin/elastic/editElasticConfig.action
             1. Set your AWS EC2 "Bamboo" Access Key ID and Secret Access Key
+        4. Place your Bamboo base URL at ["company"]["bamboo_base_url"], the format should be https://[your-name-here].atlassian.net/builds/
+        5. Place your Bamboo username (usually admin) at ["company"]["bamboo_username"]
+        6. Place your Bamboo password (usually admin) at ["company"]["bamboo_password"]
 
 4. **DNS:**
     1. **CloudFlare** Sign-Up and Configuration
@@ -166,7 +174,7 @@ The following options are available:
 
 # Contributing #
 
-The open source community is an awesome thing, we hope Catapult is of use to you, and if you develop a feature that you think would benefit everyone, please submit a pull request.
+The open source community is an awesome thing, we hope Catapult is of use to you, and if you develop a feature that you think would benefit everyone, please submit a pull request. When you first setup Catapult a develop branch is created for you under your repository that does not include your configuration along with with an upstream set to https://github.com/devopsgroup-io/catapult-release-management.git so that you can easily create a pull request.
 
 ## Versioning ##
 
