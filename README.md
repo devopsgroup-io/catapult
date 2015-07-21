@@ -306,9 +306,9 @@ Once the new website is committed to your Catapult fork on the master branch, it
 | **Upstream Database**         | Restore from *develop* ~/_sql folder of website repo        | Daily backup to *develop* ~/_sql folder of website repo       | Restore from *master* ~/_sql folder of website repo           | Restore from *master* ~/_sql folder of website repo           |
 | **Downstream Database**       | Restore from *develop* ~/_sql folder of website repo        | Restore from *develop* ~/_sql folder of website repo          | Restore from *master* ~/_sql folder of website repo           | Daily backup to *develop* ~/_sql folder of website repo       |
 | **Automated Deployments**     | Manually via Vagrant                                        | Automatically via Bamboo (watch for new commits to *develop*) | Automatically via Bamboo (watch for new commits to *master*)  | Manually via Bamboo                                           |
-| **Website Provisioning**      | Manually via Vagrant                                        | Manually via Vagrant                                          | Manually via Vagrant                                          | Manually via Vagrant                                          |
+| **New Website Provisioning**  | Manually via Vagrant                                        | Manually via Vagrant                                          | Manually via Vagrant                                          | Manually via Vagrant                                          |
 
-For each **Environment** you will need to:
+**New Website Provisioning** requires for each **Environment** to be provisioned via Vagrant:
 * **Web Servers**
     * `vagrant provision ["company"]["name"]-dev-redhat`
     * `vagrant provision ["company"]["name"]-test-redhat`
