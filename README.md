@@ -210,9 +210,9 @@ Catapult uses several third-party services to pull everything off - below is a l
 5. **Verify Configuration:**
     1. To verify all of the configuration that you just set, open your command line and cd into your fork of Catapult, then run `vagrant status`. Catapult will confirm connection to all of the Services and inform you of any problems.
 
-|                               | Service                       |                                             |                               |
+|                               | Service                       | Description                                 | Monthly Cost                  |
 |-------------------------------|-------------------------------|---------------------------------------------|------------------------------:|
-| **Hosting**                   |
+| **Hosting**                   |                               |                                             |                               |
 |                               | **DigitalOcean**              | ["company"]["name"]-test-redhat             | $5                            |
 |                               | **DigitalOcean**              | ["company"]["name"]-qc-redhat               | $5                            |
 |                               | **DigitalOcean**              | ["company"]["name"]-production-redhat       | $5                            |
@@ -220,9 +220,14 @@ Catapult uses several third-party services to pull everything off - below is a l
 |                               | **DigitalOcean**              | ["company"]["name"]-qc-redhat-mysql         | $5                            |
 |                               | **DigitalOcean**              | ["company"]["name"]-production-redhat-mysql | $5                            |
 | **Repositories:**             |                               |                                             |                               |
+|                               | **Bitbucket**                 | Private Repositories                        | Free                          |
+|                               | **GitHub**                    | Public Repositories                         | Free                          |
 | **Automated Deployments:**    |                               |                                             |                               |
+|                               | **Amazon Web Services**       | Build Server                                | $1 - $15                      |
+|                               | **Bamboo**                    | Continuous Integration                      | $10                           |
 | **DNS:**                      |                               |                                             |                               |
-|                               |                               |                                             |                               |
+|                               | **CloudFlare**                | test., qc., and production global DNS       | Free                          |
+| **Total**                     |                               |                                             | $41 - $55                     |
 
 
 
