@@ -155,9 +155,9 @@ unless File.exist?("configuration-user.yml")
 end
 # parse configuration-user.yml and configuration-user.yml.template file
 configuration_user = YAML.load_file("configuration-user.yml")
-configuration_user_example = YAML.load_file("configuration-user.yml.template")
+configuration_user_template = YAML.load_file("configuration-user.yml.template")
 # ensure version is up-to-date
-if configuration_user["settings"]["version"] != configuration_user_example["settings"]["version"]
+if configuration_user["settings"]["version"] != configuration_user_template["settings"]["version"]
   catapult_exception("Your configuration-user.yml file is out of date. To retain your settings please manually merge entries from configuration-user.yml.template to configuration-user.yml with your specific settings.\n*You may also delete your configuration-user.yml and re-run any vagrant command to have a vanilla version created.")
 end
 # check for required fields
