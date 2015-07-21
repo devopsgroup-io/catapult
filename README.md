@@ -189,6 +189,23 @@ Catapult uses several third-party services to pull everything off - below is a l
 
 Catapult is centered around web and database servers. The web and database servers are provisioned (created) via Vagrant and continuously integrated (when new code is detected) via Bamboo.
 
+## Spinning up VMs ##
+|  Environment                                 | redhat                                     | redhat-mysql                                       |
+| :--------------------------------------------|--------------------------------------------|----------------------------------------------------|
+| Dev                                          | vagrant up [companyname]-dev-redhat        | vagrant up [companyname]-dev-redhat-mysql          |
+| TEST                                         | vagrant up [companyname]-test-redhat       | vagrant up [companyname]-test-redhat-mysql         |
+| Quality Control                              | vagrant up [companyname]-qc-redhat         | vagrant up [companyname]-qc-redhat-mysql           |
+| Production                                   | vagrant up [companyname]-production-redhat | vagrant up [companyname]-production-redhat-mysql   |
+
+## Provisioning VMs ##
+|  Environment                                 | redhat                                            | redhat-mysql                                              |
+| :--------------------------------------------|---------------------------------------------------|-----------------------------------------------------------|
+| Dev                                          | vagrant provision [companyname]-dev-redhat        | vagrant provision [companyname]-dev-redhat-mysql          |
+| TEST                                         | vagrant provision [companyname]-test-redhat       | vagrant provision [companyname]-test-redhat-mysql         |
+| Quality Control                              | vagrant provision [companyname]-qc-redhat         | vagrant provision [companyname]-qc-redhat-mysql           |
+| Production                                   | vagrant provision [companyname]-production-redhat | vagrant provision [companyname]-production-redhat-mysql   |
+
+
 ## Adding Websites ##
 
 Adding websites to Catapult is easy. The only requirement is that the website needs to be contained in its own repo on GitHub or Bitbucket. Websites are then added to configuration.yml, a minimal addition looks like this:
@@ -245,7 +262,7 @@ The following options are available:
 | :--------------------------------------------------|--------|--------------|---------------:
 | [Bamboo](https://www.atlassian.com/software/bamboo)|        |              | $10.00        |
 | [CloudFlare](https://www.cloudflare.com/)          |        |              | Free          |
-| [Digital Ocean](http://digitalocean.com/)          |        |              |               |
+| [Digital Ocean](http://digitalocean.com/)          | Droplet| Droplet      |               |
 | &nbsp;TEST                                         | redhat | redhat mysql | $10.00        |
 | &nbsp;Quality Control                              | redhat | redhat mysql | $10.00        |
 | &nbsp;Production                                   | redhat | redhat mysql | $10.00        |
