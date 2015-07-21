@@ -63,6 +63,9 @@ end
 unless Vagrant.has_plugin?("vagrant-hostmanager")
   catapult_exception('vagrant-hostmanager is not installed, please run "vagrant plugin install vagrant-hostmanager"')
 end
+unless Vagrant.has_plugin?("vagrant-vbguest")
+  catapult_exception('vagrant-vbguest is not installed, please run "vagrant plugin install vagrant-vbguest"')
+end
 
 
 # require vm name on up and provision
@@ -79,8 +82,7 @@ if remote.include?("devopsgroup-io/release-management.git") || remote.include?("
   catapult_exception("In order to use Catapult Release Management, you must fork the repository so that the committed and encrypted configuration is unique to you! See https://github.com/devopsgroup-io/catapult-release-management for more information.")
 else
   puts "Self updating Catapult:"
-  branch = `#{git} rev-parse --abbrev-ref HEAD`
-  branch = branch.strip
+  branch = `#{git} rev-parse --abbrev-ref HEAD`.strip
   repo = `#{git} config --get remote.origin.url`
   repo_upstream = `#{git} config --get remote.upstream.url`
   repo_upstream = "https://github.com/devopsgroup-io/catapult-release-management.git"
@@ -435,9 +437,9 @@ if ["status"].include?(ARGV[0])
   puts "\n\nAvailable websites legend:"
   puts "\n[http response codes]"
   puts "\n * 200 ok, 301 moved permanently, 302 found, 400 bad request, 401 unauthorized, 403 forbidden, 404 not found, 500 internal server error, 502 bad gateway, 503 service unavailable, 504 gateway timeout"
-  puts " * http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html"
+  puts " * [reference] http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html"
   puts "\n[cert signature algorithm]"
-  puts "\n * https://www.openssl.org/docs/apps/ciphers.html"
+  puts "\n * [reference] https://www.openssl.org/docs/apps/ciphers.html"
   puts "\n\n\nAvailable websites:"
   puts "".ljust(30) + "[software]".ljust(15) + "[dev.]".ljust(22) + "[test.]".ljust(22) + "[qc.]".ljust(22) + "[production / cert expiry, signature algorithm, common name]".ljust(80) + "[alexa rank, 3m delta]".ljust(26)
 
