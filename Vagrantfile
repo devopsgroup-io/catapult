@@ -166,7 +166,7 @@ if configuration_user["settings"]["gpg_key"] == nil || configuration_user["setti
 end
 
 
-puts "\n\nEncryption and decryption of Catapult configuration files:"
+puts "\n\nVerification of encrypted Catapult configuration files:"
 puts "\n"
 if "#{branch}" == "develop"
   puts " * You are on the develop branch, this branch is automatically synced with Catapult core and is meant to contribute back to the core Catapult project."
@@ -239,19 +239,28 @@ end
 if configuration["company"]["name"] == nil
   catapult_exception("Please set [\"company\"][\"name\"] in configuration.yml")
 end
-if configuration["company"]["bamboo_base_url"] == nil || configuration["company"]["bamboo_username"] == nil || configuration["company"]["bamboo_password"] == nil
-  catapult_exception("Please set [\"company\"][\"bamboo_base_url\"] and [\"company\"][\"bamboo_username\"] and [\"company\"][\"bamboo_password\"] in configuration.yml")
+if configuration["company"]["email"] == nil
+  catapult_exception("Please set [\"company\"][\"email\"] in configuration.yml")
+end
+if configuration["company"]["timezone_redhat"] == nil
+  catapult_exception("Please set [\"company\"][\"timezone_redhat\"] in configuration.yml")
+end
+if configuration["company"]["timezone_windows"] == nil
+  catapult_exception("Please set [\"company\"][\"timezone_windows\"] in configuration.yml")
+end
+if configuration["company"]["digitalocean_personal_access_token"] == nil
+  catapult_exception("Please set [\"company\"][\"digitalocean_personal_access_token\"] in configuration.yml")
 else
-  uri = URI("#{configuration["company"]["bamboo_base_url"]}rest/api/latest/plan.json?os_authType=basic")
+  uri = URI("https://api.digitalocean.com/v2/droplets")
   Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => OpenSSL::SSL::VERIFY_NONE) do |http|
     request = Net::HTTP::Get.new uri.request_uri
-    request.basic_auth "#{configuration["company"]["bamboo_username"]}", "#{configuration["company"]["bamboo_password"]}"
+    request.add_field "Authorization", "Bearer #{configuration["company"]["digitalocean_personal_access_token"]}"
     response = http.request request
     if response.code.to_f.between?(399,600)
-      catapult_exception("The Bamboo API could not authenticate, please verify [\"company\"][\"bamboo_base_url\"] and [\"company\"][\"bamboo_username\"] and [\"company\"][\"bamboo_password\"].")
+      catapult_exception("The DigitalOcean API could not authenticate, please verify [\"company\"][\"digitalocean_personal_access_token\"].")
     else
-      puts "Bamboo API authenticated successfully."
-      @api_bamboo = JSON.parse(response.body)
+      puts " * DigitalOcean API authenticated successfully."
+      @api_digitalocean = JSON.parse(response.body)
     end
   end
 end
@@ -266,8 +275,40 @@ else
     if response.code.to_f.between?(399,600)
       catapult_exception("The Bitbucket API could not authenticate, please verify [\"company\"][\"bitbucket_username\"] and [\"company\"][\"bitbucket_password\"].")
     else
-      puts "Bitbucket API authenticated successfully."
+      puts " * Bitbucket API authenticated successfully."
       @api_bitbucket = JSON.parse(response.body)
+    end
+  end
+end
+if configuration["company"]["github_username"] == nil || configuration["company"]["github_password"] == nil
+  catapult_exception("Please set [\"company\"][\"github_username\"] and [\"company\"][\"github_password\"] in configuration.yml")
+else
+  uri = URI("https://api.github.com/user")
+  Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => OpenSSL::SSL::VERIFY_NONE) do |http|
+    request = Net::HTTP::Get.new uri.request_uri
+    request.basic_auth "#{configuration["company"]["github_username"]}", "#{configuration["company"]["github_password"]}"
+    response = http.request request
+    if response.code.to_f.between?(399,600)
+      catapult_exception("The GitHub API could not authenticate, please verify [\"company\"][\"github_username\"] and [\"company\"][\"github_password\"].")
+    else
+      puts " * GitHub API authenticated successfully."
+      @api_github = JSON.parse(response.body)
+    end
+  end
+end
+if configuration["company"]["bamboo_base_url"] == nil || configuration["company"]["bamboo_username"] == nil || configuration["company"]["bamboo_password"] == nil
+  catapult_exception("Please set [\"company\"][\"bamboo_base_url\"] and [\"company\"][\"bamboo_username\"] and [\"company\"][\"bamboo_password\"] in configuration.yml")
+else
+  uri = URI("#{configuration["company"]["bamboo_base_url"]}rest/api/latest/plan.json?os_authType=basic")
+  Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => OpenSSL::SSL::VERIFY_NONE) do |http|
+    request = Net::HTTP::Get.new uri.request_uri
+    request.basic_auth "#{configuration["company"]["bamboo_username"]}", "#{configuration["company"]["bamboo_password"]}"
+    response = http.request request
+    if response.code.to_f.between?(399,600)
+      catapult_exception("The Bamboo API could not authenticate, please verify [\"company\"][\"bamboo_base_url\"] and [\"company\"][\"bamboo_username\"] and [\"company\"][\"bamboo_password\"].")
+    else
+      puts " * Bamboo API authenticated successfully."
+      @api_bamboo = JSON.parse(response.body)
     end
   end
 end
@@ -283,51 +324,10 @@ else
     if response.code.to_f.between?(399,600)
       catapult_exception("The CloudFlare API could not authenticate, please verify [\"company\"][\"cloudflare_api_key\"] and [\"company\"][\"cloudflare_email\"].")
     else
-      puts "CloudFlare API authenticated successfully."
+      puts " * CloudFlare API authenticated successfully."
       @api_cloudflare = JSON.parse(response.body)
     end
   end
-end
-if configuration["company"]["digitalocean_personal_access_token"] == nil
-  catapult_exception("Please set [\"company\"][\"digitalocean_personal_access_token\"] in configuration.yml")
-else
-  uri = URI("https://api.digitalocean.com/v2/droplets")
-  Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => OpenSSL::SSL::VERIFY_NONE) do |http|
-    request = Net::HTTP::Get.new uri.request_uri
-    request.add_field "Authorization", "Bearer #{configuration["company"]["digitalocean_personal_access_token"]}"
-    response = http.request request
-    if response.code.to_f.between?(399,600)
-      catapult_exception("The DigitalOcean API could not authenticate, please verify [\"company\"][\"digitalocean_personal_access_token\"].")
-    else
-      puts "DigitalOcean API authenticated successfully."
-      @api_digitalocean = JSON.parse(response.body)
-    end
-  end
-end
-if configuration["company"]["email"] == nil
-  catapult_exception("Please set [\"company\"][\"email\"] in configuration.yml")
-end
-if configuration["company"]["github_username"] == nil || configuration["company"]["github_password"] == nil
-  catapult_exception("Please set [\"company\"][\"github_username\"] and [\"company\"][\"github_password\"] in configuration.yml")
-else
-  uri = URI("https://api.github.com/user")
-  Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => OpenSSL::SSL::VERIFY_NONE) do |http|
-    request = Net::HTTP::Get.new uri.request_uri
-    request.basic_auth "#{configuration["company"]["github_username"]}", "#{configuration["company"]["github_password"]}"
-    response = http.request request
-    if response.code.to_f.between?(399,600)
-      catapult_exception("The GitHub API could not authenticate, please verify [\"company\"][\"github_username\"] and [\"company\"][\"github_password\"].")
-    else
-      puts "GitHub API authenticated successfully."
-      @api_github = JSON.parse(response.body)
-    end
-  end
-end
-if configuration["company"]["timezone_redhat"] == nil
-  catapult_exception("Please set [\"company\"][\"timezone_redhat\"] in configuration.yml")
-end
-if configuration["company"]["timezone_windows"] == nil
-  catapult_exception("Please set [\"company\"][\"timezone_windows\"] in configuration.yml")
 end
 # validate configuration["environments"]
 configuration["environments"].each do |environment,data|
