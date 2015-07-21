@@ -414,7 +414,6 @@ configuration["websites"].each do |service,data|
   end
 end
 
-puts "\n\n"
 
 # create arrays of domains for localdev hosts file
 redhathostsfile = Array.new
@@ -429,8 +428,8 @@ configuration["websites"]["iis"].each do |instance|
 end
 
 
+# vagrant status binding
 if ["status"].include?(ARGV[0])
-  # vagrant status binding
   totalwebsites = 0
   # start a new row
   puts "\n\nAvailable websites legend:"
@@ -562,15 +561,13 @@ end
 # server vms
 Vagrant.configure("2") do |config|
 
-
   # vagrant hostmanager plugin configuration
   config.hostmanager.enabled = true
   config.hostmanager.manage_host = true
   config.hostmanager.ignore_private_ip = false
   config.hostmanager.include_offline = true
 
-
-  # localdev servers
+  # redhat localdev servers
   config.vm.define "#{configuration["company"]["name"]}-dev-redhat" do |config|
     config.vm.box = "chef/centos-7.0"
     config.vm.network "private_network", ip: configuration["environments"]["dev"]["servers"]["redhat"]["ip"]
@@ -597,8 +594,7 @@ Vagrant.configure("2") do |config|
     config.vm.provision "shell", path: "provisioners/redhat_mysql/provision.sh", args: ["dev"]
   end
 
-
-  # test servers
+  # redhat test servers
   config.vm.define "#{configuration["company"]["name"]}-test-redhat" do |config|
     config.vm.provider :digital_ocean do |provider,override|
       override.ssh.private_key_path = "provisioners/.ssh/id_rsa"
@@ -630,8 +626,7 @@ Vagrant.configure("2") do |config|
     config.vm.provision "shell", path: "provisioners/redhat_mysql/provision.sh", args: ["test"]
   end
 
-
-  # quality control servers
+  # redhat quality control servers
   config.vm.define "#{configuration["company"]["name"]}-qc-redhat" do |config|
     config.vm.provider :digital_ocean do |provider,override|
       override.ssh.private_key_path = "provisioners/.ssh/id_rsa"
@@ -663,8 +658,7 @@ Vagrant.configure("2") do |config|
     config.vm.provision "shell", path: "provisioners/redhat_mysql/provision.sh", args: ["qc"]
   end
 
-
-  # production servers
+  # redhat production servers
   config.vm.define "#{configuration["company"]["name"]}-production-redhat" do |config|
     config.vm.provider :digital_ocean do |provider,override|
       override.ssh.private_key_path = "provisioners/.ssh/id_rsa"
@@ -696,7 +690,7 @@ Vagrant.configure("2") do |config|
     config.vm.provision "shell", path: "provisioners/redhat_mysql/provision.sh", args: ["production"]
   end
 
-
+  # windows localdev servers
   config.vm.define "#{configuration["company"]["name"]}-dev-windows" do |config|
     config.vm.box = "opentable/win-2012r2-standard-amd64-nocm"
     config.vm.network "private_network", ip: configuration["environments"]["dev"]["servers"]["windows"]["ip"]
@@ -716,6 +710,5 @@ Vagrant.configure("2") do |config|
     config.vm.communicator = "winrm"
     config.vm.network "forwarded_port", guest: 3389, host: configuration["environments"]["dev"]["servers"]["redhat"]["port_3389"]
   end
-
 
 end
