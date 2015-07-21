@@ -25,6 +25,8 @@ Catapult only costs $40/month to have a full-stack localDev, Test, Quality Contr
 - [Versioning](#versioning)
 - [Copyright and license](#copyright-and-license)
 
+### [Submit Issue](https://github.com/devopsgroup-io/catapult-release-management/issues/new) ###
+
 ### What's included
 
 ```
@@ -239,23 +241,17 @@ The following options are available:
 
 ## Service Costs ##
 
-| Service                        | Monthly Costs                                               |
-| :------------------------------| :------------------------------------------------------------
-| [Bamboo](https://www.atlassian.com/software/bamboo)| $10.00                                  |
-| [CloudFlare](https://www.cloudflare.com/)| Free                                              |
-| [Digital Ocean](http://digitalocean.com/)|                                                   |
-| &nbsp;TEST                    |                                                              |
-| &nbsp;&nbsp;redhat            | $5.00                                                        |
-| &nbsp;&nbsp;redhat mysql      | $5.00                                                        |
-| &nbsp;QC                      |                                                              |
-| &nbsp;&nbsp;redhat            | $5.00                                                        |
-| &nbsp;&nbsp;redhat mysql      | $5.00                                                        |
-| &nbsp;PROD                    |                                                              |
-| &nbsp;&nbsp;redhat            | $5.00                                                        |
-| &nbsp;&nbsp;redhat mysql      | $5.00                                                        |
-|                               | $30.00                                                       |
-|                               |                                                              |
-| **Total Monthly Costs**       | **$40.00**                                                   |
+| Service                                            |        |              | Monthly Costs |
+| :--------------------------------------------------|--------|--------------|---------------:
+| [Bamboo](https://www.atlassian.com/software/bamboo)|        |              | $10.00        |
+| [CloudFlare](https://www.cloudflare.com/)          |        |              | Free          |
+| [Digital Ocean](http://digitalocean.com/)          |        |              |               |
+| &nbsp;TEST                                         | redhat | redhat mysql | $10.00        |
+| &nbsp;Quality Control                              | redhat | redhat mysql | $10.00        |
+| &nbsp;Production                                   | redhat | redhat mysql | $10.00        |
+|                                                                                            |
+|                                            |       | **Total Monthly Costs** | **$40.00**  |
+
 
 # Contributing #
 
