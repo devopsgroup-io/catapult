@@ -224,6 +224,7 @@ To use Catapult you will first need to [Provision Environments](#provision-envir
 |-------------------------------|-------------------------------------------------------------|---------------------------------------------------------------|---------------------------------------------------------------|---------------------------------------------------------------|
 | **Running Branch**            | *develop*                                                   | *develop*                                                     | *master*                                                      | *master*                                                      |
 | **Server Provisioning**       | Manually via Vagrant                                        | Manually via Vagrant                                          | Manually via Vagrant                                          | Manually via Vagrant                                          |
+
 For each Environment Key you will need to:
 * **Web Servers**
     * `vagrant up **["company"]["name"]**-dev-redhat
@@ -235,6 +236,7 @@ For each Environment Key you will need to:
     * `vagrant up **["company"]["name"]**-test-redhat-mysql
     * `vagrant up **["company"]["name"]**-qc-redhat-mysql
     * `vagrant up **["company"]["name"]**-production-redhat-mysql
+
 | **New Website Database**      | Restore from *develop* ~/_sql folder of website repo        | Daily backup to *develop* ~/_sql folder of website repo       | Restore from *master* ~/_sql folder of website repo           | Restore from *master* ~/_sql folder of website repo           |
 | **Existing Website Database** | Restore from *develop* ~/_sql folder of website repo        | Restore from *develop* ~/_sql folder of website repo          | Restore from *master* ~/_sql folder of website repo           | Daily backup to *develop* ~/_sql folder of website repo       |
 | **Automated Deployments**     | Manually via Vagrant                                        | Automatically via Bamboo (watch for new commits to *develop*) | Automatically via Bamboo (watch for new commits to *master*)  | Manually via Bamboo                                           |
