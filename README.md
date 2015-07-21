@@ -6,7 +6,7 @@
 
 **Welcome to devopsgroup.io Catapult Release Management**, a complete DevOps Release Management solution featuring automated website deployment and continuous integration following Gitflow and SCRUM workflows. Built for Developers easy enough to use by non-Developers.
 
-To a non-Developer you may think, *I already have a website.*, why do I need Catapult? Over time you will find yourself paying a freelancer or a development company hundreds or even thousands of dollars to manage or interact with the Development Operations (DevOps) of your website and asking yourself these questions:
+To a non-Developer you may think - *I already have a website, why do I need Catapult?*. Over time you will find yourself paying a freelancer or a development company hundreds or even thousands of dollars to manage or interact with the DevOps (Development Operations) and solve these problems:
 
   * *Production is down.*
   * *We need a test site.*
@@ -15,9 +15,11 @@ To a non-Developer you may think, *I already have a website.*, why do I need Cat
   * *Is my website backed up?*
   * *Can I easily scale my website for more traffic?*
 
-Catapult manages all of this for you and is open-sourced, documented, and free to use. We also provide a service if you need some help getting started - if you do, let us know at https://devopsgroup.io. Catapult leverages the Services that you're already using, which collectively, costs $40/month to have a full-stack localDev, Test, Quality Control, and Production environment.  
+Catapult manages all of this for you and is open-sourced, well-documented, developer-focused, and free to use. We also provide a service if you need some help getting started - if you do, let us know at https://devopsgroup.io. Catapult leverages the Services that you're already using, which collectively, costs $40/month to have a full-stack localDev, Test, Quality Control, and Production environment.  
 
-If you're having issues with Catapult Release Management, [submit an issue here](https://github.com/devopsgroup-io/catapult-release-management/issues/new).
+If you're having issues with Catapult, [submit an issue here](https://github.com/devopsgroup-io/catapult-release-management/issues/new).
+
+
 
 ## Table of Contents ##
 
@@ -37,6 +39,8 @@ If you're having issues with Catapult Release Management, [submit an issue here]
     - [Service Costs](#service-costs)
 - [Contributing](#contributing)
     - [Versioning](#versioning)
+
+
 
 ## File Structure ##
 
@@ -82,6 +86,8 @@ catapult-release-management/
 └── Vagrantfile
 ```
 
+
+
 ## Supported Software ##
 
 Catapult currently supports the following software:
@@ -92,26 +98,33 @@ Catapult currently supports the following software:
 * WordPress 3.5.2+, WordPress 4.x
     * as required by WP-CLI
 
+
+
 # Setup #
 
 Catapult requires a [Developer Setup](#developer-setup), [Instance Setup](#instance-setup), and [Services Setup](#services-setup) as described in the following sections.
+
 **Please Note:** It is advised to turn off any antivirus software that you may have installed during Developer Setup and Usage of Catapult as necessary tasks such as forwarding ports and writing hosts files may be blocked.
+
+
 
 ## Developer Setup ##
 
 Catapult is controlled via Vagrant and the command line of a Developer's computer - below is a list of required software.
 
-1. Vagrant
+1. **Vagrant**
     1. Please download and install from https://www.vagrantup.com/downloads.html
-2. VirtualBox
+2. **VirtualBox**
     1. Please download and install from https://www.virtualbox.org/wiki/Downloads
-3. SourceTree
+3. **SourceTree**
     1. Please download and install from https://www.sourcetreeapp.com/
-4. Sublime Text 3
+4. **Sublime Text 3**
     1. Please download and install from http://www.sublimetext.com/3
-5. GPG2
+5. **GPG2**
     1. Using OSX ? Please download and install GPG Suite https://gpgtools.org
     2. Using Windows? Please download and install Gpg4win from http://gpg4win.org/download.html
+
+
 
 ## Instance Setup ##
 
@@ -139,6 +152,8 @@ Catapult is quick to setup. Fork the Github repository and start adding your con
     3. This will now allow you to add secrets to configuration.yml and run `vagrant status` to encrypt the secrets in configuration.yml.gpg
         1. In addition to encrypting ~/provisioners/.ssh/id_rsa and ~/provisioners/.ssh/id_rsa.pub as ~/provisioners/.ssh/id_rsa.gpb and ~/provisioners/.ssh/id_rsa.pub.gpb, respectfully.
 
+
+
 ## Services Setup ##
 
 Catapult uses several third-party services to pull everything off - below is a list of the required services and setup steps.
@@ -149,7 +164,6 @@ Catapult uses several third-party services to pull everything off - below is a l
         2. Create a Personal Access Token at https://cloud.digitalocean.com/settings/applications named "Vagrant" and place the token value in ~/configuration.yml at  
            **["company"]["digitalocean_personal_access_token"]**
         3. Add your newly created id_rsa.pub from ~/provisioners/.ssh/id_rsa.pub key in https://cloud.digitalocean.com/settings/security named "Vagrant"
-
 2. **Repositories:**
     1. **Bitbucket** Sign-Up and Configuration
         1. Create an account at https://bitbucket.org
@@ -163,7 +177,6 @@ Catapult uses several third-party services to pull everything off - below is a l
             **["company"]["github_username"]**
             2. Place the password of the account for GitHub at  
             **["company"]["github_password"]**
-
 3. **Automated Deployments:**
     1. **Amazon Web Services** (AWS) EC2 Sign-Up and Configuration (Required for Bamboo)
         1. Create an AWS account https://portal.aws.amazon.com/gp/aws/developer/registration
@@ -187,8 +200,6 @@ Catapult uses several third-party services to pull everything off - below is a l
         **["company"]["bamboo_username"]**
         6. Place your Bamboo password (usually admin) at
         **["company"]["bamboo_password"]**
-
-
 4. **DNS:**
     1. **CloudFlare** Sign-Up and Configuration
         * CloudFlare provides two major components - free SSL certificate functionality (https) and DNS management - just update the name servers to clark.ns.cloudflare.com and liv.ns.cloudflare.com at the registrar where you purchased the domain name and Catapult will handle the rest.
@@ -198,13 +209,16 @@ Catapult uses several third-party services to pull everything off - below is a l
         **["company"]["cloudflare_api_key"]**
         4. Place the email address of the email address that you used to sign up for CloudFlare at  
          **["company"]["cloudflare_email"]**
-
 5. **Verify Configuration:**
     1. To verify all of the configuration that you just set, open your command line and cd into your fork of Catapult, then run `vagrant status`. Catapult will confirm connection to all of the Services and inform you of any problems.
+
+
 
 # Usage #
 
 Catapult is centered around web and database servers. The web and database servers are provisioned (created) via Vagrant and continuously integrated (when new code is detected) via Bamboo.
+
+
 
 ## Spinning up VMs ##
 
@@ -223,6 +237,8 @@ The **vagrant up** command creates and configures guest machines according to th
 | QC                                           | vagrant up **companyname**-qc-redhat         | vagrant up **companyname**-qc-redhat-mysql           |
 | PRD                                          | vagrant up **companyname**-production-redhat | vagrant up **companyname**-production-redhat-mysql   |
 
+
+
 ## Provisioning VMs ##
 
 If you want to provision a VM, and it's already running, then you simply run the following command:
@@ -235,6 +251,7 @@ If you want to provision a VM, and it's already running, then you simply run the
 | TEST                                         | vagrant provision **companyname**-test-redhat       | vagrant provision **companyname**-test-redhat-mysql         |
 | QC                                           | vagrant provision **companyname**-qc-redhat         | vagrant provision **companyname**-qc-redhat-mysql           |
 | PRD                                          | vagrant provision **companyname**-production-redhat | vagrant provision **companyname**-production-redhat-mysql   |
+
 
 
 ## Adding Websites ##
@@ -277,6 +294,8 @@ The following options are available:
         * if the webroot differs from the repo root, specify it here
         * must include the trailing slash
 
+
+
 ## Environments ##
 
 |                               | DEV                                                         | TEST                                                          | QC                                                            | PRD                                                           |
@@ -286,6 +305,8 @@ The following options are available:
 | **New Website Database**      | Restore from *develop* ~/_sql folder of website repo        | Daily backup to *develop* ~/_sql folder of website repo       | Restore from *master* ~/_sql folder of website repo           | Restore from *master* ~/_sql folder of website repo           |
 | **Existing Website Database** | Restore from *develop* ~/_sql folder of website repo        | Restore from *develop* ~/_sql folder of website repo          | Restore from *master* ~/_sql folder of website repo           | Daily backup to *develop* ~/_sql folder of website repo       |
 | **Automated Deployments**     | Manually via Vagrant                                        | Automatically via Bamboo (watch for new commits to *develop*) | Automatically via Bamboo (watch for new commits to *master*)  | Manually via Bamboo                                           |
+
+
 
 ## Service Costs ##
 
@@ -301,9 +322,11 @@ The following options are available:
 |                                            |       | **Total Monthly Costs** | **$40.00**  |
 
 
+
 # Contributing #
 
 The open source community is an awesome thing, we hope Catapult is of use to you, and if you develop a feature that you think would benefit everyone, please submit a pull request. When you first setup Catapult a develop branch is created for you under your repository that does not include your configuration along with with an upstream set to https://github.com/devopsgroup-io/catapult-release-management.git so that you can easily create a pull request.
+
 
 
 ## Versioning ##
