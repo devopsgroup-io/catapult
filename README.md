@@ -20,12 +20,13 @@ If you're having issues with Catapult Release Management, [submit an issue here]
  - [Instance Setup](#instance-setup)
  - [Services Setup](#services-setup)
 - [Usage](#usage)
-- [Environments](#environments)
-- [Adding Websites](#adding-websites)
-- [Service Costs](#service-costs)
+ - [Spinning up VMs](#spinning-up-vms)
+ - [Provisioning VMs](#provisioning-vms)
+ - [Adding Websites](#adding-websites)
+ - [Environments](#environments)
+ - [Service Costs](#service-costs)
 - [Contributing](#contributing)
 - [Versioning](#versioning)
-- [Copyright and license](#copyright-and-license)
 
 ### What's included
 
