@@ -1,6 +1,6 @@
 # Catapult Release Management #
 
-> ![Catapult Release Management Logo](https://avatars0.githubusercontent.com/u/12451107?v=3&amp;s=200)  
+![Catapult Release Management Logo](https://avatars0.githubusercontent.com/u/12451107?v=3&amp;s=200)  
 > [devopsgroup.io](https://devopsgroup.io/) Copyright (c) 2015  
 > [Author] Seth Reeser  
 > [Contributors] Steve Britton  
