@@ -35,7 +35,6 @@ If you're having issues with Catapult, [submit an issue here](https://github.com
 - [Usage](#usage)
     - [Provision Environments](#provision-environments)
     - [Provision Websites](#provision-websites)
-    - [Service Costs](#service-costs)
 - [Contributing](#contributing)
     - [Versioning](#versioning)
 
@@ -155,29 +154,29 @@ Catapult is quick to setup. Fork the Github repository and start adding your con
 
 ## Services Setup ##
 
-Catapult uses several third-party services to pull everything off - below is a list of the required services and setup steps.
+Catapult uses several third-party services to pull everything off - below is a list of the required services and sign-up and configuration steps.
 
 1. **Hosting:** 
-    1. **DigitalOcean** Sign-Up and Configuration
+    1. **DigitalOcean** sign-up and configuration
         1. Create an account at http://digitalocean.com
         2. Create a Personal Access Token at https://cloud.digitalocean.com/settings/applications named "Vagrant" and place the token value in ~/configuration.yml at  
            **["company"]["digitalocean_personal_access_token"]**
         3. Add your newly created id_rsa.pub from ~/provisioners/.ssh/id_rsa.pub key in https://cloud.digitalocean.com/settings/security named "Vagrant"
 2. **Repositories:**
-    1. **Bitbucket** Sign-Up and Configuration
+    1. **Bitbucket** sign-up and configuration
         1. Create an account at https://bitbucket.org
             1. Place the email address that you used to sign up for Bitbucket at  
             **["company"]["bitbucket_username"]**
             2. Place the password of the account for Bitbucket at  
             **["company"]["bitbucket_password"]**
-    2. **GitHub** Sign-Up and Configuration
+    2. **GitHub** sign-up and configuration
         1. Create an account at https://github.com
             1. Place the email address that you used to sign up for GitHub at  
             **["company"]["github_username"]**
             2. Place the password of the account for GitHub at  
             **["company"]["github_password"]**
 3. **Automated Deployments:**
-    1. **Amazon Web Services** (AWS) EC2 Sign-Up and Configuration (Required for Bamboo)
+    1. **Amazon Web Services** (AWS) EC2 sign-up and configuration (Required for Bamboo)
         1. Create an AWS account https://portal.aws.amazon.com/gp/aws/developer/registration
         2. Sign in to your new AWS console https://console.aws.amazon.com
         3. Go to your AWS Identity and Access Management (IAM) Users Dashboard https://console.aws.amazon.com/iam/home#users
@@ -189,7 +188,7 @@ Catapult uses several third-party services to pull everything off - below is a l
         5. Go back to your AWS Identity and Access Management (IAM) Groups Dashboard https://console.aws.amazon.com/iam/home#groups
             1. Select your newly created "Bamboo" group.
             2. Select Add Users to Group and add your newly created "Bamboo" user.
-    2. **Bamboo** Sign-Up and Configuration
+    2. **Bamboo** sign-up and configuration
         1. Create a Bamboo Cloud account at https://www.atlassian.com/software/bamboo
         2. Sign in to your new custom Bamboo instance https://[your-name-here].atlassian.net
         3. Go to your Elastic Bamboo configuration https://[your-name-here].atlassian.net/builds/admin/elastic/editElasticConfig.action
@@ -200,7 +199,7 @@ Catapult uses several third-party services to pull everything off - below is a l
         6. Place your Bamboo password (usually admin) at
         **["company"]["bamboo_password"]**
 4. **DNS:**
-    1. **CloudFlare** Sign-Up and Configuration
+    1. **CloudFlare** sign-up and configuration
         * CloudFlare provides two major components - free SSL certificate functionality (https) and DNS management - just update the name servers to clark.ns.cloudflare.com and liv.ns.cloudflare.com at the registrar where you purchased the domain name and Catapult will handle the rest.
         1. Create a CloudFlare account at https://www.cloudflare.com
         2. Sign in your new CloudFlare account
@@ -298,6 +297,8 @@ The following options are available:
     * "www"
         * if the webroot differs from the repo root, specify it here
         * must include the trailing slash
+
+Once the new website is committed to your Catapult fork on the master branch, it's time to provision your servers, below are commands on how to do so. Once a website is provisioned, then Bamboo Automated Deployments following Gitflow and SCRUM will kick in.
 
 | Environment                   | dev                                                         | test                                                          | qc                                                            | production                                                    |
 |-------------------------------|-------------------------------------------------------------|---------------------------------------------------------------|---------------------------------------------------------------|---------------------------------------------------------------|
