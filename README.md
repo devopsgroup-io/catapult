@@ -136,18 +136,13 @@ Catapult uses several third-party services to pull everything off - below is a l
 1. **Hosting:** 
     1. **DigitalOcean** Sign-Up and Configuration
         1. Create an account at http://digitalocean.com
-<<<<<<< HEAD
         2. Create a Personal Access Token at https://cloud.digitalocean.com/settings/applications named "Vagrant" and place the token value in ~/configuration.yml at  
            **["company"]["digitalocean_personal_access_token"]**
-=======
-        2. Create a Personal Access Token at https://cloud.digitalocean.com/settings/applications named "Vagrant" and place the token value in ~/configuration.yml at ["company"]["digitalocean_personal_access_token"]
->>>>>>> e0f2634cae1f0b00424cb9f36525b9b0db25e9db
         3. Add your newly created id_rsa.pub from ~/provisioners/.ssh/id_rsa.pub key in https://cloud.digitalocean.com/settings/security named "Vagrant"
 
 2. **Repositories:**
     1. **Bitbucket** Sign-Up and Configuration
         1. Create an account at https://bitbucket.org
-<<<<<<< HEAD
             1. Place the email address that you used to sign up for Bitbucket at  
             **["company"]["bitbucket_username"]**
             2. Place the password of the account for Bitbucket at  
@@ -158,14 +153,6 @@ Catapult uses several third-party services to pull everything off - below is a l
             **["company"]["github_username"]**
             2. Place the password of the account for GitHub at  
             **["company"]["github_password"]**
-=======
-            1. Place the email address that you used to sign up for Bitbucket at ["company"]["bitbucket_username"]
-            2. Place the password of the account for Bitbucket at ["company"]["bitbucket_username"]
-    2. **GitHub** Sign-Up and Configuration
-        1. Create an account at https://github.com
-            1. Place the email address that you used to sign up for GitHub at ["company"]["github_username"]
-            2. Place the password of the account for GitHub at ["company"]["github_password"]
->>>>>>> e0f2634cae1f0b00424cb9f36525b9b0db25e9db
 
 3. **Automated Deployments:**
     1. **Amazon Web Services** (AWS) EC2 Sign-Up and Configuration (Required for Bamboo)
@@ -307,10 +294,7 @@ The following options are available:
 # Contributing #
 
 The open source community is an awesome thing, we hope Catapult is of use to you, and if you develop a feature that you think would benefit everyone, please submit a pull request. When you first setup Catapult a develop branch is created for you under your repository that does not include your configuration along with with an upstream set to https://github.com/devopsgroup-io/catapult-release-management.git so that you can easily create a pull request.
-<<<<<<< HEAD
 
-=======
->>>>>>> e0f2634cae1f0b00424cb9f36525b9b0db25e9db
 
 ## Versioning ##
 
