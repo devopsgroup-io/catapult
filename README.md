@@ -222,7 +222,6 @@ To use Catapult you will first need to [Provision Environments](#provision-envir
 
 | Environment                   | dev                                                         | test                                                          | qc                                                            | production                                                    |
 |-------------------------------|-------------------------------------------------------------|---------------------------------------------------------------|---------------------------------------------------------------|---------------------------------------------------------------|
-| **Running Branch**            | *develop*                                                   | *develop*                                                     | *master*                                                      | *master*                                                      |
 | **Server Provider**           | Local via VirtualBox                                        | Hosted via DigitalOcean                                       | Hosted via DigitalOcean                                       | Hosted via DigitalOcean                                       |
 | **Server Provisioning**       | Manually via Vagrant                                        | Manually via Vagrant                                          | Manually via Vagrant                                          | Manually via Vagrant                                          |
 
@@ -237,12 +236,6 @@ For each **Environment** you will need to:
     * `vagrant up ["company"]["name"]-test-redhat-mysql`
     * `vagrant up ["company"]["name"]-qc-redhat-mysql`
     * `vagrant up ["company"]["name"]-production-redhat-mysql`
-
-| Environment                   | dev                                                         | test                                                          | qc                                                            | production                                                    |
-|-------------------------------|-------------------------------------------------------------|---------------------------------------------------------------|---------------------------------------------------------------|---------------------------------------------------------------|
-| **New Website Database**      | Restore from *develop* ~/_sql folder of website repo        | Daily backup to *develop* ~/_sql folder of website repo       | Restore from *master* ~/_sql folder of website repo           | Restore from *master* ~/_sql folder of website repo           |
-| **Existing Website Database** | Restore from *develop* ~/_sql folder of website repo        | Restore from *develop* ~/_sql folder of website repo          | Restore from *master* ~/_sql folder of website repo           | Daily backup to *develop* ~/_sql folder of website repo       |
-| **Automated Deployments**     | Manually via Vagrant                                        | Automatically via Bamboo (watch for new commits to *develop*) | Automatically via Bamboo (watch for new commits to *master*)  | Manually via Bamboo                                           |
 
 
 
@@ -285,6 +278,26 @@ The following options are available:
     * "www"
         * if the webroot differs from the repo root, specify it here
         * must include the trailing slash
+
+| Environment                   | dev                                                         | test                                                          | qc                                                            | production                                                    |
+|-------------------------------|-------------------------------------------------------------|---------------------------------------------------------------|---------------------------------------------------------------|---------------------------------------------------------------|
+| **Running Branch**            | *develop*                                                   | *develop*                                                     | *master*                                                      | *master*                                                      |
+| **Upstream Database**         | Restore from *develop* ~/_sql folder of website repo        | Daily backup to *develop* ~/_sql folder of website repo       | Restore from *master* ~/_sql folder of website repo           | Restore from *master* ~/_sql folder of website repo           |
+| **Downstream Database**       | Restore from *develop* ~/_sql folder of website repo        | Restore from *develop* ~/_sql folder of website repo          | Restore from *master* ~/_sql folder of website repo           | Daily backup to *develop* ~/_sql folder of website repo       |
+| **Automated Deployments**     | Manually via Vagrant                                        | Automatically via Bamboo (watch for new commits to *develop*) | Automatically via Bamboo (watch for new commits to *master*)  | Manually via Bamboo                                           |
+| **Server Provisioning**       | Manually via Vagrant                                        | Manually via Vagrant                                          | Manually via Vagrant                                          | Manually via Vagrant                                          |
+
+For each **Environment** you will need to:
+* **Web Servers**
+    * `vagrant provision ["company"]["name"]-dev-redhat`
+    * `vagrant provision ["company"]["name"]-test-redhat`
+    * `vagrant provision ["company"]["name"]-qc-redhat`
+    * `vagrant provision ["company"]["name"]-production-redhat`
+* **Database Servers**
+    * `vagrant provision ["company"]["name"]-dev-redhat-mysql`
+    * `vagrant provision ["company"]["name"]-test-redhat-mysql`
+    * `vagrant provision ["company"]["name"]-qc-redhat-mysql`
+    * `vagrant provision ["company"]["name"]-production-redhat-mysql`
 
 
 
