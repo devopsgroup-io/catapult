@@ -357,18 +357,18 @@ configuration["environments"].each do |environment,data|
   end
   # if upstream digitalocean droplets are provisioned, get their ip addresses to write to configuration.yml
   unless environment == "dev"
-    unless configuration["environments"]["#{environment}"]["servers"]["redhat"]["ip"]
-      droplet = @api_digitalocean["droplets"].find { |d| d['name'] == "#{configuration["company"]["name"]}-#{environment}-redhat" }
-      unless droplet == nil
+    droplet = @api_digitalocean["droplets"].find { |d| d['name'] == "#{configuration["company"]["name"]}-#{environment}-redhat" }
+    unless droplet == nil
+      unless configuration["environments"]["#{environment}"]["servers"]["redhat"]["ip"] == droplet["networks"]["v4"].first["ip_address"]
         configuration["environments"]["#{environment}"]["servers"]["redhat"]["ip"] = droplet["networks"]["v4"].first["ip_address"]
         `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output configuration.yml --decrypt configuration.yml.gpg`
         File.open('configuration.yml', 'w') {|f| f.write configuration.to_yaml }
         `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output configuration.yml.gpg --armor --cipher-algo AES256 --symmetric configuration.yml`
       end
     end
-    unless configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["ip"]
-      droplet = @api_digitalocean["droplets"].find { |d| d['name'] == "#{configuration["company"]["name"]}-#{environment}-redhat-mysql" }
-      unless droplet == nil
+    droplet = @api_digitalocean["droplets"].find { |d| d['name'] == "#{configuration["company"]["name"]}-#{environment}-redhat-mysql" }
+    unless droplet == nil
+      unless configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["ip"] == droplet["networks"]["v4"].first["ip_address"]
         configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["ip"] = droplet["networks"]["v4"].first["ip_address"]
         `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output configuration.yml --decrypt configuration.yml.gpg`
         File.open('configuration.yml', 'w') {|f| f.write configuration.to_yaml }
