@@ -8,7 +8,9 @@ Welcome to devopsgroup.io Catapult Release Management, a complete DevOps Release
 
 To a non-Developer you may think, "I already have a website.", why do I need Catapult? Over time you will find yourself paying a freelancer or a development company hundreds or even thousands of dollars to manage or interact with the Development Operations (DevOps) of your website i.e. - "Production is down.", "We need a test site.", "Why is this costing so much?", "Is my website safe?", "Is my website backed up?", "Can I easily scale my website for more traffic?" etc. Catapult manages all of this for you and is open-sourced, documented, and free to use. We also provide a service if you need some help getting started, if you do, let us know at https://devopsgroup.io
 
-Catapult only costs $40/month to have a full-stack localDev, Test, Quality Control, and Production environment.
+Catapult only costs $40/month to have a full-stack localDev, Test, Quality Control, and Production environment.  
+
+If you're having issues with Catapult Release Management, [submit an issue here](https://github.com/devopsgroup-io/catapult-release-management/issues/new).
 
 ## Table of contents
 
@@ -24,8 +26,6 @@ Catapult only costs $40/month to have a full-stack localDev, Test, Quality Contr
 - [Contributing](#contributing)
 - [Versioning](#versioning)
 - [Copyright and license](#copyright-and-license)
-
-### [Submit Issue](https://github.com/devopsgroup-io/catapult-release-management/issues/new) ###
 
 ### What's included
 
@@ -191,14 +191,12 @@ Catapult is centered around web and database servers. The web and database serve
 
 ## Spinning up VMs ##
 
-To create a virtual machine (defined in the Vagrantfile), open your command line and cd into your fork of Catapult:
+To create a virtual machine (defined in the Vagrantfile), open your command line, cd into your fork of Catapult, and run a `vagrant up`:
 > `cd catapult-release-management`
-
-This command creates and configures guest machines according to the Vagrantfile.
 
 > `vagrant up **machine name**`
 
-This is the single most important command in Vagrant, since it is how any Vagrant machine is created. 
+The **vagrant up** command creates and configures guest machines according to the Vagrantfile. This is the single most important command in Vagrant, since it is how any Vagrant machine is created. 
 
 
 |  Environment                                 | redhat                                       | redhat-mysql                                         |
