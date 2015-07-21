@@ -210,6 +210,20 @@ Catapult uses several third-party services to pull everything off - below is a l
 5. **Verify Configuration:**
     1. To verify all of the configuration that you just set, open your command line and cd into your fork of Catapult, then run `vagrant status`. Catapult will confirm connection to all of the Services and inform you of any problems.
 
+|                               | Service                       |                                             |                               |
+|-------------------------------|-------------------------------|---------------------------------------------|------------------------------:|
+| **Hosting**                   |                               |                                             |                               |
+|                               | **DigitalOcean**              | ["company"]["name"]-test-redhat             | $5                            |
+|                               | **DigitalOcean**              | ["company"]["name"]-qc-redhat               | $5                            |
+|                               | **DigitalOcean**              | ["company"]["name"]-production-redhat       | $5                            |
+|                               | **DigitalOcean**              | ["company"]["name"]-test-redhat-mysql       | $5                            |
+|                               | **DigitalOcean**              | ["company"]["name"]-qc-redhat-mysql         | $5                            |
+|                               | **DigitalOcean**              | ["company"]["name"]-production-redhat-mysql | $5                            |
+| **Repositories:**             |                               |                                             |                               |
+| **Automated Deployments:**    |                               |                                             |                               |
+| **DNS:**                      |                               |                                             |                               |
+|                               |                               |                                             |                               |
+
 
 
 # Usage #
@@ -285,7 +299,7 @@ The following options are available:
 | **Upstream Database**         | Restore from *develop* ~/_sql folder of website repo        | Daily backup to *develop* ~/_sql folder of website repo       | Restore from *master* ~/_sql folder of website repo           | Restore from *master* ~/_sql folder of website repo           |
 | **Downstream Database**       | Restore from *develop* ~/_sql folder of website repo        | Restore from *develop* ~/_sql folder of website repo          | Restore from *master* ~/_sql folder of website repo           | Daily backup to *develop* ~/_sql folder of website repo       |
 | **Automated Deployments**     | Manually via Vagrant                                        | Automatically via Bamboo (watch for new commits to *develop*) | Automatically via Bamboo (watch for new commits to *master*)  | Manually via Bamboo                                           |
-| **Server Provisioning**       | Manually via Vagrant                                        | Manually via Vagrant                                          | Manually via Vagrant                                          | Manually via Vagrant                                          |
+| **Website Provisioning**      | Manually via Vagrant                                        | Manually via Vagrant                                          | Manually via Vagrant                                          | Manually via Vagrant                                          |
 
 For each **Environment** you will need to:
 * **Web Servers**
@@ -298,21 +312,6 @@ For each **Environment** you will need to:
     * `vagrant provision ["company"]["name"]-test-redhat-mysql`
     * `vagrant provision ["company"]["name"]-qc-redhat-mysql`
     * `vagrant provision ["company"]["name"]-production-redhat-mysql`
-
-
-
-## Service Costs ##
-
-| Service                                            |        |              | Monthly Costs |
-| :--------------------------------------------------|--------|--------------|---------------:
-| [Bamboo](https://www.atlassian.com/software/bamboo)|        |              | $10.00        |
-| [CloudFlare](https://www.cloudflare.com/)          |        |              | Free          |
-| [Digital Ocean](http://digitalocean.com/)          | Droplet| Droplet      |               |
-| &nbsp;TEST                                         | redhat | redhat mysql | $10.00        |
-| &nbsp;Quality Control                              | redhat | redhat mysql | $10.00        |
-| &nbsp;Production                                   | redhat | redhat mysql | $10.00        |
-|                                                                                            |
-|                                            |       | **Total Monthly Costs** | **$40.00**  |
 
 
 
