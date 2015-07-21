@@ -4,7 +4,7 @@
 > [devopsgroup.io](https://devopsgroup.io/)   
 > Copyright (c) 2015 devopsgroup.io - Seth Reeser
 
-**Welcome to devopsgroup.io Catapult Release Management**, a complete DevOps Release Management solution featuring automated website deployment and continuous integration following Gitflow and SCRUM workflows. Built for Developers easy enough to use by non-Developers.
+**Welcome to devopsgroup.io Catapult Release Management**, a complete DevOps Release Management solution featuring automated website deployment and continuous integration following Gitflow and SCRUM workflows. Built for Developers, simple enough to use by non-Developers.
 
 To a non-Developer you may think - *I already have a website, why do I need Catapult?*. Over time you will find yourself paying a freelancer or a development company hundreds or even thousands of dollars to manage or interact with the DevOps (Development Operations) and solve these problems:
 
@@ -32,10 +32,8 @@ If you're having issues with Catapult, [submit an issue here](https://github.com
     - [Instance Setup](#instance-setup)
     - [Services Setup](#services-setup)
 - [Usage](#usage)
-    - [Spinning up VMs](#spinning-up-vms)
-    - [Provisioning VMs](#provisioning-vms)
-    - [Adding Websites](#adding-websites)
-    - [Environments](#environments)
+    - [Provision Environments](#provision-environments)
+    - [Provision Websites](#provision-websites)
     - [Service Costs](#service-costs)
 - [Contributing](#contributing)
     - [Versioning](#versioning)
@@ -216,45 +214,34 @@ Catapult uses several third-party services to pull everything off - below is a l
 
 # Usage #
 
-Catapult is centered around web and database servers. The web and database servers are provisioned (created) via Vagrant and continuously integrated (when new code is detected) via Bamboo.
+To use Catapult you will first need to [Provision Environments](#provision-environments) then [Provision Websites](#provision-websites).
 
 
 
-## Spinning up VMs ##
+## Provision Environments ##
 
-To create a virtual machine (defined in the Vagrantfile), open your command line, cd into your fork of Catapult, and run a `vagrant up`:
-> `cd catapult-release-management`
-
-> `vagrant up **machine name**`
-
-The **vagrant up** command creates and configures guest machines according to the Vagrantfile. This is the single most important command in Vagrant, since it is how any Vagrant machine is created. 
-
-
-|  Environment                                 | redhat                                       | redhat-mysql                                         |
-| :--------------------------------------------|----------------------------------------------|------------------------------------------------------|
-| DEV                                          | vagrant up **companyname**-dev-redhat        | vagrant up **companyname**-dev-redhat-mysql          |
-| TEST                                         | vagrant up **companyname**-test-redhat       | vagrant up **companyname**-test-redhat-mysql         |
-| QC                                           | vagrant up **companyname**-qc-redhat         | vagrant up **companyname**-qc-redhat-mysql           |
-| PRD                                          | vagrant up **companyname**-production-redhat | vagrant up **companyname**-production-redhat-mysql   |
-
-
-
-## Provisioning VMs ##
-
-If you want to provision a VM, and it's already running, then you simply run the following command:
-
-> `vagrant provision **machine name**`
-
-|  Environment                                 | redhat                                              | redhat-mysql                                                |
-| :--------------------------------------------|-----------------------------------------------------|-------------------------------------------------------------|
-| DEV                                          | vagrant provision **companyname**-dev-redhat        | vagrant provision **companyname**-dev-redhat-mysql          |
-| TEST                                         | vagrant provision **companyname**-test-redhat       | vagrant provision **companyname**-test-redhat-mysql         |
-| QC                                           | vagrant provision **companyname**-qc-redhat         | vagrant provision **companyname**-qc-redhat-mysql           |
-| PRD                                          | vagrant provision **companyname**-production-redhat | vagrant provision **companyname**-production-redhat-mysql   |
+| Environment Key               | dev                                                         | test                                                          | qc                                                            | production                                                    |
+|-------------------------------|-------------------------------------------------------------|---------------------------------------------------------------|---------------------------------------------------------------|---------------------------------------------------------------|
+| **Running Branch**            | *develop*                                                   | *develop*                                                     | *master*                                                      | *master*                                                      |
+| **Server Provisioning**       | Manually via Vagrant                                        | Manually via Vagrant                                          | Manually via Vagrant                                          | Manually via Vagrant                                          |
+| For each Environment Key you will need to:                                |||
+|     * **Web Servers**                                                     |||
+|         * `vagrant up **["company"]["name"]**-dev-redhat                  |||
+|         * `vagrant up **["company"]["name"]**-test-redhat                 |||
+|         * `vagrant up **["company"]["name"]**-qc-redhat                   |||
+|         * `vagrant up **["company"]["name"]**-production-redhat           |||
+|     * **Database Servers**                                                |||
+|         * `vagrant up **["company"]["name"]**-dev-redhat-mysql            |||
+|         * `vagrant up **["company"]["name"]**-test-redhat-mysql           |||
+|         * `vagrant up **["company"]["name"]**-qc-redhat-mysql             |||
+|         * `vagrant up **["company"]["name"]**-production-redhat-mysql     |||
+| **New Website Database**      | Restore from *develop* ~/_sql folder of website repo        | Daily backup to *develop* ~/_sql folder of website repo       | Restore from *master* ~/_sql folder of website repo           | Restore from *master* ~/_sql folder of website repo           |
+| **Existing Website Database** | Restore from *develop* ~/_sql folder of website repo        | Restore from *develop* ~/_sql folder of website repo          | Restore from *master* ~/_sql folder of website repo           | Daily backup to *develop* ~/_sql folder of website repo       |
+| **Automated Deployments**     | Manually via Vagrant                                        | Automatically via Bamboo (watch for new commits to *develop*) | Automatically via Bamboo (watch for new commits to *master*)  | Manually via Bamboo                                           |
 
 
 
-## Adding Websites ##
+## Provision Websites ##
 
 Adding websites to Catapult is easy. The only requirement is that the website needs to be contained in its own repo on GitHub or Bitbucket. Websites are then added to configuration.yml, a minimal addition looks like this:
 
@@ -293,18 +280,6 @@ The following options are available:
     * "www"
         * if the webroot differs from the repo root, specify it here
         * must include the trailing slash
-
-
-
-## Environments ##
-
-|                               | DEV                                                         | TEST                                                          | QC                                                            | PRD                                                           |
-|-------------------------------|-------------------------------------------------------------|---------------------------------------------------------------|---------------------------------------------------------------|---------------------------------------------------------------|
-| **Running Branch**            | *develop*                                                   | *develop*                                                     | *master*                                                      | *master*                                                      |
-| **Server Provisioning**       | Manually via Vagrant                                        | Manually via Vagrant                                          | Manually via Vagrant                                          | Manually via Vagrant                                          |
-| **New Website Database**      | Restore from *develop* ~/_sql folder of website repo        | Daily backup to *develop* ~/_sql folder of website repo       | Restore from *master* ~/_sql folder of website repo           | Restore from *master* ~/_sql folder of website repo           |
-| **Existing Website Database** | Restore from *develop* ~/_sql folder of website repo        | Restore from *develop* ~/_sql folder of website repo          | Restore from *master* ~/_sql folder of website repo           | Daily backup to *develop* ~/_sql folder of website repo       |
-| **Automated Deployments**     | Manually via Vagrant                                        | Automatically via Bamboo (watch for new commits to *develop*) | Automatically via Bamboo (watch for new commits to *master*)  | Manually via Bamboo                                           |
 
 
 
