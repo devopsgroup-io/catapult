@@ -227,15 +227,15 @@ To use Catapult you will first need to [Provision Environments](#provision-envir
 
 For each Environment Key you will need to:
 * **Web Servers**
-    * `vagrant up **["company"]["name"]**-dev-redhat`
-    * `vagrant up **["company"]["name"]**-test-redhat`
-    * `vagrant up **["company"]["name"]**-qc-redhat`
-    * `vagrant up **["company"]["name"]**-production-redhat`
+    * `vagrant up ["company"]["name"]-dev-redhat`
+    * `vagrant up ["company"]["name"]-test-redhat`
+    * `vagrant up ["company"]["name"]-qc-redhat`
+    * `vagrant up ["company"]["name"]-production-redhat`
 * **Database Servers**
-    * `vagrant up **["company"]["name"]**-dev-redhat-mysql`
-    * `vagrant up **["company"]["name"]**-test-redhat-mysql`
-    * `vagrant up **["company"]["name"]**-qc-redhat-mysql`
-    * `vagrant up **["company"]["name"]**-production-redhat-mysql`
+    * `vagrant up ["company"]["name"]-dev-redhat-mysql`
+    * `vagrant up ["company"]["name"]-test-redhat-mysql`
+    * `vagrant up ["company"]["name"]-qc-redhat-mysql`
+    * `vagrant up ["company"]["name"]-production-redhat-mysql`
 
 | Environment Key               | dev                                                         | test                                                          | qc                                                            | production                                                    |
 |-------------------------------|-------------------------------------------------------------|---------------------------------------------------------------|---------------------------------------------------------------|---------------------------------------------------------------|
