@@ -1,13 +1,14 @@
-# [devopsgroup.io](https://devopsgroup.io/) Catapult Release Management #
+# Catapult Release Management #
 
-![Catapult Release Management Logo](https://avatars0.githubusercontent.com/u/12451107?v=3&amp;s=100)
-Copyright (c) 2015 devopsgroup.io - Seth Reeser
+> ![Catapult Release Management Logo](https://avatars0.githubusercontent.com/u/12451107?v=3&amp;s=100)  
+> [devopsgroup.io](https://devopsgroup.io/)   
+> Copyright (c) 2015 devopsgroup.io - Seth Reeser
 
-> Welcome to devopsgroup.io **Catapult Release Management**, a complete DevOps Release Management solution featuring automated website deployment and continuous integration following Gitflow and SCRUM workflows. 
+Welcome to devopsgroup.io **Catapult Release Management**, a complete DevOps Release Management solution featuring automated website deployment and continuous integration following Gitflow and SCRUM workflows. 
 
-> To a non-Developer you may think, "I already have a website.", why do I need Catapult? Over time you will find yourself paying a freelancer or a development company hundreds or even thousands of dollars to manage or interact with the Development Operations (DevOps) of your website i.e. - "Production is down.", "We need a test site.", "Why is this costing so much?", "Is my website safe?", "Is my website backed up?", "Can I easily scale my website for more traffic?" etc. Catapult manages all of this for you and is open-sourced, documented, and free to use. We also provide a service if you need some help getting started, if you do, let us know at https://devopsgroup.io
+To a non-Developer you may think, "I already have a website.", why do I need Catapult? Over time you will find yourself paying a freelancer or a development company hundreds or even thousands of dollars to manage or interact with the Development Operations (DevOps) of your website i.e. - "Production is down.", "We need a test site.", "Why is this costing so much?", "Is my website safe?", "Is my website backed up?", "Can I easily scale my website for more traffic?" etc. Catapult manages all of this for you and is open-sourced, documented, and free to use. We also provide a service if you need some help getting started, if you do, let us know at https://devopsgroup.io
 
-> Catapult only costs $40/month to have a full-stack localDev, Test, Quality Control, and Production environment.
+Catapult only costs $40/month to have a full-stack localDev, Test, Quality Control, and Production environment.
 
 ## Table of contents
 
@@ -244,7 +245,8 @@ The following options are available:
 
 # Contributing #
 
-The open source community is an awesome thing, we hope Catapult is of use to you, and if you develop a feature that you think would benefit everyone, please submit a pull request.
+The open source community is an awesome thing, we hope Catapult is of use to you, and if you develop a feature that you think would benefit everyone, please submit a pull request. When you first setup Catapult a develop branch is created for you under your repository that does not include your configuration along with with an upstream set to https://github.com/devopsgroup-io/catapult-release-management.git so that you can easily create a pull request.
+
 
 ## Versioning ##
 
