@@ -220,12 +220,13 @@ To use Catapult you will first need to [Provision Environments](#provision-envir
 
 ## Provision Environments ##
 
-| Environment Key               | dev                                                         | test                                                          | qc                                                            | production                                                    |
+| Environment                   | dev                                                         | test                                                          | qc                                                            | production                                                    |
 |-------------------------------|-------------------------------------------------------------|---------------------------------------------------------------|---------------------------------------------------------------|---------------------------------------------------------------|
 | **Running Branch**            | *develop*                                                   | *develop*                                                     | *master*                                                      | *master*                                                      |
+| **Server Provider**           | Local via VirtualBox                                        | Hosted via DigitalOcean                                       | Hosted via DigitalOcean                                       | Hosted via DigitalOcean                                       |
 | **Server Provisioning**       | Manually via Vagrant                                        | Manually via Vagrant                                          | Manually via Vagrant                                          | Manually via Vagrant                                          |
 
-For each Environment Key you will need to:
+For each **Environment** you will need to:
 * **Web Servers**
     * `vagrant up ["company"]["name"]-dev-redhat`
     * `vagrant up ["company"]["name"]-test-redhat`
@@ -237,7 +238,7 @@ For each Environment Key you will need to:
     * `vagrant up ["company"]["name"]-qc-redhat-mysql`
     * `vagrant up ["company"]["name"]-production-redhat-mysql`
 
-| Environment Key               | dev                                                         | test                                                          | qc                                                            | production                                                    |
+| Environment                   | dev                                                         | test                                                          | qc                                                            | production                                                    |
 |-------------------------------|-------------------------------------------------------------|---------------------------------------------------------------|---------------------------------------------------------------|---------------------------------------------------------------|
 | **New Website Database**      | Restore from *develop* ~/_sql folder of website repo        | Daily backup to *develop* ~/_sql folder of website repo       | Restore from *master* ~/_sql folder of website repo           | Restore from *master* ~/_sql folder of website repo           |
 | **Existing Website Database** | Restore from *develop* ~/_sql folder of website repo        | Restore from *develop* ~/_sql folder of website repo          | Restore from *master* ~/_sql folder of website repo           | Daily backup to *develop* ~/_sql folder of website repo       |
