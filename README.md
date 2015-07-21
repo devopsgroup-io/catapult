@@ -2,8 +2,8 @@
 
 > ![Catapult Release Management Logo](https://avatars0.githubusercontent.com/u/12451107?v=3&amp;s=200)  
 > [devopsgroup.io](https://devopsgroup.io/) Copyright (c) 2015  
-> Founded by Seth Reeser.  
-> Contributions by Steve Britton.  
+> [Author] Seth Reeser  
+> [Contributors] Steve Britton  
 
 **Welcome to devopsgroup.io Catapult Release Management**, a complete DevOps Release Management solution featuring automated website deployment and continuous integration following Gitflow and SCRUM workflows. Built for Developers, simple enough to use by non-Developers.
 
