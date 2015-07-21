@@ -214,19 +214,19 @@ Catapult uses several third-party services to pull everything off - below is a l
 |-------------------------------|---------------------------------------------|-------------:|
 | **Hosting:**                  |                                             |              |
 | - **DigitalOcean**            | ["company"]["name"]-test-redhat             | $5           |
-| * **DigitalOcean**            | ["company"]["name"]-qc-redhat               | $5           |
-| * **DigitalOcean**            | ["company"]["name"]-production-redhat       | $5           |
-| * **DigitalOcean**            | ["company"]["name"]-test-redhat-mysql       | $5           |
-| * **DigitalOcean**            | ["company"]["name"]-qc-redhat-mysql         | $5           |
-| * **DigitalOcean**            | ["company"]["name"]-production-redhat-mysql | $5           |
+| - **DigitalOcean**            | ["company"]["name"]-qc-redhat               | $5           |
+| - **DigitalOcean**            | ["company"]["name"]-production-redhat       | $5           |
+| - **DigitalOcean**            | ["company"]["name"]-test-redhat-mysql       | $5           |
+| - **DigitalOcean**            | ["company"]["name"]-qc-redhat-mysql         | $5           |
+| - **DigitalOcean**            | ["company"]["name"]-production-redhat-mysql | $5           |
 | **Repositories:**             |                                             |              |
-| * **Bitbucket**               | Private Repositories                        | Free         |
-| * **GitHub**                  | Public Repositories                         | Free         |
+| - **Bitbucket**               | Private Repositories                        | Free         |
+| - **GitHub**                  | Public Repositories                         | Free         |
 | **Automated Deployments:**    |                                             |              |
-| * **Amazon Web Services**     | Build Server                                | $1 - $15     |
-| * **Bamboo**                  | Continuous Integration                      | $10          |
+| - **Amazon Web Services**     | Build Server                                | $1 - $15     |
+| - **Bamboo**                  | Continuous Integration                      | $10          |
 | **DNS:**                      |                                             |              |
-| * **CloudFlare**              | test., qc., and production global DNS       | Free         |
+| - **CloudFlare**              | test., qc., and production global DNS       | Free         |
 | **Total**                     |                                             | $41 - $55    |
 
 
