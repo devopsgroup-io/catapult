@@ -190,20 +190,36 @@ Catapult uses several third-party services to pull everything off - below is a l
 Catapult is centered around web and database servers. The web and database servers are provisioned (created) via Vagrant and continuously integrated (when new code is detected) via Bamboo.
 
 ## Spinning up VMs ##
-|  Environment                                 | redhat                                     | redhat-mysql                                       |
-| :--------------------------------------------|--------------------------------------------|----------------------------------------------------|
-| Dev                                          | vagrant up [companyname]-dev-redhat        | vagrant up [companyname]-dev-redhat-mysql          |
-| TEST                                         | vagrant up [companyname]-test-redhat       | vagrant up [companyname]-test-redhat-mysql         |
-| Quality Control                              | vagrant up [companyname]-qc-redhat         | vagrant up [companyname]-qc-redhat-mysql           |
-| Production                                   | vagrant up [companyname]-production-redhat | vagrant up [companyname]-production-redhat-mysql   |
+
+To create a virtual machine (defined in the Vagrantfile), open your command line and cd into your fork of Catapult:
+> `cd catapult-release-management`
+
+This command creates and configures guest machines according to the Vagrantfile.
+
+> `vagrant up **machine name**`
+
+This is the single most important command in Vagrant, since it is how any Vagrant machine is created. 
+
+
+|  Environment                                 | redhat                                       | redhat-mysql                                         |
+| :--------------------------------------------|----------------------------------------------|------------------------------------------------------|
+| Dev                                          | vagrant up **companyname**-dev-redhat        | vagrant up **companyname**-dev-redhat-mysql          |
+| TEST                                         | vagrant up **companyname**-test-redhat       | vagrant up **companyname**-test-redhat-mysql         |
+| Quality Control                              | vagrant up **companyname**-qc-redhat         | vagrant up **companyname**-qc-redhat-mysql           |
+| Production                                   | vagrant up **companyname**-production-redhat | vagrant up **companyname**-production-redhat-mysql   |
 
 ## Provisioning VMs ##
-|  Environment                                 | redhat                                            | redhat-mysql                                              |
-| :--------------------------------------------|---------------------------------------------------|-----------------------------------------------------------|
-| Dev                                          | vagrant provision [companyname]-dev-redhat        | vagrant provision [companyname]-dev-redhat-mysql          |
-| TEST                                         | vagrant provision [companyname]-test-redhat       | vagrant provision [companyname]-test-redhat-mysql         |
-| Quality Control                              | vagrant provision [companyname]-qc-redhat         | vagrant provision [companyname]-qc-redhat-mysql           |
-| Production                                   | vagrant provision [companyname]-production-redhat | vagrant provision [companyname]-production-redhat-mysql   |
+
+If you want to provision a VM, and it's already running, then you simply run the following command:
+
+> `vagrant provision **machine name**`
+
+|  Environment                                 | redhat                                              | redhat-mysql                                                |
+| :--------------------------------------------|-----------------------------------------------------|-------------------------------------------------------------|
+| Dev                                          | vagrant provision **companyname**-dev-redhat        | vagrant provision **companyname**-dev-redhat-mysql          |
+| TEST                                         | vagrant provision **companyname**-test-redhat       | vagrant provision **companyname**-test-redhat-mysql         |
+| Quality Control                              | vagrant provision **companyname**-qc-redhat         | vagrant provision **companyname**-qc-redhat-mysql           |
+| Production                                   | vagrant provision **companyname**-production-redhat | vagrant provision **companyname**-production-redhat-mysql   |
 
 
 ## Adding Websites ##
