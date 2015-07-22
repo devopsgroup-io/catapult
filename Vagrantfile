@@ -386,15 +386,30 @@ configuration["websites"].each do |service,data|
   configuration["websites"]["#{service}"].each do |instance|
     domains.push("#{instance["domain"]}")
     domains_sorted.push("#{instance["domain"]}")
-    # validate repo user
-    repo = instance["repo"].split("@")
-    if repo[0] != "git"
+
+    # validate repo 
+    # instance["repo"] => git@github.com:devopsgroup-io/devopsgroup-io.git
+
+    repo_split_1 = instance["repo"].split("@")
+    # repo_split_1[0] => git
+    # repo_split_1[1] => github.com:devopsgroup-io/devopsgroup-io.git
+    repo_split_2 = repo_split_1[1].split(":")
+    # repo_split_2[0] => github.com
+    # repo_split_2[1] => devopsgroup-io/devopsgroup-io.git
+    repo_split_3 = repo_split_2[1].split(".git")
+    # repo_split_3[0] => devopsgroup-io/devopsgroup-io
+
+    # validate repo type
+    unless "#{repo_split_1[0]}" == "git"
       catapult_exception("There is an error in your configuration.yml file.\nThe repo for websites => #{service} => domain => #{instance["domain"]} is invalid, the format must be git@github.com:devopsgroup-io/devopsgroup-io.git")
     end
-    # validate repo bitbucket.org or github.com
-    repo = repo[1].split(":")
-    if "#{repo[0]}" != "bitbucket.org" && "#{repo[0]}" != "github.com"
+    # validate repo hosted at bitbucket.org or github.com
+    unless "#{repo_split_2[0]}" == "bitbucket.org" || "#{repo_split_2[0]}" == "github.com"
       catapult_exception("There is an error in your configuration.yml file.\nThe repo for websites => #{service} => domain => #{instance["domain"]} is invalid, it must either be a bitbucket.org or github.com repository.")
+    end
+    # validate repo ends in .git
+    if "#{repo_split_3[0]}" == nil
+      catapult_exception("There is an error in your configuration.yml file.\nThe repo for websites => #{service} => domain => #{instance["domain"]} is invalid, it must end in .git")
     end
     # validate software
     unless "#{instance["software"]}" == ""
