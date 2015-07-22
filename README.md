@@ -332,7 +332,7 @@ Once the new website is committed to your Catapult fork on the master branch, it
 
 # Contributing #
 
-The open source community is an awesome thing, we hope Catapult is of use to you, and if you develop a feature that you think would benefit everyone, please submit a pull request. When you first setup Catapult a develop branch is created for you under your repository that does not include your configuration along with with an upstream set to https://github.com/devopsgroup-io/catapult-release-management.git so that you can easily create a pull request.
+The open source community is an awesome thing, we hope Catapult is of use to you, and if you develop a feature that you think would benefit everyone, please submit a pull request.  When you first setup Catapult a develop branch is created for you under your forked repository with an upstream set to `https://github.com/devopsgroup-io/catapult-release-management.git` so that you can easily create a pull request. Also keep in mind when closing issues to submit a pull requst that includes [GitHub's: Closing issues via commit messages](https://help.github.com/articles/closing-issues-via-commit-messages/).
 
 
 
