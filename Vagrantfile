@@ -409,7 +409,6 @@ configuration["websites"].each do |service,data|
   end
 end
 
-puts "\n\n"
 
 # create arrays of domains for localdev hosts file
 redhathostsfile = Array.new

@@ -24,7 +24,7 @@ As a Developer, you've probably had to manage many websites and probably end up 
 
 Catapult manages all of this for you and is open-sourced, well-documented, developer-focused, and free to use. We also provide a service if you need some help getting started - if you do, let us know at https://devopsgroup.io. Catapult leverages the Services that you're already using, which collectively, costs $40/month to have a full-stack localDev, Test, Quality Control, and Production environment.
 
-*Give **Catapult** a **shot**, you won't be disapointed.*
+*Give* **Catapult** *a* **shot***, you won't be disapointed.*
 
 If you're having issues with Catapult, [submit an issue here](https://github.com/devopsgroup-io/catapult-release-management/issues/new).
 
