@@ -143,21 +143,23 @@ Catapult is quick to setup. Fork the Github repository and start adding your con
 2. **Vagrant Plugins**
     1. To install all of the required Vagrant plugins, run `vagrant status` command and any Vagrant plugins that you do not have installed, will be displayed with the command to install.
 3. **SSH Key Pair**
-    1. To create a *passwordless* SSH key pair that will drive authentication for Catapult.
+    1. You will need to create a *passwordless* SSH key pair that will drive authentication for Catapult.
         1. For instructions please see https://help.github.com/articles/generating-ssh-keys/
         2. Place the newly created *passwordless* SSH key pair id_rsa and id_rsa.pub in the ~/provisioners/.ssh/ folder.
 4. **GPG Key**
-    1. You will need to create and add your team's gpg_key to the untracked configuration-user.yml.
-        1. NEVER SHARE THE GPG_KEY WITH ANYONE OTHER THAN YOUR TEAM.
-        2. The gpg_key is the single key that encrypts all of your configuration for your instance.
+    1. You will need to create your team's gpg_key that will be the single key that encrypts all of your configuration and secrets for your instance.
+        1. NEVER SHARE THE KEY WITH ANYONE OTHER THAN YOUR TEAM.
         3. Spaces are not permitted and must be at least 20 characters.
-        4. It is recommended to create and print a QR code of the gpg_key to distribute to your team.
-        5. Remember; security is 99% process and 1% technology.
+        4. To create a strong key, please visit https://xkpasswd.net/
+        5. It is recommended to print a QR code of the key to distribute to your team, please visit http://educastellano.github.io/qr-code/demo/
+        6. Remember; security is 99% process and 1% technology.
 5. **GPG Edit Mode**
-    1. Next, you will need to configure gpg_edit mode so that during the Services Setup you can add your secrets to configuration.yml and commit your secrets to configuration.yml.gpg.
-    2. To do so, set gpg_edit to true in configuration-user.yml.
-    3. This will now allow you to add secrets to configuration.yml and run `vagrant status` to encrypt the secrets in configuration.yml.gpg
-        1. In addition to encrypting ~/provisioners/.ssh/id_rsa and ~/provisioners/.ssh/id_rsa.pub as ~/provisioners/.ssh/id_rsa.gpb and ~/provisioners/.ssh/id_rsa.pub.gpb, respectfully.
+    1. When **GPG Edit Mode** is enabled (disabled by default) the following files are encrypted with the your **GPG Key**:
+        1. ~/provisioners/.ssh/id_rsa as ~/provisioners/.ssh/id_rsa.gpg
+        2. ~/provisioners/.ssh/id_rsa.pub as ~/provisioners/.ssh/id_rsa.pub.gpg
+        3. ~/configuration.yml as ~/configuration.yml.gpg
+    2. To enable **GPG Edit Mode**, set gpg_edit to true in configuration-user.yml
+    3. Once gpg_edit is set to true and while on your fork's master branch, run `vagrant status`, this will encrypt your configuraiton that you will then be able to commit and push safely to your public Catapult fork.
 
 
 
