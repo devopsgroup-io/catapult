@@ -581,8 +581,10 @@ if ["status"].include?(ARGV[0])
   puts "\n[total]"
   row.push(" #{totalwebsites}")
   puts row.join(" ")
-  puts "\n\n\n"
 end
+
+
+puts "\n\n\n"
 
 
 # server vms
