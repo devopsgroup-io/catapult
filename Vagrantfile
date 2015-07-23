@@ -41,18 +41,16 @@ end
 
 
 # set variables based on operating system
-if (RbConfig::CONFIG['host_os'] =~ /mswin|mingw|cygwin/)
+if (RbConfig::CONFIG['host_os'] =~ /mswin|msys|mingw|cygwin|bccwin|wince|emc/)
   if File.exist?('C:\Program Files (x86)\Git\bin\git.exe')
     git = "\"C:\\Program Files (x86)\\Git\\bin\\git.exe\""
   else
     catapult_exception("Git is not installed at C:\\Program Files (x86)\\Git\\bin\\git.exe")
   end
-elsif (RbConfig::CONFIG['host_os'] =~ /darwin/)
-  # apple os x
+elsif (RbConfig::CONFIG['host_os'] =~ /darwin|mac os|linux|solaris|bsd/)
   git = "git"
 else
-  # linux, etc
-  git = "git"
+  catapult_exception("Cannot detect your operating system, please submit an issue at https://github.com/devopsgroup-io/catapult-release-management")
 end
 
 
@@ -359,7 +357,7 @@ configuration["environments"].each do |environment,data|
   end
   # if upstream digitalocean droplets are provisioned, get their ip addresses to write to configuration.yml
   unless environment == "dev"
-    droplet = @api_digitalocean["droplets"].find { |d| d['name'] == "#{configuration["company"]["name"]}-#{environment}-redhat" }
+    droplet = @api_digitalocean["droplets"].find { |element| element['name'] == "#{configuration["company"]["name"]}-#{environment}-redhat" }
     unless droplet == nil
       unless configuration["environments"]["#{environment}"]["servers"]["redhat"]["ip"] == droplet["networks"]["v4"].first["ip_address"]
         configuration["environments"]["#{environment}"]["servers"]["redhat"]["ip"] = droplet["networks"]["v4"].first["ip_address"]
@@ -368,7 +366,7 @@ configuration["environments"].each do |environment,data|
         `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output configuration.yml.gpg --armor --cipher-algo AES256 --symmetric configuration.yml`
       end
     end
-    droplet = @api_digitalocean["droplets"].find { |d| d['name'] == "#{configuration["company"]["name"]}-#{environment}-redhat-mysql" }
+    droplet = @api_digitalocean["droplets"].find { |element| element['name'] == "#{configuration["company"]["name"]}-#{environment}-redhat-mysql" }
     unless droplet == nil
       unless configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["ip"] == droplet["networks"]["v4"].first["ip_address"]
         configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["ip"] = droplet["networks"]["v4"].first["ip_address"]
@@ -384,12 +382,11 @@ configuration["websites"].each do |service,data|
   domains = Array.new
   domains_sorted = Array.new
   configuration["websites"]["#{service}"].each do |instance|
+    # validate repo order by first creating arrays
     domains.push("#{instance["domain"]}")
     domains_sorted.push("#{instance["domain"]}")
-
-    # validate repo 
+    # validate repo format by first creating necessary split objects
     # instance["repo"] => git@github.com:devopsgroup-io/devopsgroup-io.git
-
     repo_split_1 = instance["repo"].split("@")
     # repo_split_1[0] => git
     # repo_split_1[1] => github.com:devopsgroup-io/devopsgroup-io.git
@@ -398,7 +395,6 @@ configuration["websites"].each do |service,data|
     # repo_split_2[1] => devopsgroup-io/devopsgroup-io.git
     repo_split_3 = repo_split_2[1].split(".git")
     # repo_split_3[0] => devopsgroup-io/devopsgroup-io
-
     # validate repo type
     unless "#{repo_split_1[0]}" == "git"
       catapult_exception("There is an error in your configuration.yml file.\nThe repo for websites => #{service} => domain => #{instance["domain"]} is invalid, the format must be git@github.com:devopsgroup-io/devopsgroup-io.git")
@@ -410,6 +406,20 @@ configuration["websites"].each do |service,data|
     # validate repo ends in .git
     if "#{repo_split_3[0]}" == nil
       catapult_exception("There is an error in your configuration.yml file.\nThe repo for websites => #{service} => domain => #{instance["domain"]} is invalid, it must end in .git")
+    end
+    # validate repo connection, this will need to be translated to windows - have fun
+    if (RbConfig::CONFIG['host_os'] =~ /darwin|mac os|linux|solaris|bsd/)
+      output = `ssh-agent bash -c "ssh-add provisioners/.ssh/id_rsa; git ls-remote #{instance["repo"]}" 2>/dev/null`
+      output = output.split(/\n/).reject(&:empty?)
+      if output.find { |element| element.include?("fatal") }
+        catapult_exception("Your SSH private key for Catapult (~/provisioners/.ssh/id_rsa) cannot connect to #{instance["repo"]}, please ensure the SSH public key (~/provisioners/.ssh/id_rsa.pub) is added to this repo as a deploy key.")
+      end
+      unless output.find { |element| element.include?("refs/heads/master") }
+        catapult_exception("A connection was established to #{instance["repo"]} using your SSH private key for Catapult (~/provisioners/.ssh/id_rsa), however, there is a no master branch, please create one.")
+      end
+      unless output.find { |element| element.include?("refs/heads/develop") }
+        catapult_exception("A connection was established to #{instance["repo"]} using your SSH private key for Catapult (~/provisioners/.ssh/id_rsa), however, there is a no develop branch, please create one.")
+      end
     end
     # validate software
     unless "#{instance["software"]}" == ""
