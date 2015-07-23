@@ -4,7 +4,7 @@
 
 **Welcome to devopsgroup.io Catapult Release Management**, a complete DevOps Release Management solution featuring automated website deployment and continuous integration following Gitflow and SCRUM workflows. Built for Developers, simple enough to use by non-Developers.
 
-As a non-Developer you may think - *I already have a website, why do I need Catapult?* Over time you will find yourself paying a freelancer or a development company hundreds or even thousands of dollars to manage or interact with the DevOps (Development Operations) and solve these problems:
+As a non-Developer you may think - *I already have a website, why do I need Catapult?* Over time you will find yourself or find yourself paying a freelancer or a development company hundreds or even thousands of dollars to manage or interact with the DevOps (Development Operations) and solve these problems:
 
   * *Production is down.*
   * *We need a test site.*
@@ -210,7 +210,6 @@ Catapult uses several third-party services to pull everything off - below is a l
         **["company"]["bamboo_password"]**
 4. **DNS:**
     1. **CloudFlare** sign-up and configuration
-        * CloudFlare provides two major components - free SSL certificate functionality (https) and DNS management - just update the name servers to clark.ns.cloudflare.com and liv.ns.cloudflare.com at the registrar where you purchased the domain name and Catapult will handle the rest.
         1. Create a CloudFlare account at https://www.cloudflare.com
         2. Sign in your new CloudFlare account
         3. Visit your My Account section at https://www.cloudflare.com/a/account/my-account and scroll down to your API Key and place the token value in ~/configuration.yml at  
