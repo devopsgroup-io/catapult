@@ -41,18 +41,16 @@ end
 
 
 # set variables based on operating system
-if (RbConfig::CONFIG['host_os'] =~ /mswin|mingw|cygwin/)
+if (RbConfig::CONFIG['host_os'] =~ /mswin|msys|mingw|cygwin|bccwin|wince|emc/)
   if File.exist?('C:\Program Files (x86)\Git\bin\git.exe')
     git = "\"C:\\Program Files (x86)\\Git\\bin\\git.exe\""
   else
     catapult_exception("Git is not installed at C:\\Program Files (x86)\\Git\\bin\\git.exe")
   end
-elsif (RbConfig::CONFIG['host_os'] =~ /darwin/)
-  # apple os x
+elsif (RbConfig::CONFIG['host_os'] =~ /darwin|mac os|linux|solaris|bsd/)
   git = "git"
 else
-  # linux, etc
-  git = "git"
+  catapult_exception("Cannot detect your operating system, please submit an issue at https://github.com/devopsgroup-io/catapult-release-management")
 end
 
 
