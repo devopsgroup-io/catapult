@@ -139,9 +139,11 @@ Catapult is quick to setup. Fork the Github repository and start adding your con
 
 1. **Fork Catapult**
     1. Fork https://github.com/devopsgroup-io/catapult-release-management and clone via SourceTree or the git utility of your choice.
-    2. Open your command line and cd into the newly cloned repository.
 2. **Vagrant Plugins**
-    1. To install all of the required Vagrant plugins, run `vagrant status` command and any Vagrant plugins that you do not have installed, will be displayed with the command to install.
+    1. Open your command line and cd into the newly cloned repository and install the following Vagrant plugins.
+        1. `vagrant plugin install vagrant-digitalocean` [vagrant-digitalocean](https://github.com/smdahlen/vagrant-digitalocean)
+        2. `vagrant plugin install vagrant-hostmanager` [vagrant-hostmanager](https://github.com/smdahlen/vagrant-hostmanager)
+        3. `vagrant plugin install vagrant-vbguest` [vagrant-vbguest](https://github.com/dotless-de/vagrant-vbguest)
 3. **SSH Key Pair**
     1. You will need to create a *passwordless* SSH key pair that will drive authentication for Catapult.
         1. For instructions please see https://help.github.com/articles/generating-ssh-keys/
