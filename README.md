@@ -141,9 +141,9 @@ Catapult is quick to setup. Fork the Github repository and start adding your con
     1. Fork https://github.com/devopsgroup-io/catapult-release-management and clone via SourceTree or the git utility of your choice.
 2. **Vagrant Plugins**
     1. Open your command line and cd into the newly cloned repository and install the following Vagrant plugins.
-        1. `vagrant plugin install vagrant-digitalocean` [GitHub](https://github.com/smdahlen/vagrant-digitalocean) [RubyGems](https://rubygems.org/gems/vagrant-digitalocean)
-        2. `vagrant plugin install vagrant-hostmanager` [GitHub](https://github.com/smdahlen/vagrant-hostmanager) [RubyGems](https://rubygems.org/gems/vagrant-hostmanager)
-        3. `vagrant plugin install vagrant-vbguest` [GitHub](https://github.com/dotless-de/vagrant-vbguest) [RubyGems](https://rubygems.org/gems/vagrant-vbguest)
+        1. `vagrant plugin install vagrant-digitalocean` [GitHub](https://github.com/smdahlen/vagrant-digitalocean), [RubyGems](https://rubygems.org/gems/vagrant-digitalocean)
+        2. `vagrant plugin install vagrant-hostmanager` [GitHub](https://github.com/smdahlen/vagrant-hostmanager), [RubyGems](https://rubygems.org/gems/vagrant-hostmanager)
+        3. `vagrant plugin install vagrant-vbguest` [GitHub](https://github.com/dotless-de/vagrant-vbguest), [RubyGems](https://rubygems.org/gems/vagrant-vbguest)
 3. **SSH Key Pair**
     1. You will need to create a *passwordless* SSH key pair that will drive authentication for Catapult.
         1. For instructions please see https://help.github.com/articles/generating-ssh-keys/
