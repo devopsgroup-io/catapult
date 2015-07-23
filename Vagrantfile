@@ -83,14 +83,14 @@ else
   branch = `#{git} rev-parse --abbrev-ref HEAD`.strip
   repo = `#{git} config --get remote.origin.url`
   repo_upstream = `#{git} config --get remote.upstream.url`
-  repo_upstream = "https://github.com/devopsgroup-io/catapult-release-management.git"
+  repo_upstream_url = "https://github.com/devopsgroup-io/catapult-release-management.git"
   puts "\nYour repository: #{repo}"
   puts "Will sync from: #{repo_upstream}\n\n"
   if repo_upstream.empty?
-    `#{git} remote add upstream https://github.com/devopsgroup-io/catapult-release-management.git`
+    `#{git} remote add upstream #{repo_upstream_url}`
   else
     `#{git} remote rm upstream`
-    `#{git} remote add upstream https://github.com/devopsgroup-io/catapult-release-management.git`
+    `#{git} remote add upstream #{repo_upstream_url}`
   end
   repo_develop = `#{git} config --get branch.develop.remote`
   if repo_develop.empty?
