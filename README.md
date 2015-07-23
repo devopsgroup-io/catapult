@@ -154,7 +154,7 @@ Catapult is quick to setup. Fork the Github repository and start adding your con
         5. It is recommended to print a QR code of the key to distribute to your team, please visit http://educastellano.github.io/qr-code/demo/
         6. Remember; security is 99% process and 1% technology.
 5. **GPG Edit Mode**
-    1. When **GPG Edit Mode** is enabled (disabled by default) the following files are encrypted with the your **GPG Key**:
+    1. When **GPG Edit Mode** is enabled (disabled by default) the following files are encrypted using your **GPG Key**:
         1. ~/provisioners/.ssh/id_rsa as ~/provisioners/.ssh/id_rsa.gpg
         2. ~/provisioners/.ssh/id_rsa.pub as ~/provisioners/.ssh/id_rsa.pub.gpg
         3. ~/configuration.yml as ~/configuration.yml.gpg
