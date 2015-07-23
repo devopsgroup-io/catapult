@@ -98,6 +98,7 @@ catapult-release-management/
 
 Catapult currently supports the following software:
 
+* Any website without a database dependancy built in PHP
 * CodeIgniter 2.x
 * Drupal 6.x, Drupal 7.x
     * as required by Drush 7.0.0-rc1
