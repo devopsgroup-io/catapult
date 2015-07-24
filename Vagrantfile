@@ -299,7 +299,7 @@ end
 if configuration["company"]["bamboo_base_url"] == nil || configuration["company"]["bamboo_username"] == nil || configuration["company"]["bamboo_password"] == nil
   catapult_exception("Please set [\"company\"][\"bamboo_base_url\"] and [\"company\"][\"bamboo_username\"] and [\"company\"][\"bamboo_password\"] in configuration.yml")
 else
-  uri = URI("#{configuration["company"]["bamboo_base_url"]}rest/api/latest/plan.json?os_authType=basic")
+  uri = URI("#{configuration["company"]["bamboo_base_url"]}rest/api/latest/project.json?os_authType=basic")
   Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => OpenSSL::SSL::VERIFY_NONE) do |http|
     request = Net::HTTP::Get.new uri.request_uri
     request.basic_auth "#{configuration["company"]["bamboo_username"]}", "#{configuration["company"]["bamboo_password"]}"
@@ -309,6 +309,14 @@ else
     else
       puts " * Bamboo API authenticated successfully."
       @api_bamboo = JSON.parse(response.body)
+      api_bamboo_project_key = @api_bamboo["projects"]["project"].find { |element| element["key"] == "CAT" }
+      unless api_bamboo_project_key
+        catapult_exception("Could not find the Catapult project key \"CAT\" in Bamboo, please follow the Services Setup for Bamboo at https://github.com/devopsgroup-io/catapult-release-management#services-setup")
+      end
+      api_bamboo_project_name = @api_bamboo["projects"]["project"].find { |element| element["name"] == "Catapult" }
+      unless api_bamboo_project_name
+        catapult_exception("Could not find the Catapult project name \"Catapult\" in Bamboo, please follow the Services Setup for Bamboo at https://github.com/devopsgroup-io/catapult-release-management#services-setup")
+      end
     end
   end
 end
