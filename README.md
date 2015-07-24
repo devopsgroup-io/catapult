@@ -202,15 +202,15 @@ Catapult uses several third-party services to pull everything off - below is a l
         5. Place your Bamboo username (usually admin) at `~/configuration.yml["company"]["bamboo_username"]`
         6. Place your Bamboo password (usually admin) at `~/configuration.yml["company"]["bamboo_password"]`
         7. Click Create > Create a new plan from the header:
-            1. Create Project and create TEST plan.
-                * **Project and build plan name**
+            1. **Create Project and create TEST plan**
+                * *Project and build plan name*
                     1. Project > New Project
                     2. Project name: Catapult
                     3. Project key: CAT
                     4. Plan name: test
                     5. Plan key: TEST
                     6. Plan description:
-                * **Link repository to new build plan**
+                * *Link repository to new build plan*
                     1. Repository host: Link new repository > Other > GitHub
                     2. Display name: Catapult
                     3. Username: `~/configuration.yml["company"]["github_username"]`
@@ -218,21 +218,21 @@ Catapult uses several third-party services to pull everything off - below is a l
                     5. Repository: Load Repositories > github_username/catapult-release-management
                     6. Branch: master
                     7. Repository access: Allow all users to reuse the configuration of this repository
-            2. Create QC plan.
-                * **Project and build plan name**
+            2. **Create QC plan**
+                * *Project and build plan name*
                     1. Project: Catapult
                     4. Plan name: qc
                     5. Plan key: QC
                     6. Plan description:
-                * **Link repository to new build plan**
+                * *Link repository to new build plan*
                     1. Repository host: Previously linked repository > github_username/catapult-release-management
-            2. Create PROD plan.
-                * **Project and build plan name**
+            2. **Create PROD plan**
+                * *Project and build plan name*
                     1. Project: Catapult
                     4. Plan name: production
                     5. Plan key: PROD
                     6. Plan description:
-                * **Link repository to new build plan**
+                * *Link repository to new build plan*
                     1. Repository host: Previously linked repository > github_username/catapult-release-management
 4. **DNS:**
     1. **CloudFlare** sign-up and configuration
