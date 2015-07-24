@@ -361,7 +361,7 @@ while IFS='' read -r -d '' key; do
         -H "X-Auth-Email: ${cloudflare_email}"\
         -H "X-Auth-Key: ${cloudflare_api_key}"\
         -H "Content-Type: application/json"\
-        --data "{\"value\":\"on\"}"\
+        --data "{\"value\":\"full\"}"\
         | sed "s/^/\t\t/"
 
         # set cloudflare tls setting per zone
@@ -369,7 +369,7 @@ while IFS='' read -r -d '' key; do
         -H "X-Auth-Email: ${cloudflare_email}"\
         -H "X-Auth-Key: ${cloudflare_api_key}"\
         -H "Content-Type: application/json"\
-        --data "{\"value\":\"full\"}"\
+        --data "{\"value\":\"on\"}"\
         | sed "s/^/\t\t/"
 
         # purge cloudflare cache per zone
