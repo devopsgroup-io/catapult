@@ -574,7 +574,13 @@ if ["status"].include?(ARGV[0])
           end
           if "#{response.xpath('//ALEXA//SD//RANK')}" != ""
             response.xpath('//ALEXA//SD//RANK').each do |attribute|
-              row.push(attribute["DELTA"].ljust(13))
+              if attribute["DELTA"].match(/\+\d+/)
+                operator = "+"
+              elsif attribute["DELTA"].match(/\-\d+/)
+                operator = "-"
+              end
+              delta = attribute["DELTA"].split(/[+,-]/)
+              row.push("#{operator}#{delta[1].to_s.reverse.gsub(/...(?=.)/,'\&,').reverse}".ljust(13))
             end
           else
             row.push("".ljust(13))
