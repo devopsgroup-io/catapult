@@ -169,17 +169,17 @@ Catapult uses several third-party services to pull everything off - below is a l
 1. **Hosting:** 
     1. **DigitalOcean** sign-up and configuration
         1. Create an account at http://digitalocean.com
-        2. Create a Personal Access Token at https://cloud.digitalocean.com/settings/applications named "Vagrant" and place the token value at `configuration.yml["company"]["digitalocean_personal_access_token"]`
+        2. Create a Personal Access Token at https://cloud.digitalocean.com/settings/applications named "Vagrant" and place the token value at `~/configuration.yml["company"]["digitalocean_personal_access_token"]`
         3. Add your newly created id_rsa.pub from ~/provisioners/.ssh/id_rsa.pub key in https://cloud.digitalocean.com/settings/security named "Vagrant"
 2. **Repositories:**
     1. **Bitbucket** sign-up and configuration
         1. Create an account at https://bitbucket.org
-            1. Place the email address that you used to sign up for Bitbucket at `configuration.yml["company"]["bitbucket_username"]`
-            2. Place the password of the account for Bitbucket at `configuration.yml["company"]["bitbucket_password"]`
+            1. Place the email address that you used to sign up for Bitbucket at `~/configuration.yml["company"]["bitbucket_username"]`
+            2. Place the password of the account for Bitbucket at `~/configuration.yml["company"]["bitbucket_password"]`
     2. **GitHub** sign-up and configuration
         1. Create an account at https://github.com
-            1. Place the email address that you used to sign up for GitHub at `configuration.yml["company"]["github_username"]`
-            2. Place the password of the account for GitHub at `configuration.yml*["company"]["github_password"]`
+            1. Place the email address that you used to sign up for GitHub at `~/configuration.yml["company"]["github_username"]`
+            2. Place the password of the account for GitHub at `~/configuration.yml*["company"]["github_password"]`
 3. **Automated Deployments:**
     1. **Amazon Web Services** (AWS) EC2 sign-up and configuration (Required for Bamboo)
         1. Create an AWS account https://portal.aws.amazon.com/gp/aws/developer/registration
@@ -198,9 +198,9 @@ Catapult uses several third-party services to pull everything off - below is a l
         2. Sign in to your new custom Bamboo instance https://[your-name-here].atlassian.net
         3. Go to your Elastic Bamboo configuration https://[your-name-here].atlassian.net/builds/admin/elastic/editElasticConfig.action
             1. Set your AWS EC2 "Bamboo" Access Key ID and Secret Access Key
-        4. Place your Bamboo base URL at `configuration.yml["company"]["bamboo_base_url"]`, the format should be https://[your-name-here].atlassian.net/builds/
-        5. Place your Bamboo username (usually admin) at `configuration.yml["company"]["bamboo_username"]`
-        6. Place your Bamboo password (usually admin) at `configuration.yml["company"]["bamboo_password"]`
+        4. Place your Bamboo base URL at `~/configuration.yml["company"]["bamboo_base_url"]`, the format should be https://[your-name-here].atlassian.net/builds/
+        5. Place your Bamboo username (usually admin) at `~/configuration.yml["company"]["bamboo_username"]`
+        6. Place your Bamboo password (usually admin) at `~/configuration.yml["company"]["bamboo_password"]`
         7. Click Create > Create a new plan from the header:
             1. Create Project and create TEST plan.
             * **Project and build plan name**
@@ -213,8 +213,8 @@ Catapult uses several third-party services to pull everything off - below is a l
             * **Link repository to new build plan**
                 1. Repository host: Link new repository > Other > GitHub
                 2. Display name: Catapult
-                3. Username: `configuration.yml["company"]["github_username"]`
-                4. Password: `configuration.yml*["company"]["github_password"]`
+                3. Username: `~/configuration.yml["company"]["github_username"]`
+                4. Password: `~/configuration.yml*["company"]["github_password"]`
                 5. Repository: Load Repositories > github_username/catapult-release-management
                 6. Branch: master
                 7. Repository access: Allow all users to reuse the configuration of this repository
@@ -238,8 +238,8 @@ Catapult uses several third-party services to pull everything off - below is a l
     1. **CloudFlare** sign-up and configuration
         1. Create a CloudFlare account at https://www.cloudflare.com
         2. Sign in your new CloudFlare account
-        3. Visit your My Account section at https://www.cloudflare.com/a/account/my-account and scroll down to your API Key and place the token value at `configuration.yml["company"]["cloudflare_api_key"]`
-        4. Place the email address of the email address that you used to sign up for CloudFlare at `configuration.yml["company"]["cloudflare_email"]`
+        3. Visit your My Account section at https://www.cloudflare.com/a/account/my-account and scroll down to your API Key and place the token value at `~/configuration.yml["company"]["cloudflare_api_key"]`
+        4. Place the email address of the email address that you used to sign up for CloudFlare at `~/configuration.yml["company"]["cloudflare_email"]`
 5. **Verify Configuration:**
     1. To verify all of the configuration that you just set, open your command line and cd into your fork of Catapult, then run `vagrant status`. Catapult will confirm connection to all of the Services and inform you of any problems.
 
