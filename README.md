@@ -202,7 +202,7 @@ Catapult uses several third-party services to pull everything off - below is a l
         5. Place your Bamboo username (usually admin) at `~/configuration.yml["company"]["bamboo_username"]`
         6. Place your Bamboo password (usually admin) at `~/configuration.yml["company"]["bamboo_password"]`
         7. Click Create > Create a new plan from the header:
-            1. **Create Project and create TEST plan**
+            1. **Create Catapult Project and create TEST Plan**
                 * *Project and build plan name*
                     1. Project > New Project
                     2. Project name: Catapult
@@ -218,7 +218,7 @@ Catapult uses several third-party services to pull everything off - below is a l
                     5. Repository: Load Repositories > github_username/catapult-release-management
                     6. Branch: master
                     7. Repository access: Allow all users to reuse the configuration of this repository
-            2. **Create QC plan**
+            2. **Create QC Plan**
                 * *Project and build plan name*
                     1. Project: Catapult
                     4. Plan name: qc
@@ -226,7 +226,7 @@ Catapult uses several third-party services to pull everything off - below is a l
                     6. Plan description:
                 * *Link repository to new build plan*
                     1. Repository host: Previously linked repository > github_username/catapult-release-management
-            2. **Create PROD plan**
+            2. **Create PROD Plan**
                 * *Project and build plan name*
                     1. Project: Catapult
                     4. Plan name: production
