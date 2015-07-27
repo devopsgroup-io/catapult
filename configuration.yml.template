@@ -95,5 +95,3 @@ websites:
       repo: git@github.com:devopsgroup-io/devopsgroup-io.git
       webroot: dist/
   iis:
-    - domain: devopsgroup.io
-      repo: git@github.com:devopsgroup-io/devopsgroup-io.git
