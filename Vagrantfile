@@ -699,7 +699,7 @@ Vagrant.configure("2") do |config|
     config.hostmanager.aliases = redhathostsfile
     config.vm.synced_folder ".", "/vagrant", type: "nfs"
     config.vm.synced_folder "repositories", "/var/www/repositories", type: "nfs"
-    config.vm.provision "shell", path: "provisioners/redhat/provision.sh", args: ["dev","#{configuration_user["settings"]["git_pull"]}","#{configuration_user["settings"]["production_rsync"]}","#{configuration_user["settings"]["software_validation"]}"]
+    config.vm.provision "shell", path: "provisioners/redhat/provision.sh", args: ["dev","#{configuration_user["settings"]["git_pull"]}","#{configuration_user["settings"]["software_validation"]}"]
   end
   config.vm.define "#{configuration["company"]["name"]}-dev-redhat-mysql" do |config|
     config.vm.box = "chef/centos-7.0"

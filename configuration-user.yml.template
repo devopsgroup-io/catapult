@@ -1,8 +1,7 @@
 ---
 settings:
-  version: 0.2
+  version: 0.3
   gpg_key: ''
   gpg_edit: false
   git_pull: true
-  production_rsync: true
   software_validation: true
