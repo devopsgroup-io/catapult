@@ -326,10 +326,18 @@ The following options are available:
         * generates WordPress database config file ~/installers/wp-config.php, resets WordPress admin password, rsyncs ~/wp-content/uploads from production source, restores database
     * "xenforo"
         * generates xenforo database config file ~/library/config.php, restores database
-
 * software_dbprefix:
     * "wp_"
         * usually used in Drupal for multisite installations ("wp_ is required for base Wordpress installs, Drupal has no prefix by default")
+* software_workflow:
+    * "downstream"
+        * production is the source for the database and untracked files
+        * this option is used when maintaining a website
+        * see the below chart for more details
+    * "upstream"
+        * test is the source for the database and untracked files
+        * this option is used when launching a new website
+        * see the below chart for more details
 * webroot:
     * "www/"
         * if the webroot differs from the repo root, specify it here

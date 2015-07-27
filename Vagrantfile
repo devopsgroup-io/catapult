@@ -32,8 +32,16 @@ def catapult_exception(error)
     raise error
   rescue => exception
     puts "\n\n"
-    puts "Catapult Error:"
+    title = "Catapult Error:"
+    length = title.size
+    padding = 5
+    puts "+".ljust(padding,"!") + "".ljust(length,"!") + "+".rjust(padding,"!")
+    puts "|".ljust(padding)     + title                + "|".rjust(padding)
+    puts "+".ljust(padding,"!") + "".ljust(length,"!") + "+".rjust(padding,"!")
+    puts "\n"
     puts exception.message
+    puts "\n"
+    puts "See https://github.com/devopsgroup-io/catapult-release-management for more information."
     puts "\n\n"
     exit 1
   end
@@ -501,6 +509,12 @@ configuration["websites"].each do |service,data|
       unless "#{instance["software"]}" == ""
         unless ["codeigniter2","drupal6","drupal7","wordpress","xenforo"].include?("#{instance["software"]}")
           catapult_exception("There is an error in your configuration.yml file.\nThe software for websites => #{service} => domain => #{instance["domain"]} is invalid, it must be one of the following [\"codeigniter2\",\"drupal6\",\"drupal7\",\"wordpress\",\"xenforo\"].")
+        end
+        if "#{instance["software_dbprefix"]}" == ""
+          catapult_exception("There is an error in your configuration.yml file.\nThe software for websites => #{service} => domain => #{instance["domain"]} requires the software_dbprefix option. By default, Drupal is software_dbprefix: \"\" and Wordpress is software_dbprefix: \"_wp\".")
+        end
+        unless ["downstream","upstream"].include?("#{instance["software_workflow"]}")
+          catapult_exception("There is an error in your configuration.yml file.\nThe software for websites => #{service} => domain => #{instance["domain"]} requires the software_workflow option, it must be one of the following [\"downstream\",\"upstream\"].")
         end
       end
       # validate webroot
