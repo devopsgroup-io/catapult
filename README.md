@@ -179,7 +179,7 @@ Catapult uses several third-party services to pull everything off - below is a l
     2. **GitHub** sign-up and configuration
         1. Create an account at https://github.com
             1. Place the email address that you used to sign up for GitHub at `~/configuration.yml["company"]["github_username"]`
-            2. Place the password of the account for GitHub at `~/configuration.yml*["company"]["github_password"]`
+            2. Place the password of the account for GitHub at `~/configuration.yml["company"]["github_password"]`
 3. **Automated Deployments:**
     1. **Amazon Web Services** (AWS) EC2 sign-up and configuration (Required for Bamboo)
         1. Create an AWS account https://portal.aws.amazon.com/gp/aws/developer/registration
@@ -214,7 +214,7 @@ Catapult uses several third-party services to pull everything off - below is a l
                     1. Repository host: Link new repository > Other > GitHub
                     2. Display name: Catapult
                     3. Username: `~/configuration.yml["company"]["github_username"]`
-                    4. Password: `~/configuration.yml*["company"]["github_password"]`
+                    4. Password: `~/configuration.yml["company"]["github_password"]`
                     5. Repository: Load Repositories > github_username/catapult-release-management
                     6. Branch: master
                     7. Repository access: Allow all users to reuse the configuration of this repository
@@ -243,24 +243,24 @@ Catapult uses several third-party services to pull everything off - below is a l
 5. **Verify Configuration:**
     1. To verify all of the configuration that you just set, open your command line and cd into your fork of Catapult, then run `vagrant status`. Catapult will confirm connection to all of the Services and inform you of any problems.
 
-| Service                       | Description                                 | Monthly Cost |
-|-------------------------------|---------------------------------------------|-------------:|
-| **Hosting:**                  |                                             |              |
-| - **DigitalOcean**            | ["company"]["name"]-test-redhat             | $5           |
-| - **DigitalOcean**            | ["company"]["name"]-qc-redhat               | $5           |
-| - **DigitalOcean**            | ["company"]["name"]-production-redhat       | $5           |
-| - **DigitalOcean**            | ["company"]["name"]-test-redhat-mysql       | $5           |
-| - **DigitalOcean**            | ["company"]["name"]-qc-redhat-mysql         | $5           |
-| - **DigitalOcean**            | ["company"]["name"]-production-redhat-mysql | $5           |
-| **Repositories:**             |                                             |              |
-| - **Bitbucket**               | Private Repositories                        | Free         |
-| - **GitHub**                  | Public Repositories                         | Free         |
-| **Automated Deployments:**    |                                             |              |
-| - **Amazon Web Services**     | Build Server                                | $1 - $15     |
-| - **Bamboo**                  | Continuous Integration                      | $10          |
-| **DNS:**                      |                                             |              |
-| - **CloudFlare**              | test., qc., and production global DNS       | Free         |
-| **Total**                     |                                             | $41 - $55    |
+| Service                       | Description                                                      | Monthly Cost |
+|-------------------------------|------------------------------------------------------------------|-------------:|
+| **Hosting:**                  |                                                                  |              |
+| - **DigitalOcean**            | ["company"]["name"]-test-redhat                                  | $5           |
+| - **DigitalOcean**            | ["company"]["name"]-qc-redhat                                    | $5           |
+| - **DigitalOcean**            | ["company"]["name"]-production-redhat                            | $5           |
+| - **DigitalOcean**            | ["company"]["name"]-test-redhat-mysql                            | $5           |
+| - **DigitalOcean**            | ["company"]["name"]-qc-redhat-mysql                              | $5           |
+| - **DigitalOcean**            | `~/configuration.yml["company"]["name"]`-production-redhat-mysql | $5           |
+| **Repositories:**             |                                                                  |              |
+| - **Bitbucket**               | Private Repositories                                             | Free         |
+| - **GitHub**                  | Public Repositories                                              | Free         |
+| **Automated Deployments:**    |                                                                  |              |
+| - **Amazon Web Services**     | Build Server                                                     | $1 - $15     |
+| - **Bamboo**                  | Continuous Integration                                           | $10          |
+| **DNS:**                      |                                                                  |              |
+| - **CloudFlare**              | test., qc., and production global DNS                            | Free         |
+| **Total**                     |                                                                  | $41 - $55    |
 
 
 
@@ -279,15 +279,15 @@ To use Catapult you will first need to [Provision Environments](#provision-envir
 
 For each **Environment** you will need to:
 * **Web Servers**
-    * `vagrant up ["company"]["name"]-dev-redhat`
-    * `vagrant up ["company"]["name"]-test-redhat`
-    * `vagrant up ["company"]["name"]-qc-redhat`
-    * `vagrant up ["company"]["name"]-production-redhat`
+    * `vagrant up ~/configuration.yml["company"]["name"]-dev-redhat`
+    * `vagrant up ~/configuration.yml["company"]["name"]-test-redhat`
+    * `vagrant up ~/configuration.yml["company"]["name"]-qc-redhat`
+    * `vagrant up ~/configuration.yml["company"]["name"]-production-redhat`
 * **Database Servers**
-    * `vagrant up ["company"]["name"]-dev-redhat-mysql`
-    * `vagrant up ["company"]["name"]-test-redhat-mysql`
-    * `vagrant up ["company"]["name"]-qc-redhat-mysql`
-    * `vagrant up ["company"]["name"]-production-redhat-mysql`
+    * `vagrant up ~/configuration.yml["company"]["name"]-dev-redhat-mysql`
+    * `vagrant up ~/configuration.yml["company"]["name"]-test-redhat-mysql`
+    * `vagrant up ~/configuration.yml["company"]["name"]-qc-redhat-mysql`
+    * `vagrant up ~/configuration.yml["company"]["name"]-production-redhat-mysql`
 
 
 
@@ -343,15 +343,15 @@ Once the new website is committed to your Catapult fork on the master branch, it
 
 **New Website Provisioning** requires for each **Environment** to be provisioned via Vagrant:
 * **Web Servers**
-    * `vagrant provision ["company"]["name"]-dev-redhat`
-    * `vagrant provision ["company"]["name"]-test-redhat`
-    * `vagrant provision ["company"]["name"]-qc-redhat`
-    * `vagrant provision ["company"]["name"]-production-redhat`
+    * `vagrant provision ~/configuration.yml["company"]["name"]-dev-redhat`
+    * `vagrant provision ~/configuration.yml["company"]["name"]-test-redhat`
+    * `vagrant provision ~/configuration.yml["company"]["name"]-qc-redhat`
+    * `vagrant provision ~/configuration.yml["company"]["name"]-production-redhat`
 * **Database Servers**
-    * `vagrant provision ["company"]["name"]-dev-redhat-mysql`
-    * `vagrant provision ["company"]["name"]-test-redhat-mysql`
-    * `vagrant provision ["company"]["name"]-qc-redhat-mysql`
-    * `vagrant provision ["company"]["name"]-production-redhat-mysql`
+    * `vagrant provision ~/configuration.yml["company"]["name"]-dev-redhat-mysql`
+    * `vagrant provision ~/configuration.yml["company"]["name"]-test-redhat-mysql`
+    * `vagrant provision ~/configuration.yml["company"]["name"]-qc-redhat-mysql`
+    * `vagrant provision ~/configuration.yml["company"]["name"]-production-redhat-mysql`
 
 
 
