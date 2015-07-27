@@ -4,7 +4,13 @@
 
 **Welcome to devopsgroup.io Catapult Release Management**, a complete DevOps Release Management solution featuring automated website deployment and continuous integration following Gitflow and SCRUM workflows. Built for Developers, simple enough to use by non-Developers.
 
-* Configuration Management via CloudFlare, DigitalOcean, Git, GPG, Shell, and Vagrant
+* Configuration Management
+    * [CloudFlare API](https://api.cloudflare.com/)
+    * [DigitalOcean API](https://developers.digitalocean.com/documentation/v2/)
+    * [Git](https://github.com/git/git) [!(https://img.shields.io/github/stars/git/git.svg)]
+    * [GPG](https://www.gnupg.org/)
+    * [Shell](https://en.wikipedia.org/wiki/Shell_(computing))
+    * [Vagrant](http://vagrantup.com/) [!(https://img.shields.io/github/stars/mitchellh/vagrant.svg)]
 * Continuous Integration via AWS and Bamboo
 * Source Code Managment via Bitbucket and GitHub
 
