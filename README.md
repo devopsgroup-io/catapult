@@ -326,10 +326,18 @@ The following options are available:
         * generates WordPress database config file ~/installers/wp-config.php, resets WordPress admin password, rsyncs ~/wp-content/uploads from production source, restores database
     * "xenforo"
         * generates xenforo database config file ~/library/config.php, restores database
-
 * software_dbprefix:
     * "wp_"
         * usually used in Drupal for multisite installations ("wp_ is required for base Wordpress installs, Drupal has no prefix by default")
+* software_workflow:
+    * "downstream"
+        * production is the source for the database and untracked files
+        * this option is used when maintaining a website
+        * see the below chart for more details
+    * "upstream"
+        * test is the source for the database and untracked files
+        * this option is used when launching a new website
+        * see the below chart for more details
 * webroot:
     * "www/"
         * if the webroot differs from the repo root, specify it here
@@ -341,9 +349,9 @@ Once the new website is committed to your Catapult fork on the master branch, it
 |--------------------------------|-------------------------------------------------------------|-----------------------------------------------------------------|----------------------------------------------------------------|---------------------------------------------------------------|
 | **New Website Provisioning**   | Manually via Vagrant                                        | Manually via Vagrant                                            | Manually via Vagrant                                           | Manually via Vagrant                                          |
 | **Running Branch**             | *develop*                                                   | *develop*                                                       | *master*                                                       | *master*                                                      |
-| **Downstream Database**        | Restore from **develop** ~/_sql folder of website repo      | Restore from **develop** ~/_sql folder of website repo          | Restore from **master** ~/_sql folder of website repo          | Daily backup to *develop* ~/_sql folder of website repo       |
+| **Downstream Database**        | Restore from **develop** ~/_sql folder of website repo      | Restore from **develop** ~/_sql folder of website repo          | Restore from **master** ~/_sql folder of website repo          | Daily backup to **develop** ~/_sql folder of website repo     |
 | **Downstream Untracked Files** | rsync files from **production**                             | rsync files from **production**                                 | rsync files from **production**                                | n/a                                                           |
-| **Upstream Database**          | Restore from **develop** ~/_sql folder of website repo      | Daily backup to **develop** ~/_sql folder of website repo       | Restore from *master* ~/_sql folder of website repo            | Restore from *master* ~/_sql folder of website repo           |
+| **Upstream Database**          | Restore from **develop** ~/_sql folder of website repo      | Daily backup to **develop** ~/_sql folder of website repo       | Restore from **master** ~/_sql folder of website repo          | Restore from **master** ~/_sql folder of website repo         |
 | **Upstream Untracked Files**   | rsync files from **test**                                   | n/a                                                             | rsync files from **test**                                      | rsync files from **test**                                     |
 | **Automated Deployments**      | Manually via `vagrant provision`                            | Automatically via Bamboo (new commits to **develop**)           | Automatically via Bamboo (new commits to **master**)           | Manually via Bamboo                                           |
 
