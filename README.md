@@ -93,7 +93,7 @@ catapult-release-management/
 
 ## Supported Software ##
 
-Catapult currently supports the following software:
+Catapult supports the following software:
 
 * Any website without a database dependancy built in PHP
 * CodeIgniter 2.x
@@ -296,8 +296,10 @@ For each **Environment** you will need to:
 Adding websites to Catapult is easy. The only requirement is that the website needs to be contained in its own repo on GitHub or Bitbucket. Websites are then added to configuration.yml, a minimal addition looks like this:
 
 ```
-- domain: "devopsgroup.io"
-  repo: "git@github.com:devopsgroup-io/devopsgroup-io.git"
+websites:
+  apache:
+  - domain: "devopsgroup.io"
+    repo: "git@github.com:devopsgroup-io/devopsgroup-io.git"
 ```
 
 The following options are available:
