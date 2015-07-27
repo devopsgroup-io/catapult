@@ -510,7 +510,7 @@ configuration["websites"].each do |service,data|
         unless ["codeigniter2","drupal6","drupal7","wordpress","xenforo"].include?("#{instance["software"]}")
           catapult_exception("There is an error in your configuration.yml file.\nThe software for websites => #{service} => domain => #{instance["domain"]} is invalid, it must be one of the following [\"codeigniter2\",\"drupal6\",\"drupal7\",\"wordpress\",\"xenforo\"].")
         end
-        if "#{instance["software_dbprefix"]}" == ""
+        if "#{instance["software_dbprefix"]}" == nil
           catapult_exception("There is an error in your configuration.yml file.\nThe software for websites => #{service} => domain => #{instance["domain"]} requires the software_dbprefix option. By default, Drupal is software_dbprefix: \"\" and Wordpress is software_dbprefix: \"_wp\".")
         end
         unless ["downstream","upstream"].include?("#{instance["software_workflow"]}")
