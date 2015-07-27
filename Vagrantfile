@@ -535,7 +535,8 @@ if ["status"].include?(ARGV[0])
       begin 
         timeout(1) do
           tcp_client = TCPSocket.new("#{instance["domain"]}", 443)
-          ssl_context = OpenSSL::SSL::SSLContext.new()
+          ssl_context = OpenSSL::SSL::SSLContext.new
+          ssl_context.ssl_version = :TLSv1_2
           ssl_client = OpenSSL::SSL::SSLSocket.new(tcp_client, ssl_context)
           ssl_client.connect
           cert = OpenSSL::X509::Certificate.new(ssl_client.peer_cert)
@@ -650,7 +651,7 @@ Vagrant.configure("2") do |config|
       provider.ipv6 = true
       provider.backups_enabled = true
     end
-    config.vm.synced_folder ".", "/vagrant", type: "rsync", rsync_excludes: ["repositories/apache/*", "repositories/iis/*"]
+    config.vm.synced_folder ".", "/vagrant", type: "rsync", rsync__exclude: ["repositories/apache/*", "repositories/iis/*"]
     config.vm.provision "shell", path: "provisioners/redhat/provision.sh", args: ["test","true","false","true"]
   end
   config.vm.define "#{configuration["company"]["name"]}-test-redhat-mysql" do |config|
@@ -665,7 +666,7 @@ Vagrant.configure("2") do |config|
       provider.ipv6 = true
       provider.backups_enabled = true
     end
-    config.vm.synced_folder ".", "/vagrant", type: "rsync", rsync_excludes: ["repositories/apache/*", "repositories/iis/*"]
+    config.vm.synced_folder ".", "/vagrant", type: "rsync", rsync__exclude: ["repositories/apache/*", "repositories/iis/*"]
     config.vm.provision "shell", path: "provisioners/redhat_mysql/provision.sh", args: ["test"]
   end
 
@@ -682,7 +683,7 @@ Vagrant.configure("2") do |config|
       provider.ipv6 = true
       provider.backups_enabled = true
     end
-    config.vm.synced_folder ".", "/vagrant", type: "rsync", rsync_excludes: ["repositories/apache/*", "repositories/iis/*"]
+    config.vm.synced_folder ".", "/vagrant", type: "rsync", rsync__exclude: ["repositories/apache/*", "repositories/iis/*"]
     config.vm.provision "shell", path: "provisioners/redhat/provision.sh", args: ["qc","true","false","true"]
   end
   config.vm.define "#{configuration["company"]["name"]}-qc-redhat-mysql" do |config|
@@ -697,7 +698,7 @@ Vagrant.configure("2") do |config|
       provider.ipv6 = true
       provider.backups_enabled = true
     end
-    config.vm.synced_folder ".", "/vagrant", type: "rsync", rsync_excludes: ["repositories/apache/*", "repositories/iis/*"]
+    config.vm.synced_folder ".", "/vagrant", type: "rsync", rsync__exclude: ["repositories/apache/*", "repositories/iis/*"]
     config.vm.provision "shell", path: "provisioners/redhat_mysql/provision.sh", args: ["qc"]
   end
 
@@ -714,7 +715,7 @@ Vagrant.configure("2") do |config|
       provider.ipv6 = true
       provider.backups_enabled = true
     end
-    config.vm.synced_folder ".", "/vagrant", type: "rsync", rsync_excludes: ["repositories/apache/*", "repositories/iis/*"]
+    config.vm.synced_folder ".", "/vagrant", type: "rsync", rsync__exclude: ["repositories/apache/*", "repositories/iis/*"]
     config.vm.provision "shell", path: "provisioners/redhat/provision.sh", args: ["production","true","false","true"]
   end
   config.vm.define "#{configuration["company"]["name"]}-production-redhat-mysql" do |config|
@@ -729,7 +730,7 @@ Vagrant.configure("2") do |config|
       provider.ipv6 = true
       provider.backups_enabled = true
     end
-    config.vm.synced_folder ".", "/vagrant", type: "rsync", rsync_excludes: ["repositories/apache/*", "repositories/iis/*"]
+    config.vm.synced_folder ".", "/vagrant", type: "rsync", rsync__exclude: ["repositories/apache/*", "repositories/iis/*"]
     config.vm.provision "shell", path: "provisioners/redhat_mysql/provision.sh", args: ["production"]
   end
 
