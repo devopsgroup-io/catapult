@@ -327,7 +327,7 @@ The following options are available:
     * "wp_"
         * usually used in Drupal for multisite installations ("wp_ is required for base Wordpress installs, Drupal has no prefix by default")
 * webroot:
-    * "www"
+    * "www/"
         * if the webroot differs from the repo root, specify it here
         * must include the trailing slash
 
@@ -352,6 +352,17 @@ Once the new website is committed to your Catapult fork on the master branch, it
     * `vagrant provision ~/configuration.yml["company"]["name"]-test-redhat-mysql`
     * `vagrant provision ~/configuration.yml["company"]["name"]-qc-redhat-mysql`
     * `vagrant provision ~/configuration.yml["company"]["name"]-production-redhat-mysql`
+
+
+
+# Troubleshooting #
+
+Below is a list of known nuances split out by Service that are worth mentioning:
+
+* **CloudFlare**
+    * If your `~/configuration.yml["websites"]["apache/iis"]["domain"]` includes more than 1 subdomain (drupal7.devopsgroup.io) the `force_https` option will not work as CloudFlare only supports a first-level subdomain. https://www.cloudflare.com/ssl
+* **Vagrant**
+    * If your `~/configuration.yml["websites"]["apache/iis"]["domain"]` includes the `force_https` option, during `vagrant status` you will receive an err for the http response code for `.dev` as this is a self-signed cert and not routing through CloudFlare.
 
 
 
