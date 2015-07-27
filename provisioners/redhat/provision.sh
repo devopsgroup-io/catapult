@@ -194,6 +194,7 @@ while IFS='' read -r -d '' key; do
     force_https=$(echo "$key" | grep -w "force_https" | cut -d ":" -f 2 | tr -d " ")
     software=$(echo "$key" | grep -w "software" | cut -d ":" -f 2 | tr -d " ")
     software_dbprefix=$(echo "$key" | grep -w "software_dbprefix" | cut -d ":" -f 2 | tr -d " ")
+    software_workflow=$(echo "$key" | grep -w "software_workflow" | cut -d ":" -f 2 | tr -d " ")
     webroot=$(echo "$key" | grep -w "webroot" | cut -d ":" -f 2 | tr -d " ")
 
     # configure apache
@@ -444,16 +445,20 @@ EOF
             fi
             sed -e "s/mysql:\/\/username:password@localhost\/databasename/${connectionstring}/g" /vagrant/provisioners/redhat/installers/drupal6_settings.php > "/var/www/repositories/apache/${domain}/${webroot}sites/default/settings.php"
             echo -e "\t\trysncing $software ~/sites/default/files/"
-            rsync  --archive --compress --copy-links --delete --verbose -e "ssh -oStrictHostKeyChecking=no -i /vagrant/provisioners/.ssh/id_rsa" root@$(cat /vagrant/configuration.yml | shyaml get-value environments.production.servers.redhat.ip):/var/www/html/$domain/sites/default/files/ /var/www/repositories/apache/$domain/sites/default/files/ 2>&1 | sed "s/^/\t\t/"
+            if [ "$software_workflow" = "downstream" && "$1" != "production"  ]; then
+                rsync  --archive --compress --copy-links --delete --verbose -e "ssh -oStrictHostKeyChecking=no -i /vagrant/provisioners/.ssh/id_rsa" root@$(cat /vagrant/configuration.yml | shyaml get-value environments.production.servers.redhat.ip):/var/www/html/$domain/sites/default/files/ /var/www/repositories/apache/${domain}/${webroot}sites/default/files/ 2>&1 | sed "s/^/\t\t/"
+            elif [ "$software_workflow" = "upstream" && "$1" != "test" ]; then
+                rsync  --archive --compress --copy-links --delete --verbose -e "ssh -oStrictHostKeyChecking=no -i /vagrant/provisioners/.ssh/id_rsa" root@$(cat /vagrant/configuration.yml | shyaml get-value environments.test.servers.redhat.ip):/var/www/html/$domain/sites/default/files/ /var/www/repositories/apache/${domain}/${webroot}sites/default/files/ 2>&1 | sed "s/^/\t\t/"
+            fi
             if [ "$settings_software_validation" = false ]; then
                 echo -e "\t\t[provisioner argument false!] skipping $software information"
             else
                 echo "$software core version:" | sed "s/^/\t\t/"
-                cd "/vagrant/repositories/apache/$domain/" && drush core-status --field-labels=0 --fields=drupal-version 2>&1 | sed "s/^/\t\t\t/"
+                cd "/vagrant/repositories/apache/${domain}/${webroot}" && drush core-status --field-labels=0 --fields=drupal-version 2>&1 | sed "s/^/\t\t\t/"
                 echo "$software core-requirements:" | sed "s/^/\t\t/"
-                cd "/vagrant/repositories/apache/$domain/" && drush core-requirements --severity=2 --format=table 2>&1 | sed "s/^/\t\t\t/"
+                cd "/vagrant/repositories/apache/${domain}/${webroot}" && drush core-requirements --severity=2 --format=table 2>&1 | sed "s/^/\t\t\t/"
                 echo "$software pm-updatestatus:" | sed "s/^/\t\t/"
-                cd "/vagrant/repositories/apache/$domain/" && drush pm-updatestatus --format=table 2>&1 | sed "s/^/\t\t\t/"
+                cd "/vagrant/repositories/apache/${domain}/${webroot}" && drush pm-updatestatus --format=table 2>&1 | sed "s/^/\t\t\t/"
             fi
     elif [ "$software" = "drupal7" ]; then
             echo -e "\t\tgenerating $software database configuration file"
@@ -463,16 +468,20 @@ EOF
             fi
             sed -e "s/\$databases\s=\sarray();/${connectionstring}/g" /vagrant/provisioners/redhat/installers/drupal7_settings.php > "/var/www/repositories/apache/${domain}/${webroot}sites/default/settings.php"
             echo -e "\t\trysncing $software ~/sites/default/files/"
-            rsync  --archive --compress --copy-links --delete --verbose -e "ssh -oStrictHostKeyChecking=no -i /vagrant/provisioners/.ssh/id_rsa" root@$(cat /vagrant/configuration.yml | shyaml get-value environments.production.servers.redhat.ip):/var/www/repositories/apache/$domain/sites/default/files/ /var/www/repositories/apache/$domain/sites/default/files/ 2>&1 | sed "s/^/\t\t/"
+            if [ "$software_workflow" = "downstream" && "$1" != "production"  ]; then
+                rsync  --archive --compress --copy-links --delete --verbose -e "ssh -oStrictHostKeyChecking=no -i /vagrant/provisioners/.ssh/id_rsa" root@$(cat /vagrant/configuration.yml | shyaml get-value environments.production.servers.redhat.ip):/var/www/html/$domain/sites/default/files/ /var/www/repositories/apache/${domain}/${webroot}sites/default/files/ 2>&1 | sed "s/^/\t\t/"
+            elif [ "$software_workflow" = "upstream" && "$1" != "test" ]; then
+                rsync  --archive --compress --copy-links --delete --verbose -e "ssh -oStrictHostKeyChecking=no -i /vagrant/provisioners/.ssh/id_rsa" root@$(cat /vagrant/configuration.yml | shyaml get-value environments.test.servers.redhat.ip):/var/www/html/$domain/sites/default/files/ /var/www/repositories/apache/${domain}/${webroot}sites/default/files/ 2>&1 | sed "s/^/\t\t/"
+            fi
             if [ "$settings_software_validation" = false ]; then
                 echo -e "\t\t[provisioner argument false!] skipping $software information"
             else
                 echo "$software core version:" | sed "s/^/\t\t/"
-                cd "/vagrant/repositories/apache/$domain/" && drush core-status --field-labels=0 --fields=drupal-version 2>&1 | sed "s/^/\t\t\t/"
+                cd "/vagrant/repositories/apache/${domain}/${webroot}" && drush core-status --field-labels=0 --fields=drupal-version 2>&1 | sed "s/^/\t\t\t/"
                 echo "$software core-requirements:" | sed "s/^/\t\t/"
-                cd "/vagrant/repositories/apache/$domain/" && drush core-requirements --severity=2 --format=table 2>&1 | sed "s/^/\t\t\t/"
+                cd "/vagrant/repositories/apache/${domain}/${webroot}" && drush core-requirements --severity=2 --format=table 2>&1 | sed "s/^/\t\t\t/"
                 echo "$software pm-updatestatus:" | sed "s/^/\t\t/"
-                cd "/vagrant/repositories/apache/$domain/" && drush pm-updatestatus --format=table 2>&1 | sed "s/^/\t\t\t/"
+                cd "/vagrant/repositories/apache/${domain}/${webroot}" && drush pm-updatestatus --format=table 2>&1 | sed "s/^/\t\t\t/"
             fi
     elif [ "$software" = "wordpress" ]; then
             echo -e "\t\tgenerating $software database configuration file"
@@ -481,20 +490,24 @@ EOF
             fi
             sed -e "s/database_name_here/${1}_${domainvaliddbname}/g" -e "s/username_here/${mysql_user}/g" -e "s/password_here/${mysql_user_password}/g" -e "s/localhost/${redhat_mysql_ip}/g" -e "s/'wp_'/'${software_dbprefix}'/g" /vagrant/provisioners/redhat/installers/wp-config.php > "/var/www/repositories/apache/${domain}/${webroot}wp-config.php"
             echo -e "\t\trysncing $software ~/wp-content/"
-            rsync  --archive --compress --copy-links --delete --verbose -e "ssh -oStrictHostKeyChecking=no -i /vagrant/provisioners/.ssh/id_rsa" root@$(cat /vagrant/configuration.yml | shyaml get-value environments.production.servers.redhat.ip):/var/www/html/$domain/wp-content/ /var/www/repositories/apache/$domain/wp-content/ 2>&1 | sed "s/^/\t\t/"
+            if [ "$software_workflow" = "downstream" && "$1" != "production"  ]; then
+                rsync  --archive --compress --copy-links --delete --verbose -e "ssh -oStrictHostKeyChecking=no -i /vagrant/provisioners/.ssh/id_rsa" root@$(cat /vagrant/configuration.yml | shyaml get-value environments.production.servers.redhat.ip):/var/www/html/${domain}/${webroot}wp-content/ /var/www/repositories/apache/${domain}/${webroot}wp-content/ 2>&1 | sed "s/^/\t\t/"
+            elif [ "$software_workflow" = "upstream" && "$1" != "test" ]; then
+                rsync  --archive --compress --copy-links --delete --verbose -e "ssh -oStrictHostKeyChecking=no -i /vagrant/provisioners/.ssh/id_rsa" root@$(cat /vagrant/configuration.yml | shyaml get-value environments.test.servers.redhat.ip):/var/www/html/${domain}/${webroot}wp-content/ /var/www/repositories/apache/${domain}/${webroot}wp-content/ 2>&1 | sed "s/^/\t\t/"
+            fi
             if [ "$settings_software_validation" = false ]; then
                 echo -e "\t\t[provisioner argument false!] skipping $software information"
             else
                 echo "$software core version:" | sed "s/^/\t/\t"
-                php /vagrant/provisioners/redhat/installers/wp-cli.phar --path="/vagrant/repositories/apache/$domain/" core version 2>&1 | sed "s/^/\t\t\t/"
+                php /vagrant/provisioners/redhat/installers/wp-cli.phar --path="/vagrant/repositories/apache/${domain}/${webroot}" core version 2>&1 | sed "s/^/\t\t\t/"
                 echo "$software core verify-checksums:" | sed "s/^/\t\t/"
-                php /vagrant/provisioners/redhat/installers/wp-cli.phar --path="/vagrant/repositories/apache/$domain/" core verify-checksums 2>&1 | sed "s/^/\t\t\t/"
+                php /vagrant/provisioners/redhat/installers/wp-cli.phar --path="/vagrant/repositories/apache/${domain}/${webroot}" core verify-checksums 2>&1 | sed "s/^/\t\t\t/"
                 echo "$software core check-update:" | sed "s/^/\t\t/"
-                php /vagrant/provisioners/redhat/installers/wp-cli.phar --path="/vagrant/repositories/apache/$domain/" core check-update 2>&1 | sed "s/^/\t\t\t/"
+                php /vagrant/provisioners/redhat/installers/wp-cli.phar --path="/vagrant/repositories/apache/${domain}/${webroot}" core check-update 2>&1 | sed "s/^/\t\t\t/"
                 echo "$software plugin list:" | sed "s/^/\t\t/"
-                php /vagrant/provisioners/redhat/installers/wp-cli.phar --path="/vagrant/repositories/apache/$domain/" plugin list 2>&1 | sed "s/^/\t\t\t/"
+                php /vagrant/provisioners/redhat/installers/wp-cli.phar --path="/vagrant/repositories/apache/${domain}/${webroot}" plugin list 2>&1 | sed "s/^/\t\t\t/"
                 echo "$software theme list:" | sed "s/^/\t\t/"
-                php /vagrant/provisioners/redhat/installers/wp-cli.phar --path="/vagrant/repositories/apache/$domain/" theme list 2>&1 | sed "s/^/\t\t\t/"
+                php /vagrant/provisioners/redhat/installers/wp-cli.phar --path="/vagrant/repositories/apache/${domain}/${webroot}" theme list 2>&1 | sed "s/^/\t\t\t/"
             fi
     elif [ "$software" = "xenforo" ]; then
             echo -e "\t\tgenerating $software database configuration file"
