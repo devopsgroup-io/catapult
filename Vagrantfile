@@ -391,7 +391,13 @@ configuration["websites"].each do |service,data|
   domains_sorted = Array.new
   unless configuration["websites"]["#{service}"] == nil
     configuration["websites"]["#{service}"].each do |instance|
-      # validate repo order by first creating arrays
+      # validate force_https
+      unless "#{instance["force_https"]}" == ""
+        unless ["true"].include?("#{instance["force_https"]}")
+          catapult_exception("There is an error in your configuration.yml file.\nThe force_https for websites => #{service} => domain => #{instance["domain"]} is invalid, it must be true or removed.")
+        end
+      end
+      # validate repo alpha order
       domains.push("#{instance["domain"]}")
       domains_sorted.push("#{instance["domain"]}")
       # validate repo format by first creating necessary split objects
