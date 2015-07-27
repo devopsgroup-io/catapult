@@ -7,10 +7,10 @@
 * Configuration Management
     * [CloudFlare API](https://api.cloudflare.com/)
     * [DigitalOcean API](https://developers.digitalocean.com/documentation/v2/)
-    * [Git](https://github.com/git/git) [!(https://img.shields.io/github/stars/git/git.svg)]()
+    * [Git](https://github.com/git/git) [![](https://img.shields.io/github/stars/git/git.svg)]()
     * [GPG](https://www.gnupg.org/)
     * [Shell](https://en.wikipedia.org/wiki/Shell_(computing))
-    * [Vagrant](http://vagrantup.com/) [!(https://img.shields.io/github/stars/mitchellh/vagrant.svg)]()
+    * [Vagrant](http://vagrantup.com/) [![](https://img.shields.io/github/stars/mitchellh/vagrant.svg)]()
 * Continuous Integration via AWS and Bamboo
 * Source Code Managment via Bitbucket and GitHub
 
