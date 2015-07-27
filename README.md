@@ -4,7 +4,10 @@
 
 **Welcome to devopsgroup.io Catapult Release Management**, a complete DevOps Release Management solution featuring automated website deployment and continuous integration following Gitflow and SCRUM workflows. Built for Developers, simple enough to use by non-Developers.
 
-As a non-Developer you may think - *I already have a website, why do I need Catapult?* Over time you will find yourself or find yourself paying a freelancer or a development company hundreds or even thousands of dollars to manage or interact with the DevOps (Development Operations) and solve these problems:
+* Configuration Management via CloudFlare, DigitalOcean, Git, GPG, and Vagrant
+* Automated Deployments via AWS, Bamboo, Bitbucket, and GitHub
+
+As a **non-Developer** you may think - *I already have a website, why do I need Catapult?* Over time you will find yourself or find yourself paying a freelancer or a development company hundreds or even thousands of dollars to manage or interact with the DevOps (Development Operations) and solve these problems:
 
   * *Production is down.*
   * *We need a test site.*
@@ -13,7 +16,7 @@ As a non-Developer you may think - *I already have a website, why do I need Cata
   * *Is my website backed up?*
   * *Can I easily scale my website for more traffic?*
 
-As a Developer, you've probably had to manage many websites and probably end up using the same tools and APIs over and over again. Why not use something that has been developed just for you from Developers that have been down the same road as you and also have the ability to contribute back?
+As a **Developer**, you have to manage many websites and probably end up using the same tools and APIs over and over again. Why not use something that has been developed just for you from Developers that have been down the same road as you and also have the ability to contribute back?
 
   * Catapult is developed in Ruby and native Shell - no new languages or technologies to learn.
   * Catapult is very simple at its core - there is no black-box to decipher - everything is out in the open.
@@ -22,8 +25,6 @@ As a Developer, you've probably had to manage many websites and probably end up 
 Catapult manages all of this for you and is open-sourced, well-documented, developer-focused, and free to use. We also provide a service if you need some help getting started - if you do, let us know at https://devopsgroup.io. Catapult leverages the Services that you're already using, which collectively, costs $40/month to have a full-stack localDev, Test, Quality Control, and Production environment.
 
 *Go ahead, give* **Catapult** *a* **shot**.
-
-If you're having issues with Catapult, [submit an issue here](https://github.com/devopsgroup-io/catapult-release-management/issues/new).
 
 
 
@@ -365,6 +366,8 @@ Below is a list of known nuances split out by Service that are worth mentioning:
     * If your `~/configuration.yml["websites"]["apache/iis"]["domain"]` includes more than 1 subdomain (drupal7.devopsgroup.io) the `force_https` option will not work as CloudFlare only supports a first-level subdomain. https://www.cloudflare.com/ssl
 * **Vagrant**
     * If your `~/configuration.yml["websites"]["apache/iis"]["domain"]` includes the `force_https` option, during `vagrant status` you will receive an err for the http response code for `.dev` as this is a self-signed cert and not routing through CloudFlare.
+
+If you're still having issues with Catapult, [submit a GitHub Issue](https://github.com/devopsgroup-io/catapult-release-management/issues/new).
 
 
 
