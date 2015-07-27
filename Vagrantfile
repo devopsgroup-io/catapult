@@ -436,6 +436,67 @@ configuration["websites"].each do |service,data|
           catapult_exception("A connection was established to #{instance["repo"]} using your SSH private key for Catapult (~/provisioners/.ssh/id_rsa), however, there is a no develop branch, please create one.")
         end
       end
+      # create bamboo service per bitbucket repo
+      if "#{repo_split_2[0]}" == "bitbucket.org"
+        uri = URI("https://api.bitbucket.org/1.0/repositories/#{repo_split_3[0]}/services")
+        Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => OpenSSL::SSL::VERIFY_NONE) do |http|
+          request = Net::HTTP::Post.new uri.request_uri
+          request.basic_auth "#{configuration["company"]["bitbucket_username"]}", "#{configuration["company"]["bitbucket_password"]}"
+          request.body = URI::encode\
+            (""\
+              "type=Bamboo"\
+              "&URL=#{configuration["company"]["bamboo_base_url"]}"\
+              "&Plan Key=CAT-TEST"\
+              "&Username=#{configuration["company"]["bamboo_username"]}"\
+              "&Password=#{configuration["company"]["bamboo_password"]}"\
+            "")
+          response = http.request request # Net::HTTPResponse object
+          if response.code.to_f.between?(399,600)
+            catapult_exception("Unable to configure Bitbucket Bamboo service for websites => #{service} => domain => #{instance["domain"]}. Ensure the github_username defined in configuration.yml has correct access to the repository.")
+          end
+        end
+        uri = URI("https://api.bitbucket.org/1.0/repositories/#{repo_split_3[0]}/services")
+        Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => OpenSSL::SSL::VERIFY_NONE) do |http|
+          request = Net::HTTP::Post.new uri.request_uri
+          request.basic_auth "#{configuration["company"]["bitbucket_username"]}", "#{configuration["company"]["bitbucket_password"]}"
+          request.body = URI::encode\
+            (""\
+              "type=Bamboo"\
+              "&URL=#{configuration["company"]["bamboo_base_url"]}"\
+              "&Plan Key=CAT-QC"\
+              "&Username=#{configuration["company"]["bamboo_username"]}"\
+              "&Password=#{configuration["company"]["bamboo_password"]}"\
+            "")
+          response = http.request request # Net::HTTPResponse object
+          if response.code.to_f.between?(399,600)
+            catapult_exception("Unable to configure Bitbucket Bamboo service for websites => #{service} => domain => #{instance["domain"]}. Ensure the github_username defined in configuration.yml has correct access to the repository.")
+          end
+        end
+      end
+      # create bamboo service per github repo
+      if "#{repo_split_2[0]}" == "github.com"
+        uri = URI("https://api.github.com/repos/#{repo_split_3[0]}/hooks")
+        Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => OpenSSL::SSL::VERIFY_NONE) do |http|
+          request = Net::HTTP::Post.new uri.request_uri
+          request.basic_auth "#{configuration["company"]["github_username"]}", "#{configuration["company"]["github_password"]}"
+          request.body = ""\
+            "{"\
+              "\"name\":\"bamboo\","\
+              "\"active\":true,"\
+              "\"config\":"\
+                "{"\
+                  "\"base_url\":\"#{configuration["company"]["bamboo_base_url"]}\","\
+                  "\"build_key\":\"develop:CAT-TEST,master:CAT-QC\","\
+                  "\"username\":\"#{configuration["company"]["bamboo_username"]}\","\
+                  "\"password\":\"#{configuration["company"]["bamboo_password"]}\""\
+                "}"\
+            "}"
+          response = http.request request # Net::HTTPResponse object
+          if response.code.to_f.between?(399,600)
+            catapult_exception("Unable to configure GitHub Bamboo service for websites => #{service} => domain => #{instance["domain"]}. Ensure the github_username defined in configuration.yml has correct access to the repository.")
+          end
+        end
+      end
       # validate software
       unless "#{instance["software"]}" == ""
         unless ["codeigniter2","drupal6","drupal7","wordpress","xenforo"].include?("#{instance["software"]}")
