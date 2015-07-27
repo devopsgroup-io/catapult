@@ -389,56 +389,58 @@ end
 configuration["websites"].each do |service,data|
   domains = Array.new
   domains_sorted = Array.new
-  configuration["websites"]["#{service}"].each do |instance|
-    # validate repo order by first creating arrays
-    domains.push("#{instance["domain"]}")
-    domains_sorted.push("#{instance["domain"]}")
-    # validate repo format by first creating necessary split objects
-    # instance["repo"] => git@github.com:devopsgroup-io/devopsgroup-io.git
-    repo_split_1 = instance["repo"].split("@")
-    # repo_split_1[0] => git
-    # repo_split_1[1] => github.com:devopsgroup-io/devopsgroup-io.git
-    repo_split_2 = repo_split_1[1].split(":")
-    # repo_split_2[0] => github.com
-    # repo_split_2[1] => devopsgroup-io/devopsgroup-io.git
-    repo_split_3 = repo_split_2[1].split(".git")
-    # repo_split_3[0] => devopsgroup-io/devopsgroup-io
-    # validate repo type
-    unless "#{repo_split_1[0]}" == "git"
-      catapult_exception("There is an error in your configuration.yml file.\nThe repo for websites => #{service} => domain => #{instance["domain"]} is invalid, the format must be git@github.com:devopsgroup-io/devopsgroup-io.git")
-    end
-    # validate repo hosted at bitbucket.org or github.com
-    unless "#{repo_split_2[0]}" == "bitbucket.org" || "#{repo_split_2[0]}" == "github.com"
-      catapult_exception("There is an error in your configuration.yml file.\nThe repo for websites => #{service} => domain => #{instance["domain"]} is invalid, it must either be a bitbucket.org or github.com repository.")
-    end
-    # validate repo ends in .git
-    if "#{repo_split_3[0]}" == nil
-      catapult_exception("There is an error in your configuration.yml file.\nThe repo for websites => #{service} => domain => #{instance["domain"]} is invalid, it must end in .git")
-    end
-    # validate repo connection, this will need to be translated to windows - have fun
-    if (RbConfig::CONFIG['host_os'] =~ /darwin|mac os|linux|solaris|bsd/)
-      output = `ssh-agent bash -c "ssh-add provisioners/.ssh/id_rsa; git ls-remote #{instance["repo"]}" 2>/dev/null`
-      output = output.split(/\n/).reject(&:empty?)
-      if output.find { |element| element.include?("fatal") }
-        catapult_exception("Your SSH private key for Catapult (~/provisioners/.ssh/id_rsa) cannot connect to #{instance["repo"]}, please ensure the SSH public key (~/provisioners/.ssh/id_rsa.pub) is added to this repo as a deploy key.")
+  unless configuration["websites"]["#{service}"] == nil
+    configuration["websites"]["#{service}"].each do |instance|
+      # validate repo order by first creating arrays
+      domains.push("#{instance["domain"]}")
+      domains_sorted.push("#{instance["domain"]}")
+      # validate repo format by first creating necessary split objects
+      # instance["repo"] => git@github.com:devopsgroup-io/devopsgroup-io.git
+      repo_split_1 = instance["repo"].split("@")
+      # repo_split_1[0] => git
+      # repo_split_1[1] => github.com:devopsgroup-io/devopsgroup-io.git
+      repo_split_2 = repo_split_1[1].split(":")
+      # repo_split_2[0] => github.com
+      # repo_split_2[1] => devopsgroup-io/devopsgroup-io.git
+      repo_split_3 = repo_split_2[1].split(".git")
+      # repo_split_3[0] => devopsgroup-io/devopsgroup-io
+      # validate repo type
+      unless "#{repo_split_1[0]}" == "git"
+        catapult_exception("There is an error in your configuration.yml file.\nThe repo for websites => #{service} => domain => #{instance["domain"]} is invalid, the format must be git@github.com:devopsgroup-io/devopsgroup-io.git")
       end
-      unless output.find { |element| element.include?("refs/heads/master") }
-        catapult_exception("A connection was established to #{instance["repo"]} using your SSH private key for Catapult (~/provisioners/.ssh/id_rsa), however, there is a no master branch, please create one.")
+      # validate repo hosted at bitbucket.org or github.com
+      unless "#{repo_split_2[0]}" == "bitbucket.org" || "#{repo_split_2[0]}" == "github.com"
+        catapult_exception("There is an error in your configuration.yml file.\nThe repo for websites => #{service} => domain => #{instance["domain"]} is invalid, it must either be a bitbucket.org or github.com repository.")
       end
-      unless output.find { |element| element.include?("refs/heads/develop") }
-        catapult_exception("A connection was established to #{instance["repo"]} using your SSH private key for Catapult (~/provisioners/.ssh/id_rsa), however, there is a no develop branch, please create one.")
+      # validate repo ends in .git
+      if "#{repo_split_3[0]}" == nil
+        catapult_exception("There is an error in your configuration.yml file.\nThe repo for websites => #{service} => domain => #{instance["domain"]} is invalid, it must end in .git")
       end
-    end
-    # validate software
-    unless "#{instance["software"]}" == ""
-      unless ["codeigniter2","drupal6","drupal7","wordpress","xenforo"].include?("#{instance["software"]}")
-        catapult_exception("There is an error in your configuration.yml file.\nThe software for websites => #{service} => domain => #{instance["domain"]} is invalid, it must be one of the following [\"codeigniter2\",\"drupal6\",\"drupal7\",\"wordpress\",\"xenforo\"].")
+      # validate repo connection, this will need to be translated to windows - have fun
+      if (RbConfig::CONFIG['host_os'] =~ /darwin|mac os|linux|solaris|bsd/)
+        output = `ssh-agent bash -c "ssh-add provisioners/.ssh/id_rsa; git ls-remote #{instance["repo"]}" 2>/dev/null`
+        output = output.split(/\n/).reject(&:empty?)
+        if output.find { |element| element.include?("fatal") }
+          catapult_exception("Your SSH private key for Catapult (~/provisioners/.ssh/id_rsa) cannot connect to #{instance["repo"]}, please ensure the SSH public key (~/provisioners/.ssh/id_rsa.pub) is added to this repo as a deploy key.")
+        end
+        unless output.find { |element| element.include?("refs/heads/master") }
+          catapult_exception("A connection was established to #{instance["repo"]} using your SSH private key for Catapult (~/provisioners/.ssh/id_rsa), however, there is a no master branch, please create one.")
+        end
+        unless output.find { |element| element.include?("refs/heads/develop") }
+          catapult_exception("A connection was established to #{instance["repo"]} using your SSH private key for Catapult (~/provisioners/.ssh/id_rsa), however, there is a no develop branch, please create one.")
+        end
       end
-    end
-    # validate webroot
-    unless "#{instance["webroot"]}" == ""
-      unless "#{instance["webroot"]}"[-1,1] == "/"
-        catapult_exception("There is an error in your configuration.yml file.\nThe webroot for websites => #{service} => domain => #{instance["domain"]} is invalid, it must include a trailing slash.")
+      # validate software
+      unless "#{instance["software"]}" == ""
+        unless ["codeigniter2","drupal6","drupal7","wordpress","xenforo"].include?("#{instance["software"]}")
+          catapult_exception("There is an error in your configuration.yml file.\nThe software for websites => #{service} => domain => #{instance["domain"]} is invalid, it must be one of the following [\"codeigniter2\",\"drupal6\",\"drupal7\",\"wordpress\",\"xenforo\"].")
+        end
+      end
+      # validate webroot
+      unless "#{instance["webroot"]}" == ""
+        unless "#{instance["webroot"]}"[-1,1] == "/"
+          catapult_exception("There is an error in your configuration.yml file.\nThe webroot for websites => #{service} => domain => #{instance["domain"]} is invalid, it must include a trailing slash.")
+        end
       end
     end
   end
@@ -452,14 +454,18 @@ end
 
 # create arrays of domains for localdev hosts file
 redhathostsfile = Array.new
-configuration["websites"]["apache"].each do |instance|
-  redhathostsfile.push("dev.#{instance["domain"]}")
-  redhathostsfile.push("www.dev.#{instance["domain"]}")
+unless configuration["websites"]["apache"] == nil
+  configuration["websites"]["apache"].each do |instance|
+    redhathostsfile.push("dev.#{instance["domain"]}")
+    redhathostsfile.push("www.dev.#{instance["domain"]}")
+  end
 end
 windowshostsfile = Array.new
-configuration["websites"]["iis"].each do |instance|
-  windowshostsfile.push("dev.#{instance["domain"]}")
-  windowshostsfile.push("www.dev.#{instance["domain"]}")
+  unless configuration["websites"]["iis"] == nil
+  configuration["websites"]["iis"].each do |instance|
+    windowshostsfile.push("dev.#{instance["domain"]}")
+    windowshostsfile.push("www.dev.#{instance["domain"]}")
+  end
 end
 
 
@@ -478,117 +484,119 @@ if ["status"].include?(ARGV[0])
 
   configuration["websites"].each do |service,data|
     puts "\n[#{service}]"
-    configuration["websites"]["#{service}"].each do |instance|
-      # count websites
-      totalwebsites = totalwebsites + 1
-      # start new row
-      row = Array.new
-      # get domain name
-      row.push(" * #{instance["domain"]}".ljust(29))
-      # get software
-      row.push((instance["software"] || "").ljust(14))
-      # get http response code per environment
-      configuration["environments"].each do |environment,data|
-        response = nil
-        if ["production"].include?("#{environment}")
-          environment = nil
-        else
-          environment = "#{environment}."
-        end
-        begin
-          def http_repsonse(uri_str, limit = 10)
-            if limit == 0
-              row.push("loop".ljust(7))
-            else
-              response = Net::HTTP.get_response(URI(uri_str))
-              case response
-              when Net::HTTPSuccess then
-                return response.code
-              when Net::HTTPRedirection then
-                location = response['location']
-                http_repsonse(location, limit - 1)
+    unless configuration["websites"]["#{service}"] == nil
+      configuration["websites"]["#{service}"].each do |instance|
+        # count websites
+        totalwebsites = totalwebsites + 1
+        # start new row
+        row = Array.new
+        # get domain name
+        row.push(" * #{instance["domain"]}".ljust(29))
+        # get software
+        row.push((instance["software"] || "").ljust(14))
+        # get http response code per environment
+        configuration["environments"].each do |environment,data|
+          response = nil
+          if ["production"].include?("#{environment}")
+            environment = nil
+          else
+            environment = "#{environment}."
+          end
+          begin
+            def http_repsonse(uri_str, limit = 10)
+              if limit == 0
+                row.push("loop".ljust(7))
               else
-                return response.code
+                response = Net::HTTP.get_response(URI(uri_str))
+                case response
+                when Net::HTTPSuccess then
+                  return response.code
+                when Net::HTTPRedirection then
+                  location = response['location']
+                  http_repsonse(location, limit - 1)
+                else
+                  return response.code
+                end
               end
             end
+            row.push(http_repsonse("http://#{environment}#{instance["domain"]}").ljust(4))
+          rescue SocketError
+            row.push("down".ljust(4))
+          rescue Errno::ECONNREFUSED
+            row.push("down".ljust(4))
+          rescue EOFError
+            row.push("down".ljust(4))
+          rescue OpenSSL::SSL::SSLError
+            row.push("err".ljust(4))
+          rescue Exception => ex
+            row.push("#{ex.class}".ljust(4))
           end
-          row.push(http_repsonse("http://#{environment}#{instance["domain"]}").ljust(4))
+          # nslookup production top-level domain
+          begin
+            row.push((Resolv.getaddress "#{environment}#{instance["domain"]}").ljust(16))
+          rescue
+            row.push("down".ljust(16))
+          end
+        end
+        # ssl cert lookup
+        begin 
+          timeout(1) do
+            tcp_client = TCPSocket.new("#{instance["domain"]}", 443)
+            ssl_context = OpenSSL::SSL::SSLContext.new
+            ssl_context.ssl_version = :TLSv1_2
+            ssl_client = OpenSSL::SSL::SSLSocket.new(tcp_client, ssl_context)
+            ssl_client.connect
+            cert = OpenSSL::X509::Certificate.new(ssl_client.peer_cert)
+            ssl_client.sysclose
+            tcp_client.close
+            #http://ruby-doc.org/stdlib-2.0/libdoc/openssl/rdoc/OpenSSL/X509/Certificate.html
+            date = Date.parse((cert.not_after).to_s)
+            row.push("#{date.strftime('%F')} #{cert.signature_algorithm} #{cert.subject.to_a.select{|name, _, _| name == 'CN' }.first[1]}".downcase.ljust(57))
+          end
         rescue SocketError
-          row.push("down".ljust(4))
+          row.push("down".ljust(57))
         rescue Errno::ECONNREFUSED
-          row.push("down".ljust(4))
-        rescue EOFError
-          row.push("down".ljust(4))
+          row.push("connection refused".ljust(57))
+        rescue Errno::ECONNRESET
+          row.push("connection reset".ljust(57))
+        rescue Timeout::Error
+          row.push("no 443 listener".ljust(57))
         rescue OpenSSL::SSL::SSLError
-          row.push("err".ljust(4))
+          row.push("cannot read cert, missing local cipher?".ljust(57))
         rescue Exception => ex
-          row.push("#{ex.class}".ljust(4))
+          row.push("#{ex.class}".ljust(57))
         end
-        # nslookup production top-level domain
+        # alexa rank and 3 month deviation
         begin
-          row.push((Resolv.getaddress "#{environment}#{instance["domain"]}").ljust(16))
-        rescue
-          row.push("down".ljust(16))
-        end
-      end
-      # ssl cert lookup
-      begin 
-        timeout(1) do
-          tcp_client = TCPSocket.new("#{instance["domain"]}", 443)
-          ssl_context = OpenSSL::SSL::SSLContext.new
-          ssl_context.ssl_version = :TLSv1_2
-          ssl_client = OpenSSL::SSL::SSLSocket.new(tcp_client, ssl_context)
-          ssl_client.connect
-          cert = OpenSSL::X509::Certificate.new(ssl_client.peer_cert)
-          ssl_client.sysclose
-          tcp_client.close
-          #http://ruby-doc.org/stdlib-2.0/libdoc/openssl/rdoc/OpenSSL/X509/Certificate.html
-          date = Date.parse((cert.not_after).to_s)
-          row.push("#{date.strftime('%F')} #{cert.signature_algorithm} #{cert.subject.to_a.select{|name, _, _| name == 'CN' }.first[1]}".downcase.ljust(57))
-        end
-      rescue SocketError
-        row.push("down".ljust(57))
-      rescue Errno::ECONNREFUSED
-        row.push("connection refused".ljust(57))
-      rescue Errno::ECONNRESET
-        row.push("connection reset".ljust(57))
-      rescue Timeout::Error
-        row.push("no 443 listener".ljust(57))
-      rescue OpenSSL::SSL::SSLError
-        row.push("cannot read cert, missing local cipher?".ljust(57))
-      rescue Exception => ex
-        row.push("#{ex.class}".ljust(57))
-      end
-      # alexa rank and 3 month deviation
-      begin
-        uri = URI("http://data.alexa.com/data?cli=10&url=#{instance["domain"]}")
-        Net::HTTP.start(uri.host, uri.port) do |http|
-          request = Net::HTTP::Get.new uri.request_uri
-          response = http.request request
-          response = Nokogiri::XML(response.body)
-          if "#{response.xpath('//ALEXA//SD//POPULARITY')}" != ""
-            response.xpath('//ALEXA//SD//POPULARITY').each do |attribute|
-              row.push(attribute["TEXT"].to_s.reverse.gsub(/...(?=.)/,'\&,').reverse.ljust(11))
-            end
-          else
-            row.push("".ljust(11))
-          end
-          if "#{response.xpath('//ALEXA//SD//RANK')}" != ""
-            response.xpath('//ALEXA//SD//RANK').each do |attribute|
-              if attribute["DELTA"].match(/\+\d+/)
-                operator = "+"
-              elsif attribute["DELTA"].match(/\-\d+/)
-                operator = "-"
+          uri = URI("http://data.alexa.com/data?cli=10&url=#{instance["domain"]}")
+          Net::HTTP.start(uri.host, uri.port) do |http|
+            request = Net::HTTP::Get.new uri.request_uri
+            response = http.request request
+            response = Nokogiri::XML(response.body)
+            if "#{response.xpath('//ALEXA//SD//POPULARITY')}" != ""
+              response.xpath('//ALEXA//SD//POPULARITY').each do |attribute|
+                row.push(attribute["TEXT"].to_s.reverse.gsub(/...(?=.)/,'\&,').reverse.ljust(11))
               end
-              delta = attribute["DELTA"].split(/[+,-]/)
-              row.push("#{operator}#{delta[1].to_s.reverse.gsub(/...(?=.)/,'\&,').reverse}".ljust(13))
+            else
+              row.push("".ljust(11))
             end
-          else
-            row.push("".ljust(13))
+            if "#{response.xpath('//ALEXA//SD//RANK')}" != ""
+              response.xpath('//ALEXA//SD//RANK').each do |attribute|
+                if attribute["DELTA"].match(/\+\d+/)
+                  operator = "+"
+                elsif attribute["DELTA"].match(/\-\d+/)
+                  operator = "-"
+                end
+                delta = attribute["DELTA"].split(/[+,-]/)
+                row.push("#{operator}#{delta[1].to_s.reverse.gsub(/...(?=.)/,'\&,').reverse}".ljust(13))
+              end
+            else
+              row.push("".ljust(13))
+            end
           end
         end
+        puts row.join(" ")
       end
-      puts row.join(" ")
     end
   end
   # start a new row
