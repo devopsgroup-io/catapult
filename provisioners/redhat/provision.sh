@@ -17,8 +17,7 @@ start=$(date +%s)
 # set human friendly variables inbound from provisioner args
 settings_environment=$1
 settings_git_pull=$2
-settings_production_rsync=$3
-settings_software_validation=$4
+settings_software_validation=$3
 # update yum
 sudo yum update -y
 # git clones
@@ -162,18 +161,6 @@ company_email="$(cat /vagrant/configuration.yml | shyaml get-value company.email
 cloudflare_api_key="$(cat /vagrant/configuration.yml | shyaml get-value company.cloudflare_api_key)"
 cloudflare_email="$(cat /vagrant/configuration.yml | shyaml get-value company.cloudflare_email)"
 
-# rackspace web1 - are we connected to do rsync of drupal and wordpress files?
-# one time copy ssh key to rackspace web1 while vagrant ssh redhat
-# ssh-copy-id -i /vagrant/provisioners/.ssh/id_rsa.pub 172.17.100.153
-# prime rackspace ping
-ping -c 1 $(cat /vagrant/configuration.yml | shyaml get-value environments.production.servers.rackspace.web1_ip) &> /dev/null
-if ping -c 1 $(cat /vagrant/configuration.yml | shyaml get-value environments.production.servers.rackspace.web1_ip) &> /dev/null
-then
-  rackspace=true
-else
-  rackspace=false
-fi
-
 # configure vhosts
 # this is a debianism - but it makes things easier for cross-distro
 sudo mkdir -p /etc/httpd/sites-available
@@ -186,8 +173,6 @@ fi
 if ! grep -q "ServerName localhost" "/etc/httpd/conf/httpd.conf"; then
    sudo bash -c 'echo "ServerName localhost" >> /etc/httpd/conf/httpd.conf'
 fi
-
-# @todo mod_ssl functionality: need certificate configured
 
 # start fresh remove all logs, vhosts, and kill the welcome file
 sudo rm -rf /var/log/httpd/*
@@ -381,10 +366,13 @@ while IFS='' read -r -d '' key; do
         --data "{\"purge_everything\":true}"\
         | sed "s/^/\t\t/"
 
+        # throw a new line
+        echo -e "\n"
+
     fi
 
     # configure vhost
-    echo -e "\n\t * configuring vhost"
+    echo -e "\t * configuring vhost"
     sudo mkdir -p /var/log/httpd/${domain_environment}
     sudo touch /var/log/httpd/${domain_environment}/access.log
     sudo touch /var/log/httpd/${domain_environment}/error.log
@@ -455,14 +443,8 @@ EOF
                 sudo chmod 0777 "/var/www/repositories/apache/${domain}/${webroot}sites/default/settings.php"
             fi
             sed -e "s/mysql:\/\/username:password@localhost\/databasename/${connectionstring}/g" /vagrant/provisioners/redhat/installers/drupal6_settings.php > "/var/www/repositories/apache/${domain}/${webroot}sites/default/settings.php"
-            if [ "$settings_production_rsync" = false ]; then
-              echo -e "\t\t[provisioner argument false!] skipping $software ~/sites/default/files/ file sync"
-            elif [ "$rackspace" = false ]; then
-              echo -e "\t\t[not connected to rackspace vpn!] skipping $software ~/sites/default/files/ file sync"
-            else
-              echo -e "\tconnected to rackspace vpn - rysncing $software ~/sites/default/files/"
-              rsync -rz -e "ssh -oStrictHostKeyChecking=no -i /vagrant/provisioners/.ssh/id_rsa" $(cat /vagrant/configuration.yml | shyaml get-value environments.production.servers.rackspace.web1_ssh_user)@$(cat /vagrant/configuration.yml | shyaml get-value environments.production.servers.rackspace.web1_ip):/var/www/html/$domain/sites/default/files/ /var/www/repositories/apache/$domain/sites/default/files/
-            fi
+            echo -e "\t\trysncing $software ~/sites/default/files/"
+            rsync  --archive --compress --copy-links --delete --verbose -e "ssh -oStrictHostKeyChecking=no -i /vagrant/provisioners/.ssh/id_rsa" root@$(cat /vagrant/configuration.yml | shyaml get-value environments.production.servers.redhat.ip):/var/www/html/$domain/sites/default/files/ /var/www/repositories/apache/$domain/sites/default/files/ 2>&1 | sed "s/^/\t\t/"
             if [ "$settings_software_validation" = false ]; then
                 echo -e "\t\t[provisioner argument false!] skipping $software information"
             else
@@ -480,14 +462,8 @@ EOF
                 sudo chmod 0777 "/var/www/repositories/apache/${domain}/${webroot}sites/default/settings.php"
             fi
             sed -e "s/\$databases\s=\sarray();/${connectionstring}/g" /vagrant/provisioners/redhat/installers/drupal7_settings.php > "/var/www/repositories/apache/${domain}/${webroot}sites/default/settings.php"
-            if [ "$settings_production_rsync" = false ]; then
-                echo -e "\t\t[provisioner argument false!] skipping $software ~/sites/default/files/ file sync"
-            elif [ "$rackspace" = false ]; then
-                echo -e "\t\t[not connected to rackspace vpn!] skipping $software ~/sites/default/files/ file sync"
-            else
-                echo -e "\tconnected to rackspace vpn - rysncing $software ~/sites/default/files/"
-                rsync -rz -e "ssh -oStrictHostKeyChecking=no -i /vagrant/provisioners/.ssh/id_rsa" $(cat /vagrant/configuration.yml | shyaml get-value environments.production.servers.rackspace.web1_ssh_user)@$(cat /vagrant/configuration.yml | shyaml get-value environments.production.servers.rackspace.web1_ip):/var/www/html/$domain/sites/default/files/ /var/www/repositories/apache/$domain/sites/default/files/
-            fi
+            echo -e "\t\trysncing $software ~/sites/default/files/"
+            rsync  --archive --compress --copy-links --delete --verbose -e "ssh -oStrictHostKeyChecking=no -i /vagrant/provisioners/.ssh/id_rsa" root@$(cat /vagrant/configuration.yml | shyaml get-value environments.production.servers.redhat.ip):/var/www/repositories/apache/$domain/sites/default/files/ /var/www/repositories/apache/$domain/sites/default/files/ 2>&1 | sed "s/^/\t\t/"
             if [ "$settings_software_validation" = false ]; then
                 echo -e "\t\t[provisioner argument false!] skipping $software information"
             else
@@ -504,14 +480,8 @@ EOF
                 sudo chmod 0777 "/var/www/repositories/apache/${domain}/${webroot}wp-config.php"
             fi
             sed -e "s/database_name_here/${1}_${domainvaliddbname}/g" -e "s/username_here/${mysql_user}/g" -e "s/password_here/${mysql_user_password}/g" -e "s/localhost/${redhat_mysql_ip}/g" -e "s/'wp_'/'${software_dbprefix}'/g" /vagrant/provisioners/redhat/installers/wp-config.php > "/var/www/repositories/apache/${domain}/${webroot}wp-config.php"
-            if [ "$settings_production_rsync" = false ]; then
-                echo -e "\t\t[provisioner argument false!] skipping $software ~/sites/default/files/ file sync"
-            elif [ "$rackspace" = false ]; then
-                echo -e "\t\t[not connected to rackspace vpn!] skipping $software ~/sites/default/files/ file sync"
-            else
-                echo -e "\tconnected to rackspace vpn - rysncing $software ~/wp-content/"
-                rsync -rz -e "ssh -oStrictHostKeyChecking=no -i /vagrant/provisioners/.ssh/id_rsa" $(cat /vagrant/configuration.yml | shyaml get-value environments.production.servers.rackspace.web1_ssh_user)@$(cat /vagrant/configuration.yml | shyaml get-value environments.production.servers.rackspace.web1_ip):/var/www/html/$domain/wp-content/ /var/www/repositories/apache/$domain/wp-content/
-            fi
+            echo -e "\t\trysncing $software ~/wp-content/"
+            rsync  --archive --compress --copy-links --delete --verbose -e "ssh -oStrictHostKeyChecking=no -i /vagrant/provisioners/.ssh/id_rsa" root@$(cat /vagrant/configuration.yml | shyaml get-value environments.production.servers.redhat.ip):/var/www/html/$domain/wp-content/ /var/www/repositories/apache/$domain/wp-content/ 2>&1 | sed "s/^/\t\t/"
             if [ "$settings_software_validation" = false ]; then
                 echo -e "\t\t[provisioner argument false!] skipping $software information"
             else
