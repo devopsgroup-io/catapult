@@ -108,8 +108,9 @@ while IFS='' read -r -d '' key; do
     domainvaliddbname=$(echo "$key" | grep -w "domain" | cut -d ":" -f 2 | tr -d " " | tr "." "_")
     software=$(echo "$key" | grep -w "software" | cut -d ":" -f 2 | tr -d " ")
     software_dbprefix=$(echo "$key" | grep -w "software_dbprefix" | cut -d ":" -f 2 | tr -d " ")
+    software_workflow=$(echo "$key" | grep -w "software_workflow" | cut -d ":" -f 2 | tr -d " ")
 
-    if test -n "$software"; then
+    if ( test -n "$software" && [ "$1" != "production" ] && [ "$software_workflow" = "downstream" ]) || ( test -n "$software" && [ "$1" != "test" ] && [ "$software_workflow" = "upstream" ]); then
         if [ "$software" = "codeigniter2" ] || [ "$software" = "drupal6" ] || [ "$software" = "drupal7" ] || [ "$software" = "wordpress" ] || [ "$software" = "xenforo" ]; then
             # create database
             mysql --defaults-extra-file=$dbconf -e "CREATE DATABASE $1_$domainvaliddbname"
