@@ -7,10 +7,13 @@
 * Configuration Management
     * [CloudFlare API](https://api.cloudflare.com/)
     * [DigitalOcean API](https://developers.digitalocean.com/documentation/v2/)
-    * [Git](https://github.com/git/git) [![](https://img.shields.io/github/stars/git/git.svg)]()
+    * [![](https://img.shields.io/github/stars/git/git.svg)]() [Git](https://github.com/git/git)
     * [GPG](https://www.gnupg.org/)
     * [Shell](https://en.wikipedia.org/wiki/Shell_(computing))
-    * [Vagrant](http://vagrantup.com/) [![](https://img.shields.io/github/stars/mitchellh/vagrant.svg)]()
+    * [![](https://img.shields.io/github/stars/mitchellh/vagrant.svg)]() [Vagrant](http://vagrantup.com/)
+    * [![](https://img.shields.io/gem/dt/vagrant-digitalocean.svg)]() [Vagrant Plugin: vagrant-digitalocean](https://github.com/smdahlen/vagrant-digitalocean)
+    * [![](https://img.shields.io/gem/dt/vagrant-hostmanager.svg)]() [Vagrant Plugin: vagrant-hostmanager](https://github.com/smdahlen/vagrant-hostmanager)
+    * [![](https://img.shields.io/gem/dt/vagrant-vbguest.svg)]() [Vagrant Plugin: vagrant-vbguest](https://github.com/dotless-de/vagrant-vbguest)
 * Continuous Integration via AWS and Bamboo
 * Source Code Managment via Bitbucket and GitHub
 
