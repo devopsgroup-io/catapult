@@ -4,8 +4,9 @@
 
 **Welcome to devopsgroup.io Catapult Release Management**, a complete DevOps Release Management solution featuring automated website deployment and continuous integration following Gitflow and SCRUM workflows. Built for Developers, simple enough to use by non-Developers.
 
-* Configuration Management via CloudFlare, DigitalOcean, Git, GPG, and Vagrant
-* Automated Deployments via AWS, Bamboo, Bitbucket, and GitHub
+* Configuration Management via CloudFlare, DigitalOcean, Git, GPG, Shell, and Vagrant
+* Continuous Integration via AWS and Bamboo
+* Source Code Managment via Bitbucket and GitHub
 
 As a **non-Developer** you may think - *I already have a website, why do I need Catapult?* Over time you will find yourself or find yourself paying a freelancer or a development company hundreds or even thousands of dollars to manage or interact with the DevOps (Development Operations) and solve these problems:
 
