@@ -110,8 +110,16 @@ while IFS='' read -r -d '' key; do
     software_dbprefix=$(echo "$key" | grep -w "software_dbprefix" | cut -d ":" -f 2 | tr -d " ")
     software_workflow=$(echo "$key" | grep -w "software_workflow" | cut -d ":" -f 2 | tr -d " ")
 
-    if ( test -n "$software" && [ "$1" != "production" ] && [ "$software_workflow" = "downstream" ]) || ( test -n "$software" && [ "$1" != "test" ] && [ "$software_workflow" = "upstream" ]); then
-        if [ "$software" = "codeigniter2" ] || [ "$software" = "drupal6" ] || [ "$software" = "drupal7" ] || [ "$software" = "wordpress" ] || [ "$software" = "xenforo" ]; then
+    if test -n "$software"; then
+        if [ "$1" = "production" ]; then
+            echo -e "\nNOTICE: ${domain}"
+        else
+            echo -e "\nNOTICE: ${1}.${domain}"
+        fi
+        # respect software_workflow option
+        if ! ([ "$1" != "production" ] && [ "$software_workflow" = "downstream" ]) || ([ "$1" != "test" ] && [ "$software_workflow" = "upstream" ]); then
+            echo -e "\t* skipping database restore as this website's software_workflow is set to ${software_workflow} and this is the ${1} environment"
+        else
             # create database
             mysql --defaults-extra-file=$dbconf -e "CREATE DATABASE $1_$domainvaliddbname"
             # grant user to database
@@ -119,9 +127,10 @@ while IFS='' read -r -d '' key; do
             # flush privileges
             mysql --defaults-extra-file=$dbconf -e "FLUSH PRIVILEGES"
             # confirm we have a usable database backup
-            if [ -d "/vagrant/repositories/apache/$domain/_sql" ]; then
-                echo -e "NOTICE: $1.$domain"
-                echo -e "\t/repositories/$domain/_sql directory exists"
+            if ! [ -d "/vagrant/repositories/apache/$domain/_sql" ]; then
+                echo -e "\t* /repositories/$domain/_sql does not exist - $software will not function"
+            else
+                echo -e "\t* /repositories/$domain/_sql directory exists"
                 filenewest=$(ls "/vagrant/repositories/apache/$domain/_sql" | grep -E ^[0-9]{8}\.sql$ | sort -n | tail -1)
                 for file in /vagrant/repositories/apache/$domain/_sql/*.*; do
                     filename=$(basename "$file")
@@ -162,9 +171,6 @@ while IFS='' read -r -d '' key; do
                         fi
                     fi
                 done
-            else
-                echo -e "WARNING: $1.$domain"
-                echo -e "\t/repositories/$domain/_sql does not exist - $software will not function"
             fi
         fi
     fi
