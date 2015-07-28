@@ -491,7 +491,7 @@ configuration["websites"].each do |service,data|
       end
       # create bamboo service per bitbucket repo
       if "#{repo_split_2[0]}" == "bitbucket.org"
-        # the bitbucket api offers no patch for service hooks so we first need to check if the bamboo services exist
+        # the bitbucket api offers no patch for service hooks, so we first need to check if the bitbucket bamboo service hooks exist
         uri = URI("https://api.bitbucket.org/1.0/repositories/#{repo_split_3[0]}/services")
         Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => OpenSSL::SSL::VERIFY_NONE) do |http|
           request = Net::HTTP::Get.new uri.request_uri
