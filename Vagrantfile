@@ -41,6 +41,7 @@ def catapult_exception(error)
     puts "\n"
     puts exception.message
     puts "\n"
+    puts "Please correct the error then re-run your vagrant command."
     puts "See https://github.com/devopsgroup-io/catapult-release-management for more information."
     puts "\n\n"
     exit 1
@@ -114,7 +115,6 @@ else
   `#{git} pull upstream master`
   `#{git} push origin master`
   `#{git} checkout #{branch}`
-  puts "\n"
 end
 # create a git pre-commit hook to ensure no configuration is committed to develop and only configuration is committed to master
 FileUtils.mkdir_p(".git/hooks")
@@ -174,8 +174,7 @@ if configuration_user["settings"]["gpg_key"] == nil || configuration_user["setti
 end
 
 
-puts "\n\nVerification of encrypted Catapult configuration files:"
-puts "\n"
+puts "\n\n\nVerification of encrypted Catapult configuration files:\n\n"
 if "#{branch}" == "develop"
   puts " * You are on the develop branch, this branch is automatically synced with Catapult core and is meant to contribute back to the core Catapult project."
   puts " * configuration.yml.gpg, provisioners/.ssh/id_rsa.gpg, and provisioners/.ssh/id_rsa.pub.gpg are checked out from the master branch so that you're able to develop and test."
@@ -235,14 +234,16 @@ configuration_example = YAML.load_file("configuration.yml.template")
 # decrypt id_rsa and id_rsa.pub
 `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output provisioners/.ssh/id_rsa --decrypt provisioners/.ssh/id_rsa.gpg`
 `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output provisioners/.ssh/id_rsa.pub --decrypt provisioners/.ssh/id_rsa.pub.gpg`
-puts "\n"
 
 
-# configuration.yml validation
+
+puts "\nVerification of configuration[\"software\"]:\n\n"
 # validate configuration["software"]
 if configuration["software"]["version"] != configuration_example["software"]["version"]
   catapult_exception("Your configuration.yml file is out of date. To retain your settings please manually duplicate entries from configuration.yml.template with your specific settings.\n*You may also delete your configuration.yml and re-run any vagrant command to have a vanilla version created.")
 end
+puts " * Status: Verified"
+puts "\nVerification of configuration[\"company\"]:\n\n"
 # validate configuration["company"]
 if configuration["company"]["name"] == nil
   catapult_exception("Please set [\"company\"][\"name\"] in configuration.yml")
@@ -328,8 +329,9 @@ else
       api_bamboo_project_name = @api_bamboo["projects"]["project"].find { |element| element["name"] == "Catapult" }
       unless api_bamboo_project_name
         catapult_exception("Could not find the project name \"Catapult\" in Bamboo, please follow the Services Setup for Bamboo at https://github.com/devopsgroup-io/catapult-release-management#services-setup")
+      else
+        puts "   - Found the project key \"CAT\"."
       end
-      puts "   - Found the project key \"CAT\"."
     end
     uri = URI("#{configuration["company"]["bamboo_base_url"]}rest/api/latest/result/CAT-TEST.json?os_authType=basic")
     Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => OpenSSL::SSL::VERIFY_NONE) do |http|
@@ -339,8 +341,9 @@ else
       @api_bamboo = JSON.parse(response.body)
       if response.code.to_f.between?(399,600)
         catapult_exception("Could not find the plan key \"TEST\" in Bamboo, please follow the Services Setup for Bamboo at https://github.com/devopsgroup-io/catapult-release-management#services-setup")
+      else
+        puts "   - Found the plan key \"TEST\"."
       end
-      puts "   - Found the plan key \"TEST\"."
     end
     uri = URI("#{configuration["company"]["bamboo_base_url"]}rest/api/latest/result/CAT-QC.json?os_authType=basic")
     Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => OpenSSL::SSL::VERIFY_NONE) do |http|
@@ -350,8 +353,9 @@ else
       @api_bamboo = JSON.parse(response.body)
       if response.code.to_f.between?(399,600)
         catapult_exception("Could not find the plan key \"QC\" in Bamboo, please follow the Services Setup for Bamboo at https://github.com/devopsgroup-io/catapult-release-management#services-setup")
+      else
+        puts "   - Found the plan key \"QC\"."
       end
-      puts "   - Found the plan key \"QC\"."
     end
     uri = URI("#{configuration["company"]["bamboo_base_url"]}rest/api/latest/result/CAT-PROD.json?os_authType=basic")
     Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => OpenSSL::SSL::VERIFY_NONE) do |http|
@@ -361,8 +365,9 @@ else
       @api_bamboo = JSON.parse(response.body)
       if response.code.to_f.between?(399,600)
         catapult_exception("Could not find the plan key \"PROD\" in Bamboo, please follow the Services Setup for Bamboo at https://github.com/devopsgroup-io/catapult-release-management#services-setup")
+      else
+        puts "   - Found the plan key \"PROD\"."
       end
-      puts "   - Found the plan key \"PROD\"."
     end
   end
 end
@@ -384,6 +389,8 @@ else
     end
   end
 end
+puts " * Status: Verified"
+puts "\nVerification of configuration[\"environments\"]:\n\n"
 # validate configuration["environments"]
 configuration["environments"].each do |environment,data|
   unless configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["mysql"]["user_password"]
@@ -432,6 +439,8 @@ configuration["environments"].each do |environment,data|
     end
   end
 end
+puts " * Status: Verified"
+puts "\nVerification of configuration[\"websites\"]:\n\n"
 # validate configuration["websites"]
 configuration["websites"].each do |service,data|
   domains = Array.new
@@ -567,6 +576,7 @@ configuration["websites"].each do |service,data|
     catapult_exception("There is an error in your configuration.yml file.\nThe domains in configuration.yml are not in alpha order for websites => #{service} - please adjust.")
   end
 end
+puts " * Status: Verified"
 
 
 # create arrays of domains for localdev hosts file
@@ -590,7 +600,7 @@ end
 if ["status"].include?(ARGV[0])
   totalwebsites = 0
   # start a new row
-  puts "\n\nAvailable websites legend:"
+  puts "\n\n\nAvailable websites legend:"
   puts "\n[http response codes]"
   puts "\n * 200 ok, 301 moved permanently, 302 found, 400 bad request, 401 unauthorized, 403 forbidden, 404 not found, 500 internal server error, 502 bad gateway, 503 service unavailable, 504 gateway timeout"
   puts " * [reference] http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html"
