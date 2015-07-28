@@ -238,7 +238,7 @@ elsif "#{branch}" == "master"
       puts "\nThere were changes to provisioners/.ssh/id_rsa, encrypting provisioners/.ssh/id_rsa as provisioners/.ssh/id_rsa.gpg. Please commit these changes to the master branch for your team to get the changes.\n\n"
       `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output provisioners/.ssh/id_rsa.gpg --armor --cipher-algo AES256 --symmetric provisioners/.ssh/id_rsa`
     end
-    FileUtils.rm('provisioners/.ssh/id_rsa.gpg.compare')
+    FileUtils.rm('provisioners/.ssh/id_rsa.compare')
     # decrypt provisioners/.ssh/id_rsa.pub.gpg as provisioners/.ssh/id_rsa.pub.compare
     `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output provisioners/.ssh/id_rsa.pub.compare --decrypt provisioners/.ssh/id_rsa.pub.gpg`
     if FileUtils.compare_file('provisioners/.ssh/id_rsa.pub', 'provisioners/.ssh/id_rsa.pub.compare')
@@ -249,7 +249,7 @@ elsif "#{branch}" == "master"
       puts "\nThere were changes to provisioners/.ssh/id_rsa.pub, encrypting provisioners/.ssh/id_rsa.pub as provisioners/.ssh/id_rsa.pub.gpg. Please commit these changes to the master branch for your team to get the changes.\n\n"
       `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output provisioners/.ssh/id_rsa.pub.gpg --armor --cipher-algo AES256 --symmetric provisioners/.ssh/id_rsa.pub`
     end
-    FileUtils.rm('provisioners/.ssh/id_rsa.pub.gpg.compare')
+    FileUtils.rm('provisioners/.ssh/id_rsa.pub.compare')
   else
     `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output provisioners/.ssh/id_rsa --decrypt provisioners/.ssh/id_rsa.gpg`
     `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output provisioners/.ssh/id_rsa.pub --decrypt provisioners/.ssh/id_rsa.pub.gpg`
