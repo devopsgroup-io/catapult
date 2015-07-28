@@ -338,7 +338,6 @@ else
       request = Net::HTTP::Get.new uri.request_uri
       request.basic_auth "#{configuration["company"]["bamboo_username"]}", "#{configuration["company"]["bamboo_password"]}"
       response = http.request request
-      @api_bamboo = JSON.parse(response.body)
       if response.code.to_f.between?(399,600)
         catapult_exception("Could not find the plan key \"TEST\" in Bamboo, please follow the Services Setup for Bamboo at https://github.com/devopsgroup-io/catapult-release-management#services-setup")
       else
@@ -350,7 +349,6 @@ else
       request = Net::HTTP::Get.new uri.request_uri
       request.basic_auth "#{configuration["company"]["bamboo_username"]}", "#{configuration["company"]["bamboo_password"]}"
       response = http.request request
-      @api_bamboo = JSON.parse(response.body)
       if response.code.to_f.between?(399,600)
         catapult_exception("Could not find the plan key \"QC\" in Bamboo, please follow the Services Setup for Bamboo at https://github.com/devopsgroup-io/catapult-release-management#services-setup")
       else
@@ -362,7 +360,6 @@ else
       request = Net::HTTP::Get.new uri.request_uri
       request.basic_auth "#{configuration["company"]["bamboo_username"]}", "#{configuration["company"]["bamboo_password"]}"
       response = http.request request
-      @api_bamboo = JSON.parse(response.body)
       if response.code.to_f.between?(399,600)
         catapult_exception("Could not find the plan key \"PROD\" in Bamboo, please follow the Services Setup for Bamboo at https://github.com/devopsgroup-io/catapult-release-management#services-setup")
       else
@@ -494,38 +491,66 @@ configuration["websites"].each do |service,data|
       end
       # create bamboo service per bitbucket repo
       if "#{repo_split_2[0]}" == "bitbucket.org"
+        # the bitbucket api offers no patch for service hooks, so we first need to check if the bitbucket bamboo service hooks exist
         uri = URI("https://api.bitbucket.org/1.0/repositories/#{repo_split_3[0]}/services")
         Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => OpenSSL::SSL::VERIFY_NONE) do |http|
-          request = Net::HTTP::Post.new uri.request_uri
+          request = Net::HTTP::Get.new uri.request_uri
           request.basic_auth "#{configuration["company"]["bitbucket_username"]}", "#{configuration["company"]["bitbucket_password"]}"
-          request.body = URI::encode\
-            (""\
-              "type=Bamboo"\
-              "&URL=#{configuration["company"]["bamboo_base_url"]}"\
-              "&Plan Key=CAT-TEST"\
-              "&Username=#{configuration["company"]["bamboo_username"]}"\
-              "&Password=#{configuration["company"]["bamboo_password"]}"\
-            "")
           response = http.request request # Net::HTTPResponse object
-          if response.code.to_f.between?(399,600)
-            catapult_exception("Unable to configure Bitbucket Bamboo service for websites => #{service} => domain => #{instance["domain"]}. Ensure the github_username defined in configuration.yml has correct access to the repository.")
+          api_bitbucket_services = JSON.parse(response.body)
+          @api_bitbucket_services_bamboo_cat_test = false
+          @api_bitbucket_services_bamboo_cat_qc = false
+          api_bitbucket_services.each do |service|
+            if service["service"]["type"] == "Bamboo"
+              service["service"]["fields"].each do |field|
+                if field["name"] == "Plan Key"
+                  if field["value"] == "CAT-TEST"
+                    @api_bitbucket_services_bamboo_cat_test = true
+                  end
+                  if field["value"] == "CAT-QC"
+                    @api_bitbucket_services_bamboo_cat_qc = true
+                  end
+                end
+              end
+            end
           end
-        end
-        uri = URI("https://api.bitbucket.org/1.0/repositories/#{repo_split_3[0]}/services")
-        Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => OpenSSL::SSL::VERIFY_NONE) do |http|
-          request = Net::HTTP::Post.new uri.request_uri
-          request.basic_auth "#{configuration["company"]["bitbucket_username"]}", "#{configuration["company"]["bitbucket_password"]}"
-          request.body = URI::encode\
-            (""\
-              "type=Bamboo"\
-              "&URL=#{configuration["company"]["bamboo_base_url"]}"\
-              "&Plan Key=CAT-QC"\
-              "&Username=#{configuration["company"]["bamboo_username"]}"\
-              "&Password=#{configuration["company"]["bamboo_password"]}"\
-            "")
-          response = http.request request # Net::HTTPResponse object
-          if response.code.to_f.between?(399,600)
-            catapult_exception("Unable to configure Bitbucket Bamboo service for websites => #{service} => domain => #{instance["domain"]}. Ensure the github_username defined in configuration.yml has correct access to the repository.")
+          unless @api_bitbucket_services_bamboo_cat_test
+            uri = URI("https://api.bitbucket.org/1.0/repositories/#{repo_split_3[0]}/services")
+            Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => OpenSSL::SSL::VERIFY_NONE) do |http|
+              request = Net::HTTP::Post.new uri.request_uri
+              request.basic_auth "#{configuration["company"]["bitbucket_username"]}", "#{configuration["company"]["bitbucket_password"]}"
+              request.body = URI::encode\
+                (""\
+                  "type=Bamboo"\
+                  "&URL=#{configuration["company"]["bamboo_base_url"]}"\
+                  "&Plan Key=CAT-TEST"\
+                  "&Username=#{configuration["company"]["bamboo_username"]}"\
+                  "&Password=#{configuration["company"]["bamboo_password"]}"\
+                "")
+              response = http.request request # Net::HTTPResponse object
+              if response.code.to_f.between?(399,600)
+                catapult_exception("Unable to configure Bitbucket Bamboo service for websites => #{service} => domain => #{instance["domain"]}. Ensure the github_username defined in configuration.yml has correct access to the repository.")
+              end
+            end
+          end
+          unless @api_bitbucket_services_bamboo_cat_qc
+            uri = URI("https://api.bitbucket.org/1.0/repositories/#{repo_split_3[0]}/services")
+            Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => OpenSSL::SSL::VERIFY_NONE) do |http|
+              request = Net::HTTP::Post.new uri.request_uri
+              request.basic_auth "#{configuration["company"]["bitbucket_username"]}", "#{configuration["company"]["bitbucket_password"]}"
+              request.body = URI::encode\
+                (""\
+                  "type=Bamboo"\
+                  "&URL=#{configuration["company"]["bamboo_base_url"]}"\
+                  "&Plan Key=CAT-QC"\
+                  "&Username=#{configuration["company"]["bamboo_username"]}"\
+                  "&Password=#{configuration["company"]["bamboo_password"]}"\
+                "")
+              response = http.request request # Net::HTTPResponse object
+              if response.code.to_f.between?(399,600)
+                catapult_exception("Unable to configure Bitbucket Bamboo service for websites => #{service} => domain => #{instance["domain"]}. Ensure the github_username defined in configuration.yml has correct access to the repository.")
+              end
+            end
           end
         end
       end
