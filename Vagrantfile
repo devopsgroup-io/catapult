@@ -256,6 +256,7 @@ end
 if configuration["company"]["timezone_windows"] == nil
   catapult_exception("Please set [\"company\"][\"timezone_windows\"] in configuration.yml")
 end
+# https://developers.digitalocean.com/documentation/v2/
 if configuration["company"]["digitalocean_personal_access_token"] == nil
   catapult_exception("Please set [\"company\"][\"digitalocean_personal_access_token\"] in configuration.yml")
 else
@@ -272,6 +273,7 @@ else
     end
   end
 end
+# https://confluence.atlassian.com/display/BITBUCKET/Version+1
 if configuration["company"]["bitbucket_username"] == nil || configuration["company"]["bitbucket_password"] == nil
   catapult_exception("Please set [\"company\"][\"bitbucket_username\"] and [\"company\"][\"bitbucket_password\"] in configuration.yml")
 else
@@ -288,6 +290,7 @@ else
     end
   end
 end
+# https://developer.github.com/v3/
 if configuration["company"]["github_username"] == nil || configuration["company"]["github_password"] == nil
   catapult_exception("Please set [\"company\"][\"github_username\"] and [\"company\"][\"github_password\"] in configuration.yml")
 else
@@ -304,6 +307,7 @@ else
     end
   end
 end
+# https://docs.atlassian.com/bamboo/REST/
 if configuration["company"]["bamboo_base_url"] == nil || configuration["company"]["bamboo_username"] == nil || configuration["company"]["bamboo_password"] == nil
   catapult_exception("Please set [\"company\"][\"bamboo_base_url\"] and [\"company\"][\"bamboo_username\"] and [\"company\"][\"bamboo_password\"] in configuration.yml")
 else
@@ -319,15 +323,50 @@ else
       @api_bamboo = JSON.parse(response.body)
       api_bamboo_project_key = @api_bamboo["projects"]["project"].find { |element| element["key"] == "CAT" }
       unless api_bamboo_project_key
-        catapult_exception("Could not find the Catapult project key \"CAT\" in Bamboo, please follow the Services Setup for Bamboo at https://github.com/devopsgroup-io/catapult-release-management#services-setup")
+        catapult_exception("Could not find the project key \"CAT\" in Bamboo, please follow the Services Setup for Bamboo at https://github.com/devopsgroup-io/catapult-release-management#services-setup")
       end
       api_bamboo_project_name = @api_bamboo["projects"]["project"].find { |element| element["name"] == "Catapult" }
       unless api_bamboo_project_name
-        catapult_exception("Could not find the Catapult project name \"Catapult\" in Bamboo, please follow the Services Setup for Bamboo at https://github.com/devopsgroup-io/catapult-release-management#services-setup")
+        catapult_exception("Could not find the project name \"Catapult\" in Bamboo, please follow the Services Setup for Bamboo at https://github.com/devopsgroup-io/catapult-release-management#services-setup")
       end
+      puts "   - Found the project key \"CAT\"."
+    end
+    uri = URI("#{configuration["company"]["bamboo_base_url"]}rest/api/latest/result/CAT-TEST.json?os_authType=basic")
+    Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => OpenSSL::SSL::VERIFY_NONE) do |http|
+      request = Net::HTTP::Get.new uri.request_uri
+      request.basic_auth "#{configuration["company"]["bamboo_username"]}", "#{configuration["company"]["bamboo_password"]}"
+      response = http.request request
+      @api_bamboo = JSON.parse(response.body)
+      if response.code.to_f.between?(399,600)
+        catapult_exception("Could not find the plan key \"TEST\" in Bamboo, please follow the Services Setup for Bamboo at https://github.com/devopsgroup-io/catapult-release-management#services-setup")
+      end
+      puts "   - Found the plan key \"TEST\"."
+    end
+    uri = URI("#{configuration["company"]["bamboo_base_url"]}rest/api/latest/result/CAT-QC.json?os_authType=basic")
+    Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => OpenSSL::SSL::VERIFY_NONE) do |http|
+      request = Net::HTTP::Get.new uri.request_uri
+      request.basic_auth "#{configuration["company"]["bamboo_username"]}", "#{configuration["company"]["bamboo_password"]}"
+      response = http.request request
+      @api_bamboo = JSON.parse(response.body)
+      if response.code.to_f.between?(399,600)
+        catapult_exception("Could not find the plan key \"QC\" in Bamboo, please follow the Services Setup for Bamboo at https://github.com/devopsgroup-io/catapult-release-management#services-setup")
+      end
+      puts "   - Found the plan key \"QC\"."
+    end
+    uri = URI("#{configuration["company"]["bamboo_base_url"]}rest/api/latest/result/CAT-PROD.json?os_authType=basic")
+    Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => OpenSSL::SSL::VERIFY_NONE) do |http|
+      request = Net::HTTP::Get.new uri.request_uri
+      request.basic_auth "#{configuration["company"]["bamboo_username"]}", "#{configuration["company"]["bamboo_password"]}"
+      response = http.request request
+      @api_bamboo = JSON.parse(response.body)
+      if response.code.to_f.between?(399,600)
+        catapult_exception("Could not find the plan key \"PROD\" in Bamboo, please follow the Services Setup for Bamboo at https://github.com/devopsgroup-io/catapult-release-management#services-setup")
+      end
+      puts "   - Found the plan key \"PROD\"."
     end
   end
 end
+# https://api.cloudflare.com/
 if configuration["company"]["cloudflare_api_key"] == nil || configuration["company"]["cloudflare_email"] == nil
   catapult_exception("Please set [\"company\"][\"cloudflare_api_key\"] and [\"company\"][\"cloudflare_email\"] in configuration.yml")
 else
