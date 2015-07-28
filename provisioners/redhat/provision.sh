@@ -97,10 +97,6 @@ sudo mkdir -p ~/.ssh
 sudo touch ~/.ssh/known_hosts
 sudo ssh-keyscan bitbucket.org > ~/.ssh/known_hosts
 sudo ssh-keyscan github.com >> ~/.ssh/known_hosts
-# link /vagrant/repositories to webroot if not in dev, otherwise dev will use vagrant synced folder
-if [ "$1" != "dev" ]; then
-    sudo ln -s /vagrant/repositories /var/www/repositories
-fi
 while IFS='' read -r -d '' key; do
     domain=$(echo "$key" | grep -w "domain" | cut -d ":" -f 2 | tr -d " ")
     repo=$(echo "$key" | grep -w "repo" | cut -d ":" -f 2,3 | tr -d " ")
