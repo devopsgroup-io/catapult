@@ -175,8 +175,6 @@ sudo rm -rf /var/log/httpd/*
 sudo rm -rf /etc/httpd/sites-available/*
 sudo rm -rf /etc/httpd/sites-enabled/*
 sudo cat /dev/null > /etc/httpd/conf.d/welcome.conf
-sudo apachectl stop
-sudo apachectl start
 
 cat /vagrant/configuration.yml | shyaml get-values-0 websites.apache |
 while IFS='' read -r -d '' key; do
