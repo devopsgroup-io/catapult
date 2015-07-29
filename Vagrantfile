@@ -293,6 +293,33 @@ else
     else
       puts " * DigitalOcean API authenticated successfully."
       @api_digitalocean = JSON.parse(response.body)
+      uri = URI("https://api.digitalocean.com/v2/account/keys")
+      Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => OpenSSL::SSL::VERIFY_NONE) do |http|
+        request = Net::HTTP::Get.new uri.request_uri
+        request.add_field "Authorization", "Bearer #{configuration["company"]["digitalocean_personal_access_token"]}"
+        response = http.request request
+        api_digitalocean_account_keys = JSON.parse(response.body)
+        @api_digitalocean_account_key_name = false
+        @api_digitalocean_account_key_public_key = false
+        api_digitalocean_account_keys["ssh_keys"].each do |key|
+          if key["name"] == "Vagrant"
+            @api_digitalocean_account_key_name = true
+            if key["public_key"] == File.read("provisioners/.ssh/id_rsa.pub").gsub(/\n+/, "")
+              @api_digitalocean_account_key_public_key = true
+            end
+          end
+        end
+        unless @api_digitalocean_account_key_name
+          catapult_exception("Could not find the SSH Key named \"Vagrant\" in DigitalOcean, please follow the Services Setup for DigitalOcean at https://github.com/devopsgroup-io/catapult-release-management#services-setup")
+        else
+          puts "   - Found the SSH Key \"Vagrant\""
+        end
+        unless @api_digitalocean_account_key_public_key
+          catapult_exception("The SSH Key named \"Vagrant\" in DigitalOcean does not match your Catapult instance's SSH Key at \"provisioners/.ssh/id_rsa.pub\", please follow the Services Setup for DigitalOcean at https://github.com/devopsgroup-io/catapult-release-management#services-setup")
+        else
+          puts "   - The SSH Key \"Vagrant\" matches Catapult's SSH Key"
+        end
+      end
     end
   end
 end
@@ -352,7 +379,7 @@ else
       unless api_bamboo_project_name
         catapult_exception("Could not find the project name \"Catapult\" in Bamboo, please follow the Services Setup for Bamboo at https://github.com/devopsgroup-io/catapult-release-management#services-setup")
       else
-        puts "   - Found the project key \"CAT\"."
+        puts "   - Found the project key \"CAT\""
       end
     end
     uri = URI("#{configuration["company"]["bamboo_base_url"]}rest/api/latest/result/CAT-TEST.json?os_authType=basic")
@@ -363,7 +390,7 @@ else
       if response.code.to_f.between?(399,600)
         catapult_exception("Could not find the plan key \"TEST\" in Bamboo, please follow the Services Setup for Bamboo at https://github.com/devopsgroup-io/catapult-release-management#services-setup")
       else
-        puts "   - Found the plan key \"TEST\"."
+        puts "   - Found the plan key \"TEST\""
       end
     end
     uri = URI("#{configuration["company"]["bamboo_base_url"]}rest/api/latest/result/CAT-QC.json?os_authType=basic")
@@ -374,7 +401,7 @@ else
       if response.code.to_f.between?(399,600)
         catapult_exception("Could not find the plan key \"QC\" in Bamboo, please follow the Services Setup for Bamboo at https://github.com/devopsgroup-io/catapult-release-management#services-setup")
       else
-        puts "   - Found the plan key \"QC\"."
+        puts "   - Found the plan key \"QC\""
       end
     end
     uri = URI("#{configuration["company"]["bamboo_base_url"]}rest/api/latest/result/CAT-PROD.json?os_authType=basic")
@@ -385,7 +412,7 @@ else
       if response.code.to_f.between?(399,600)
         catapult_exception("Could not find the plan key \"PROD\" in Bamboo, please follow the Services Setup for Bamboo at https://github.com/devopsgroup-io/catapult-release-management#services-setup")
       else
-        puts "   - Found the plan key \"PROD\"."
+        puts "   - Found the plan key \"PROD\""
       end
     end
   end
