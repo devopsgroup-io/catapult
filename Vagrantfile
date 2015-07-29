@@ -188,8 +188,10 @@ if "#{branch}" == "develop"
   `git reset -- provisioners/.ssh/id_rsa.pub.gpg`
 elsif "#{branch}" == "master"
   puts " * You are on the master branch, this branch is automatically synced with Catapult core and is meant to commit your unique configuration.yml.gpg, provisioners/.ssh/id_rsa.gpg, and provisioners/.ssh/id_rsa.pub.gpg configuration."
+  if configuration_user["settings"]["gpg_edit"]
+    puts " * GPG Edit Mode is enabled at configuration-user.yml[\"settings\"][\"gpg_edit\"], if there are changes to configuration.yml, provisioners/.ssh/id_rsa, or provisioners/.ssh/id_rsa.pub, they will be re-encrypted."
+  end
   puts "\n"
-
   # bootstrap configuration.yml
   # initialize configuration.yml.gpg
   if File.zero?("configuration.yml.gpg")
@@ -203,11 +205,9 @@ elsif "#{branch}" == "master"
     # decrypt configuration.yml.gpg as configuration.yml.compare
     `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output configuration.yml.compare --decrypt configuration.yml.gpg`
     if FileUtils.compare_file('configuration.yml', 'configuration.yml.compare')
-      puts "\nconfiguration_user[\"settings\"][\"gpg_edit\"] in configuration-user.yml is set to true."
-      puts "\nThere were no changes to configuration.yml, no need to encrypt as this would create a new cipher to commit.\n\n"
+      puts "\n * There were no changes to configuration.yml, no need to encrypt as this would create a new cipher to commit.\n\n"
     else
-      puts "\nconfiguration_user[\"settings\"][\"gpg_edit\"] in configuration-user.yml is set to true."
-      puts "\nThere were changes to configuration.yml, encrypting configuration.yml as configuration.yml.gpg. Please commit these changes to the master branch for your team to get the changes.\n\n"
+      puts "\n * There were changes to configuration.yml, encrypting configuration.yml as configuration.yml.gpg. Please commit these changes to the master branch for your team to get the changes.\n\n"
       `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output configuration.yml.gpg --armor --cipher-algo AES256 --symmetric configuration.yml`
     end
     FileUtils.rm('configuration.yml.compare')
@@ -215,7 +215,6 @@ elsif "#{branch}" == "master"
     # decrypt configuration.yml.gpg as configuration.yml
     `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output configuration.yml --decrypt configuration.yml.gpg`
   end
-
   # bootstrap ssh keys
   # decrypt id_rsa and id_rsa.pub
   if File.zero?("provisioners/.ssh/id_rsa.gpg") || File.zero?("provisioners/.ssh/id_rsa.pub.gpg")
@@ -231,22 +230,18 @@ elsif "#{branch}" == "master"
     # decrypt provisioners/.ssh/id_rsa.gpg as provisioners/.ssh/id_rsa.compare
     `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output provisioners/.ssh/id_rsa.compare --decrypt provisioners/.ssh/id_rsa.gpg`
     if FileUtils.compare_file('provisioners/.ssh/id_rsa', 'provisioners/.ssh/id_rsa.compare')
-      puts "\nconfiguration_user[\"settings\"][\"gpg_edit\"] in configuration-user.yml is set to true."
-      puts "\nThere were no changes to provisioners/.ssh/id_rsa, no need to encrypt as this would create a new cipher to commit.\n\n"
+      puts "\n * There were no changes to provisioners/.ssh/id_rsa, no need to encrypt as this would create a new cipher to commit.\n\n"
     else
-      puts "\nconfiguration_user[\"settings\"][\"gpg_edit\"] in configuration-user.yml is set to true."
-      puts "\nThere were changes to provisioners/.ssh/id_rsa, encrypting provisioners/.ssh/id_rsa as provisioners/.ssh/id_rsa.gpg. Please commit these changes to the master branch for your team to get the changes.\n\n"
+      puts "\n * There were changes to provisioners/.ssh/id_rsa, encrypting provisioners/.ssh/id_rsa as provisioners/.ssh/id_rsa.gpg. Please commit these changes to the master branch for your team to get the changes.\n\n"
       `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output provisioners/.ssh/id_rsa.gpg --armor --cipher-algo AES256 --symmetric provisioners/.ssh/id_rsa`
     end
     FileUtils.rm('provisioners/.ssh/id_rsa.compare')
     # decrypt provisioners/.ssh/id_rsa.pub.gpg as provisioners/.ssh/id_rsa.pub.compare
     `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output provisioners/.ssh/id_rsa.pub.compare --decrypt provisioners/.ssh/id_rsa.pub.gpg`
     if FileUtils.compare_file('provisioners/.ssh/id_rsa.pub', 'provisioners/.ssh/id_rsa.pub.compare')
-      puts "\nconfiguration_user[\"settings\"][\"gpg_edit\"] in configuration-user.yml is set to true."
-      puts "\nThere were no changes to provisioners/.ssh/id_rsa.pub, no need to encrypt as this would create a new cipher to commit.\n\n"
+      puts "\n * There were no changes to provisioners/.ssh/id_rsa.pub, no need to encrypt as this would create a new cipher to commit.\n\n"
     else
-      puts "\nconfiguration_user[\"settings\"][\"gpg_edit\"] in configuration-user.yml is set to true."
-      puts "\nThere were changes to provisioners/.ssh/id_rsa.pub, encrypting provisioners/.ssh/id_rsa.pub as provisioners/.ssh/id_rsa.pub.gpg. Please commit these changes to the master branch for your team to get the changes.\n\n"
+      puts "\n * There were changes to provisioners/.ssh/id_rsa.pub, encrypting provisioners/.ssh/id_rsa.pub as provisioners/.ssh/id_rsa.pub.gpg. Please commit these changes to the master branch for your team to get the changes.\n\n"
       `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output provisioners/.ssh/id_rsa.pub.gpg --armor --cipher-algo AES256 --symmetric provisioners/.ssh/id_rsa.pub`
     end
     FileUtils.rm('provisioners/.ssh/id_rsa.pub.compare')
@@ -259,6 +254,8 @@ end
 # create objects from configuration.yml.gpg and configuration.yml.template
 configuration = YAML.load(`gpg --batch --passphrase "#{configuration_user["settings"]["gpg_key"]}" --decrypt configuration.yml.gpg`)
 configuration_example = YAML.load_file("configuration.yml.template")
+`gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output provisioners/.ssh/id_rsa --decrypt provisioners/.ssh/id_rsa.gpg`
+`gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output provisioners/.ssh/id_rsa.pub --decrypt provisioners/.ssh/id_rsa.pub.gpg`
 
 
 
