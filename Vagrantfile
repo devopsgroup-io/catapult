@@ -312,12 +312,12 @@ else
         unless @api_digitalocean_account_key_name
           catapult_exception("Could not find the SSH Key named \"Vagrant\" in DigitalOcean, please follow the Services Setup for DigitalOcean at https://github.com/devopsgroup-io/catapult-release-management#services-setup")
         else
-          puts "   - Found the SSH Key \"Vagrant\""
+          puts "   - Found the ssh public key \"Vagrant\""
         end
         unless @api_digitalocean_account_key_public_key
           catapult_exception("The SSH Key named \"Vagrant\" in DigitalOcean does not match your Catapult instance's SSH Key at \"provisioners/.ssh/id_rsa.pub\", please follow the Services Setup for DigitalOcean at https://github.com/devopsgroup-io/catapult-release-management#services-setup")
         else
-          puts "   - The SSH Key \"Vagrant\" matches Catapult's SSH Key"
+          puts "   - The ssh public key \"Vagrant\" matches your provisioners/.ssh/id_rsa.pub ssh public key"
         end
       end
     end
