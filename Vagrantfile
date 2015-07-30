@@ -304,7 +304,7 @@ else
         api_digitalocean_account_keys["ssh_keys"].each do |key|
           if key["name"] == "Vagrant"
             @api_digitalocean_account_key_name = true
-            if key["public_key"] == File.read("provisioners/.ssh/id_rsa.pub").gsub(/\n+/, "")
+            if "#{key["public_key"].match(/(\w*-\w*\s\S*)/)}" == "#{File.read("provisioners/.ssh/id_rsa.pub").match(/(\w*-\w*\s\S*)/)}"
               @api_digitalocean_account_key_public_key = true
             end
           end
@@ -337,6 +337,36 @@ else
     else
       puts " * Bitbucket API authenticated successfully."
       @api_bitbucket = JSON.parse(response.body)
+      # verify bitbucket user's catapult ssh key
+      uri = URI("https://api.bitbucket.org/1.0/users/#{configuration["company"]["bitbucket_username"]}/ssh-keys")
+      Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => OpenSSL::SSL::VERIFY_NONE) do |http|
+        request = Net::HTTP::Get.new uri.request_uri
+        request.basic_auth "#{configuration["company"]["bitbucket_username"]}", "#{configuration["company"]["bitbucket_password"]}"
+        response = http.request request # Net::HTTPResponse object
+        @api_bitbucket_ssh_keys = JSON.parse(response.body)
+        @api_bitbucket_ssh_keys_title = false
+        @api_bitbucket_ssh_keys_key = false
+        unless response.code.to_f.between?(399,600)
+          @api_bitbucket_ssh_keys.each do |key|
+            if key["label"] == "Catapult"
+              @api_bitbucket_ssh_keys_title = true
+              if "#{key["key"].match(/(\w*-\w*\s\S*)/)}" == "#{File.read("provisioners/.ssh/id_rsa.pub").match(/(\w*-\w*\s\S*)/)}"
+                @api_bitbucket_ssh_keys_key = true
+              end
+            end
+          end
+        end
+        unless @api_bitbucket_ssh_keys_title
+          catapult_exception("Could not find the SSH Key named \"Catapult\" for your Bitbucket user #{configuration["company"]["bitbucket_username"]}, please follow Provision Websites at https://github.com/devopsgroup-io/catapult-release-management#provision-websites")
+        else
+          puts "   - Found the ssh public key \"Catapult\" for your Bitbucket user #{configuration["company"]["bitbucket_username"]}"
+        end
+        unless @api_bitbucket_ssh_keys_key
+          catapult_exception("The SSH Key named \"Catapult\" in Bitbucket does not match your Catapult instance's SSH Key at \"provisioners/.ssh/id_rsa.pub\", please follow Provision Websites at https://github.com/devopsgroup-io/catapult-release-management#provision-websites")
+        else
+          puts "   - The ssh public key \"Catapult\" matches your provisioners/.ssh/id_rsa.pub ssh public key"
+        end
+      end
     end
   end
 end
@@ -354,6 +384,36 @@ else
     else
       puts " * GitHub API authenticated successfully."
       @api_github = JSON.parse(response.body)
+      # verify github user's catapult ssh key
+      uri = URI("https://api.github.com/user/keys")
+      Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => OpenSSL::SSL::VERIFY_NONE) do |http|
+        request = Net::HTTP::Get.new uri.request_uri
+        request.basic_auth "#{configuration["company"]["github_username"]}", "#{configuration["company"]["github_password"]}"
+        response = http.request request # Net::HTTPResponse object
+        @api_github_ssh_keys = JSON.parse(response.body)
+        @api_github_ssh_keys_title = false
+        @api_github_ssh_keys_key = false
+        unless response.code.to_f.between?(399,600)
+          @api_github_ssh_keys.each do |key|
+            if key["title"] == "Catapult"
+              @api_github_ssh_keys_title = true
+              if "#{key["key"].match(/(\w*-\w*\s\S*)/)}" == "#{File.read("provisioners/.ssh/id_rsa.pub").match(/(\w*-\w*\s\S*)/)}"
+                @api_github_ssh_keys_key = true
+              end
+            end
+          end
+        end
+        unless @api_github_ssh_keys_title
+          catapult_exception("Could not find the SSH Key named \"Catapult\" for your GitHub user #{configuration["company"]["github_username"]}, please follow Provision Websites at https://github.com/devopsgroup-io/catapult-release-management#provision-websites")
+        else
+          puts "   - Found the ssh public key \"Catapult\" for your GitHub user #{configuration["company"]["github_username"]}"
+        end
+        unless @api_github_ssh_keys_key
+          catapult_exception("The SSH Key named \"Catapult\" in GitHub does not match your Catapult instance's SSH Key at \"provisioners/.ssh/id_rsa.pub\", please follow Provision Websites at https://github.com/devopsgroup-io/catapult-release-management#provision-websites")
+        else
+          puts "   - The ssh public key \"Catapult\" matches your provisioners/.ssh/id_rsa.pub ssh public key"
+        end
+      end
     end
   end
 end
@@ -492,7 +552,9 @@ configuration["websites"].each do |service,data|
   domains = Array.new
   domains_sorted = Array.new
   unless configuration["websites"]["#{service}"] == nil
+    puts " [#{service}]"
     configuration["websites"]["#{service}"].each do |instance|
+      puts " * #{instance["domain"]}"
       # validate force_https
       unless "#{instance["force_https"]}" == ""
         unless ["true"].include?("#{instance["force_https"]}")
