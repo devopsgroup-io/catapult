@@ -127,12 +127,12 @@ while IFS='' read -r -d '' key; do
             # flush privileges
             mysql --defaults-extra-file=$dbconf -e "FLUSH PRIVILEGES"
             # confirm we have a usable database backup
-            if ! [ -d "/vagrant/repositories/apache/$domain/_sql" ]; then
+            if ! [ -d "/var/www/repositories/apache/$domain/_sql" ]; then
                 echo -e "\t* /repositories/$domain/_sql does not exist - $software will not function"
             else
                 echo -e "\t* /repositories/$domain/_sql directory exists"
-                filenewest=$(ls "/vagrant/repositories/apache/$domain/_sql" | grep -E ^[0-9]{8}\.sql$ | sort -n | tail -1)
-                for file in /vagrant/repositories/apache/$domain/_sql/*.*; do
+                filenewest=$(ls "/var/www/repositories/apache/$domain/_sql" | grep -E ^[0-9]{8}\.sql$ | sort -n | tail -1)
+                for file in /var/www/repositories/apache/$domain/_sql/*.*; do
                     filename=$(basename "$file")
                     filename="${filename%.*}"
                     if [[ "$file" != *.sql ]]; then
@@ -146,12 +146,12 @@ while IFS='' read -r -d '' key; do
                         echo -e "\t\trestoring..."
                         # match http:// and optionally www. then replace with http:// + optionally www. + either dev., test., or the production domain
                         if [[ "$software" != "wordpress" ]]; then
-                            sed -r -e "s/:\/\/(www\.)?${domain}/:\/\/\1${1}\.${domain}/g" "/vagrant/repositories/apache/$domain/_sql/$(basename "$file")" > "/vagrant/repositories/apache/$domain/_sql/$1.$(basename "$file")"
+                            sed -r -e "s/:\/\/(www\.)?${domain}/:\/\/\1${1}\.${domain}/g" "/var/www/repositories/apache/$domain/_sql/$(basename "$file")" > "/var/www/repositories/apache/$domain/_sql/$1.$(basename "$file")"
                         else
-                            cp "/vagrant/repositories/apache/$domain/_sql/$(basename "$file")" "/vagrant/repositories/apache/$domain/_sql/$1.$(basename "$file")"
+                            cp "/var/www/repositories/apache/$domain/_sql/$(basename "$file")" "/var/www/repositories/apache/$domain/_sql/$1.$(basename "$file")"
                         fi
-                        mysql --defaults-extra-file=$dbconf $1_$domainvaliddbname < "/vagrant/repositories/apache/$domain/_sql/$1.$(basename "$file")"
-                        rm -f "/vagrant/repositories/apache/$domain/_sql/$1.$(basename "$file")"
+                        mysql --defaults-extra-file=$dbconf $1_$domainvaliddbname < "/var/www/repositories/apache/$domain/_sql/$1.$(basename "$file")"
+                        rm -f "/var/www/repositories/apache/$domain/_sql/$1.$(basename "$file")"
                         if [[ "$software" = "drupal6" ]]; then
                             echo -e "\t\tresetting ${software} admin password..."
                             mysql --defaults-extra-file=$dbconf $1_$domainvaliddbname -e "UPDATE ${software_dbprefix}users SET name='admin', mail='$company_email', pass=MD5('$drupal_admin_password'), status='1' WHERE uid = 1;"
@@ -164,7 +164,7 @@ while IFS='' read -r -d '' key; do
                             echo -e "\t\tresetting ${software} admin password..."
                             mysql --defaults-extra-file=$dbconf $1_$domainvaliddbname -e "UPDATE ${software_dbprefix}users SET user_login='admin', user_email='$company_email', user_pass=MD5('$wordpress_admin_password'), user_status='0' WHERE id = 1;"
                             echo -e "\t\tupdating $software database with ${1}.${domainvaliddbname} URL"
-                            php /vagrant/provisioners/redhat/installers/wp-cli.phar --path="/vagrant/repositories/apache/$domain/" search-replace "$domain" "$1.$domain" | sed "s/^/\t\t/"
+                            php /vagrant/provisioners/redhat/installers/wp-cli.phar --path="/var/www/repositories/apache/$domain/" search-replace "$domain" "$1.$domain" | sed "s/^/\t\t/"
                             mysql --defaults-extra-file=$dbconf $1_$domainvaliddbname -e "UPDATE ${software_dbprefix}options SET option_value='$company_email' WHERE option_name = 'admin_email';"
                             mysql --defaults-extra-file=$dbconf $1_$domainvaliddbname -e "UPDATE ${software_dbprefix}options SET option_value='http://$1.$domain' WHERE option_name = 'home';"
                             mysql --defaults-extra-file=$dbconf $1_$domainvaliddbname -e "UPDATE ${software_dbprefix}options SET option_value='http://$1.$domain' WHERE option_name = 'siteurl';"

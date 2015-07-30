@@ -106,9 +106,9 @@ while IFS='' read -r -d '' key; do
             echo "the repo has changed in configuration.yml, removing and cloning the new repository." | sed "s/^/\t/"
             sudo rm -rf /var/www/repositories/apache/$domain
             sudo ssh-agent bash -c "ssh-add /vagrant/provisioners/.ssh/id_rsa; git clone --recursive -b $(cat /vagrant/configuration.yml | shyaml get-value environments.$1.branch) $repo /var/www/repositories/apache/$domain" | sed "s/^/\t/"
-        elif [ "$(cd /vagrant/repositories/apache/$domain && git rev-list HEAD | tail -n 1 )" != "$(cd /vagrant/repositories/apache/$domain && git rev-list origin/master | tail -n 1 )" ]; then
+        elif [ "$(cd /var/www/repositories/apache/$domain && git rev-list HEAD | tail -n 1 )" != "$(cd /var/www/repositories/apache/$domain && git rev-list origin/master | tail -n 1 )" ]; then
             echo "the repo has changed, removing and cloning the new repository." | sed "s/^/\t/"
-            sudo rm -rf /vagrant/repositories/apache/$domain
+            sudo rm -rf /var/www/repositories/apache/$domain
             sudo ssh-agent bash -c "ssh-add /vagrant/provisioners/.ssh/id_rsa; git clone --recursive -b $(cat /vagrant/configuration.yml | shyaml get-value environments.$1.branch) $repo /var/www/repositories/apache/$domain" | sed "s/^/\t/"
         elif [ "$settings_git_pull" = true ]; then
             cd /var/www/repositories/apache/$domain && git checkout $(cat /vagrant/configuration.yml | shyaml get-value environments.$1.branch)
@@ -117,10 +117,10 @@ while IFS='' read -r -d '' key; do
             echo "[provisioner argument false!] skipping git pull" | sed "s/^/\t/"
         fi
     else
-        if [ -d "/vagrant/repositories/apache/$domain" ]; then
+        if [ -d "/var/www/repositories/apache/$domain" ]; then
             echo "the .git folder is missing, removing the directory and re-cloning the repository." | sed "s/^/\t/"
-            sudo chmod 0777 -R /vagrant/repositories/apache/$domain
-            sudo rm -rf /vagrant/repositories/apache/$domain
+            sudo chmod 0777 -R /var/www/repositories/apache/$domain
+            sudo rm -rf /var/www/repositories/apache/$domain
         fi
         sudo ssh-agent bash -c "ssh-add /vagrant/provisioners/.ssh/id_rsa; git clone --recursive -b $(cat /vagrant/configuration.yml | shyaml get-value environments.$1.branch) $repo /var/www/repositories/apache/$domain" | sed "s/^/\t/"
     fi
@@ -448,11 +448,11 @@ EOF
                 echo -e "\t\t[provisioner argument false!] skipping $software information"
             else
                 echo "$software core version:" | sed "s/^/\t\t/"
-                cd "/vagrant/repositories/apache/${domain}/${webroot}" && drush core-status --field-labels=0 --fields=drupal-version 2>&1 | sed "s/^/\t\t\t/"
+                cd "/var/www/repositories/apache/${domain}/${webroot}" && drush core-status --field-labels=0 --fields=drupal-version 2>&1 | sed "s/^/\t\t\t/"
                 echo "$software core-requirements:" | sed "s/^/\t\t/"
-                cd "/vagrant/repositories/apache/${domain}/${webroot}" && drush core-requirements --severity=2 --format=table 2>&1 | sed "s/^/\t\t\t/"
+                cd "/var/www/repositories/apache/${domain}/${webroot}" && drush core-requirements --severity=2 --format=table 2>&1 | sed "s/^/\t\t\t/"
                 echo "$software pm-updatestatus:" | sed "s/^/\t\t/"
-                cd "/vagrant/repositories/apache/${domain}/${webroot}" && drush pm-updatestatus --format=table 2>&1 | sed "s/^/\t\t\t/"
+                cd "/var/www/repositories/apache/${domain}/${webroot}" && drush pm-updatestatus --format=table 2>&1 | sed "s/^/\t\t\t/"
             fi
     elif [ "$software" = "drupal7" ]; then
             echo -e "\t\tgenerating $software database configuration file"
@@ -471,11 +471,11 @@ EOF
                 echo -e "\t\t[provisioner argument false!] skipping $software information"
             else
                 echo "$software core version:" | sed "s/^/\t\t/"
-                cd "/vagrant/repositories/apache/${domain}/${webroot}" && drush core-status --field-labels=0 --fields=drupal-version 2>&1 | sed "s/^/\t\t\t/"
+                cd "/var/www/repositories/apache/${domain}/${webroot}" && drush core-status --field-labels=0 --fields=drupal-version 2>&1 | sed "s/^/\t\t\t/"
                 echo "$software core-requirements:" | sed "s/^/\t\t/"
-                cd "/vagrant/repositories/apache/${domain}/${webroot}" && drush core-requirements --severity=2 --format=table 2>&1 | sed "s/^/\t\t\t/"
+                cd "/var/www/repositories/apache/${domain}/${webroot}" && drush core-requirements --severity=2 --format=table 2>&1 | sed "s/^/\t\t\t/"
                 echo "$software pm-updatestatus:" | sed "s/^/\t\t/"
-                cd "/vagrant/repositories/apache/${domain}/${webroot}" && drush pm-updatestatus --format=table 2>&1 | sed "s/^/\t\t\t/"
+                cd "/var/www/repositories/apache/${domain}/${webroot}" && drush pm-updatestatus --format=table 2>&1 | sed "s/^/\t\t\t/"
             fi
     elif [ "$software" = "wordpress" ]; then
             echo -e "\t\tgenerating $software database configuration file"
@@ -493,15 +493,15 @@ EOF
                 echo -e "\t\t[provisioner argument false!] skipping $software information"
             else
                 echo "$software core version:" | sed "s/^/\t/\t"
-                php /vagrant/provisioners/redhat/installers/wp-cli.phar --path="/vagrant/repositories/apache/${domain}/${webroot}" core version 2>&1 | sed "s/^/\t\t\t/"
+                php /vagrant/provisioners/redhat/installers/wp-cli.phar --path="/var/www/repositories/apache/${domain}/${webroot}" core version 2>&1 | sed "s/^/\t\t\t/"
                 echo "$software core verify-checksums:" | sed "s/^/\t\t/"
-                php /vagrant/provisioners/redhat/installers/wp-cli.phar --path="/vagrant/repositories/apache/${domain}/${webroot}" core verify-checksums 2>&1 | sed "s/^/\t\t\t/"
+                php /vagrant/provisioners/redhat/installers/wp-cli.phar --path="/var/www/repositories/apache/${domain}/${webroot}" core verify-checksums 2>&1 | sed "s/^/\t\t\t/"
                 echo "$software core check-update:" | sed "s/^/\t\t/"
-                php /vagrant/provisioners/redhat/installers/wp-cli.phar --path="/vagrant/repositories/apache/${domain}/${webroot}" core check-update 2>&1 | sed "s/^/\t\t\t/"
+                php /vagrant/provisioners/redhat/installers/wp-cli.phar --path="/var/www/repositories/apache/${domain}/${webroot}" core check-update 2>&1 | sed "s/^/\t\t\t/"
                 echo "$software plugin list:" | sed "s/^/\t\t/"
-                php /vagrant/provisioners/redhat/installers/wp-cli.phar --path="/vagrant/repositories/apache/${domain}/${webroot}" plugin list 2>&1 | sed "s/^/\t\t\t/"
+                php /vagrant/provisioners/redhat/installers/wp-cli.phar --path="/var/www/repositories/apache/${domain}/${webroot}" plugin list 2>&1 | sed "s/^/\t\t\t/"
                 echo "$software theme list:" | sed "s/^/\t\t/"
-                php /vagrant/provisioners/redhat/installers/wp-cli.phar --path="/vagrant/repositories/apache/${domain}/${webroot}" theme list 2>&1 | sed "s/^/\t\t\t/"
+                php /vagrant/provisioners/redhat/installers/wp-cli.phar --path="/var/www/repositories/apache/${domain}/${webroot}" theme list 2>&1 | sed "s/^/\t\t\t/"
             fi
     elif [ "$software" = "xenforo" ]; then
             echo -e "\t\tgenerating $software database configuration file"
