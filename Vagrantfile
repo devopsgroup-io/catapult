@@ -586,18 +586,42 @@ configuration["websites"].each do |service,data|
       if "#{repo_split_3[0]}" == nil
         catapult_exception("There is an error in your configuration.yml file.\nThe repo for websites => #{service} => domain => #{instance["domain"]} is invalid, it must end in .git")
       end
-      # validate repo connection, this will need to be translated to windows - have fun
-      if (RbConfig::CONFIG['host_os'] =~ /darwin|mac os|linux|solaris|bsd/)
-        output = `ssh-agent bash -c "ssh-add provisioners/.ssh/id_rsa; git ls-remote #{instance["repo"]}" 2>/dev/null`
-        output = output.split(/\n/).reject(&:empty?)
-        if output.find { |element| element.include?("fatal") }
-          catapult_exception("Your SSH private key for Catapult (~/provisioners/.ssh/id_rsa) cannot connect to #{instance["repo"]}, please ensure the SSH public key (~/provisioners/.ssh/id_rsa.pub) is added to this repo as a deploy key.")
+      # validate access to repo
+      if "#{repo_split_2[0]}" == "bitbucket.org"
+        uri = URI("https://api.bitbucket.org/1.0/group-privileges/#{repo_split_3[0]}")
+        Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => OpenSSL::SSL::VERIFY_NONE) do |http|
+          request = Net::HTTP::Get.new uri.request_uri
+          request.basic_auth "#{configuration["company"]["bitbucket_username"]}", "#{configuration["company"]["bitbucket_password"]}"
+          response = http.request request # Net::HTTPResponse object
+          api_bitbucket_repo_group_privileges = JSON.parse(response.body)
+          @api_bitbucket_repo_access = false
+          api_bitbucket_repo_group_privileges.each do |group|
+            if group["privilege"] == "write"
+              group["group"]["members"].each do |member|
+                if member["username"] == "#{configuration["company"]["bitbucket_username"]}"
+                  @api_bitbucket_repo_access = true
+                end
+              end
+            end
+          end
+          unless @api_bitbucket_repo_access
+            catapult_exception("Your Bitbucket user #{configuration["company"]["bitbucket_username"]} does not have write access to this repository.")
+          else
+            puts "   - Verified your Bitbucket user #{configuration["company"]["bitbucket_username"]} has write access."
+          end
         end
-        unless output.find { |element| element.include?("refs/heads/master") }
-          catapult_exception("A connection was established to #{instance["repo"]} using your SSH private key for Catapult (~/provisioners/.ssh/id_rsa), however, there is a no master branch, please create one.")
-        end
-        unless output.find { |element| element.include?("refs/heads/develop") }
-          catapult_exception("A connection was established to #{instance["repo"]} using your SSH private key for Catapult (~/provisioners/.ssh/id_rsa), however, there is a no develop branch, please create one.")
+      end
+      if "#{repo_split_2[0]}" == "github.com"
+        uri = URI("https://api.github.com/repos/#{repo_split_3[0]}/collaborators/#{configuration["company"]["github_username"]}")
+        Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => OpenSSL::SSL::VERIFY_NONE) do |http|
+          request = Net::HTTP::Get.new uri.request_uri
+          request.basic_auth "#{configuration["company"]["github_username"]}", "#{configuration["company"]["github_password"]}"
+          response = http.request request # Net::HTTPResponse object
+          if response.code.to_f == 204
+            puts "   - Verified your GitHub user #{configuration["company"]["github_username"]} has write access."
+          else
+            catapult_exception("Your GitHub user #{configuration["company"]["github_username"]} does not have write access to this repository.")
+          end
         end
       end
       # create bamboo service per bitbucket repo
