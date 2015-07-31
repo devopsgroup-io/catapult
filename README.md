@@ -9,12 +9,12 @@
 
 As a non-Developer you may think - *I already have a website, why do I need Catapult?* Over time you will find yourself paying a freelancer or a development company hundreds or even thousands of dollars to manage or interact with the DevOps (Development Operations) and solve these problems:
 
-  * *Production is down.*
-  * *We need a test site.*
-  * *Why is this costing so much?*
-  * *Is my website safe?* 
-  * *Is my website backed up?*
-  * *Can I easily scale my website for more traffic?*
+  * Production is down.
+  * We need a test site.
+  * Why is this costing so much?
+  * Is my website safe? 
+  * Is my website backed up?
+  * Can I easily scale my website for more traffic?
 
 As a Developer, you've probably had to manage many websites and probably end up using the same tools and APIs over and over again. Why not use something that has been developed just for you from Developers that have been down the same road as you and also have the ability to contribute back?
 
