@@ -133,8 +133,8 @@ staged = `#{git} diff --name-only --staged --word-diff=porcelain`
 staged = staged.split($/)
 
 if "#{branch}" == "develop"
-  if staged.include?("configuration.yml.gpg")
-    puts "Please commit configuration.yml.gpg on the master branch. You are on the develop branch, which is meant for contribution back to Catapult and should not contain your configuration files."
+  if staged.include?("secrets/configuration.yml.gpg")
+    puts "Please commit secrets/configuration.yml.gpg on the master branch. You are on the develop branch, which is meant for contribution back to Catapult and should not contain your configuration files."
     exit 1
   end
   if staged.include?("secrets/id_rsa.gpg")
@@ -146,8 +146,8 @@ if "#{branch}" == "develop"
     exit 1
   end
 elsif "#{branch}" == "master"
-  unless staged.include?("configuration.yml.gpg") || staged.include?("secrets/id_rsa.gpg") || staged.include?("secrets/id_rsa.pub.gpg")
-    puts "You are on the master branch, which is only meant for your configuration files (configuration.yml.gpg, secrets/id_rsa.gpg, secrets/id_rsa.pub.gpg). To contribute to Catapult, please switch to the develop branch."
+  unless staged.include?("secrets/configuration.yml.gpg") || staged.include?("secrets/id_rsa.gpg") || staged.include?("secrets/id_rsa.pub.gpg")
+    puts "You are on the master branch, which is only meant for your configuration files (secrets/configuration.yml.gpg, secrets/id_rsa.gpg, secrets/id_rsa.pub.gpg). To contribute to Catapult, please switch to the develop branch."
     exit 1
   end
 end
@@ -177,43 +177,43 @@ end
 puts "\n\n\nVerification of encrypted Catapult configuration files:\n\n"
 if "#{branch}" == "develop"
   puts " * You are on the develop branch, this branch is automatically synced with Catapult core and is meant to contribute back to the core Catapult project."
-  puts " * configuration.yml.gpg, secrets/id_rsa.gpg, and secrets/id_rsa.pub.gpg are checked out from the master branch so that you're able to develop and test."
-  puts " * After you're finished on the develop branch, switch to the master branch and discard configuration.yml.gpg, secrets/id_rsa.gpg, and secrets/id_rsa.pub.gpg"
+  puts " * secrets/configuration.yml.gpg, secrets/id_rsa.gpg, and secrets/id_rsa.pub.gpg are checked out from the master branch so that you're able to develop and test."
+  puts " * After you're finished on the develop branch, switch to the master branch and discard secrets/configuration.yml.gpg, secrets/id_rsa.gpg, and secrets/id_rsa.pub.gpg"
   puts "\n"
-  `git checkout --force master -- configuration.yml.gpg`
+  `git checkout --force master -- secrets/configuration.yml.gpg`
   `git checkout --force master -- secrets/id_rsa.gpg`
   `git checkout --force master -- secrets/id_rsa.pub.gpg`
-  `git reset -- configuration.yml.gpg`
+  `git reset -- secrets/configuration.yml.gpg`
   `git reset -- secrets/id_rsa.gpg`
   `git reset -- secrets/id_rsa.pub.gpg`
 elsif "#{branch}" == "master"
-  puts " * You are on the master branch, this branch is automatically synced with Catapult core and is meant to commit your unique configuration.yml.gpg, secrets/id_rsa.gpg, and secrets/id_rsa.pub.gpg configuration."
+  puts " * You are on the master branch, this branch is automatically synced with Catapult core and is meant to commit your unique secrets/configuration.yml.gpg, secrets/id_rsa.gpg, and secrets/id_rsa.pub.gpg secrets/configuration."
   if configuration_user["settings"]["gpg_edit"]
-    puts " * GPG Edit Mode is enabled at configuration-user.yml[\"settings\"][\"gpg_edit\"], if there are changes to configuration.yml, secrets/id_rsa, or secrets/id_rsa.pub, they will be re-encrypted."
+    puts " * GPG Edit Mode is enabled at configuration-user.yml[\"settings\"][\"gpg_edit\"], if there are changes to secrets/configuration.yml, secrets/id_rsa, or secrets/id_rsa.pub, they will be re-encrypted."
   end
   puts "\n"
-  # bootstrap configuration.yml
-  # initialize configuration.yml.gpg
-  if File.zero?("configuration.yml.gpg")
-    `gpg --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output configuration.yml.gpg --armor --cipher-algo AES256 --symmetric configuration.yml.template`
+  # bootstrap secrets/configuration.yml
+  # initialize secrets/configuration.yml.gpg
+  if File.zero?("secrets/configuration.yml.gpg")
+    `gpg --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml.gpg --armor --cipher-algo AES256 --symmetric secrets/configuration.yml.template`
   end
   if configuration_user["settings"]["gpg_edit"]
-    unless File.exist?("configuration.yml")
-      # decrypt configuration.yml.gpg as configuration.yml
-      `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output configuration.yml --decrypt configuration.yml.gpg`
+    unless File.exist?("secrets/configuration.yml")
+      # decrypt secrets/configuration.yml.gpg as secrets/configuration.yml
+      `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml --decrypt secrets/configuration.yml.gpg`
     end
-    # decrypt configuration.yml.gpg as configuration.yml.compare
-    `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output configuration.yml.compare --decrypt configuration.yml.gpg`
-    if FileUtils.compare_file('configuration.yml', 'configuration.yml.compare')
-      puts "\n * There were no changes to configuration.yml, no need to encrypt as this would create a new cipher to commit.\n\n"
+    # decrypt secrets/configuration.yml.gpg as secrets/configuration.yml.compare
+    `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml.compare --decrypt secrets/configuration.yml.gpg`
+    if FileUtils.compare_file('secrets/configuration.yml', 'secrets/configuration.yml.compare')
+      puts "\n * There were no changes to secrets/configuration.yml, no need to encrypt as this would create a new cipher to commit.\n\n"
     else
-      puts "\n * There were changes to configuration.yml, encrypting configuration.yml as configuration.yml.gpg. Please commit these changes to the master branch for your team to get the changes.\n\n"
-      `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output configuration.yml.gpg --armor --cipher-algo AES256 --symmetric configuration.yml`
+      puts "\n * There were changes to secrets/configuration.yml, encrypting secrets/configuration.yml as secrets/configuration.yml.gpg. Please commit these changes to the master branch for your team to get the changes.\n\n"
+      `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml.gpg --armor --cipher-algo AES256 --symmetric secrets/configuration.yml`
     end
-    FileUtils.rm('configuration.yml.compare')
+    FileUtils.rm('secrets/configuration.yml.compare')
   else
-    # decrypt configuration.yml.gpg as configuration.yml
-    `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output configuration.yml --decrypt configuration.yml.gpg`
+    # decrypt secrets/configuration.yml.gpg as secrets/configuration.yml
+    `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml --decrypt secrets/configuration.yml.gpg`
   end
   # bootstrap ssh keys
   # decrypt id_rsa and id_rsa.pub
@@ -251,9 +251,9 @@ elsif "#{branch}" == "master"
   end
   
 end
-# create objects from configuration.yml.gpg and configuration.yml.template
-configuration = YAML.load(`gpg --batch --passphrase "#{configuration_user["settings"]["gpg_key"]}" --decrypt configuration.yml.gpg`)
-configuration_example = YAML.load_file("configuration.yml.template")
+# create objects from secrets/configuration.yml.gpg and secrets/configuration.yml.template
+configuration = YAML.load(`gpg --batch --passphrase "#{configuration_user["settings"]["gpg_key"]}" --decrypt secrets/configuration.yml.gpg`)
+configuration_example = YAML.load_file("secrets/configuration.yml.template")
 `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output secrets/id_rsa --decrypt secrets/id_rsa.gpg`
 `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output secrets/id_rsa.pub --decrypt secrets/id_rsa.pub.gpg`
 
@@ -262,26 +262,26 @@ configuration_example = YAML.load_file("configuration.yml.template")
 puts "\nVerification of configuration[\"software\"]:\n\n"
 # validate configuration["software"]
 if configuration["software"]["version"] != configuration_example["software"]["version"]
-  catapult_exception("Your configuration.yml file is out of date. To retain your settings please manually duplicate entries from configuration.yml.template with your specific settings.\n*You may also delete your configuration.yml and re-run any vagrant command to have a vanilla version created.")
+  catapult_exception("Your secrets/configuration.yml file is out of date. To retain your settings please manually duplicate entries from secrets/configuration.yml.template with your specific settings.\n*You may also delete your secrets/configuration.yml and re-run any vagrant command to have a vanilla version created.")
 end
 puts " * Status: Verified"
 puts "\nVerification of configuration[\"company\"]:\n\n"
 # validate configuration["company"]
 if configuration["company"]["name"] == nil
-  catapult_exception("Please set [\"company\"][\"name\"] in configuration.yml")
+  catapult_exception("Please set [\"company\"][\"name\"] in secrets/configuration.yml")
 end
 if configuration["company"]["email"] == nil
-  catapult_exception("Please set [\"company\"][\"email\"] in configuration.yml")
+  catapult_exception("Please set [\"company\"][\"email\"] in secrets/configuration.yml")
 end
 if configuration["company"]["timezone_redhat"] == nil
-  catapult_exception("Please set [\"company\"][\"timezone_redhat\"] in configuration.yml")
+  catapult_exception("Please set [\"company\"][\"timezone_redhat\"] in secrets/configuration.yml")
 end
 if configuration["company"]["timezone_windows"] == nil
-  catapult_exception("Please set [\"company\"][\"timezone_windows\"] in configuration.yml")
+  catapult_exception("Please set [\"company\"][\"timezone_windows\"] in secrets/configuration.yml")
 end
 # https://developers.digitalocean.com/documentation/v2/
 if configuration["company"]["digitalocean_personal_access_token"] == nil
-  catapult_exception("Please set [\"company\"][\"digitalocean_personal_access_token\"] in configuration.yml")
+  catapult_exception("Please set [\"company\"][\"digitalocean_personal_access_token\"] in secrets/configuration.yml")
 else
   uri = URI("https://api.digitalocean.com/v2/droplets")
   Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => OpenSSL::SSL::VERIFY_NONE) do |http|
@@ -325,7 +325,7 @@ else
 end
 # https://confluence.atlassian.com/display/BITBUCKET/Version+1
 if configuration["company"]["bitbucket_username"] == nil || configuration["company"]["bitbucket_password"] == nil
-  catapult_exception("Please set [\"company\"][\"bitbucket_username\"] and [\"company\"][\"bitbucket_password\"] in configuration.yml")
+  catapult_exception("Please set [\"company\"][\"bitbucket_username\"] and [\"company\"][\"bitbucket_password\"] in secrets/configuration.yml")
 else
   uri = URI("https://api.bitbucket.org/1.0/user/repositories")
   Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => OpenSSL::SSL::VERIFY_NONE) do |http|
@@ -372,7 +372,7 @@ else
 end
 # https://developer.github.com/v3/
 if configuration["company"]["github_username"] == nil || configuration["company"]["github_password"] == nil
-  catapult_exception("Please set [\"company\"][\"github_username\"] and [\"company\"][\"github_password\"] in configuration.yml")
+  catapult_exception("Please set [\"company\"][\"github_username\"] and [\"company\"][\"github_password\"] in secrets/configuration.yml")
 else
   uri = URI("https://api.github.com/user")
   Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => OpenSSL::SSL::VERIFY_NONE) do |http|
@@ -419,7 +419,7 @@ else
 end
 # https://docs.atlassian.com/bamboo/REST/
 if configuration["company"]["bamboo_base_url"] == nil || configuration["company"]["bamboo_username"] == nil || configuration["company"]["bamboo_password"] == nil
-  catapult_exception("Please set [\"company\"][\"bamboo_base_url\"] and [\"company\"][\"bamboo_username\"] and [\"company\"][\"bamboo_password\"] in configuration.yml")
+  catapult_exception("Please set [\"company\"][\"bamboo_base_url\"] and [\"company\"][\"bamboo_username\"] and [\"company\"][\"bamboo_password\"] in secrets/configuration.yml")
 else
   uri = URI("#{configuration["company"]["bamboo_base_url"]}rest/api/latest/project.json?os_authType=basic")
   Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => OpenSSL::SSL::VERIFY_NONE) do |http|
@@ -479,7 +479,7 @@ else
 end
 # https://api.cloudflare.com/
 if configuration["company"]["cloudflare_api_key"] == nil || configuration["company"]["cloudflare_email"] == nil
-  catapult_exception("Please set [\"company\"][\"cloudflare_api_key\"] and [\"company\"][\"cloudflare_email\"] in configuration.yml")
+  catapult_exception("Please set [\"company\"][\"cloudflare_api_key\"] and [\"company\"][\"cloudflare_email\"] in secrets/configuration.yml")
 else
   uri = URI("https://api.cloudflare.com/client/v4/zones")
   Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => OpenSSL::SSL::VERIFY_NONE) do |http|
@@ -501,46 +501,46 @@ puts "\nVerification of configuration[\"environments\"]:\n\n"
 configuration["environments"].each do |environment,data|
   unless configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["mysql"]["user_password"]
     configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["mysql"]["user_password"] = SecureRandom.urlsafe_base64(16)
-    `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output configuration.yml --decrypt configuration.yml.gpg`
-    File.open('configuration.yml', 'w') {|f| f.write configuration.to_yaml }
-    `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output configuration.yml.gpg --armor --cipher-algo AES256 --symmetric configuration.yml`
+    `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml --decrypt secrets/configuration.yml.gpg`
+    File.open('secrets/configuration.yml', 'w') {|f| f.write secrets/configuration.to_yaml }
+    `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml.gpg --armor --cipher-algo AES256 --symmetric secrets/configuration.yml`
   end
   unless configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["mysql"]["root_password"]
     configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["mysql"]["root_password"] = SecureRandom.urlsafe_base64(16)
-    `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output configuration.yml --decrypt configuration.yml.gpg`
-    File.open('configuration.yml', 'w') {|f| f.write configuration.to_yaml }
-    `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output configuration.yml.gpg --armor --cipher-algo AES256 --symmetric configuration.yml`
+    `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml --decrypt secrets/configuration.yml.gpg`
+    File.open('secrets/configuration.yml', 'w') {|f| f.write secrets/configuration.to_yaml }
+    `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml.gpg --armor --cipher-algo AES256 --symmetric secrets/configuration.yml`
   end
   unless configuration["environments"]["#{environment}"]["software"]["drupal"]["admin_password"]
     configuration["environments"]["#{environment}"]["software"]["drupal"]["admin_password"] = SecureRandom.urlsafe_base64(16)
-    `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output configuration.yml --decrypt configuration.yml.gpg`
-    File.open('configuration.yml', 'w') {|f| f.write configuration.to_yaml }
-    `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output configuration.yml.gpg --armor --cipher-algo AES256 --symmetric configuration.yml`
+    `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml --decrypt secrets/configuration.yml.gpg`
+    File.open('secrets/configuration.yml', 'w') {|f| f.write secrets/configuration.to_yaml }
+    `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml.gpg --armor --cipher-algo AES256 --symmetric secrets/configuration.yml`
   end
   unless configuration["environments"]["#{environment}"]["software"]["wordpress"]["admin_password"]
     configuration["environments"]["#{environment}"]["software"]["wordpress"]["admin_password"] = SecureRandom.urlsafe_base64(16)
-    `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output configuration.yml --decrypt configuration.yml.gpg`
-    File.open('configuration.yml', 'w') {|f| f.write configuration.to_yaml }
-    `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output configuration.yml.gpg --armor --cipher-algo AES256 --symmetric configuration.yml`
+    `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml --decrypt secrets/configuration.yml.gpg`
+    File.open('secrets/configuration.yml', 'w') {|f| f.write secrets/configuration.to_yaml }
+    `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml.gpg --armor --cipher-algo AES256 --symmetric secrets/configuration.yml`
   end
-  # if upstream digitalocean droplets are provisioned, get their ip addresses to write to configuration.yml
+  # if upstream digitalocean droplets are provisioned, get their ip addresses to write to secrets/configuration.yml
   unless environment == "dev"
     droplet = @api_digitalocean["droplets"].find { |element| element['name'] == "#{configuration["company"]["name"]}-#{environment}-redhat" }
     unless droplet == nil
       unless configuration["environments"]["#{environment}"]["servers"]["redhat"]["ip"] == droplet["networks"]["v4"].first["ip_address"]
         configuration["environments"]["#{environment}"]["servers"]["redhat"]["ip"] = droplet["networks"]["v4"].first["ip_address"]
-        `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output configuration.yml --decrypt configuration.yml.gpg`
-        File.open('configuration.yml', 'w') {|f| f.write configuration.to_yaml }
-        `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output configuration.yml.gpg --armor --cipher-algo AES256 --symmetric configuration.yml`
+        `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml --decrypt secrets/configuration.yml.gpg`
+        File.open('secrets/configuration.yml', 'w') {|f| f.write secrets/configuration.to_yaml }
+        `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml.gpg --armor --cipher-algo AES256 --symmetric secrets/configuration.yml`
       end
     end
     droplet = @api_digitalocean["droplets"].find { |element| element['name'] == "#{configuration["company"]["name"]}-#{environment}-redhat-mysql" }
     unless droplet == nil
       unless configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["ip"] == droplet["networks"]["v4"].first["ip_address"]
         configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["ip"] = droplet["networks"]["v4"].first["ip_address"]
-        `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output configuration.yml --decrypt configuration.yml.gpg`
-        File.open('configuration.yml', 'w') {|f| f.write configuration.to_yaml }
-        `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output configuration.yml.gpg --armor --cipher-algo AES256 --symmetric configuration.yml`
+        `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml --decrypt secrets/configuration.yml.gpg`
+        File.open('secrets/configuration.yml', 'w') {|f| f.write secrets/configuration.to_yaml }
+        `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml.gpg --armor --cipher-algo AES256 --symmetric secrets/configuration.yml`
       end
     end
   end
@@ -558,7 +558,7 @@ configuration["websites"].each do |service,data|
       # validate force_https
       unless "#{instance["force_https"]}" == ""
         unless ["true"].include?("#{instance["force_https"]}")
-          catapult_exception("There is an error in your configuration.yml file.\nThe force_https for websites => #{service} => domain => #{instance["domain"]} is invalid, it must be true or removed.")
+          catapult_exception("There is an error in your secrets/configuration.yml file.\nThe force_https for websites => #{service} => domain => #{instance["domain"]} is invalid, it must be true or removed.")
         end
       end
       # validate repo alpha order
@@ -576,15 +576,15 @@ configuration["websites"].each do |service,data|
       # repo_split_3[0] => devopsgroup-io/devopsgroup-io
       # validate repo type
       unless "#{repo_split_1[0]}" == "git"
-        catapult_exception("There is an error in your configuration.yml file.\nThe repo for websites => #{service} => domain => #{instance["domain"]} is invalid, the format must be git@github.com:devopsgroup-io/devopsgroup-io.git")
+        catapult_exception("There is an error in your secrets/configuration.yml file.\nThe repo for websites => #{service} => domain => #{instance["domain"]} is invalid, the format must be git@github.com:devopsgroup-io/devopsgroup-io.git")
       end
       # validate repo hosted at bitbucket.org or github.com
       unless "#{repo_split_2[0]}" == "bitbucket.org" || "#{repo_split_2[0]}" == "github.com"
-        catapult_exception("There is an error in your configuration.yml file.\nThe repo for websites => #{service} => domain => #{instance["domain"]} is invalid, it must either be a bitbucket.org or github.com repository.")
+        catapult_exception("There is an error in your secrets/configuration.yml file.\nThe repo for websites => #{service} => domain => #{instance["domain"]} is invalid, it must either be a bitbucket.org or github.com repository.")
       end
       # validate repo ends in .git
       if "#{repo_split_3[0]}" == nil
-        catapult_exception("There is an error in your configuration.yml file.\nThe repo for websites => #{service} => domain => #{instance["domain"]} is invalid, it must end in .git")
+        catapult_exception("There is an error in your secrets/configuration.yml file.\nThe repo for websites => #{service} => domain => #{instance["domain"]} is invalid, it must end in .git")
       end
       # validate access to repo
       if "#{repo_split_2[0]}" == "bitbucket.org"
@@ -664,7 +664,7 @@ configuration["websites"].each do |service,data|
                 "")
               response = http.request request # Net::HTTPResponse object
               if response.code.to_f.between?(399,600)
-                catapult_exception("Unable to configure Bitbucket Bamboo service for websites => #{service} => domain => #{instance["domain"]}. Ensure the github_username defined in configuration.yml has correct access to the repository.")
+                catapult_exception("Unable to configure Bitbucket Bamboo service for websites => #{service} => domain => #{instance["domain"]}. Ensure the github_username defined in secrets/configuration.yml has correct access to the repository.")
               end
             end
           end
@@ -683,7 +683,7 @@ configuration["websites"].each do |service,data|
                 "")
               response = http.request request # Net::HTTPResponse object
               if response.code.to_f.between?(399,600)
-                catapult_exception("Unable to configure Bitbucket Bamboo service for websites => #{service} => domain => #{instance["domain"]}. Ensure the github_username defined in configuration.yml has correct access to the repository.")
+                catapult_exception("Unable to configure Bitbucket Bamboo service for websites => #{service} => domain => #{instance["domain"]}. Ensure the github_username defined in secrets/configuration.yml has correct access to the repository.")
               end
             end
           end
@@ -709,23 +709,23 @@ configuration["websites"].each do |service,data|
             "}"
           response = http.request request # Net::HTTPResponse object
           if response.code.to_f.between?(399,600)
-            catapult_exception("Unable to configure GitHub Bamboo service for websites => #{service} => domain => #{instance["domain"]}. Ensure the github_username defined in configuration.yml has correct access to the repository.")
+            catapult_exception("Unable to configure GitHub Bamboo service for websites => #{service} => domain => #{instance["domain"]}. Ensure the github_username defined in secrets/configuration.yml has correct access to the repository.")
           end
         end
       end
       # validate software
       unless "#{instance["software"]}" == ""
         unless ["codeigniter2","drupal6","drupal7","wordpress","xenforo"].include?("#{instance["software"]}")
-          catapult_exception("There is an error in your configuration.yml file.\nThe software for websites => #{service} => domain => #{instance["domain"]} is invalid, it must be one of the following [\"codeigniter2\",\"drupal6\",\"drupal7\",\"wordpress\",\"xenforo\"].")
+          catapult_exception("There is an error in your secrets/configuration.yml file.\nThe software for websites => #{service} => domain => #{instance["domain"]} is invalid, it must be one of the following [\"codeigniter2\",\"drupal6\",\"drupal7\",\"wordpress\",\"xenforo\"].")
         end
         unless ["downstream","upstream"].include?("#{instance["software_workflow"]}")
-          catapult_exception("There is an error in your configuration.yml file.\nThe software for websites => #{service} => domain => #{instance["domain"]} requires the software_workflow option, it must be one of the following [\"downstream\",\"upstream\"].")
+          catapult_exception("There is an error in your secrets/configuration.yml file.\nThe software for websites => #{service} => domain => #{instance["domain"]} requires the software_workflow option, it must be one of the following [\"downstream\",\"upstream\"].")
         end
       end
       # validate webroot
       unless "#{instance["webroot"]}" == ""
         unless "#{instance["webroot"]}"[-1,1] == "/"
-          catapult_exception("There is an error in your configuration.yml file.\nThe webroot for websites => #{service} => domain => #{instance["domain"]} is invalid, it must include a trailing slash.")
+          catapult_exception("There is an error in your secrets/configuration.yml file.\nThe webroot for websites => #{service} => domain => #{instance["domain"]} is invalid, it must include a trailing slash.")
         end
       end
     end
@@ -733,7 +733,7 @@ configuration["websites"].each do |service,data|
   # ensure domains are in alpha order
   domains_sorted = domains_sorted.sort
   if domains != domains_sorted
-    catapult_exception("There is an error in your configuration.yml file.\nThe domains in configuration.yml are not in alpha order for websites => #{service} - please adjust.")
+    catapult_exception("There is an error in your secrets/configuration.yml file.\nThe domains in secrets/configuration.yml are not in alpha order for websites => #{service} - please adjust.")
   end
 end
 puts " * Status: Verified"
