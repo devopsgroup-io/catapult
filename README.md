@@ -10,12 +10,12 @@
 
 As a **non-Developer** you may think - *I already have a website, why do I need Catapult?* Over time you will find yourself or find yourself paying a freelancer or a development company hundreds or even thousands of dollars to manage or interact with the DevOps (Development Operations) and solve these problems:
 
-  * *Production is down.*
-  * *We need a test site.*
-  * *Why is this costing so much?*
-  * *Is my website safe?* 
-  * *Is my website backed up?*
-  * *Can I easily scale my website for more traffic?*
+  * Production is down.
+  * We need a test site.
+  * Why is this costing so much?
+  * Is my website safe? 
+  * Is my website backed up?
+  * Can I easily scale my website for more traffic?
 
 As a **Developer**, you have to manage many websites and probably end up using the same tools and APIs over and over again. Why not use something that has been developed just for you from Developers that have been down the same road as you and also have the ability to contribute back?
 
@@ -337,7 +337,17 @@ If you're still having issues with Catapult, [submit a GitHub Issue](https://git
 
 # Contributing #
 
-The open source community is an awesome thing, we hope Catapult is of use to you, and if you develop a feature that you think would benefit everyone, please submit a pull request.  When you first setup Catapult a develop branch is created for you under your forked repository with an upstream set to `https://github.com/devopsgroup-io/catapult-release-management.git` so that you can easily create a pull request. Also keep in mind when closing issues to submit a pull requst that includes [GitHub's: Closing issues via commit messages](https://help.github.com/articles/closing-issues-via-commit-messages/).
+So you want to contribute... Great! Open source projects like Catapult Release Management succeed or fail upon the involvement of a thriving community of developers, who often offer various levels of code skills and time commitment. Here are some ways you can begin contributing right away, at whatever level is most comfortable for you.
+
+       * Submit a feature
+       * Report a bug
+       * Verify and track down a reported bug
+       * Add documentation to the README
+       * Answer project specific questions
+       * Contribute to the Catapult wiki
+       * Blog about your experiences with Catapult
+
+When you first setup Catapult a develop branch is created for you under your forked repository, with an upstream set to `https://github.com/devopsgroup-io/catapult-release-management.git` so that you can easily create a pull request. Also keep in mind when closing issues to submit a pull requst that includes [GitHub's: Closing issues via commit messages](https://help.github.com/articles/closing-issues-via-commit-messages/).
 
 
 
