@@ -156,21 +156,21 @@ end
 File.chmod(0777,'.git/hooks/pre-commit')
 
 
-# bootstrap configuration-user.yml
-# generate configuration-user.yml file if it does not exist
-unless File.exist?("configuration-user.yml")
-  FileUtils.cp("configuration-user.yml.template", "configuration-user.yml")
+# bootstrap secrets/configuration-user.yml
+# generate secrets/configuration-user.yml file if it does not exist
+unless File.exist?("secrets/configuration-user.yml")
+  FileUtils.cp("secrets/configuration-user.yml.template", "secrets/configuration-user.yml")
 end
-# parse configuration-user.yml and configuration-user.yml.template file
-configuration_user = YAML.load_file("configuration-user.yml")
-configuration_user_template = YAML.load_file("configuration-user.yml.template")
+# parse secrets/configuration-user.yml and secrets/configuration-user.yml.template file
+configuration_user = YAML.load_file("secrets/configuration-user.yml")
+configuration_user_template = YAML.load_file("secrets/configuration-user.yml.template")
 # ensure version is up-to-date
 if configuration_user["settings"]["version"] != configuration_user_template["settings"]["version"]
-  catapult_exception("Your configuration-user.yml file is out of date. To retain your settings please manually merge entries from configuration-user.yml.template to configuration-user.yml with your specific settings.\n*You may also delete your configuration-user.yml and re-run any vagrant command to have a vanilla version created.")
+  catapult_exception("Your secrets/configuration-user.yml file is out of date. To retain your settings please manually merge entries from secrets/configuration-user.yml.template to secrets/configuration-user.yml with your specific settings.\n*You may also delete your secrets/configuration-user.yml and re-run any vagrant command to have a vanilla version created.")
 end
 # check for required fields
 if configuration_user["settings"]["gpg_key"] == nil || configuration_user["settings"]["gpg_key"].match(/\s/) || configuration_user["settings"]["gpg_key"].length < 20
-  catapult_exception("Please set your team's gpg_key in configuration-user.yml - spaces are not permitted and must be at least 20 characters.")
+  catapult_exception("Please set your team's gpg_key in secrets/configuration-user.yml - spaces are not permitted and must be at least 20 characters.")
 end
 
 
@@ -189,7 +189,7 @@ if "#{branch}" == "develop"
 elsif "#{branch}" == "master"
   puts " * You are on the master branch, this branch is automatically synced with Catapult core and is meant to commit your unique secrets/configuration.yml.gpg, secrets/id_rsa.gpg, and secrets/id_rsa.pub.gpg secrets/configuration."
   if configuration_user["settings"]["gpg_edit"]
-    puts " * GPG Edit Mode is enabled at configuration-user.yml[\"settings\"][\"gpg_edit\"], if there are changes to secrets/configuration.yml, secrets/id_rsa, or secrets/id_rsa.pub, they will be re-encrypted."
+    puts " * GPG Edit Mode is enabled at secrets/configuration-user.yml[\"settings\"][\"gpg_edit\"], if there are changes to secrets/configuration.yml, secrets/id_rsa, or secrets/id_rsa.pub, they will be re-encrypted."
   end
   puts "\n"
   # bootstrap secrets/configuration.yml
