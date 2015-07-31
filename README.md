@@ -129,11 +129,11 @@ Catapult uses several third-party services to pull everything off - below is a l
 2. **Repositories:**
     1. **Bitbucket** sign-up and configuration
         1. Create an account at https://bitbucket.org
-            1. Place the email address that you used to sign up for Bitbucket at `~/configuration.yml["company"]["bitbucket_username"]`
+            1. Place the username (not the email address) that you used to sign up for Bitbucket at `~/configuration.yml["company"]["bitbucket_username"]`
             2. Place the password of the account for Bitbucket at `~/configuration.yml["company"]["bitbucket_password"]`
     2. **GitHub** sign-up and configuration
         1. Create an account at https://github.com
-            1. Place the email address that you used to sign up for GitHub at `~/configuration.yml["company"]["github_username"]`
+            1. Place the username (not the email address) that you used to sign up for GitHub at `~/configuration.yml["company"]["github_username"]`
             2. Place the password of the account for GitHub at `~/configuration.yml["company"]["github_password"]`
 3. **Automated Deployments:**
     1. **Amazon Web Services** (AWS) EC2 sign-up and configuration (Required for Bamboo)
