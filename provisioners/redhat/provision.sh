@@ -127,7 +127,6 @@ while IFS='' read -r -d '' key; do
 done < <(cat /vagrant/secrets/configuration.yml | shyaml get-values-0 websites.apache)
 
 # create an array of domains
-domains=()
 while IFS='' read -r -d '' key; do
     domain=$(echo "$key" | grep -w "domain" | cut -d ":" -f 2 | tr -d " ")
     domains+=($domain)
@@ -136,7 +135,7 @@ done < <(cat /vagrant/secrets/configuration.yml | shyaml get-values-0 websites.a
 for directory in /var/www/repositories/apache/*/; do
     domain=$(basename $directory)
     if ! [[ ${domains[*]} =~ $domain ]]; then
-        echo "Website does not exist in secrets/configuration.yaml, removing $directory ..."
+        echo "Cleaning up websites that no longer exist..."
         sudo chmod 0777 -R $directory
         sudo rm -rf $directory
     fi
