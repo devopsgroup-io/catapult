@@ -1,5 +1,5 @@
 import-module c:\vagrant\provisioners\windows\installers\poweryaml\poweryaml.psm1
-$config = get-yaml -fromfile (resolve-path c:\vagrant\configuration.yml)
+$config = get-yaml -fromfile (resolve-path c:\vagrant\secrets/configuration.yml)
 # @todo pass environment arg from vagrant
 
 echo "==> Configuring time"
@@ -67,7 +67,7 @@ if (-not(Test-Path -Path "c:\windows\Microsoft.NET\Framework64\v4.0.30319\")) {
     get-childitem "c:\vagrant\repositories\iis\*" | ?{ $_.PSIsContainer } | foreach-object {
         $domain = split-path $_.FullName -leaf
         if (-not($domains -contains $domain)) {
-            echo "`nWebsite does not exist in configuration.yaml, removing $domain ..."
+            echo "`nWebsite does not exist in secrets/configuration.yaml, removing $domain ..."
             remove-item -recurse -force $_.FullName
         }
     }

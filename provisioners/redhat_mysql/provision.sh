@@ -2,8 +2,8 @@
 export DEBIAN_FRONTEND=noninteractive
 
 
-if ! [ -e "/vagrant/configuration.yml" ]; then
-    echo -e "Cannot read from /vagrant/configuration.yml, please vagrant reload the virtual machine."
+if ! [ -e "/vagrant/secrets/configuration.yml" ]; then
+    echo -e "Cannot read from /vagrant/secrets/configuration.yml, please vagrant reload the virtual machine."
     exit 1
 fi
 
@@ -31,7 +31,7 @@ echo "[$(date)] Updating existing packages and installing utilities ($(($end - $
 echo -e "\n\n==> Configuring time"
 start=$(date +%s)
 # set timezone
-sudo timedatectl set-timezone "$(cat /vagrant/configuration.yml | shyaml get-value company.timezone_redhat)"
+sudo timedatectl set-timezone "$(cat /vagrant/secrets/configuration.yml | shyaml get-value company.timezone_redhat)"
 # install ntp
 sudo yum install -y ntp
 sudo systemctl enable ntpd.service
@@ -54,13 +54,13 @@ echo "[$(date)] Installing MySQL ($(($end - $start)) seconds)" >> /vagrant/provi
 
 echo -e "\n\n==> Configuring MySQL"
 start=$(date +%s)
-# set variables from configuration.yml
-mysql_user="$(cat /vagrant/configuration.yml | shyaml get-value environments.$1.servers.redhat_mysql.mysql.user)"
-mysql_user_password="$(cat /vagrant/configuration.yml | shyaml get-value environments.$1.servers.redhat_mysql.mysql.user_password)"
-mysql_root_password="$(cat /vagrant/configuration.yml | shyaml get-value environments.$1.servers.redhat_mysql.mysql.root_password)"
-drupal_admin_password="$(cat /vagrant/configuration.yml | shyaml get-value environments.$1.software.drupal.admin_password)"
-wordpress_admin_password="$(cat /vagrant/configuration.yml | shyaml get-value environments.$1.software.wordpress.admin_password)"
-company_email="$(cat /vagrant/configuration.yml | shyaml get-value company.email)"
+# set variables from secrets/configuration.yml
+mysql_user="$(cat /vagrant/secrets/configuration.yml | shyaml get-value environments.$1.servers.redhat_mysql.mysql.user)"
+mysql_user_password="$(cat /vagrant/secrets/configuration.yml | shyaml get-value environments.$1.servers.redhat_mysql.mysql.user_password)"
+mysql_root_password="$(cat /vagrant/secrets/configuration.yml | shyaml get-value environments.$1.servers.redhat_mysql.mysql.root_password)"
+drupal_admin_password="$(cat /vagrant/secrets/configuration.yml | shyaml get-value environments.$1.software.drupal.admin_password)"
+wordpress_admin_password="$(cat /vagrant/secrets/configuration.yml | shyaml get-value environments.$1.software.wordpress.admin_password)"
+company_email="$(cat /vagrant/secrets/configuration.yml | shyaml get-value company.email)"
 
 # configure mysql conf so user/pass isn't logged in shell history or memory
 sudo cat > "/vagrant/provisioners/redhat_mysql/installers/$1.cnf" << EOF
@@ -101,7 +101,7 @@ mysql --defaults-extra-file=$dbconf -e "CREATE USER '$mysql_user'@'%' IDENTIFIED
 # flush privileges
 mysql --defaults-extra-file=$dbconf -e "FLUSH PRIVILEGES"
 
-cat /vagrant/configuration.yml | shyaml get-values-0 websites.apache |
+cat /vagrant/secrets/configuration.yml | shyaml get-values-0 websites.apache |
 while IFS='' read -r -d '' key; do
 
     domain=$(echo "$key" | grep -w "domain" | cut -d ":" -f 2 | tr -d " ")
