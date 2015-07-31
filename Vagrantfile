@@ -218,7 +218,12 @@ elsif "#{branch}" == "master"
   # bootstrap ssh keys
   # decrypt id_rsa and id_rsa.pub
   if File.zero?("secrets/id_rsa.gpg") || File.zero?("secrets/id_rsa.pub.gpg")
-    catapult_exception("Please place your team's ssh public (id_rsa.pub) and private key (id_rsa.pub) in secrets")
+    if File.zero?("secrets/id_rsa") || File.zero?("secrets/id_rsa.pub")
+      catapult_exception("Please place your team's ssh public (id_rsa.pub) and private key (id_rsa.pub) in the ~/secrets folder.")
+    else
+      `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output secrets/id_rsa.gpg --armor --cipher-algo AES256 --symmetric secrets/id_rsa`
+      `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output secrets/id_rsa.pub.gpg --armor --cipher-algo AES256 --symmetric secrets/id_rsa.pub`
+    end
   end
   if configuration_user["settings"]["gpg_edit"]
     unless File.exist?("secrets/id_rsa")
