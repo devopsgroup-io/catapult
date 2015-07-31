@@ -1,5 +1,5 @@
-configuration.yml
-configuration-user.yml
-provisioners/.ssh/id_rsa
-provisioners/.ssh/id_rsa.pub
+secrets/configuration.yml
+secrets/configuration-user.yml
+secrets/id_rsa
+secrets/id_rsa.pub
 .vagrant

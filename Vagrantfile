@@ -137,17 +137,17 @@ if "#{branch}" == "develop"
     puts "Please commit configuration.yml.gpg on the master branch. You are on the develop branch, which is meant for contribution back to Catapult and should not contain your configuration files."
     exit 1
   end
-  if staged.include?("provisioners/.ssh/id_rsa.gpg")
-    puts "Please commit provisioners/.ssh/id_rsa.gpg on the master branch. You are on the develop branch, which is meant for contribution back to Catapult and should not contain your configuration files."
+  if staged.include?("secrets/id_rsa.gpg")
+    puts "Please commit secrets/id_rsa.gpg on the master branch. You are on the develop branch, which is meant for contribution back to Catapult and should not contain your configuration files."
     exit 1
   end
-  if staged.include?("provisioners/.ssh/id_rsa.pub.gpg")
-    puts "Please commit provisioners/.ssh/id_rsa.pub.gpg on the master branch. You are on the develop branch, which is meant for contribution back to Catapult and should not contain your configuration files."
+  if staged.include?("secrets/id_rsa.pub.gpg")
+    puts "Please commit secrets/id_rsa.pub.gpg on the master branch. You are on the develop branch, which is meant for contribution back to Catapult and should not contain your configuration files."
     exit 1
   end
 elsif "#{branch}" == "master"
-  unless staged.include?("configuration.yml.gpg") || staged.include?("provisioners/.ssh/id_rsa.gpg") || staged.include?("provisioners/.ssh/id_rsa.pub.gpg")
-    puts "You are on the master branch, which is only meant for your configuration files (configuration.yml.gpg, provisioners/.ssh/id_rsa.gpg, provisioners/.ssh/id_rsa.pub.gpg). To contribute to Catapult, please switch to the develop branch."
+  unless staged.include?("configuration.yml.gpg") || staged.include?("secrets/id_rsa.gpg") || staged.include?("secrets/id_rsa.pub.gpg")
+    puts "You are on the master branch, which is only meant for your configuration files (configuration.yml.gpg, secrets/id_rsa.gpg, secrets/id_rsa.pub.gpg). To contribute to Catapult, please switch to the develop branch."
     exit 1
   end
 end
@@ -177,19 +177,19 @@ end
 puts "\n\n\nVerification of encrypted Catapult configuration files:\n\n"
 if "#{branch}" == "develop"
   puts " * You are on the develop branch, this branch is automatically synced with Catapult core and is meant to contribute back to the core Catapult project."
-  puts " * configuration.yml.gpg, provisioners/.ssh/id_rsa.gpg, and provisioners/.ssh/id_rsa.pub.gpg are checked out from the master branch so that you're able to develop and test."
-  puts " * After you're finished on the develop branch, switch to the master branch and discard configuration.yml.gpg, provisioners/.ssh/id_rsa.gpg, and provisioners/.ssh/id_rsa.pub.gpg"
+  puts " * configuration.yml.gpg, secrets/id_rsa.gpg, and secrets/id_rsa.pub.gpg are checked out from the master branch so that you're able to develop and test."
+  puts " * After you're finished on the develop branch, switch to the master branch and discard configuration.yml.gpg, secrets/id_rsa.gpg, and secrets/id_rsa.pub.gpg"
   puts "\n"
   `git checkout --force master -- configuration.yml.gpg`
-  `git checkout --force master -- provisioners/.ssh/id_rsa.gpg`
-  `git checkout --force master -- provisioners/.ssh/id_rsa.pub.gpg`
+  `git checkout --force master -- secrets/id_rsa.gpg`
+  `git checkout --force master -- secrets/id_rsa.pub.gpg`
   `git reset -- configuration.yml.gpg`
-  `git reset -- provisioners/.ssh/id_rsa.gpg`
-  `git reset -- provisioners/.ssh/id_rsa.pub.gpg`
+  `git reset -- secrets/id_rsa.gpg`
+  `git reset -- secrets/id_rsa.pub.gpg`
 elsif "#{branch}" == "master"
-  puts " * You are on the master branch, this branch is automatically synced with Catapult core and is meant to commit your unique configuration.yml.gpg, provisioners/.ssh/id_rsa.gpg, and provisioners/.ssh/id_rsa.pub.gpg configuration."
+  puts " * You are on the master branch, this branch is automatically synced with Catapult core and is meant to commit your unique configuration.yml.gpg, secrets/id_rsa.gpg, and secrets/id_rsa.pub.gpg configuration."
   if configuration_user["settings"]["gpg_edit"]
-    puts " * GPG Edit Mode is enabled at configuration-user.yml[\"settings\"][\"gpg_edit\"], if there are changes to configuration.yml, provisioners/.ssh/id_rsa, or provisioners/.ssh/id_rsa.pub, they will be re-encrypted."
+    puts " * GPG Edit Mode is enabled at configuration-user.yml[\"settings\"][\"gpg_edit\"], if there are changes to configuration.yml, secrets/id_rsa, or secrets/id_rsa.pub, they will be re-encrypted."
   end
   puts "\n"
   # bootstrap configuration.yml
@@ -217,45 +217,45 @@ elsif "#{branch}" == "master"
   end
   # bootstrap ssh keys
   # decrypt id_rsa and id_rsa.pub
-  if File.zero?("provisioners/.ssh/id_rsa.gpg") || File.zero?("provisioners/.ssh/id_rsa.pub.gpg")
-    catapult_exception("Please place your team's ssh public (id_rsa.pub) and private key (id_rsa.pub) in provisioners/.ssh")
+  if File.zero?("secrets/id_rsa.gpg") || File.zero?("secrets/id_rsa.pub.gpg")
+    catapult_exception("Please place your team's ssh public (id_rsa.pub) and private key (id_rsa.pub) in secrets")
   end
   if configuration_user["settings"]["gpg_edit"]
-    unless File.exist?("provisioners/.ssh/id_rsa")
-      `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output provisioners/.ssh/id_rsa --decrypt provisioners/.ssh/id_rsa.gpg`
+    unless File.exist?("secrets/id_rsa")
+      `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output secrets/id_rsa --decrypt secrets/id_rsa.gpg`
     end
-    unless File.exist?("provisioners/.ssh/id_rsa.pub")
-      `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output provisioners/.ssh/id_rsa.pub --decrypt provisioners/.ssh/id_rsa.pub.gpg`
+    unless File.exist?("secrets/id_rsa.pub")
+      `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output secrets/id_rsa.pub --decrypt secrets/id_rsa.pub.gpg`
     end
-    # decrypt provisioners/.ssh/id_rsa.gpg as provisioners/.ssh/id_rsa.compare
-    `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output provisioners/.ssh/id_rsa.compare --decrypt provisioners/.ssh/id_rsa.gpg`
-    if FileUtils.compare_file('provisioners/.ssh/id_rsa', 'provisioners/.ssh/id_rsa.compare')
-      puts "\n * There were no changes to provisioners/.ssh/id_rsa, no need to encrypt as this would create a new cipher to commit.\n\n"
+    # decrypt secrets/id_rsa.gpg as secrets/id_rsa.compare
+    `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output secrets/id_rsa.compare --decrypt secrets/id_rsa.gpg`
+    if FileUtils.compare_file('secrets/id_rsa', 'secrets/id_rsa.compare')
+      puts "\n * There were no changes to secrets/id_rsa, no need to encrypt as this would create a new cipher to commit.\n\n"
     else
-      puts "\n * There were changes to provisioners/.ssh/id_rsa, encrypting provisioners/.ssh/id_rsa as provisioners/.ssh/id_rsa.gpg. Please commit these changes to the master branch for your team to get the changes.\n\n"
-      `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output provisioners/.ssh/id_rsa.gpg --armor --cipher-algo AES256 --symmetric provisioners/.ssh/id_rsa`
+      puts "\n * There were changes to secrets/id_rsa, encrypting secrets/id_rsa as secrets/id_rsa.gpg. Please commit these changes to the master branch for your team to get the changes.\n\n"
+      `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output secrets/id_rsa.gpg --armor --cipher-algo AES256 --symmetric secrets/id_rsa`
     end
-    FileUtils.rm('provisioners/.ssh/id_rsa.compare')
-    # decrypt provisioners/.ssh/id_rsa.pub.gpg as provisioners/.ssh/id_rsa.pub.compare
-    `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output provisioners/.ssh/id_rsa.pub.compare --decrypt provisioners/.ssh/id_rsa.pub.gpg`
-    if FileUtils.compare_file('provisioners/.ssh/id_rsa.pub', 'provisioners/.ssh/id_rsa.pub.compare')
-      puts "\n * There were no changes to provisioners/.ssh/id_rsa.pub, no need to encrypt as this would create a new cipher to commit.\n\n"
+    FileUtils.rm('secrets/id_rsa.compare')
+    # decrypt secrets/id_rsa.pub.gpg as secrets/id_rsa.pub.compare
+    `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output secrets/id_rsa.pub.compare --decrypt secrets/id_rsa.pub.gpg`
+    if FileUtils.compare_file('secrets/id_rsa.pub', 'secrets/id_rsa.pub.compare')
+      puts "\n * There were no changes to secrets/id_rsa.pub, no need to encrypt as this would create a new cipher to commit.\n\n"
     else
-      puts "\n * There were changes to provisioners/.ssh/id_rsa.pub, encrypting provisioners/.ssh/id_rsa.pub as provisioners/.ssh/id_rsa.pub.gpg. Please commit these changes to the master branch for your team to get the changes.\n\n"
-      `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output provisioners/.ssh/id_rsa.pub.gpg --armor --cipher-algo AES256 --symmetric provisioners/.ssh/id_rsa.pub`
+      puts "\n * There were changes to secrets/id_rsa.pub, encrypting secrets/id_rsa.pub as secrets/id_rsa.pub.gpg. Please commit these changes to the master branch for your team to get the changes.\n\n"
+      `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output secrets/id_rsa.pub.gpg --armor --cipher-algo AES256 --symmetric secrets/id_rsa.pub`
     end
-    FileUtils.rm('provisioners/.ssh/id_rsa.pub.compare')
+    FileUtils.rm('secrets/id_rsa.pub.compare')
   else
-    `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output provisioners/.ssh/id_rsa --decrypt provisioners/.ssh/id_rsa.gpg`
-    `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output provisioners/.ssh/id_rsa.pub --decrypt provisioners/.ssh/id_rsa.pub.gpg`
+    `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output secrets/id_rsa --decrypt secrets/id_rsa.gpg`
+    `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output secrets/id_rsa.pub --decrypt secrets/id_rsa.pub.gpg`
   end
   
 end
 # create objects from configuration.yml.gpg and configuration.yml.template
 configuration = YAML.load(`gpg --batch --passphrase "#{configuration_user["settings"]["gpg_key"]}" --decrypt configuration.yml.gpg`)
 configuration_example = YAML.load_file("configuration.yml.template")
-`gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output provisioners/.ssh/id_rsa --decrypt provisioners/.ssh/id_rsa.gpg`
-`gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output provisioners/.ssh/id_rsa.pub --decrypt provisioners/.ssh/id_rsa.pub.gpg`
+`gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output secrets/id_rsa --decrypt secrets/id_rsa.gpg`
+`gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output secrets/id_rsa.pub --decrypt secrets/id_rsa.pub.gpg`
 
 
 
@@ -304,7 +304,7 @@ else
         api_digitalocean_account_keys["ssh_keys"].each do |key|
           if key["name"] == "Vagrant"
             @api_digitalocean_account_key_name = true
-            if "#{key["public_key"].match(/(\w*-\w*\s\S*)/)}" == "#{File.read("provisioners/.ssh/id_rsa.pub").match(/(\w*-\w*\s\S*)/)}"
+            if "#{key["public_key"].match(/(\w*-\w*\s\S*)/)}" == "#{File.read("secrets/id_rsa.pub").match(/(\w*-\w*\s\S*)/)}"
               @api_digitalocean_account_key_public_key = true
             end
           end
@@ -315,9 +315,9 @@ else
           puts "   - Found the ssh public key \"Vagrant\""
         end
         unless @api_digitalocean_account_key_public_key
-          catapult_exception("The SSH Key named \"Vagrant\" in DigitalOcean does not match your Catapult instance's SSH Key at \"provisioners/.ssh/id_rsa.pub\", please follow the Services Setup for DigitalOcean at https://github.com/devopsgroup-io/catapult-release-management#services-setup")
+          catapult_exception("The SSH Key named \"Vagrant\" in DigitalOcean does not match your Catapult instance's SSH Key at \"secrets/id_rsa.pub\", please follow the Services Setup for DigitalOcean at https://github.com/devopsgroup-io/catapult-release-management#services-setup")
         else
-          puts "   - The ssh public key \"Vagrant\" matches your provisioners/.ssh/id_rsa.pub ssh public key"
+          puts "   - The ssh public key \"Vagrant\" matches your secrets/id_rsa.pub ssh public key"
         end
       end
     end
@@ -350,7 +350,7 @@ else
           @api_bitbucket_ssh_keys.each do |key|
             if key["label"] == "Catapult"
               @api_bitbucket_ssh_keys_title = true
-              if "#{key["key"].match(/(\w*-\w*\s\S*)/)}" == "#{File.read("provisioners/.ssh/id_rsa.pub").match(/(\w*-\w*\s\S*)/)}"
+              if "#{key["key"].match(/(\w*-\w*\s\S*)/)}" == "#{File.read("secrets/id_rsa.pub").match(/(\w*-\w*\s\S*)/)}"
                 @api_bitbucket_ssh_keys_key = true
               end
             end
@@ -362,9 +362,9 @@ else
           puts "   - Found the ssh public key \"Catapult\" for your Bitbucket user #{configuration["company"]["bitbucket_username"]}"
         end
         unless @api_bitbucket_ssh_keys_key
-          catapult_exception("The SSH Key named \"Catapult\" in Bitbucket does not match your Catapult instance's SSH Key at \"provisioners/.ssh/id_rsa.pub\", please follow Provision Websites at https://github.com/devopsgroup-io/catapult-release-management#provision-websites")
+          catapult_exception("The SSH Key named \"Catapult\" in Bitbucket does not match your Catapult instance's SSH Key at \"secrets/id_rsa.pub\", please follow Provision Websites at https://github.com/devopsgroup-io/catapult-release-management#provision-websites")
         else
-          puts "   - The ssh public key \"Catapult\" matches your provisioners/.ssh/id_rsa.pub ssh public key"
+          puts "   - The ssh public key \"Catapult\" matches your secrets/id_rsa.pub ssh public key"
         end
       end
     end
@@ -397,7 +397,7 @@ else
           @api_github_ssh_keys.each do |key|
             if key["title"] == "Catapult"
               @api_github_ssh_keys_title = true
-              if "#{key["key"].match(/(\w*-\w*\s\S*)/)}" == "#{File.read("provisioners/.ssh/id_rsa.pub").match(/(\w*-\w*\s\S*)/)}"
+              if "#{key["key"].match(/(\w*-\w*\s\S*)/)}" == "#{File.read("secrets/id_rsa.pub").match(/(\w*-\w*\s\S*)/)}"
                 @api_github_ssh_keys_key = true
               end
             end
@@ -409,9 +409,9 @@ else
           puts "   - Found the ssh public key \"Catapult\" for your GitHub user #{configuration["company"]["github_username"]}"
         end
         unless @api_github_ssh_keys_key
-          catapult_exception("The SSH Key named \"Catapult\" in GitHub does not match your Catapult instance's SSH Key at \"provisioners/.ssh/id_rsa.pub\", please follow Provision Websites at https://github.com/devopsgroup-io/catapult-release-management#provision-websites")
+          catapult_exception("The SSH Key named \"Catapult\" in GitHub does not match your Catapult instance's SSH Key at \"secrets/id_rsa.pub\", please follow Provision Websites at https://github.com/devopsgroup-io/catapult-release-management#provision-websites")
         else
-          puts "   - The ssh public key \"Catapult\" matches your provisioners/.ssh/id_rsa.pub ssh public key"
+          puts "   - The ssh public key \"Catapult\" matches your secrets/id_rsa.pub ssh public key"
         end
       end
     end
@@ -936,7 +936,7 @@ Vagrant.configure("2") do |config|
   # redhat test servers
   config.vm.define "#{configuration["company"]["name"]}-test-redhat" do |config|
     config.vm.provider :digital_ocean do |provider,override|
-      override.ssh.private_key_path = "provisioners/.ssh/id_rsa"
+      override.ssh.private_key_path = "secrets/id_rsa"
       override.vm.box = "digital_ocean"
       override.vm.box_url = "https://github.com/smdahlen/vagrant-digitalocean/raw/master/box/digital_ocean.box"
       provider.token = configuration["company"]["digitalocean_personal_access_token"]
@@ -951,7 +951,7 @@ Vagrant.configure("2") do |config|
   end
   config.vm.define "#{configuration["company"]["name"]}-test-redhat-mysql" do |config|
     config.vm.provider :digital_ocean do |provider,override|
-      override.ssh.private_key_path = "provisioners/.ssh/id_rsa"
+      override.ssh.private_key_path = "secrets/id_rsa"
       override.vm.box = "digital_ocean"
       override.vm.box_url = "https://github.com/smdahlen/vagrant-digitalocean/raw/master/box/digital_ocean.box"
       provider.token = configuration["company"]["digitalocean_personal_access_token"]
@@ -968,7 +968,7 @@ Vagrant.configure("2") do |config|
   # redhat quality control servers
   config.vm.define "#{configuration["company"]["name"]}-qc-redhat" do |config|
     config.vm.provider :digital_ocean do |provider,override|
-      override.ssh.private_key_path = "provisioners/.ssh/id_rsa"
+      override.ssh.private_key_path = "secrets/id_rsa"
       override.vm.box = "digital_ocean"
       override.vm.box_url = "https://github.com/smdahlen/vagrant-digitalocean/raw/master/box/digital_ocean.box"
       provider.token = configuration["company"]["digitalocean_personal_access_token"]
@@ -983,7 +983,7 @@ Vagrant.configure("2") do |config|
   end
   config.vm.define "#{configuration["company"]["name"]}-qc-redhat-mysql" do |config|
     config.vm.provider :digital_ocean do |provider,override|
-      override.ssh.private_key_path = "provisioners/.ssh/id_rsa"
+      override.ssh.private_key_path = "secrets/id_rsa"
       override.vm.box = "digital_ocean"
       override.vm.box_url = "https://github.com/smdahlen/vagrant-digitalocean/raw/master/box/digital_ocean.box"
       provider.token = configuration["company"]["digitalocean_personal_access_token"]
@@ -1000,7 +1000,7 @@ Vagrant.configure("2") do |config|
   # redhat production servers
   config.vm.define "#{configuration["company"]["name"]}-production-redhat" do |config|
     config.vm.provider :digital_ocean do |provider,override|
-      override.ssh.private_key_path = "provisioners/.ssh/id_rsa"
+      override.ssh.private_key_path = "secrets/id_rsa"
       override.vm.box = "digital_ocean"
       override.vm.box_url = "https://github.com/smdahlen/vagrant-digitalocean/raw/master/box/digital_ocean.box"
       provider.token = configuration["company"]["digitalocean_personal_access_token"]
@@ -1015,7 +1015,7 @@ Vagrant.configure("2") do |config|
   end
   config.vm.define "#{configuration["company"]["name"]}-production-redhat-mysql" do |config|
     config.vm.provider :digital_ocean do |provider,override|
-      override.ssh.private_key_path = "provisioners/.ssh/id_rsa"
+      override.ssh.private_key_path = "secrets/id_rsa"
       override.vm.box = "digital_ocean"
       override.vm.box_url = "https://github.com/smdahlen/vagrant-digitalocean/raw/master/box/digital_ocean.box"
       provider.token = configuration["company"]["digitalocean_personal_access_token"]
