@@ -121,20 +121,23 @@ Catapult is quick to setup. Fork the Github repository and start adding your con
 
 Catapult uses several third-party services to pull everything off - below is a list of the required services and sign-up and configuration steps.
 
-1. **Hosting:** 
+1. **Hosting:**
     1. **DigitalOcean** sign-up and configuration
         1. Create an account at http://digitalocean.com
         2. Create a Personal Access Token at https://cloud.digitalocean.com/settings/applications named "Vagrant" and place the token value at `~/configuration.yml["company"]["digitalocean_personal_access_token"]`
         3. Add your newly created id_rsa.pub from ~/secrets/id_rsa.pub key in https://cloud.digitalocean.com/settings/security named "Vagrant"
 2. **Repositories:**
+    Bitbucket provides free private repositories and GitHub provides an unparalleled social aspect to repositories but costs $25/month for private repositories. You will need to sign up for both; if you already have Bitbucket and GitHub accounts you may use them, however, it's best to setup a [machine user](https://developer.github.com/guides/managing-deploy-keys/#machine-users) if you're using Catapult with your team.
     1. **Bitbucket** sign-up and configuration
         1. Create an account at https://bitbucket.org
             1. Place the username (not the email address) that you used to sign up for Bitbucket at `~/configuration.yml["company"]["bitbucket_username"]`
             2. Place the password of the account for Bitbucket at `~/configuration.yml["company"]["bitbucket_password"]`
+        2. Add your newly created id_rsa.pub from ~/secrets/id_rsa.pub key in https://bitbucket.org/account/user/`your-user-here`/ssh-keys/ named "Catapult"
     2. **GitHub** sign-up and configuration
         1. Create an account at https://github.com
             1. Place the username (not the email address) that you used to sign up for GitHub at `~/configuration.yml["company"]["github_username"]`
             2. Place the password of the account for GitHub at `~/configuration.yml["company"]["github_password"]`
+        2. Add your newly created id_rsa.pub from ~/secrets/id_rsa.pub key in https://github.com/settings/ssh named "Catapult"
 3. **Automated Deployments:**
     1. **Amazon Web Services** (AWS) EC2 sign-up and configuration (Required for Bamboo)
         1. Create an AWS account https://portal.aws.amazon.com/gp/aws/developer/registration
