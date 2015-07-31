@@ -507,25 +507,25 @@ configuration["environments"].each do |environment,data|
   unless configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["mysql"]["user_password"]
     configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["mysql"]["user_password"] = SecureRandom.urlsafe_base64(16)
     `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml --decrypt secrets/configuration.yml.gpg`
-    File.open('secrets/configuration.yml', 'w') {|f| f.write secrets/configuration.to_yaml }
+    File.open('secrets/configuration.yml', 'w') {|f| f.write configuration.to_yaml }
     `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml.gpg --armor --cipher-algo AES256 --symmetric secrets/configuration.yml`
   end
   unless configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["mysql"]["root_password"]
     configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["mysql"]["root_password"] = SecureRandom.urlsafe_base64(16)
     `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml --decrypt secrets/configuration.yml.gpg`
-    File.open('secrets/configuration.yml', 'w') {|f| f.write secrets/configuration.to_yaml }
+    File.open('secrets/configuration.yml', 'w') {|f| f.write configuration.to_yaml }
     `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml.gpg --armor --cipher-algo AES256 --symmetric secrets/configuration.yml`
   end
   unless configuration["environments"]["#{environment}"]["software"]["drupal"]["admin_password"]
     configuration["environments"]["#{environment}"]["software"]["drupal"]["admin_password"] = SecureRandom.urlsafe_base64(16)
     `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml --decrypt secrets/configuration.yml.gpg`
-    File.open('secrets/configuration.yml', 'w') {|f| f.write secrets/configuration.to_yaml }
+    File.open('secrets/configuration.yml', 'w') {|f| f.write configuration.to_yaml }
     `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml.gpg --armor --cipher-algo AES256 --symmetric secrets/configuration.yml`
   end
   unless configuration["environments"]["#{environment}"]["software"]["wordpress"]["admin_password"]
     configuration["environments"]["#{environment}"]["software"]["wordpress"]["admin_password"] = SecureRandom.urlsafe_base64(16)
     `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml --decrypt secrets/configuration.yml.gpg`
-    File.open('secrets/configuration.yml', 'w') {|f| f.write secrets/configuration.to_yaml }
+    File.open('secrets/configuration.yml', 'w') {|f| f.write configuration.to_yaml }
     `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml.gpg --armor --cipher-algo AES256 --symmetric secrets/configuration.yml`
   end
   # if upstream digitalocean droplets are provisioned, get their ip addresses to write to secrets/configuration.yml
@@ -535,7 +535,7 @@ configuration["environments"].each do |environment,data|
       unless configuration["environments"]["#{environment}"]["servers"]["redhat"]["ip"] == droplet["networks"]["v4"].first["ip_address"]
         configuration["environments"]["#{environment}"]["servers"]["redhat"]["ip"] = droplet["networks"]["v4"].first["ip_address"]
         `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml --decrypt secrets/configuration.yml.gpg`
-        File.open('secrets/configuration.yml', 'w') {|f| f.write secrets/configuration.to_yaml }
+        File.open('secrets/configuration.yml', 'w') {|f| f.write configuration.to_yaml }
         `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml.gpg --armor --cipher-algo AES256 --symmetric secrets/configuration.yml`
       end
     end
@@ -544,7 +544,7 @@ configuration["environments"].each do |environment,data|
       unless configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["ip"] == droplet["networks"]["v4"].first["ip_address"]
         configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["ip"] = droplet["networks"]["v4"].first["ip_address"]
         `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml --decrypt secrets/configuration.yml.gpg`
-        File.open('secrets/configuration.yml', 'w') {|f| f.write secrets/configuration.to_yaml }
+        File.open('secrets/configuration.yml', 'w') {|f| f.write configuration.to_yaml }
         `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml.gpg --armor --cipher-algo AES256 --symmetric secrets/configuration.yml`
       end
     end
