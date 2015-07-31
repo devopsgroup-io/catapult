@@ -87,9 +87,18 @@ iptables -I OUTPUT -p tcp --sport 3306 -m state --state ESTABLISHED -j ACCEPT
 
 # clear out all users except root
 mysql --defaults-extra-file=$dbconf -e "DELETE FROM mysql.user WHERE user!='root'"
-# clear out all of the databases except default
-for database in $(mysql --defaults-extra-file=$dbconf -e "show databases" | egrep -v "Database|mysql|information_schema|performance_schema");
-    do mysql --defaults-extra-file=$dbconf -e "drop database $database";
+
+# create an array of domainvaliddbnames
+while IFS='' read -r -d '' key; do
+    domainvaliddbname=$(echo "$key" | grep -w "domain" | cut -d ":" -f 2 | tr -d " " | tr "." "_")
+    domainvaliddbnames+=($1_$domainvaliddbname)
+done < <(cat /vagrant/secrets/configuration.yml | shyaml get-values-0 websites.apache)
+# cleanup databases from domainvaliddbnames array
+for database in $(mysql --defaults-extra-file=$dbconf -e "show databases" | egrep -v "Database|mysql|information_schema|performance_schema"); do
+    if ! [[ ${domainvaliddbnames[*]} =~ $database ]]; then
+        echo "Cleaning up websites that no longer exist..."
+        mysql --defaults-extra-file=$dbconf -e "DROP DATABASE $database";
+    fi
 done
 
 # create global user
@@ -110,16 +119,24 @@ while IFS='' read -r -d '' key; do
     software_dbprefix=$(echo "$key" | grep -w "software_dbprefix" | cut -d ":" -f 2 | tr -d " ")
     software_workflow=$(echo "$key" | grep -w "software_workflow" | cut -d ":" -f 2 | tr -d " ")
 
-    if test -n "$software"; then
-        if [ "$1" = "production" ]; then
-            echo -e "\nNOTICE: ${domain}"
-        else
-            echo -e "\nNOTICE: ${1}.${domain}"
-        fi
+    if [ "$1" = "production" ]; then
+        echo -e "\nNOTICE: ${domain}"
+    else
+        echo -e "\nNOTICE: ${1}.${domain}"
+    fi
+    if ! test -n "$software"; then
+        echo -e "\t* skipping database creation/restore as this website does not require a database"
+    else
         # respect software_workflow option
         if ! ([ "$1" != "production" ] && [ "$software_workflow" = "downstream" ]) || ([ "$1" != "test" ] && [ "$software_workflow" = "upstream" ]); then
-            echo -e "\t* skipping database restore as this website's software_workflow is set to ${software_workflow} and this is the ${1} environment"
+            echo -e "\t* skipping database creation/restore as this website's software_workflow is set to ${software_workflow} and this is the ${1} environment"
         else
+            # drop the database
+            for database in $(mysql --defaults-extra-file=$dbconf -e "show databases" | egrep -v "Database|mysql|information_schema|performance_schema"); do
+                if [ ${database} = ${1}_${domainvaliddbname} ]; then
+                    mysql --defaults-extra-file=$dbconf -e "DROP DATABASE $1_$domainvaliddbname";
+                fi
+            done
             # create database
             mysql --defaults-extra-file=$dbconf -e "CREATE DATABASE $1_$domainvaliddbname"
             # grant user to database
