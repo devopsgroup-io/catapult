@@ -629,6 +629,65 @@ configuration["websites"].each do |service,data|
           end
         end
       end
+      # validate repo branches
+      if "#{repo_split_2[0]}" == "bitbucket.org"
+        uri = URI("https://api.bitbucket.org/1.0/repositories/#{repo_split_3[0]}/branches")
+        Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => OpenSSL::SSL::VERIFY_NONE) do |http|
+          request = Net::HTTP::Get.new uri.request_uri
+          request.basic_auth "#{configuration["company"]["bitbucket_username"]}", "#{configuration["company"]["bitbucket_password"]}"
+          response = http.request request # Net::HTTPResponse object
+          api_bitbucket_repo_branches = JSON.parse(response.body)
+          @api_bitbucket_repo_develop = false
+          @api_bitbucket_repo_master = false
+          api_bitbucket_repo_branches.each do |branch, array|
+            if branch == "develop"
+              @api_bitbucket_repo_develop = true
+            end
+            if branch == "master"
+              @api_bitbucket_repo_master = true
+            end
+          end
+          unless @api_bitbucket_repo_develop
+            catapult_exception("Cannot find the develop branch for this repository, please create one.")
+          else
+            puts "   - Found the develop branch."
+          end
+          unless @api_bitbucket_repo_master
+            catapult_exception("Cannot find the master branch for this repository, please create one.")
+          else
+            puts "   - Found the master branch."
+          end
+        end
+      end
+      if "#{repo_split_2[0]}" == "github.com"
+        uri = URI("https://api.github.com/repos/#{repo_split_3[0]}/branches")
+        Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => OpenSSL::SSL::VERIFY_NONE) do |http|
+          request = Net::HTTP::Get.new uri.request_uri
+          request.basic_auth "#{configuration["company"]["github_username"]}", "#{configuration["company"]["github_password"]}"
+          response = http.request request # Net::HTTPResponse object
+          api_github_repo_branches = JSON.parse(response.body)
+          @api_github_repo_develop = false
+          @api_github_repo_master = false
+          api_github_repo_branches.each do |branch|
+            if branch["name"] == "develop"
+              @api_github_repo_develop = true
+            end
+            if branch["name"] == "master"
+              @api_github_repo_master = true
+            end
+          end
+          unless @api_github_repo_develop
+            catapult_exception("Cannot find the develop branch for this repository, please create one.")
+          else
+            puts "   - Found the develop branch."
+          end
+          unless @api_github_repo_master
+            catapult_exception("Cannot find the master branch for this repository, please create one.")
+          else
+            puts "   - Found the master branch."
+          end
+        end
+      end
       # create bamboo service per bitbucket repo
       if "#{repo_split_2[0]}" == "bitbucket.org"
         # the bitbucket api offers no patch for service hooks, so we first need to check if the bitbucket bamboo service hooks exist
