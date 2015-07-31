@@ -33,7 +33,6 @@ Catapult manages all of this for you and is open-sourced, well-documented, devel
 
 - [Catapult Release Management](#catapult-release-management)
     - [Table of Contents](#table-of-contents)
-    - [File Structure](#file-structure)
     - [Supported Software](#supported-software)
 - [Setup](#setup)
     - [Developer Setup](#developer-setup)
