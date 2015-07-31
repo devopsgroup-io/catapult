@@ -47,52 +47,6 @@ Catapult manages all of this for you and is open-sourced, well-documented, devel
 
 
 
-## File Structure ##
-
-```
-catapult-release-management/
-├── provisioners/
-│   ├── .ssh/
-│   ├── redhat/
-│   │   ├── installers/
-│   │   │    └── codeigniter2_database.php
-│   │   │    └── drupal6_settings.php
-│   │   │    └── drupal7_settings.php
-│   │   │    └── wp-cli.phar
-│   │   │    └── wp-config.php
-│   │   │    └── xenforo_config.php
-│   │   │ 
-│   │   ├── logs/
-│   │   │
-│   │   └── provision.sh
-│   │
-│   ├── redhat_mysql/
-│   │   ├── installers/
-│   │   ├── logs/
-│   │   └── provision.sh
-│   │
-│   └── windows
-│       ├── installers/
-│       │    └── poweryaml/
-│       │    └── ProcessExplorer/
-│       │    └── dotNetFx40_Full_x86_x64.exe
-│       │    └── Git-1.9.5-preview20141217.exe
-│       │    └── Windows6.1-KB2560289-x64.msu
-│       │    
-│       ├── logs/
-│       └── provision.ps1
-│   
-├── repositories/
-│   ├── apache/
-│   └── iis/
-│   
-├── configuration-user.yml.template
-├── configuration.yml.template
-└── Vagrantfile
-```
-
-
-
 ## Supported Software ##
 
 Catapult supports the following software:
@@ -146,7 +100,7 @@ Catapult is quick to setup. Fork the Github repository and start adding your con
 3. **SSH Key Pair**
     1. You will need to create a *passwordless* SSH key pair that will drive authentication for Catapult.
         1. For instructions please see https://help.github.com/articles/generating-ssh-keys/
-        2. Place the newly created *passwordless* SSH key pair id_rsa and id_rsa.pub in the ~/provisioners/.ssh/ folder.
+        2. Place the newly created *passwordless* SSH key pair id_rsa and id_rsa.pub in the ~/secrets/ folder.
 4. **GPG Key**
     1. You will need to create your team's gpg_key that will be the single key that encrypts all of your configuration and secrets for your instance.
         1. NEVER SHARE THE KEY WITH ANYONE OTHER THAN YOUR TEAM.
@@ -156,8 +110,8 @@ Catapult is quick to setup. Fork the Github repository and start adding your con
         6. Remember; security is 99% process and 1% technology.
 5. **GPG Edit Mode**
     1. When **GPG Edit Mode** is enabled (disabled by default) the following files are encrypted using your **GPG Key**:
-        1. ~/provisioners/.ssh/id_rsa as ~/provisioners/.ssh/id_rsa.gpg
-        2. ~/provisioners/.ssh/id_rsa.pub as ~/provisioners/.ssh/id_rsa.pub.gpg
+        1. ~/secrets/id_rsa as ~/secrets/id_rsa.gpg
+        2. ~/secrets/id_rsa.pub as ~/secrets/id_rsa.pub.gpg
         3. ~/configuration.yml as ~/configuration.yml.gpg
     2. To enable **GPG Edit Mode**, set `~/configuration-user.yml["settings"]["gpg_edit"]` to true.
     3. Once gpg_edit is set to true and while on your fork's master branch, run `vagrant status`, this will encrypt your configuraiton that you will then be able to commit and push safely to your public Catapult fork.
@@ -172,7 +126,7 @@ Catapult uses several third-party services to pull everything off - below is a l
     1. **DigitalOcean** sign-up and configuration
         1. Create an account at http://digitalocean.com
         2. Create a Personal Access Token at https://cloud.digitalocean.com/settings/applications named "Vagrant" and place the token value at `~/configuration.yml["company"]["digitalocean_personal_access_token"]`
-        3. Add your newly created id_rsa.pub from ~/provisioners/.ssh/id_rsa.pub key in https://cloud.digitalocean.com/settings/security named "Vagrant"
+        3. Add your newly created id_rsa.pub from ~/secrets/id_rsa.pub key in https://cloud.digitalocean.com/settings/security named "Vagrant"
 2. **Repositories:**
     1. **Bitbucket** sign-up and configuration
         1. Create an account at https://bitbucket.org

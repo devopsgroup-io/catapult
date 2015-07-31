@@ -105,14 +105,14 @@ while IFS='' read -r -d '' key; do
         if [ "$(cd /var/www/repositories/apache/$domain && git config --get remote.origin.url)" != "$repo" ]; then
             echo "the repo has changed in configuration.yml, removing and cloning the new repository." | sed "s/^/\t/"
             sudo rm -rf /var/www/repositories/apache/$domain
-            sudo ssh-agent bash -c "ssh-add /vagrant/provisioners/.ssh/id_rsa; git clone --recursive -b $(cat /vagrant/configuration.yml | shyaml get-value environments.$1.branch) $repo /var/www/repositories/apache/$domain" | sed "s/^/\t/"
+            sudo ssh-agent bash -c "ssh-add /vagrant/secrets/id_rsa; git clone --recursive -b $(cat /vagrant/configuration.yml | shyaml get-value environments.$1.branch) $repo /var/www/repositories/apache/$domain" | sed "s/^/\t/"
         elif [ "$(cd /var/www/repositories/apache/$domain && git rev-list HEAD | tail -n 1 )" != "$(cd /var/www/repositories/apache/$domain && git rev-list origin/master | tail -n 1 )" ]; then
             echo "the repo has changed, removing and cloning the new repository." | sed "s/^/\t/"
             sudo rm -rf /var/www/repositories/apache/$domain
-            sudo ssh-agent bash -c "ssh-add /vagrant/provisioners/.ssh/id_rsa; git clone --recursive -b $(cat /vagrant/configuration.yml | shyaml get-value environments.$1.branch) $repo /var/www/repositories/apache/$domain" | sed "s/^/\t/"
+            sudo ssh-agent bash -c "ssh-add /vagrant/secrets/id_rsa; git clone --recursive -b $(cat /vagrant/configuration.yml | shyaml get-value environments.$1.branch) $repo /var/www/repositories/apache/$domain" | sed "s/^/\t/"
         elif [ "$settings_git_pull" = true ]; then
             cd /var/www/repositories/apache/$domain && git checkout $(cat /vagrant/configuration.yml | shyaml get-value environments.$1.branch)
-            cd /var/www/repositories/apache/$domain && sudo ssh-agent bash -c "ssh-add /vagrant/provisioners/.ssh/id_rsa; git pull origin $(cat /vagrant/configuration.yml | shyaml get-value environments.$1.branch)" | sed "s/^/\t/"
+            cd /var/www/repositories/apache/$domain && sudo ssh-agent bash -c "ssh-add /vagrant/secrets/id_rsa; git pull origin $(cat /vagrant/configuration.yml | shyaml get-value environments.$1.branch)" | sed "s/^/\t/"
         elif [ "$settings_git_pull" = false ]; then
             echo "[provisioner argument false!] skipping git pull" | sed "s/^/\t/"
         fi
@@ -122,7 +122,7 @@ while IFS='' read -r -d '' key; do
             sudo chmod 0777 -R /var/www/repositories/apache/$domain
             sudo rm -rf /var/www/repositories/apache/$domain
         fi
-        sudo ssh-agent bash -c "ssh-add /vagrant/provisioners/.ssh/id_rsa; git clone --recursive -b $(cat /vagrant/configuration.yml | shyaml get-value environments.$1.branch) $repo /var/www/repositories/apache/$domain" | sed "s/^/\t/"
+        sudo ssh-agent bash -c "ssh-add /vagrant/secrets/id_rsa; git clone --recursive -b $(cat /vagrant/configuration.yml | shyaml get-value environments.$1.branch) $repo /var/www/repositories/apache/$domain" | sed "s/^/\t/"
     fi
 done < <(cat /vagrant/configuration.yml | shyaml get-values-0 websites.apache)
 
@@ -440,9 +440,9 @@ EOF
             sed -e "s/mysql:\/\/username:password@localhost\/databasename/${connectionstring}/g" /vagrant/provisioners/redhat/installers/drupal6_settings.php > "/var/www/repositories/apache/${domain}/${webroot}sites/default/settings.php"
             echo -e "\t\trysncing $software ~/sites/default/files/"
             if ([ "$software_workflow" = "downstream" ] && [ "$1" != "production" ]); then
-                rsync  --archive --compress --copy-links --delete --verbose -e "ssh -oStrictHostKeyChecking=no -i /vagrant/provisioners/.ssh/id_rsa" root@$(cat /vagrant/configuration.yml | shyaml get-value environments.production.servers.redhat.ip):/var/www/html/$domain/sites/default/files/ /var/www/repositories/apache/${domain}/${webroot}sites/default/files/ 2>&1 | sed "s/^/\t\t/"
+                rsync  --archive --compress --copy-links --delete --verbose -e "ssh -oStrictHostKeyChecking=no -i /vagrant/secrets/id_rsa" root@$(cat /vagrant/configuration.yml | shyaml get-value environments.production.servers.redhat.ip):/var/www/html/$domain/sites/default/files/ /var/www/repositories/apache/${domain}/${webroot}sites/default/files/ 2>&1 | sed "s/^/\t\t/"
             elif ([ "$software_workflow" = "upstream" ] && [ "$1" != "test" ]); then
-                rsync  --archive --compress --copy-links --delete --verbose -e "ssh -oStrictHostKeyChecking=no -i /vagrant/provisioners/.ssh/id_rsa" root@$(cat /vagrant/configuration.yml | shyaml get-value environments.test.servers.redhat.ip):/var/www/html/$domain/sites/default/files/ /var/www/repositories/apache/${domain}/${webroot}sites/default/files/ 2>&1 | sed "s/^/\t\t/"
+                rsync  --archive --compress --copy-links --delete --verbose -e "ssh -oStrictHostKeyChecking=no -i /vagrant/secrets/id_rsa" root@$(cat /vagrant/configuration.yml | shyaml get-value environments.test.servers.redhat.ip):/var/www/html/$domain/sites/default/files/ /var/www/repositories/apache/${domain}/${webroot}sites/default/files/ 2>&1 | sed "s/^/\t\t/"
             fi
             if [ "$settings_software_validation" = false ]; then
                 echo -e "\t\t[provisioner argument false!] skipping $software information"
@@ -463,9 +463,9 @@ EOF
             sed -e "s/\$databases\s=\sarray();/${connectionstring}/g" /vagrant/provisioners/redhat/installers/drupal7_settings.php > "/var/www/repositories/apache/${domain}/${webroot}sites/default/settings.php"
             echo -e "\t\trysncing $software ~/sites/default/files/"
             if ([ "$software_workflow" = "downstream" ] && [ "$1" != "production" ]); then
-                rsync  --archive --compress --copy-links --delete --verbose -e "ssh -oStrictHostKeyChecking=no -i /vagrant/provisioners/.ssh/id_rsa" root@$(cat /vagrant/configuration.yml | shyaml get-value environments.production.servers.redhat.ip):/var/www/html/$domain/sites/default/files/ /var/www/repositories/apache/${domain}/${webroot}sites/default/files/ 2>&1 | sed "s/^/\t\t/"
+                rsync  --archive --compress --copy-links --delete --verbose -e "ssh -oStrictHostKeyChecking=no -i /vagrant/secrets/id_rsa" root@$(cat /vagrant/configuration.yml | shyaml get-value environments.production.servers.redhat.ip):/var/www/html/$domain/sites/default/files/ /var/www/repositories/apache/${domain}/${webroot}sites/default/files/ 2>&1 | sed "s/^/\t\t/"
             elif ([ "$software_workflow" = "upstream" ] && [ "$1" != "test" ]); then
-                rsync  --archive --compress --copy-links --delete --verbose -e "ssh -oStrictHostKeyChecking=no -i /vagrant/provisioners/.ssh/id_rsa" root@$(cat /vagrant/configuration.yml | shyaml get-value environments.test.servers.redhat.ip):/var/www/html/$domain/sites/default/files/ /var/www/repositories/apache/${domain}/${webroot}sites/default/files/ 2>&1 | sed "s/^/\t\t/"
+                rsync  --archive --compress --copy-links --delete --verbose -e "ssh -oStrictHostKeyChecking=no -i /vagrant/secrets/id_rsa" root@$(cat /vagrant/configuration.yml | shyaml get-value environments.test.servers.redhat.ip):/var/www/html/$domain/sites/default/files/ /var/www/repositories/apache/${domain}/${webroot}sites/default/files/ 2>&1 | sed "s/^/\t\t/"
             fi
             if [ "$settings_software_validation" = false ]; then
                 echo -e "\t\t[provisioner argument false!] skipping $software information"
@@ -485,9 +485,9 @@ EOF
             sed -e "s/database_name_here/${1}_${domainvaliddbname}/g" -e "s/username_here/${mysql_user}/g" -e "s/password_here/${mysql_user_password}/g" -e "s/localhost/${redhat_mysql_ip}/g" -e "s/'wp_'/'${software_dbprefix}'/g" /vagrant/provisioners/redhat/installers/wp-config.php > "/var/www/repositories/apache/${domain}/${webroot}wp-config.php"
             echo -e "\t\trysncing $software ~/wp-content/"
             if ([ "$software_workflow" = "downstream" ] && [ "$1" != "production" ]); then
-                rsync  --archive --compress --copy-links --delete --verbose -e "ssh -oStrictHostKeyChecking=no -i /vagrant/provisioners/.ssh/id_rsa" root@$(cat /vagrant/configuration.yml | shyaml get-value environments.production.servers.redhat.ip):/var/www/html/${domain}/${webroot}wp-content/ /var/www/repositories/apache/${domain}/${webroot}wp-content/ 2>&1 | sed "s/^/\t\t/"
+                rsync  --archive --compress --copy-links --delete --verbose -e "ssh -oStrictHostKeyChecking=no -i /vagrant/secrets/id_rsa" root@$(cat /vagrant/configuration.yml | shyaml get-value environments.production.servers.redhat.ip):/var/www/html/${domain}/${webroot}wp-content/ /var/www/repositories/apache/${domain}/${webroot}wp-content/ 2>&1 | sed "s/^/\t\t/"
             elif ([ "$software_workflow" = "upstream" ] && [ "$1" != "test" ]); then
-                rsync  --archive --compress --copy-links --delete --verbose -e "ssh -oStrictHostKeyChecking=no -i /vagrant/provisioners/.ssh/id_rsa" root@$(cat /vagrant/configuration.yml | shyaml get-value environments.test.servers.redhat.ip):/var/www/html/${domain}/${webroot}wp-content/ /var/www/repositories/apache/${domain}/${webroot}wp-content/ 2>&1 | sed "s/^/\t\t/"
+                rsync  --archive --compress --copy-links --delete --verbose -e "ssh -oStrictHostKeyChecking=no -i /vagrant/secrets/id_rsa" root@$(cat /vagrant/configuration.yml | shyaml get-value environments.test.servers.redhat.ip):/var/www/html/${domain}/${webroot}wp-content/ /var/www/repositories/apache/${domain}/${webroot}wp-content/ 2>&1 | sed "s/^/\t\t/"
             fi
             if [ "$settings_software_validation" = false ]; then
                 echo -e "\t\t[provisioner argument false!] skipping $software information"
