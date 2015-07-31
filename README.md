@@ -127,7 +127,7 @@ Catapult uses several third-party services to pull everything off - below is a l
         2. Create a Personal Access Token at https://cloud.digitalocean.com/settings/applications named "Vagrant" and place the token value at `~/configuration.yml["company"]["digitalocean_personal_access_token"]`
         3. Add your newly created id_rsa.pub from ~/secrets/id_rsa.pub key in https://cloud.digitalocean.com/settings/security named "Vagrant"
 2. **Repositories:**    
-    Bitbucket provides free private repositories and GitHub provides an unparalleled social aspect to repositories but costs $25/month for private repositories. You will need to sign up for both; if you already have Bitbucket and GitHub accounts you may use them, however, it's best to setup a [machine user](https://developer.github.com/guides/managing-deploy-keys/#machine-users) if you're using Catapult with your team.
+    Bitbucket provides free private repositories and GitHub provides free public repositories, you will need to sign up for both. If you already have Bitbucket and GitHub accounts you may use them, however, it's best to setup a [machine user](https://developer.github.com/guides/managing-deploy-keys/#machine-users) if you're using Catapult with your team.
     1. **Bitbucket** sign-up and configuration
         1. Create an account at https://bitbucket.org
             1. Place the username (not the email address) that you used to sign up for Bitbucket at `~/configuration.yml["company"]["bitbucket_username"]`
