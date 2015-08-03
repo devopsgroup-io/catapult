@@ -240,10 +240,6 @@ while IFS='' read -r -d '' key; do
             done
             # create database
             mysql --defaults-extra-file=$dbconf -e "CREATE DATABASE $1_$domainvaliddbname"
-            # grant user to database
-            mysql --defaults-extra-file=$dbconf -e "GRANT ALL ON $1_$domainvaliddbname.* TO '$mysql_user'@'%'";
-            # flush privileges
-            mysql --defaults-extra-file=$dbconf -e "FLUSH PRIVILEGES"
             # confirm we have a usable database backup
             if ! [ -d "/var/www/repositories/apache/$domain/_sql" ]; then
                 echo -e "\t* /repositories/$domain/_sql does not exist - $software will not function"
@@ -291,6 +287,10 @@ while IFS='' read -r -d '' key; do
                 done
             fi
         fi
+        # grant user to database
+        mysql --defaults-extra-file=$dbconf -e "GRANT ALL ON $1_$domainvaliddbname.* TO '$mysql_user'@'%'";
+        # flush privileges
+        mysql --defaults-extra-file=$dbconf -e "FLUSH PRIVILEGES"
     fi
 
 done
