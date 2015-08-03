@@ -19,6 +19,8 @@ start=$(date +%s)
 if ! grep -q "PasswordAuthentication no" "/etc/ssh/sshd_config"; then
    sudo bash -c 'echo "PasswordAuthentication no" >> /etc/ssh/sshd_config'
 fi
+sudo systemctl stop sshd.service
+sudo systemctl start sshd.service
 # set human friendly variables inbound from provisioner args
 settings_environment=$1
 settings_git_pull=$2
