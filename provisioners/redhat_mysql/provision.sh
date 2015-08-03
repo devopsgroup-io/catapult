@@ -1,15 +1,13 @@
 #!/usr/bin/env bash
-export DEBIAN_FRONTEND=noninteractive
 
 
-if ! [ -e "/vagrant/secrets/configuration.yml" ]; then
-    echo -e "Cannot read from /vagrant/secrets/configuration.yml, please vagrant reload the virtual machine."
-    exit 1
-fi
 
+# variables inbound from provisioner args
+# $1 => environment
+# $2 => repository
+# $3 => gpg key
+# $4 => software_validation
 
-provisionstart=$(date +%s)
-sudo touch /vagrant/provisioners/redhat_mysql/logs/provision.log
 
 
 echo -e "==> Updating existing packages and installing utilities"
@@ -27,27 +25,70 @@ sudo yum update -y
 sudo yum install -y git
 # parse yaml
 sudo easy_install pip
-sudo pip install shyaml
-# wpi-cli dependancies
-sudo yum install -y php-cli
-sudo yum install -y php-mysql
+sudo pip install --upgrade pip
+sudo pip install shyaml --upgrade
+# clone and pull catapult
+if ([ $1 = "dev" ] || [ $1 = "test" ]); then
+    branch="develop"
+elif ([ $1 = "qc" ] || [ $1 = "production" ]); then
+    branch="master"
+fi
+if [ $1 != "dev" ]; then
+    if [ -d "/catapult/.git" ]; then
+        cd /catapult && sudo git pull
+    else
+        sudo git clone --recursive -b ${branch} $2 /catapult | sed "s/^/\t/"
+    fi
+else
+    if ! [ -e "/catapult/secrets/configuration.yml.gpg" ]; then
+        echo -e "Cannot read from /catapult/secrets/configuration.yml.gpg, please vagrant reload the virtual machine."
+        exit 1
+    fi
+fi
+configuration=$(gpg --batch --passphrase ${3} --decrypt /catapult/secrets/configuration.yml.gpg)
+gpg --verbose --batch --yes --passphrase ${3} --output /catapult/secrets/id_rsa --decrypt /catapult/secrets/id_rsa.gpg
+gpg --verbose --batch --yes --passphrase ${3} --output /catapult/secrets/id_rsa.pub --decrypt /catapult/secrets/id_rsa.pub.gpg
+chmod 700 /catapult/secrets/id_rsa
+chmod 700 /catapult/secrets/id_rsa.pub
 end=$(date +%s)
-echo "[$(date)] Updating existing packages and installing utilities ($(($end - $start)) seconds)" >> /vagrant/provisioners/redhat_mysql/logs/provision.log
+echo "[$(date)] Updating existing packages and installing utilities ($(($end - $start)) seconds)" >> /catapult/provisioners/redhat_mysql/logs/provision.log
 
 
 echo -e "\n\n==> Configuring time"
 start=$(date +%s)
 # set timezone
-sudo timedatectl set-timezone "$(cat /vagrant/secrets/configuration.yml | shyaml get-value company.timezone_redhat)"
+sudo timedatectl set-timezone "$(echo "${configuration}" | shyaml get-value company.timezone_redhat)"
 # install ntp
 sudo yum install -y ntp
 sudo systemctl enable ntpd.service
 sudo systemctl start ntpd.service
 # echo datetimezone
 date
+provisionstart=$(date +%s)
+sudo touch /catapult/provisioners/redhat_mysql/logs/provision.log
 end=$(date +%s)
-echo "[$(date)] Configuring time ($(($end - $start)) seconds" >> /vagrant/provisioners/redhat_mysql/logs/provision.log
-    
+echo "[$(date)] Configuring time ($(($end - $start)) seconds" >> /catapult/provisioners/redhat_mysql/logs/provision.log
+
+
+echo -e "\n\n==> Installing Drush and WP-CLI"
+start=$(date +%s)
+sudo yum install -y php-cli
+sudo yum install -y mariadb
+# install drush
+if [ ! -f /usr/bin/drush  ]; then
+    curl -sS https://getcomposer.org/installer | php
+    mv composer.phar /usr/local/bin/composer
+    ln -s /usr/local/bin/composer /usr/bin/composer
+    git clone https://github.com/drush-ops/drush.git /usr/local/src/drush
+    cd /usr/local/src/drush
+    git checkout 7.0.0-rc1
+    ln -s /usr/local/src/drush/drush /usr/bin/drush
+    composer install
+fi
+drush --version
+end=$(date +%s)
+echo "[$(date)] Installing Drush and WP-CLI ($(($end - $start)) seconds)" >> /catapult/provisioners/redhat/logs/provision.log
+
 
 echo -e "\n\n==> Installing MySQL"
 start=$(date +%s)
@@ -56,27 +97,79 @@ sudo yum -y install mariadb mariadb-server
 sudo systemctl enable mariadb.service
 sudo systemctl start mariadb.service
 end=$(date +%s)
-echo "[$(date)] Installing MySQL ($(($end - $start)) seconds)" >> /vagrant/provisioners/redhat_mysql/logs/provision.log
+echo "[$(date)] Installing MySQL ($(($end - $start)) seconds)" >> /catapult/provisioners/redhat_mysql/logs/provision.log
+
+
+echo -e "\n\n==> Configuring git repositories (This may take a while...)"
+start=$(date +%s)
+# clone/pull necessary repos
+sudo mkdir -p ~/.ssh
+sudo touch ~/.ssh/known_hosts
+sudo ssh-keyscan bitbucket.org > ~/.ssh/known_hosts
+sudo ssh-keyscan github.com >> ~/.ssh/known_hosts
+while IFS='' read -r -d '' key; do
+    domain=$(echo "$key" | grep -w "domain" | cut -d ":" -f 2 | tr -d " ")
+    repo=$(echo "$key" | grep -w "repo" | cut -d ":" -f 2,3 | tr -d " ")
+    echo -e "\nNOTICE: $domain"
+    if [ -d "/var/www/repositories/apache/$domain/.git" ]; then
+        if [ "$(cd /var/www/repositories/apache/$domain && git config --get remote.origin.url)" != "$repo" ]; then
+            echo "the repo has changed in secrets/configuration.yml, removing and cloning the new repository." | sed "s/^/\t/"
+            sudo rm -rf /var/www/repositories/apache/$domain
+            sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git clone --recursive -b $(echo "${configuration}" | shyaml get-value environments.$1.branch) $repo /var/www/repositories/apache/$domain" | sed "s/^/\t/"
+        elif [ "$(cd /var/www/repositories/apache/$domain && git rev-list HEAD | tail -n 1 )" != "$(cd /var/www/repositories/apache/$domain && git rev-list origin/master | tail -n 1 )" ]; then
+            echo "the repo has changed, removing and cloning the new repository." | sed "s/^/\t/"
+            sudo rm -rf /var/www/repositories/apache/$domain
+            sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git clone --recursive -b $(echo "${configuration}" | shyaml get-value environments.$1.branch) $repo /var/www/repositories/apache/$domain" | sed "s/^/\t/"
+        else
+            cd /var/www/repositories/apache/$domain && git checkout $(echo "${configuration}" | shyaml get-value environments.$1.branch)
+            cd /var/www/repositories/apache/$domain && sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git pull origin $(echo "${configuration}" | shyaml get-value environments.$1.branch)" | sed "s/^/\t/"
+        fi
+    else
+        if [ -d "/var/www/repositories/apache/$domain" ]; then
+            echo "the .git folder is missing, removing the directory and re-cloning the repository." | sed "s/^/\t/"
+            sudo chmod 0777 -R /var/www/repositories/apache/$domain
+            sudo rm -rf /var/www/repositories/apache/$domain
+        fi
+        sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git clone --recursive -b $(echo "${configuration}" | shyaml get-value environments.$1.branch) $repo /var/www/repositories/apache/$domain" | sed "s/^/\t/"
+    fi
+done < <(echo "${configuration}" | shyaml get-values-0 websites.apache)
+
+# create an array of domains
+while IFS='' read -r -d '' key; do
+    domain=$(echo "$key" | grep -w "domain" | cut -d ":" -f 2 | tr -d " ")
+    domains+=($domain)
+done < <(echo "${configuration}" | shyaml get-values-0 websites.apache)
+# cleanup directories from domains array
+for directory in /var/www/repositories/apache/*/; do
+    domain=$(basename $directory)
+    if ! [[ ${domains[*]} =~ $domain ]]; then
+        echo "Cleaning up websites that no longer exist..."
+        sudo chmod 0777 -R $directory
+        sudo rm -rf $directory
+    fi
+done
+end=$(date +%s)
+echo "[$(date)] Configuring git repositories ($(($end - $start)) seconds" >> /catapult/provisioners/redhat_mysql/logs/provision.log
 
 
 echo -e "\n\n==> Configuring MySQL"
 start=$(date +%s)
 # set variables from secrets/configuration.yml
-mysql_user="$(cat /vagrant/secrets/configuration.yml | shyaml get-value environments.$1.servers.redhat_mysql.mysql.user)"
-mysql_user_password="$(cat /vagrant/secrets/configuration.yml | shyaml get-value environments.$1.servers.redhat_mysql.mysql.user_password)"
-mysql_root_password="$(cat /vagrant/secrets/configuration.yml | shyaml get-value environments.$1.servers.redhat_mysql.mysql.root_password)"
-drupal_admin_password="$(cat /vagrant/secrets/configuration.yml | shyaml get-value environments.$1.software.drupal.admin_password)"
-wordpress_admin_password="$(cat /vagrant/secrets/configuration.yml | shyaml get-value environments.$1.software.wordpress.admin_password)"
-company_email="$(cat /vagrant/secrets/configuration.yml | shyaml get-value company.email)"
+mysql_user="$(echo "${configuration}" | shyaml get-value environments.$1.servers.redhat_mysql.mysql.user)"
+mysql_user_password="$(echo "${configuration}" | shyaml get-value environments.$1.servers.redhat_mysql.mysql.user_password)"
+mysql_root_password="$(echo "${configuration}" | shyaml get-value environments.$1.servers.redhat_mysql.mysql.root_password)"
+drupal_admin_password="$(echo "${configuration}" | shyaml get-value environments.$1.software.drupal.admin_password)"
+wordpress_admin_password="$(echo "${configuration}" | shyaml get-value environments.$1.software.wordpress.admin_password)"
+company_email="$(echo "${configuration}" | shyaml get-value company.email)"
 
 # configure mysql conf so user/pass isn't logged in shell history or memory
-sudo cat > "/vagrant/provisioners/redhat_mysql/installers/$1.cnf" << EOF
+sudo cat > "/catapult/provisioners/redhat_mysql/installers/$1.cnf" << EOF
 [client]
 host = "localhost"
 user = "root"
 password = "$mysql_root_password"
 EOF
-dbconf="/vagrant/provisioners/redhat_mysql/installers/$1.cnf"
+dbconf="/catapult/provisioners/redhat_mysql/installers/$1.cnf"
 
 # only set root password on fresh install of mysql
 if mysqladmin --defaults-extra-file=$dbconf ping 2>&1 | grep -q "failed"; then
@@ -99,7 +192,7 @@ mysql --defaults-extra-file=$dbconf -e "DELETE FROM mysql.user WHERE user!='root
 while IFS='' read -r -d '' key; do
     domainvaliddbname=$(echo "$key" | grep -w "domain" | cut -d ":" -f 2 | tr -d " " | tr "." "_")
     domainvaliddbnames+=($1_$domainvaliddbname)
-done < <(cat /vagrant/secrets/configuration.yml | shyaml get-values-0 websites.apache)
+done < <(echo "${configuration}" | shyaml get-values-0 websites.apache)
 # cleanup databases from domainvaliddbnames array
 for database in $(mysql --defaults-extra-file=$dbconf -e "show databases" | egrep -v "Database|mysql|information_schema|performance_schema"); do
     if ! [[ ${domainvaliddbnames[*]} =~ $database ]]; then
@@ -117,7 +210,7 @@ mysql --defaults-extra-file=$dbconf -e "CREATE USER '$mysql_user'@'%' IDENTIFIED
 # flush privileges
 mysql --defaults-extra-file=$dbconf -e "FLUSH PRIVILEGES"
 
-cat /vagrant/secrets/configuration.yml | shyaml get-values-0 websites.apache |
+echo "${configuration}" | shyaml get-values-0 websites.apache |
 while IFS='' read -r -d '' key; do
 
     domain=$(echo "$key" | grep -w "domain" | cut -d ":" -f 2 | tr -d " ")
@@ -188,7 +281,7 @@ while IFS='' read -r -d '' key; do
                             echo -e "\t\tresetting ${software} admin password..."
                             mysql --defaults-extra-file=$dbconf $1_$domainvaliddbname -e "UPDATE ${software_dbprefix}users SET user_login='admin', user_email='$company_email', user_pass=MD5('$wordpress_admin_password'), user_status='0' WHERE id = 1;"
                             echo -e "\t\tupdating $software database with ${1}.${domainvaliddbname} URL"
-                            php /vagrant/provisioners/redhat/installers/wp-cli.phar --path="/var/www/repositories/apache/$domain/" search-replace "$domain" "$1.$domain" | sed "s/^/\t\t/"
+                            php /catapult/provisioners/redhat/installers/wp-cli.phar --path="/var/www/repositories/apache/$domain/" search-replace "$domain" "$1.$domain" | sed "s/^/\t\t/"
                             mysql --defaults-extra-file=$dbconf $1_$domainvaliddbname -e "UPDATE ${software_dbprefix}options SET option_value='$company_email' WHERE option_name = 'admin_email';"
                             mysql --defaults-extra-file=$dbconf $1_$domainvaliddbname -e "UPDATE ${software_dbprefix}options SET option_value='http://$1.$domain' WHERE option_name = 'home';"
                             mysql --defaults-extra-file=$dbconf $1_$domainvaliddbname -e "UPDATE ${software_dbprefix}options SET option_value='http://$1.$domain' WHERE option_name = 'siteurl';"
@@ -201,14 +294,14 @@ while IFS='' read -r -d '' key; do
 
 done
 # remove .cnf file after usage
-sudo rm -f /vagrant/provisioners/redhat_mysql/installers/$1.cnf
+sudo rm -f /catapult/provisioners/redhat_mysql/installers/$1.cnf
 end=$(date +%s)
-echo "[$(date)] Configuring MySQL ($(($end - $start)) seconds)" >> /vagrant/provisioners/redhat_mysql/logs/provision.log
+echo "[$(date)] Configuring MySQL ($(($end - $start)) seconds)" >> /catapult/provisioners/redhat_mysql/logs/provision.log
 
 
 provisionend=$(date +%s)
 echo -e "\n\n==> Provision complete ($(($provisionend - $provisionstart)) seconds)"
-echo -e "[$(date)] Provision complete ($(($provisionend - $provisionstart)) total seconds)\n" >> /vagrant/provisioners/redhat_mysql/logs/provision.log
+echo -e "[$(date)] Provision complete ($(($provisionend - $provisionstart)) total seconds)\n" >> /catapult/provisioners/redhat_mysql/logs/provision.log
 
 
 exit 0
