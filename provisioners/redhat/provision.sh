@@ -22,6 +22,7 @@ elif ([ $1 = "qc" ] || [ $1 = "production" ]); then
 fi
 if [ $1 != "dev" ]; then
     if [ -d "/catapult/.git" ]; then
+        cd /catapult && sudo git checkout ${branch}
         cd /catapult && sudo git pull
     else
         sudo git clone --recursive -b ${branch} $2 /catapult | sed "s/^/\t/"
@@ -36,9 +37,9 @@ fi
 
 
 if [ "${4}" = "apache" ]; then
-    bash /catapult/provisioners/redhat/apache.sh $1 $2 $3 $4 $5
+    bash /catapult/provisioners/redhat/apache.sh $1 $2 $3 $4 $5 | tee -a /catapult/provisioners/redhat/logs/apache.log
 elif [ "${4}" = "mysql" ]; then
-    bash /catapult/provisioners/redhat/mysql.sh $1 $2 $3 $4 $5
+    bash /catapult/provisioners/redhat/mysql.sh $1 $2 $3 $4 $5 | tee -a /catapult/provisioners/redhat/logs/mysql.log
 else
     "Error: Cannot detect the instance type."
     exit 1

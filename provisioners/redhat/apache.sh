@@ -11,7 +11,7 @@
 
 
 
-echo -e "\n\n==> Updating existing packages and installing utilities"
+echo -e "==> Updating existing packages and installing utilities"
 start=$(date +%s)
 # only allow authentication via ssh key pair
 # suppress this - There were 34877 failed login attempts since the last successful login.
@@ -34,7 +34,7 @@ gpg --verbose --batch --yes --passphrase ${3} --output /catapult/secrets/id_rsa.
 chmod 700 /catapult/secrets/id_rsa
 chmod 700 /catapult/secrets/id_rsa.pub
 end=$(date +%s)
-echo "[$(date)] Updating existing packages and installing utilities ($(($end - $start)) seconds)" >> /catapult/provisioners/redhat/logs/apache.log
+echo "==> completed in ($(($end - $start)) seconds)"
 
 
 
@@ -51,7 +51,7 @@ date
 provisionstart=$(date +%s)
 sudo touch /catapult/provisioners/redhat/logs/apache.log
 end=$(date +%s)
-echo "[$(date)] Configuring time ($(($end - $start)) seconds" >> /catapult/provisioners/redhat/logs/apache.log
+echo "==> completed in ($(($end - $start)) seconds)"
 
 
 echo -e "\n\n==> Installing PHP"
@@ -65,7 +65,7 @@ sudo yum install -y php-dom
 sudo yum install -y php-mbstring
 sed -i -e "s#\;date\.timezone.*#date.timezone = \"$(echo "${configuration}" | shyaml get-value company.timezone_redhat)\"#g" /etc/php.ini
 end=$(date +%s)
-echo "[$(date)] Installing PHP ($(($end - $start)) seconds)" >> /catapult/provisioners/redhat/logs/apache.log
+echo "==> completed in ($(($end - $start)) seconds)"
 
 
 echo -e "\n\n==> Installing Drush and WP-CLI"
@@ -85,7 +85,7 @@ if [ ! -f /usr/bin/drush  ]; then
 fi
 drush --version
 end=$(date +%s)
-echo "[$(date)] Installing Drush and WP-CLI ($(($end - $start)) seconds)" >> /catapult/provisioners/redhat/logs/apache.log
+echo "==> completed in ($(($end - $start)) seconds)"
 
 
 echo -e "\n\n==> Installing Apache"
@@ -97,7 +97,7 @@ sudo systemctl start httpd.service
 sudo yum install -y mod_ssl
 sudo bash /etc/ssl/certs/make-dummy-cert "/etc/ssl/certs/httpd-dummy-cert.key.cert"
 end=$(date +%s)
-echo "[$(date)] Installing Apache ($(($end - $start)) seconds)" >> /catapult/provisioners/redhat/logs/apache.log
+echo "==> completed in ($(($end - $start)) seconds)"
 
 
 echo -e "\n\n==> Configuring git repositories (This may take a while...)"
@@ -149,7 +149,7 @@ for directory in /var/www/repositories/apache/*/; do
     fi
 done
 end=$(date +%s)
-echo "[$(date)] Configuring git repositories ($(($end - $start)) seconds" >> /catapult/provisioners/redhat/logs/apache.log
+echo "==> completed in ($(($end - $start)) seconds)"
 
 
 echo -e "\n\n==> Configuring Apache"
@@ -521,7 +521,7 @@ EOF
 done
 
 end=$(date +%s)
-echo "[$(date)] Configuring Apache ($(($end - $start)) seconds)" >> /catapult/provisioners/redhat/logs/apache.log
+echo "==> completed in ($(($end - $start)) seconds)"
 
 
 echo -e "\n\n==> Restarting Apache"
@@ -531,12 +531,11 @@ sudo apachectl start
 sudo apachectl configtest
 sudo systemctl is-active httpd.service
 end=$(date +%s)
-echo "[$(date)] Restarting Apache ($(($end - $start)) seconds)" >> /catapult/provisioners/redhat/logs/apache.log
+echo "==> completed in ($(($end - $start)) seconds)"
 
 
 provisionend=$(date +%s)
-echo -e "\n\n==> Provision complete ($(($provisionend - $provisionstart)) seconds)"
-echo -e "[$(date)] Provision complete ($(($provisionend - $provisionstart)) total seconds)\n" >> /catapult/provisioners/redhat/logs/apache.log
+echo -e "\n\n==> Provision complete ($(($provisionend - $provisionstart)) total seconds)"
 
 
 exit 0
