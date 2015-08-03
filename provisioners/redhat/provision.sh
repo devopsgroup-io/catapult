@@ -14,6 +14,11 @@ sudo touch /vagrant/provisioners/redhat/logs/provision.log
 
 echo -e "==> Updating existing packages and installing utilities"
 start=$(date +%s)
+# only allow authentication via ssh key pair
+# suppress this - There were 34877 failed login attempts since the last successful login.
+if ! grep -q "PasswordAuthentication no" "/etc/ssh/sshd_config"; then
+   sudo bash -c 'echo "PasswordAuthentication no" >> /etc/ssh/sshd_config'
+fi
 # set human friendly variables inbound from provisioner args
 settings_environment=$1
 settings_git_pull=$2
@@ -163,8 +168,8 @@ sudo mkdir -p /etc/httpd/sites-enabled
 if ! grep -q "IncludeOptional sites-enabled/*.conf" "/etc/httpd/conf/httpd.conf"; then
    sudo bash -c 'echo "IncludeOptional sites-enabled/*.conf" >> "/etc/httpd/conf/httpd.conf"'
 fi
-# supress the following message
-# httpd: Could not reliably determine the server's fully qualified domain name, using localhost.localdomain. Set the 'ServerName' directive globally to suppress this message
+# define the server's servername
+# suppress this - httpd: Could not reliably determine the server's fully qualified domain name, using localhost.localdomain. Set the 'ServerName' directive globally to suppress this message
 if ! grep -q "ServerName localhost" "/etc/httpd/conf/httpd.conf"; then
    sudo bash -c 'echo "ServerName localhost" >> /etc/httpd/conf/httpd.conf'
 fi

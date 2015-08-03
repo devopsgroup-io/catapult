@@ -14,6 +14,11 @@ sudo touch /vagrant/provisioners/redhat_mysql/logs/provision.log
 
 echo -e "==> Updating existing packages and installing utilities"
 start=$(date +%s)
+# only allow authentication via ssh key pair
+# suppress this - There were 34877 failed login attempts since the last successful login.
+if ! grep -q "PasswordAuthentication no" "/etc/ssh/sshd_config"; then
+   sudo bash -c 'echo "PasswordAuthentication no" >> /etc/ssh/sshd_config'
+fi
 # update yum
 sudo yum update -y
 # git clones
