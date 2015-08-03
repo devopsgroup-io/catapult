@@ -208,7 +208,7 @@ end
 puts "\n\n\nVerification of encrypted Catapult configuration files:\n\n"
 if "#{branch}" == "develop-catapult"
   puts " * You are on the develop-catapult branch, this branch is automatically synced with Catapult core and is meant to contribute back to the core Catapult project."
-  puts " * secrets/configuration.yml.gpg, secrets/id_rsa.gpg, and secrets/id_rsa.pub.gpg are checked out from the master branch so that you're able to develop and test."
+  puts " * secrets/configuration.yml.gpg, secrets/id_rsa.gpg, and secrets/id_rsa.pub.gpg are checked out from the develop branch so that you're able to develop and test."
   puts " * After you're finished on the develop branch, switch to the master branch and discard secrets/configuration.yml.gpg, secrets/id_rsa.gpg, and secrets/id_rsa.pub.gpg"
   puts "\n"
   `#{@git} checkout --force develop -- secrets/configuration.yml.gpg`
