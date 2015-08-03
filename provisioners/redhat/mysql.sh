@@ -11,7 +11,7 @@
 
 
 
-echo -e "\n\n==> Updating existing packages and installing utilities"
+echo -e "==> Updating existing packages and installing utilities"
 start=$(date +%s)
 # only allow authentication via ssh key pair
 # suppress this - There were 34877 failed login attempts since the last successful login.
@@ -34,7 +34,7 @@ gpg --verbose --batch --yes --passphrase ${3} --output /catapult/secrets/id_rsa.
 chmod 700 /catapult/secrets/id_rsa
 chmod 700 /catapult/secrets/id_rsa.pub
 end=$(date +%s)
-echo "[$(date)] Updating existing packages and installing utilities ($(($end - $start)) seconds)" >> /catapult/provisioners/redhat/logs/mysql.log
+echo "==> completed in ($(($end - $start)) seconds)"
 
 
 echo -e "\n\n==> Configuring time"
@@ -50,7 +50,7 @@ date
 provisionstart=$(date +%s)
 sudo touch /catapult/provisioners/redhat/logs/mysql.log
 end=$(date +%s)
-echo "[$(date)] Configuring time ($(($end - $start)) seconds" >> /catapult/provisioners/redhat/logs/mysql.log
+echo "==> completed in ($(($end - $start)) seconds)"
 
 
 echo -e "\n\n==> Installing Drush and WP-CLI"
@@ -70,7 +70,7 @@ if [ ! -f /usr/bin/drush  ]; then
 fi
 drush --version
 end=$(date +%s)
-echo "[$(date)] Installing Drush and WP-CLI ($(($end - $start)) seconds)" >> /catapult/provisioners/redhat/logs/provision.log
+echo "==> completed in ($(($end - $start)) seconds)"
 
 
 echo -e "\n\n==> Installing MySQL"
@@ -80,7 +80,7 @@ sudo yum -y install mariadb mariadb-server
 sudo systemctl enable mariadb.service
 sudo systemctl start mariadb.service
 end=$(date +%s)
-echo "[$(date)] Installing MySQL ($(($end - $start)) seconds)" >> /catapult/provisioners/redhat/logs/mysql.log
+echo "==> completed in ($(($end - $start)) seconds)"
 
 
 echo -e "\n\n==> Configuring git repositories (This may take a while...)"
@@ -132,7 +132,7 @@ for directory in /var/www/repositories/apache/*/; do
     fi
 done
 end=$(date +%s)
-echo "[$(date)] Configuring git repositories ($(($end - $start)) seconds" >> /catapult/provisioners/redhat/logs/mysql.log
+echo "==> completed in ($(($end - $start)) seconds)"
 
 
 echo -e "\n\n==> Configuring MySQL"
@@ -280,12 +280,11 @@ done
 # remove .cnf file after usage
 sudo rm -f /catapult/provisioners/redhat/installers/$1.cnf
 end=$(date +%s)
-echo "[$(date)] Configuring MySQL ($(($end - $start)) seconds)" >> /catapult/provisioners/redhat/logs/mysql.log
+echo "==> completed in ($(($end - $start)) seconds)"
 
 
 provisionend=$(date +%s)
-echo -e "\n\n==> Provision complete ($(($provisionend - $provisionstart)) seconds)"
-echo -e "[$(date)] Provision complete ($(($provisionend - $provisionstart)) total seconds)\n" >> /catapult/provisioners/redhat/logs/mysql.log
+echo -e "\n\n==> Provision complete ($(($provisionend - $provisionstart)) total seconds)"
 
 
 exit 0
