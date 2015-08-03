@@ -119,6 +119,11 @@ else
   def branch_management(branch)
     puts "\n * Configuring #{branch} branch:\n\n"
     if @branches.find { |element| element.include?("refs/heads/#{branch}") }
+      if "#{branch}" == "develop-catapult"
+        `#{@git} checkout -- secrets/configuration.yml.gpg`
+        `#{@git} checkout -- secrets/id_rsa.gpg`
+        `#{@git} checkout -- secrets/id_rsa.pub.gpg`
+      end
       `#{@git} checkout #{branch}`
       `#{@git} pull upstream master`
       `#{@git} push origin #{branch}`
