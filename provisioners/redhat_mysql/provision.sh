@@ -19,6 +19,8 @@ start=$(date +%s)
 if ! grep -q "PasswordAuthentication no" "/etc/ssh/sshd_config"; then
    sudo bash -c 'echo "PasswordAuthentication no" >> /etc/ssh/sshd_config'
 fi
+sudo systemctl stop sshd.service
+sudo systemctl start sshd.service
 # update yum
 sudo yum update -y
 # git clones
