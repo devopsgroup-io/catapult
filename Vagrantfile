@@ -1021,7 +1021,7 @@ Vagrant.configure("2") do |config|
     config.vm.synced_folder ".", "/catapult", type: "nfs"
     # this takes place of git clones
     config.vm.synced_folder "repositories", "/var/www/repositories", type: "nfs"
-    config.vm.provision "shell", path: "provisioners/redhat/provision.sh", args: ["dev","#{repo}","#{configuration_user["settings"]["gpg_key"]}","#{configuration_user["settings"]["software_validation"]}"]
+    config.vm.provision "shell", path: "provisioners/redhat/provision.sh", args: ["dev","#{repo}","#{configuration_user["settings"]["gpg_key"]}","apache","#{configuration_user["settings"]["software_validation"]}"]
   end
   config.vm.define "#{configuration["company"]["name"]}-dev-redhat-mysql" do |config|
     config.vm.box = "chef/centos-7.0"
@@ -1035,7 +1035,7 @@ Vagrant.configure("2") do |config|
     # this takes place of git clones
     config.vm.synced_folder "repositories", "/var/www/repositories", type: "nfs"
     config.vm.provision :hostmanager
-    config.vm.provision "shell", path: "provisioners/redhat_mysql/provision.sh", args: ["dev","#{repo}","#{configuration_user["settings"]["gpg_key"]}","#{configuration_user["settings"]["software_validation"]}"]
+    config.vm.provision "shell", path: "provisioners/redhat/provision.sh", args: ["dev","#{repo}","#{configuration_user["settings"]["gpg_key"]}","mysql","#{configuration_user["settings"]["software_validation"]}"]
   end
 
   # redhat test servers
@@ -1052,7 +1052,7 @@ Vagrant.configure("2") do |config|
       provider.backups_enabled = true
     end
     config.vm.synced_folder ".", "/vagrant", disabled: true
-    config.vm.provision "shell", path: "provisioners/redhat/provision.sh", args: ["test","#{repo}","#{configuration_user["settings"]["gpg_key"]}","false"]
+    config.vm.provision "shell", path: "provisioners/redhat/provision.sh", args: ["test","#{repo}","#{configuration_user["settings"]["gpg_key"]}","apache","false"]
   end
   config.vm.define "#{configuration["company"]["name"]}-test-redhat-mysql" do |config|
     config.vm.provider :digital_ocean do |provider,override|
@@ -1067,7 +1067,7 @@ Vagrant.configure("2") do |config|
       provider.backups_enabled = true
     end
     config.vm.synced_folder ".", "/vagrant", disabled: true
-    config.vm.provision "shell", path: "provisioners/redhat_mysql/provision.sh", args: ["test","#{repo}","#{configuration_user["settings"]["gpg_key"]}","false"]
+    config.vm.provision "shell", path: "provisioners/redhat/provision.sh", args: ["test","#{repo}","#{configuration_user["settings"]["gpg_key"]}","mysql","false"]
   end
 
   # redhat quality control servers
@@ -1084,7 +1084,7 @@ Vagrant.configure("2") do |config|
       provider.backups_enabled = true
     end
     config.vm.synced_folder ".", "/vagrant", disabled: true
-    config.vm.provision "shell", path: "provisioners/redhat/provision.sh", args: ["qc","#{repo}","#{configuration_user["settings"]["gpg_key"]}","false"]
+    config.vm.provision "shell", path: "provisioners/redhat/provision.sh", args: ["qc","#{repo}","#{configuration_user["settings"]["gpg_key"]}","apache","false"]
   end
   config.vm.define "#{configuration["company"]["name"]}-qc-redhat-mysql" do |config|
     config.vm.provider :digital_ocean do |provider,override|
@@ -1099,7 +1099,7 @@ Vagrant.configure("2") do |config|
       provider.backups_enabled = true
     end
     config.vm.synced_folder ".", "/vagrant", disabled: true
-    config.vm.provision "shell", path: "provisioners/redhat_mysql/provision.sh", args: ["qc","#{repo}","#{configuration_user["settings"]["gpg_key"]}","false"]
+    config.vm.provision "shell", path: "provisioners/redhat/provision.sh", args: ["qc","#{repo}","#{configuration_user["settings"]["gpg_key"]}","mysql","false"]
   end
 
   # redhat production servers
@@ -1116,7 +1116,7 @@ Vagrant.configure("2") do |config|
       provider.backups_enabled = true
     end
     config.vm.synced_folder ".", "/vagrant", disabled: true
-    config.vm.provision "shell", path: "provisioners/redhat/provision.sh", args: ["production","#{repo}","#{configuration_user["settings"]["gpg_key"]}","false"]
+    config.vm.provision "shell", path: "provisioners/redhat/provision.sh", args: ["production","#{repo}","#{configuration_user["settings"]["gpg_key"]}","apache","false"]
   end
   config.vm.define "#{configuration["company"]["name"]}-production-redhat-mysql" do |config|
     config.vm.provider :digital_ocean do |provider,override|
@@ -1131,7 +1131,7 @@ Vagrant.configure("2") do |config|
       provider.backups_enabled = true
     end
     config.vm.synced_folder ".", "/vagrant", disabled: true
-    config.vm.provision "shell", path: "provisioners/redhat_mysql/provision.sh", args: ["production","#{repo}","#{configuration_user["settings"]["gpg_key"]}","false"]
+    config.vm.provision "shell", path: "provisioners/redhat/provision.sh", args: ["production","#{repo}","#{configuration_user["settings"]["gpg_key"]}","mysql","false"]
   end
 
   # windows localdev servers
