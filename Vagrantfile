@@ -53,12 +53,12 @@ end
 # set variables based on operating system
 if (RbConfig::CONFIG['host_os'] =~ /mswin|msys|mingw|cygwin|bccwin|wince|emc/)
   if File.exist?('C:\Program Files (x86)\Git\bin\git.exe')
-    git = "\"C:\\Program Files (x86)\\Git\\bin\\git.exe\""
+    @git = "\"C:\\Program Files (x86)\\Git\\bin\\git.exe\""
   else
     catapult_exception("Git is not installed at C:\\Program Files (x86)\\Git\\bin\\git.exe")
   end
 elsif (RbConfig::CONFIG['host_os'] =~ /darwin|mac os|linux|solaris|bsd/)
-  git = "git"
+  @git = "git"
 else
   catapult_exception("Cannot detect your operating system, please submit an issue at https://github.com/devopsgroup-io/catapult-release-management")
 end
@@ -94,37 +94,46 @@ end
 
 
 # configure catapult and git
-remote = `#{git} config --get remote.origin.url`
-if remote.include?("devopsgroup-io/release-management.git") || remote.include?("devopsgroup-io/catapult-release-management.git")
+remote = `#{@git} config --get remote.origin.url`
+if remote.include?("devopsgroup-io/")
   catapult_exception("In order to use Catapult Release Management, you must fork the repository so that the committed and encrypted configuration is unique to you! See https://github.com/devopsgroup-io/catapult-release-management for more information.")
 else
   puts "Self updating Catapult:"
-  branch = `#{git} rev-parse --abbrev-ref HEAD`.strip
-  repo = `#{git} config --get remote.origin.url`
-  repo_upstream = `#{git} config --get remote.upstream.url`
-  repo_upstream_url = "https://github.com/devopsgroup-io/catapult-release-management.git"
+  `#{@git} fetch`
+  # get current branch
+  branch = `#{@git} rev-parse --abbrev-ref HEAD`.strip
+  # get current repo
+  repo = `#{@git} config --get remote.origin.url`
   puts "\nYour repository: #{repo}"
-  puts "Will sync from: #{repo_upstream}\n\n"
+  # set the correct upstream
+  repo_upstream = `#{@git} config --get remote.upstream.url`
+  repo_upstream_url = "https://github.com/devopsgroup-io/catapult-release-management.git"
+  puts "Will sync from: #{repo_upstream}"
   if repo_upstream.empty?
-    `#{git} remote add upstream #{repo_upstream_url}`
+    `#{@git} remote add upstream #{repo_upstream_url}`
   else
-    `#{git} remote rm upstream`
-    `#{git} remote add upstream #{repo_upstream_url}`
+    `#{@git} remote rm upstream`
+    `#{@git} remote add upstream #{repo_upstream_url}`
   end
-  repo_develop = `#{git} config --get branch.develop.remote`
-  if repo_develop.empty?
-    `#{git} fetch upstream`
-    `#{git} checkout -b develop --track upstream/master`
-    `#{git} pull upstream master`
-  else
-    `#{git} checkout develop`
-    `#{git} pull upstream master`
+  # create and confirm branches, and sync from catapult core
+  @branches = `#{@git} ls-remote #{repo}`.split(/\n/).reject(&:empty?)
+  def branch_management(branch)
+    puts "\n * Configuring #{branch} branch:\n\n"
+    if @branches.find { |element| element.include?("refs/heads/#{branch}") }
+      `#{@git} checkout #{branch}`
+      `#{@git} pull upstream master`
+      `#{@git} push origin #{branch}`
+    else
+      `#{@git} fetch upstream`
+      `#{@git} checkout -b #{branch} --track upstream/master`
+      `#{@git} pull upstream master`
+      `#{@git} push origin #{branch}`
+    end
   end
-  `#{git} push origin develop`
-  `#{git} checkout master`
-  `#{git} pull upstream master`
-  `#{git} push origin master`
-  `#{git} checkout #{branch}`
+  branch_management("develop-catapult")
+  branch_management("develop")
+  # checkout original branch
+  `#{@git} checkout #{branch}`
 end
 # create a git pre-commit hook to ensure no configuration is committed to develop and only configuration is committed to master
 FileUtils.mkdir_p(".git/hooks")
@@ -137,27 +146,35 @@ else
   git = "git"
 end
 
-branch = `#{git} rev-parse --abbrev-ref HEAD`
-branch = branch.strip
+branch = `#{git} rev-parse --abbrev-ref HEAD`.strip
 staged = `#{git} diff --name-only --staged --word-diff=porcelain`
 staged = staged.split($/)
 
-if "#{branch}" == "develop"
+if "#{branch}" == "develop-catapult"
   if staged.include?("secrets/configuration.yml.gpg")
-    puts "Please commit secrets/configuration.yml.gpg on the master branch. You are on the develop branch, which is meant for contribution back to Catapult and should not contain your configuration files."
+    puts "Please commit secrets/configuration.yml.gpg on the develop branch. You are on the develop-catapult branch, which is meant for contribution back to Catapult and should not contain your configuration files."
     exit 1
   end
   if staged.include?("secrets/id_rsa.gpg")
-    puts "Please commit secrets/id_rsa.gpg on the master branch. You are on the develop branch, which is meant for contribution back to Catapult and should not contain your configuration files."
+    puts "Please commit secrets/id_rsa.gpg on the develop branch. You are on the develop-catapult branch, which is meant for contribution back to Catapult and should not contain your configuration files."
     exit 1
   end
   if staged.include?("secrets/id_rsa.pub.gpg")
-    puts "Please commit secrets/id_rsa.pub.gpg on the master branch. You are on the develop branch, which is meant for contribution back to Catapult and should not contain your configuration files."
+    puts "Please commit secrets/id_rsa.pub.gpg on the develop branch. You are on the develop-catapult branch, which is meant for contribution back to Catapult and should not contain your configuration files."
+    exit 1
+  end
+elsif "#{branch}" == "develop"
+  unless staged.include?("secrets/configuration.yml.gpg") || staged.include?("secrets/id_rsa.gpg") || staged.include?("secrets/id_rsa.pub.gpg")
+    puts "You are on the develop branch, which is only meant for your configuration files (secrets/configuration.yml.gpg, secrets/id_rsa.gpg, secrets/id_rsa.pub.gpg)."
+    puts "To contribute to Catapult, please switch to the develop-catapult branch."
     exit 1
   end
 elsif "#{branch}" == "master"
   unless staged.include?("secrets/configuration.yml.gpg") || staged.include?("secrets/id_rsa.gpg") || staged.include?("secrets/id_rsa.pub.gpg")
-    puts "You are on the master branch, which is only meant for your configuration files (secrets/configuration.yml.gpg, secrets/id_rsa.gpg, secrets/id_rsa.pub.gpg). To contribute to Catapult, please switch to the develop branch."
+    puts "You are trying to commit directly to the master branch, please create a pull request from develop into master instead."
+    exit 1
+  else 
+    puts "To contribute to Catapult, please switch to the develop-catapult branch."
     exit 1
   end
 end
@@ -185,8 +202,8 @@ end
 
 
 puts "\n\n\nVerification of encrypted Catapult configuration files:\n\n"
-if "#{branch}" == "develop"
-  puts " * You are on the develop branch, this branch is automatically synced with Catapult core and is meant to contribute back to the core Catapult project."
+if "#{branch}" == "develop-catapult"
+  puts " * You are on the develop-catapult branch, this branch is automatically synced with Catapult core and is meant to contribute back to the core Catapult project."
   puts " * secrets/configuration.yml.gpg, secrets/id_rsa.gpg, and secrets/id_rsa.pub.gpg are checked out from the master branch so that you're able to develop and test."
   puts " * After you're finished on the develop branch, switch to the master branch and discard secrets/configuration.yml.gpg, secrets/id_rsa.gpg, and secrets/id_rsa.pub.gpg"
   puts "\n"
@@ -196,8 +213,10 @@ if "#{branch}" == "develop"
   `git reset -- secrets/configuration.yml.gpg`
   `git reset -- secrets/id_rsa.gpg`
   `git reset -- secrets/id_rsa.pub.gpg`
-elsif "#{branch}" == "master"
-  puts " * You are on the master branch, this branch is automatically synced with Catapult core and is meant to commit your unique secrets/configuration.yml.gpg, secrets/id_rsa.gpg, and secrets/id_rsa.pub.gpg secrets/configuration."
+elsif "#{branch}" == "develop"
+  puts " * You are on the develop branch, this branch contains your unique secrets/configuration.yml.gpg, secrets/id_rsa.gpg, and secrets/id_rsa.pub.gpg secrets/configuration."
+  puts " * The develop branch is running in the localdev and test environments, please first test then commit your configuration to the develop branch."
+  puts " * Once you're satisified with your new configuration in localdev and test, create a pull request from develop into master."
   if configuration_user["settings"]["gpg_edit"]
     puts " * GPG Edit Mode is enabled at secrets/configuration-user.yml[\"settings\"][\"gpg_edit\"], if there are changes to secrets/configuration.yml, secrets/id_rsa, or secrets/id_rsa.pub, they will be re-encrypted."
   end
@@ -264,7 +283,10 @@ elsif "#{branch}" == "master"
     `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output secrets/id_rsa --decrypt secrets/id_rsa.gpg`
     `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output secrets/id_rsa.pub --decrypt secrets/id_rsa.pub.gpg`
   end
-  
+elsif "#{branch}" == "master"
+  puts " * You are on the master branch, this branch contains your unique secrets/configuration.yml.gpg, secrets/id_rsa.gpg, and secrets/id_rsa.pub.gpg secrets/configuration."
+  puts " * The master branch is running in the qc and production environments, please first test then commit your configuration to the develop branch."
+  puts " * Once you're satisified with your new configuration in localdev and test, create a pull request from develop into master."
 end
 # create objects from secrets/configuration.yml.gpg and secrets/configuration.yml.template
 configuration = YAML.load(`gpg --batch --passphrase "#{configuration_user["settings"]["gpg_key"]}" --decrypt secrets/configuration.yml.gpg`)
