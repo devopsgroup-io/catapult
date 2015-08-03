@@ -113,7 +113,7 @@ Catapult is quick to setup. Fork the Github repository and start adding your con
         2. ~/secrets/id_rsa.pub as ~/secrets/id_rsa.pub.gpg
         3. ~/configuration.yml as ~/configuration.yml.gpg
     2. To enable **GPG Edit Mode**, set `~/configuration-user.yml["settings"]["gpg_edit"]` to true.
-    3. Once gpg_edit is set to true and while on your fork's master branch, run `vagrant status`, this will encrypt your configuraiton that you will then be able to commit and push safely to your public Catapult fork.
+    3. Once gpg_edit is set to true and while on your fork's develop branch, run `vagrant status`, this will encrypt your configuraiton that you will then be able to commit and push safely to your public Catapult fork.
 
 
 
@@ -299,29 +299,24 @@ The following options are available:
         * if the webroot differs from the repo root, specify it here
         * must include the trailing slash
 
-Once the new website is committed to your Catapult fork on the master branch, it's time to provision your servers, below are commands on how to do so. Once a website is provisioned, then Bamboo Automated Deployments following Gitflow and SCRUM will kick in.
+Once you add a new website to configuration.yml, it's time to test in localdev:
+
+    * `vagrant provision ~/configuration.yml["company"]["name"]-dev-redhat`
+    * `vagrant provision ~/configuration.yml["company"]["name"]-dev-redhat-mysql`
+
+Once you're satisfied with new website in localdev, it's time to commit configuration.yml.gpg to your Catapult fork's develop branch, this will kick off a automated deployment of test. Once you're satisifed with the website in test, it's time to create a pull request from your Catapult fork's develop branch into master - once the pull request is merged, this will kick off an automated deployment to qc. Once you're satisifed with the website in qc, it's time to login to Bamboo and press the deployment button for production.
+
+Once a website exists in the upstream environments (test, qc, production), automated deployments will kick off if changes are detected on their respected branches (see chart below). The same workflow of moving a website upstream, exists when you make changes to a specific website's repository.
 
 | Environment                    | dev                                                         | test                                                            | qc                                                             | production                                                    |
 |--------------------------------|-------------------------------------------------------------|-----------------------------------------------------------------|----------------------------------------------------------------|---------------------------------------------------------------|
-| **New Website Provisioning**   | Manually via Vagrant                                        | Manually via Vagrant                                            | Manually via Vagrant                                           | Manually via Vagrant                                          |
 | **Running Branch**             | *develop*                                                   | *develop*                                                       | *master*                                                       | *master*                                                      |
+| **New Website Provisioning**   | Manually via Vagrant                                        | Automatically via Bamboo (new commits to **develop**)           | Automatically via Bamboo (new commits to **master**)           | Manually via Bamboo                                           |
 | **Downstream Database**        | Restore from **develop** ~/_sql folder of website repo      | Restore from **develop** ~/_sql folder of website repo          | Restore from **master** ~/_sql folder of website repo          | Daily backup to **develop** ~/_sql folder of website repo     |
 | **Upstream Database**          | Restore from **develop** ~/_sql folder of website repo      | Daily backup to **develop** ~/_sql folder of website repo       | Restore from **master** ~/_sql folder of website repo          | Restore from **master** ~/_sql folder of website repo         |
 | **Downstream Untracked Files** | rsync files from **production**                             | rsync files from **production**                                 | rsync files from **production**                                | --                                                            |
 | **Upstream Untracked Files**   | rsync files from **test**                                   | --                                                              | rsync files from **test**                                      | rsync files from **test**                                     |
 | **Automated Deployments**      | Manually via `vagrant provision`                            | Automatically via Bamboo (new commits to **develop**)           | Automatically via Bamboo (new commits to **master**)           | Manually via Bamboo                                           |
-
-**New Website Provisioning** required for each **Environment** to be provisioned via Vagrant:
-* **Web Servers**
-    * `vagrant provision ~/configuration.yml["company"]["name"]-dev-redhat`
-    * `vagrant provision ~/configuration.yml["company"]["name"]-test-redhat`
-    * `vagrant provision ~/configuration.yml["company"]["name"]-qc-redhat`
-    * `vagrant provision ~/configuration.yml["company"]["name"]-production-redhat`
-* **Database Servers**
-    * `vagrant provision ~/configuration.yml["company"]["name"]-dev-redhat-mysql`
-    * `vagrant provision ~/configuration.yml["company"]["name"]-test-redhat-mysql`
-    * `vagrant provision ~/configuration.yml["company"]["name"]-qc-redhat-mysql`
-    * `vagrant provision ~/configuration.yml["company"]["name"]-production-redhat-mysql`
 
 
 
