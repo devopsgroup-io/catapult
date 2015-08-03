@@ -1,15 +1,13 @@
 #!/usr/bin/env bash
-export DEBIAN_FRONTEND=noninteractive
 
 
-if ! [ -e "/vagrant/secrets/configuration.yml" ]; then
-    echo -e "Cannot read from /vagrant/secrets/configuration.yml, please vagrant reload the virtual machine."
-    exit 1
-fi
 
+# variables inbound from provisioner args
+# $1 => environment
+# $2 => repository
+# $3 => gpg key
+# $4 => software_validation
 
-provisionstart=$(date +%s)
-sudo touch /vagrant/provisioners/redhat/logs/provision.log
 
 
 echo -e "==> Updating existing packages and installing utilities"
@@ -21,10 +19,6 @@ if ! grep -q "PasswordAuthentication no" "/etc/ssh/sshd_config"; then
 fi
 sudo systemctl stop sshd.service
 sudo systemctl start sshd.service
-# set human friendly variables inbound from provisioner args
-settings_environment=$1
-settings_git_pull=$2
-settings_software_validation=$3
 # update yum
 sudo yum update -y
 # git clones
@@ -33,22 +27,48 @@ sudo yum install -y git
 sudo easy_install pip
 sudo pip install --upgrade pip
 sudo pip install shyaml --upgrade
+# clone and pull catapult
+if ([ $1 = "dev" ] || [ $1 = "test" ]); then
+    branch="develop"
+elif ([ $1 = "qc" ] || [ $1 = "production" ]); then
+    branch="master"
+fi
+if [ $1 != "dev" ]; then
+    if [ -d "/catapult/.git" ]; then
+        cd /catapult && sudo git pull
+    else
+        sudo git clone --recursive -b ${branch} $2 /catapult | sed "s/^/\t/"
+    fi
+else
+    if ! [ -e "/catapult/secrets/configuration.yml.gpg" ]; then
+        echo -e "Cannot read from /catapult/secrets/configuration.yml.gpg, please vagrant reload the virtual machine."
+        exit 1
+    fi
+fi
+configuration=$(gpg --batch --passphrase ${3} --decrypt /catapult/secrets/configuration.yml.gpg)
+gpg --verbose --batch --yes --passphrase ${3} --output /catapult/secrets/id_rsa --decrypt /catapult/secrets/id_rsa.gpg
+gpg --verbose --batch --yes --passphrase ${3} --output /catapult/secrets/id_rsa.pub --decrypt /catapult/secrets/id_rsa.pub.gpg
+chmod 700 /catapult/secrets/id_rsa
+chmod 700 /catapult/secrets/id_rsa.pub
 end=$(date +%s)
-echo "[$(date)] Updating existing packages and installing utilities ($(($end - $start)) seconds)" >> /vagrant/provisioners/redhat/logs/provision.log
+echo "[$(date)] Updating existing packages and installing utilities ($(($end - $start)) seconds)" >> /catapult/provisioners/redhat/logs/provision.log
+
 
 
 echo -e "\n\n==> Configuring time"
 start=$(date +%s)
 # set timezone
-sudo timedatectl set-timezone "$(cat /vagrant/secrets/configuration.yml | shyaml get-value company.timezone_redhat)"
+sudo timedatectl set-timezone "$(echo "${configuration}" | shyaml get-value company.timezone_redhat)"
 # configure ntp
 sudo yum install -y ntp
 sudo systemctl enable ntpd.service
 sudo systemctl start ntpd.service
 # echo datetimezone
 date
+provisionstart=$(date +%s)
+sudo touch /catapult/provisioners/redhat/logs/provision.log
 end=$(date +%s)
-echo "[$(date)] Configuring time ($(($end - $start)) seconds" >> /vagrant/provisioners/redhat_mysql/logs/provision.log
+echo "[$(date)] Configuring time ($(($end - $start)) seconds" >> /catapult/provisioners/redhat_mysql/logs/provision.log
 
 
 echo -e "\n\n==> Installing PHP"
@@ -60,15 +80,15 @@ sudo yum install -y php-curl
 sudo yum install -y php-gd
 sudo yum install -y php-dom
 sudo yum install -y php-mbstring
-sed -i -e "s#\;date\.timezone.*#date.timezone = \"$(cat /vagrant/secrets/configuration.yml | shyaml get-value company.timezone_redhat)\"#g" /etc/php.ini
+sed -i -e "s#\;date\.timezone.*#date.timezone = \"$(echo "${configuration}" | shyaml get-value company.timezone_redhat)\"#g" /etc/php.ini
 end=$(date +%s)
-echo "[$(date)] Installing PHP ($(($end - $start)) seconds)" >> /vagrant/provisioners/redhat/logs/provision.log
+echo "[$(date)] Installing PHP ($(($end - $start)) seconds)" >> /catapult/provisioners/redhat/logs/provision.log
 
 
 echo -e "\n\n==> Installing Drush and WP-CLI"
 start=$(date +%s)
-sudo yum install -y php-cli # wp-cli dependancy
-sudo yum install -y mariadb # drush dependeancy
+sudo yum install -y php-cli
+sudo yum install -y mariadb
 # install drush
 if [ ! -f /usr/bin/drush  ]; then
     curl -sS https://getcomposer.org/installer | php
@@ -82,7 +102,7 @@ if [ ! -f /usr/bin/drush  ]; then
 fi
 drush --version
 end=$(date +%s)
-echo "[$(date)] Installing Drush and WP-CLI ($(($end - $start)) seconds)" >> /vagrant/provisioners/redhat/logs/provision.log
+echo "[$(date)] Installing Drush and WP-CLI ($(($end - $start)) seconds)" >> /catapult/provisioners/redhat/logs/provision.log
 
 
 echo -e "\n\n==> Installing Apache"
@@ -94,7 +114,7 @@ sudo systemctl start httpd.service
 sudo yum install -y mod_ssl
 sudo bash /etc/ssl/certs/make-dummy-cert "/etc/ssl/certs/httpd-dummy-cert.key.cert"
 end=$(date +%s)
-echo "[$(date)] Installing Apache ($(($end - $start)) seconds)" >> /vagrant/provisioners/redhat/logs/provision.log
+echo "[$(date)] Installing Apache ($(($end - $start)) seconds)" >> /catapult/provisioners/redhat/logs/provision.log
 
 
 echo -e "\n\n==> Configuring git repositories (This may take a while...)"
@@ -112,16 +132,14 @@ while IFS='' read -r -d '' key; do
         if [ "$(cd /var/www/repositories/apache/$domain && git config --get remote.origin.url)" != "$repo" ]; then
             echo "the repo has changed in secrets/configuration.yml, removing and cloning the new repository." | sed "s/^/\t/"
             sudo rm -rf /var/www/repositories/apache/$domain
-            sudo ssh-agent bash -c "ssh-add /vagrant/secrets/id_rsa; git clone --recursive -b $(cat /vagrant/secrets/configuration.yml | shyaml get-value environments.$1.branch) $repo /var/www/repositories/apache/$domain" | sed "s/^/\t/"
+            sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git clone --recursive -b $(echo "${configuration}" | shyaml get-value environments.$1.branch) $repo /var/www/repositories/apache/$domain" | sed "s/^/\t/"
         elif [ "$(cd /var/www/repositories/apache/$domain && git rev-list HEAD | tail -n 1 )" != "$(cd /var/www/repositories/apache/$domain && git rev-list origin/master | tail -n 1 )" ]; then
             echo "the repo has changed, removing and cloning the new repository." | sed "s/^/\t/"
             sudo rm -rf /var/www/repositories/apache/$domain
-            sudo ssh-agent bash -c "ssh-add /vagrant/secrets/id_rsa; git clone --recursive -b $(cat /vagrant/secrets/configuration.yml | shyaml get-value environments.$1.branch) $repo /var/www/repositories/apache/$domain" | sed "s/^/\t/"
-        elif [ "$settings_git_pull" = true ]; then
-            cd /var/www/repositories/apache/$domain && git checkout $(cat /vagrant/secrets/configuration.yml | shyaml get-value environments.$1.branch)
-            cd /var/www/repositories/apache/$domain && sudo ssh-agent bash -c "ssh-add /vagrant/secrets/id_rsa; git pull origin $(cat /vagrant/secrets/configuration.yml | shyaml get-value environments.$1.branch)" | sed "s/^/\t/"
-        elif [ "$settings_git_pull" = false ]; then
-            echo "[provisioner argument false!] skipping git pull" | sed "s/^/\t/"
+            sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git clone --recursive -b $(echo "${configuration}" | shyaml get-value environments.$1.branch) $repo /var/www/repositories/apache/$domain" | sed "s/^/\t/"
+        else
+            cd /var/www/repositories/apache/$domain && git checkout $(echo "${configuration}" | shyaml get-value environments.$1.branch)
+            cd /var/www/repositories/apache/$domain && sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git pull origin $(echo "${configuration}" | shyaml get-value environments.$1.branch)" | sed "s/^/\t/"
         fi
     else
         if [ -d "/var/www/repositories/apache/$domain" ]; then
@@ -129,15 +147,15 @@ while IFS='' read -r -d '' key; do
             sudo chmod 0777 -R /var/www/repositories/apache/$domain
             sudo rm -rf /var/www/repositories/apache/$domain
         fi
-        sudo ssh-agent bash -c "ssh-add /vagrant/secrets/id_rsa; git clone --recursive -b $(cat /vagrant/secrets/configuration.yml | shyaml get-value environments.$1.branch) $repo /var/www/repositories/apache/$domain" | sed "s/^/\t/"
+        sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git clone --recursive -b $(echo "${configuration}" | shyaml get-value environments.$1.branch) $repo /var/www/repositories/apache/$domain" | sed "s/^/\t/"
     fi
-done < <(cat /vagrant/secrets/configuration.yml | shyaml get-values-0 websites.apache)
+done < <(echo "${configuration}" | shyaml get-values-0 websites.apache)
 
 # create an array of domains
 while IFS='' read -r -d '' key; do
     domain=$(echo "$key" | grep -w "domain" | cut -d ":" -f 2 | tr -d " ")
     domains+=($domain)
-done < <(cat /vagrant/secrets/configuration.yml | shyaml get-values-0 websites.apache)
+done < <(echo "${configuration}" | shyaml get-values-0 websites.apache)
 # cleanup directories from domains array
 for directory in /var/www/repositories/apache/*/; do
     domain=$(basename $directory)
@@ -148,20 +166,20 @@ for directory in /var/www/repositories/apache/*/; do
     fi
 done
 end=$(date +%s)
-echo "[$(date)] Configuring git repositories ($(($end - $start)) seconds" >> /vagrant/provisioners/redhat_mysql/logs/provision.log
+echo "[$(date)] Configuring git repositories ($(($end - $start)) seconds" >> /catapult/provisioners/redhat_mysql/logs/provision.log
 
 
 echo -e "\n\n==> Configuring Apache"
 start=$(date +%s)
 # set variables from secrets/configuration.yml
-mysql_user="$(cat /vagrant/secrets/configuration.yml | shyaml get-value environments.$1.servers.redhat_mysql.mysql.user)"
-mysql_user_password="$(cat /vagrant/secrets/configuration.yml | shyaml get-value environments.$1.servers.redhat_mysql.mysql.user_password)"
-mysql_root_password="$(cat /vagrant/secrets/configuration.yml | shyaml get-value environments.$1.servers.redhat_mysql.mysql.root_password)"
-redhat_ip="$(cat /vagrant/secrets/configuration.yml | shyaml get-value environments.$1.servers.redhat.ip)"
-redhat_mysql_ip="$(cat /vagrant/secrets/configuration.yml | shyaml get-value environments.$1.servers.redhat_mysql.ip)"
-company_email="$(cat /vagrant/secrets/configuration.yml | shyaml get-value company.email)"
-cloudflare_api_key="$(cat /vagrant/secrets/configuration.yml | shyaml get-value company.cloudflare_api_key)"
-cloudflare_email="$(cat /vagrant/secrets/configuration.yml | shyaml get-value company.cloudflare_email)"
+mysql_user="$(echo "${configuration}" | shyaml get-value environments.$1.servers.redhat_mysql.mysql.user)"
+mysql_user_password="$(echo "${configuration}" | shyaml get-value environments.$1.servers.redhat_mysql.mysql.user_password)"
+mysql_root_password="$(echo "${configuration}" | shyaml get-value environments.$1.servers.redhat_mysql.mysql.root_password)"
+redhat_ip="$(echo "${configuration}" | shyaml get-value environments.$1.servers.redhat.ip)"
+redhat_mysql_ip="$(echo "${configuration}" | shyaml get-value environments.$1.servers.redhat_mysql.ip)"
+company_email="$(echo "${configuration}" | shyaml get-value company.email)"
+cloudflare_api_key="$(echo "${configuration}" | shyaml get-value company.cloudflare_api_key)"
+cloudflare_email="$(echo "${configuration}" | shyaml get-value company.cloudflare_email)"
 
 # configure vhosts
 # this is a debianism - but it makes things easier for cross-distro
@@ -182,7 +200,7 @@ sudo rm -rf /etc/httpd/sites-available/*
 sudo rm -rf /etc/httpd/sites-enabled/*
 sudo cat /dev/null > /etc/httpd/conf.d/welcome.conf
 
-cat /vagrant/secrets/configuration.yml | shyaml get-values-0 websites.apache |
+echo "${configuration}" | shyaml get-values-0 websites.apache |
 while IFS='' read -r -d '' key; do
 
     domain=$(echo "$key" | grep -w "domain" | cut -d ":" -f 2 | tr -d " ")
@@ -436,21 +454,21 @@ EOF
             if [ -f "/var/www/repositories/apache/${domain}/${webroot}application/config/database.php" ]; then
                 sudo chmod 0777 "/var/www/repositories/apache/${domain}/${webroot}application/config/database.php"
             fi
-            sed -e "s/\$db\['default'\]\['hostname'\]\s=\s'localhost';/\$db\['default'\]\['hostname'\] = '${redhat_mysql_ip}';/g" -e "s/\$db\['default'\]\['username'\]\s=\s'';/\$db\['default'\]\['username'\] = '${mysql_user}';/g" -e "s/\$db\['default'\]\['password'\]\s=\s'';/\$db\['default'\]\['password'\] = '${mysql_user_password}';/g" -e "s/\$db\['default'\]\['database'\]\s=\s'';/\$db\['default'\]\['database'\] = '${1}_${domainvaliddbname}';/g" -e "s/\$db\['default'\]\['dbprefix'\]\s=\s'';/\$db\['default'\]\['dbprefix'\] = '${software_dbprefix}';/g" /vagrant/provisioners/redhat/installers/codeigniter2_database.php > "/var/www/repositories/apache/${domain}/${webroot}application/config/database.php"
+            sed -e "s/\$db\['default'\]\['hostname'\]\s=\s'localhost';/\$db\['default'\]\['hostname'\] = '${redhat_mysql_ip}';/g" -e "s/\$db\['default'\]\['username'\]\s=\s'';/\$db\['default'\]\['username'\] = '${mysql_user}';/g" -e "s/\$db\['default'\]\['password'\]\s=\s'';/\$db\['default'\]\['password'\] = '${mysql_user_password}';/g" -e "s/\$db\['default'\]\['database'\]\s=\s'';/\$db\['default'\]\['database'\] = '${1}_${domainvaliddbname}';/g" -e "s/\$db\['default'\]\['dbprefix'\]\s=\s'';/\$db\['default'\]\['dbprefix'\] = '${software_dbprefix}';/g" /catapult/provisioners/redhat/installers/codeigniter2_database.php > "/var/www/repositories/apache/${domain}/${webroot}application/config/database.php"
     elif [ "$software" = "drupal6" ]; then
             echo -e "\t\tgenerating $software database configuration file"
             connectionstring="mysql:\/\/${mysql_user}:${mysql_user_password}@${redhat_mysql_ip}\/${1}_${domainvaliddbname}"
             if [ -f "/var/www/repositories/apache/${domain}/${webroot}sites/default/settings.php" ]; then
                 sudo chmod 0777 "/var/www/repositories/apache/${domain}/${webroot}sites/default/settings.php"
             fi
-            sed -e "s/mysql:\/\/username:password@localhost\/databasename/${connectionstring}/g" /vagrant/provisioners/redhat/installers/drupal6_settings.php > "/var/www/repositories/apache/${domain}/${webroot}sites/default/settings.php"
+            sed -e "s/mysql:\/\/username:password@localhost\/databasename/${connectionstring}/g" /catapult/provisioners/redhat/installers/drupal6_settings.php > "/var/www/repositories/apache/${domain}/${webroot}sites/default/settings.php"
             echo -e "\t\trysncing $software ~/sites/default/files/"
             if ([ "$software_workflow" = "downstream" ] && [ "$1" != "production" ]); then
-                rsync  --archive --compress --copy-links --delete --verbose -e "ssh -oStrictHostKeyChecking=no -i /vagrant/secrets/id_rsa" root@$(cat /vagrant/secrets/configuration.yml | shyaml get-value environments.production.servers.redhat.ip):/var/www/repositories/apache/$domain/sites/default/files/ /var/www/repositories/apache/${domain}/${webroot}sites/default/files/ 2>&1 | sed "s/^/\t\t/"
+                rsync  --archive --compress --copy-links --delete --verbose -e "ssh -oStrictHostKeyChecking=no -i /catapult/secrets/id_rsa" root@$(echo "${configuration}" | shyaml get-value environments.production.servers.redhat.ip):/var/www/repositories/apache/$domain/sites/default/files/ /var/www/repositories/apache/${domain}/${webroot}sites/default/files/ 2>&1 | sed "s/^/\t\t/"
             elif ([ "$software_workflow" = "upstream" ] && [ "$1" != "test" ]); then
-                rsync  --archive --compress --copy-links --delete --verbose -e "ssh -oStrictHostKeyChecking=no -i /vagrant/secrets/id_rsa" root@$(cat /vagrant/secrets/configuration.yml | shyaml get-value environments.test.servers.redhat.ip):/var/www/repositories/apache/$domain/sites/default/files/ /var/www/repositories/apache/${domain}/${webroot}sites/default/files/ 2>&1 | sed "s/^/\t\t/"
+                rsync  --archive --compress --copy-links --delete --verbose -e "ssh -oStrictHostKeyChecking=no -i /catapult/secrets/id_rsa" root@$(echo "${configuration}" | shyaml get-value environments.test.servers.redhat.ip):/var/www/repositories/apache/$domain/sites/default/files/ /var/www/repositories/apache/${domain}/${webroot}sites/default/files/ 2>&1 | sed "s/^/\t\t/"
             fi
-            if [ "$settings_software_validation" = false ]; then
+            if [ "${4}" = false ]; then
                 echo -e "\t\t[provisioner argument false!] skipping $software information"
             else
                 echo "$software core version:" | sed "s/^/\t\t/"
@@ -466,14 +484,14 @@ EOF
             if [ -f "/var/www/repositories/apache/${domain}/${webroot}sites/default/settings.php" ]; then
                 sudo chmod 0777 "/var/www/repositories/apache/${domain}/${webroot}sites/default/settings.php"
             fi
-            sed -e "s/\$databases\s=\sarray();/${connectionstring}/g" /vagrant/provisioners/redhat/installers/drupal7_settings.php > "/var/www/repositories/apache/${domain}/${webroot}sites/default/settings.php"
+            sed -e "s/\$databases\s=\sarray();/${connectionstring}/g" /catapult/provisioners/redhat/installers/drupal7_settings.php > "/var/www/repositories/apache/${domain}/${webroot}sites/default/settings.php"
             echo -e "\t\trysncing $software ~/sites/default/files/"
             if ([ "$software_workflow" = "downstream" ] && [ "$1" != "production" ]); then
-                rsync  --archive --compress --copy-links --delete --verbose -e "ssh -oStrictHostKeyChecking=no -i /vagrant/secrets/id_rsa" root@$(cat /vagrant/secrets/configuration.yml | shyaml get-value environments.production.servers.redhat.ip):/var/www/repositories/apache/$domain/sites/default/files/ /var/www/repositories/apache/${domain}/${webroot}sites/default/files/ 2>&1 | sed "s/^/\t\t/"
+                rsync  --archive --compress --copy-links --delete --verbose -e "ssh -oStrictHostKeyChecking=no -i /catapult/secrets/id_rsa" root@$(echo "${configuration}" | shyaml get-value environments.production.servers.redhat.ip):/var/www/repositories/apache/$domain/sites/default/files/ /var/www/repositories/apache/${domain}/${webroot}sites/default/files/ 2>&1 | sed "s/^/\t\t/"
             elif ([ "$software_workflow" = "upstream" ] && [ "$1" != "test" ]); then
-                rsync  --archive --compress --copy-links --delete --verbose -e "ssh -oStrictHostKeyChecking=no -i /vagrant/secrets/id_rsa" root@$(cat /vagrant/secrets/configuration.yml | shyaml get-value environments.test.servers.redhat.ip):/var/www/repositories/apache/$domain/sites/default/files/ /var/www/repositories/apache/${domain}/${webroot}sites/default/files/ 2>&1 | sed "s/^/\t\t/"
+                rsync  --archive --compress --copy-links --delete --verbose -e "ssh -oStrictHostKeyChecking=no -i /catapult/secrets/id_rsa" root@$(echo "${configuration}" | shyaml get-value environments.test.servers.redhat.ip):/var/www/repositories/apache/$domain/sites/default/files/ /var/www/repositories/apache/${domain}/${webroot}sites/default/files/ 2>&1 | sed "s/^/\t\t/"
             fi
-            if [ "$settings_software_validation" = false ]; then
+            if [ "${4}" = false ]; then
                 echo -e "\t\t[provisioner argument false!] skipping $software information"
             else
                 echo "$software core version:" | sed "s/^/\t\t/"
@@ -488,39 +506,39 @@ EOF
             if [ -f "/var/www/repositories/apache/${domain}/${webroot}wp-config.php" ]; then
                 sudo chmod 0777 "/var/www/repositories/apache/${domain}/${webroot}wp-config.php"
             fi
-            sed -e "s/database_name_here/${1}_${domainvaliddbname}/g" -e "s/username_here/${mysql_user}/g" -e "s/password_here/${mysql_user_password}/g" -e "s/localhost/${redhat_mysql_ip}/g" -e "s/'wp_'/'${software_dbprefix}'/g" /vagrant/provisioners/redhat/installers/wp-config.php > "/var/www/repositories/apache/${domain}/${webroot}wp-config.php"
+            sed -e "s/database_name_here/${1}_${domainvaliddbname}/g" -e "s/username_here/${mysql_user}/g" -e "s/password_here/${mysql_user_password}/g" -e "s/localhost/${redhat_mysql_ip}/g" -e "s/'wp_'/'${software_dbprefix}'/g" /catapult/provisioners/redhat/installers/wp-config.php > "/var/www/repositories/apache/${domain}/${webroot}wp-config.php"
             echo -e "\t\trysncing $software ~/wp-content/"
             if ([ "$software_workflow" = "downstream" ] && [ "$1" != "production" ]); then
-                rsync  --archive --compress --copy-links --delete --verbose -e "ssh -oStrictHostKeyChecking=no -i /vagrant/secrets/id_rsa" root@$(cat /vagrant/secrets/configuration.yml | shyaml get-value environments.production.servers.redhat.ip):/var/www/repositories/apache/${domain}/${webroot}wp-content/ /var/www/repositories/apache/${domain}/${webroot}wp-content/ 2>&1 | sed "s/^/\t\t/"
+                rsync  --archive --compress --copy-links --delete --verbose -e "ssh -oStrictHostKeyChecking=no -i /catapult/secrets/id_rsa" root@$(echo "${configuration}" | shyaml get-value environments.production.servers.redhat.ip):/var/www/repositories/apache/${domain}/${webroot}wp-content/ /var/www/repositories/apache/${domain}/${webroot}wp-content/ 2>&1 | sed "s/^/\t\t/"
             elif ([ "$software_workflow" = "upstream" ] && [ "$1" != "test" ]); then
-                rsync  --archive --compress --copy-links --delete --verbose -e "ssh -oStrictHostKeyChecking=no -i /vagrant/secrets/id_rsa" root@$(cat /vagrant/secrets/configuration.yml | shyaml get-value environments.test.servers.redhat.ip):/var/www/repositories/apache/${domain}/${webroot}wp-content/ /var/www/repositories/apache/${domain}/${webroot}wp-content/ 2>&1 | sed "s/^/\t\t/"
+                rsync  --archive --compress --copy-links --delete --verbose -e "ssh -oStrictHostKeyChecking=no -i /catapult/secrets/id_rsa" root@$(echo "${configuration}" | shyaml get-value environments.test.servers.redhat.ip):/var/www/repositories/apache/${domain}/${webroot}wp-content/ /var/www/repositories/apache/${domain}/${webroot}wp-content/ 2>&1 | sed "s/^/\t\t/"
             fi
-            if [ "$settings_software_validation" = false ]; then
+            if [ "${4}" = false ]; then
                 echo -e "\t\t[provisioner argument false!] skipping $software information"
             else
                 echo "$software core version:" | sed "s/^/\t/\t"
-                php /vagrant/provisioners/redhat/installers/wp-cli.phar --path="/var/www/repositories/apache/${domain}/${webroot}" core version 2>&1 | sed "s/^/\t\t\t/"
+                php /catapult/provisioners/redhat/installers/wp-cli.phar --path="/var/www/repositories/apache/${domain}/${webroot}" core version 2>&1 | sed "s/^/\t\t\t/"
                 echo "$software core verify-checksums:" | sed "s/^/\t\t/"
-                php /vagrant/provisioners/redhat/installers/wp-cli.phar --path="/var/www/repositories/apache/${domain}/${webroot}" core verify-checksums 2>&1 | sed "s/^/\t\t\t/"
+                php /catapult/provisioners/redhat/installers/wp-cli.phar --path="/var/www/repositories/apache/${domain}/${webroot}" core verify-checksums 2>&1 | sed "s/^/\t\t\t/"
                 echo "$software core check-update:" | sed "s/^/\t\t/"
-                php /vagrant/provisioners/redhat/installers/wp-cli.phar --path="/var/www/repositories/apache/${domain}/${webroot}" core check-update 2>&1 | sed "s/^/\t\t\t/"
+                php /catapult/provisioners/redhat/installers/wp-cli.phar --path="/var/www/repositories/apache/${domain}/${webroot}" core check-update 2>&1 | sed "s/^/\t\t\t/"
                 echo "$software plugin list:" | sed "s/^/\t\t/"
-                php /vagrant/provisioners/redhat/installers/wp-cli.phar --path="/var/www/repositories/apache/${domain}/${webroot}" plugin list 2>&1 | sed "s/^/\t\t\t/"
+                php /catapult/provisioners/redhat/installers/wp-cli.phar --path="/var/www/repositories/apache/${domain}/${webroot}" plugin list 2>&1 | sed "s/^/\t\t\t/"
                 echo "$software theme list:" | sed "s/^/\t\t/"
-                php /vagrant/provisioners/redhat/installers/wp-cli.phar --path="/var/www/repositories/apache/${domain}/${webroot}" theme list 2>&1 | sed "s/^/\t\t\t/"
+                php /catapult/provisioners/redhat/installers/wp-cli.phar --path="/var/www/repositories/apache/${domain}/${webroot}" theme list 2>&1 | sed "s/^/\t\t\t/"
             fi
     elif [ "$software" = "xenforo" ]; then
             echo -e "\t\tgenerating $software database configuration file"
             if [ -f "/var/www/repositories/apache/${domain}/${webroot}library/config.php" ]; then
                 sudo chmod 0777 "/var/www/repositories/apache/${domain}/${webroot}library/config.php"
             fi
-            sed -e "s/\$config\['db'\]\['host'\]\s=\s'localhost';/\$config\['db'\]\['host'\] = '${redhat_mysql_ip}';/g" -e "s/\$config\['db'\]\['username'\]\s=\s'';/\$config\['db'\]\['username'\] = '${mysql_user}';/g" -e "s/\$config\['db'\]\['password'\]\s=\s'';/\$config\['db'\]\['password'\] = '${mysql_user_password}';/g" -e "s/\$config\['db'\]\['dbname'\]\s=\s'';/\$config\['db'\]\['dbname'\] = '${1}_${domainvaliddbname}';/g" /vagrant/provisioners/redhat/installers/xenforo_config.php > "/var/www/repositories/apache/${domain}/${webroot}library/config.php"
+            sed -e "s/\$config\['db'\]\['host'\]\s=\s'localhost';/\$config\['db'\]\['host'\] = '${redhat_mysql_ip}';/g" -e "s/\$config\['db'\]\['username'\]\s=\s'';/\$config\['db'\]\['username'\] = '${mysql_user}';/g" -e "s/\$config\['db'\]\['password'\]\s=\s'';/\$config\['db'\]\['password'\] = '${mysql_user_password}';/g" -e "s/\$config\['db'\]\['dbname'\]\s=\s'';/\$config\['db'\]\['dbname'\] = '${1}_${domainvaliddbname}';/g" /catapult/provisioners/redhat/installers/xenforo_config.php > "/var/www/repositories/apache/${domain}/${webroot}library/config.php"
     fi
 
 done
 
 end=$(date +%s)
-echo "[$(date)] Configuring Apache ($(($end - $start)) seconds)" >> /vagrant/provisioners/redhat/logs/provision.log
+echo "[$(date)] Configuring Apache ($(($end - $start)) seconds)" >> /catapult/provisioners/redhat/logs/provision.log
 
 
 echo -e "\n\n==> Restarting Apache"
@@ -530,12 +548,12 @@ sudo apachectl start
 sudo apachectl configtest
 sudo systemctl is-active httpd.service
 end=$(date +%s)
-echo "[$(date)] Restarting Apache ($(($end - $start)) seconds)" >> /vagrant/provisioners/redhat/logs/provision.log
+echo "[$(date)] Restarting Apache ($(($end - $start)) seconds)" >> /catapult/provisioners/redhat/logs/provision.log
 
 
 provisionend=$(date +%s)
 echo -e "\n\n==> Provision complete ($(($provisionend - $provisionstart)) seconds)"
-echo -e "[$(date)] Provision complete ($(($provisionend - $provisionstart)) total seconds)\n" >> /vagrant/provisioners/redhat/logs/provision.log
+echo -e "[$(date)] Provision complete ($(($provisionend - $provisionstart)) total seconds)\n" >> /catapult/provisioners/redhat/logs/provision.log
 
 
 exit 0
