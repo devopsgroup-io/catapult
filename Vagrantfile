@@ -44,7 +44,6 @@ def catapult_exception(error)
     puts "\n"
     puts "Please correct the error then re-run your vagrant command."
     puts "See https://github.com/devopsgroup-io/catapult-release-management for more information."
-    puts "\n\n"
     exit 1
   end
 end
@@ -98,17 +97,17 @@ remote = `#{@git} config --get remote.origin.url`
 if remote.include?("devopsgroup-io/")
   catapult_exception("In order to use Catapult Release Management, you must fork the repository so that the committed and encrypted configuration is unique to you! See https://github.com/devopsgroup-io/catapult-release-management for more information.")
 else
-  puts "Self updating Catapult:"
+  puts "\n\nSelf updating Catapult:\n\n"
   `#{@git} fetch`
   # get current branch
   branch = `#{@git} rev-parse --abbrev-ref HEAD`.strip
   # get current repo
   repo = `#{@git} config --get remote.origin.url`
-  puts "\nYour repository: #{repo}"
+  puts " * Your repository: #{repo}"
   # set the correct upstream
   repo_upstream = `#{@git} config --get remote.upstream.url`
   repo_upstream_url = "https://github.com/devopsgroup-io/catapult-release-management.git"
-  puts "Will sync from: #{repo_upstream}"
+  puts " * Will sync from: #{repo_upstream}"
   if repo_upstream.empty?
     `#{@git} remote add upstream #{repo_upstream_url}`
   else
