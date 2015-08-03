@@ -21,6 +21,7 @@ require "net/http"
 require "nokogiri"
 require "open-uri"
 require "openssl"
+require "resolv"
 require "securerandom"
 require "socket"
 require "yaml"
@@ -60,6 +61,15 @@ elsif (RbConfig::CONFIG['host_os'] =~ /darwin|mac os|linux|solaris|bsd/)
   git = "git"
 else
   catapult_exception("Cannot detect your operating system, please submit an issue at https://github.com/devopsgroup-io/catapult-release-management")
+end
+
+
+# check for an internet connection
+dns_resolver = Resolv::DNS.new()
+begin
+  dns_resolver.getaddress("google.com")
+rescue Resolv::ResolvError => e
+  catapult_exception("Please check your internet connection, unable to reach google.com")
 end
 
 
