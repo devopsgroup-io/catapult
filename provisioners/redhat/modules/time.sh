@@ -1,0 +1,8 @@
+# set timezone
+sudo timedatectl set-timezone "$(echo "${configuration}" | shyaml get-value company.timezone_redhat)"
+# install ntp
+sudo yum install -y ntp
+sudo systemctl enable ntpd.service
+sudo systemctl start ntpd.service
+# echo datetimezone
+date

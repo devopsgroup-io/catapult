@@ -39,14 +39,7 @@ echo "==> completed in ($(($end - $start)) seconds)"
 
 echo -e "\n\n==> Configuring time"
 start=$(date +%s)
-# set timezone
-sudo timedatectl set-timezone "$(echo "${configuration}" | shyaml get-value company.timezone_redhat)"
-# install ntp
-sudo yum install -y ntp
-sudo systemctl enable ntpd.service
-sudo systemctl start ntpd.service
-# echo datetimezone
-date
+source /catapult/provisioners/redhat/modules/time.sh
 provisionstart=$(date +%s)
 sudo touch /catapult/provisioners/redhat/logs/mysql.log
 end=$(date +%s)
@@ -85,7 +78,7 @@ echo "==> completed in ($(($end - $start)) seconds)"
 
 echo -e "\n\n==> Configuring git repositories (This may take a while...)"
 start=$(date +%s)
-source ./modules/git.sh
+source /catapult/provisioners/redhat/modules/git.sh
 end=$(date +%s)
 echo "==> completed in ($(($end - $start)) seconds)"
 
