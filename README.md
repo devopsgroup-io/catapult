@@ -301,8 +301,8 @@ The following options are available:
 
 Once you add a new website to configuration.yml, it's time to test in localdev:
 
-    * `vagrant provision ~/configuration.yml["company"]["name"]-dev-redhat`
-    * `vagrant provision ~/configuration.yml["company"]["name"]-dev-redhat-mysql`
+  * `vagrant provision ~/configuration.yml["company"]["name"]-dev-redhat`
+  * `vagrant provision ~/configuration.yml["company"]["name"]-dev-redhat-mysql`
 
 Once you're satisfied with new website in localdev, it's time to commit configuration.yml.gpg to your Catapult fork's develop branch, this will kick off a automated deployment of test. Once you're satisifed with the website in test, it's time to create a pull request from your Catapult fork's develop branch into master - once the pull request is merged, this will kick off an automated deployment to qc. Once you're satisifed with the website in qc, it's time to login to Bamboo and press the deployment button for production.
 
