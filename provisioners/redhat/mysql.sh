@@ -33,11 +33,15 @@ gpg --verbose --batch --yes --passphrase ${3} --output /catapult/secrets/id_rsa 
 gpg --verbose --batch --yes --passphrase ${3} --output /catapult/secrets/id_rsa.pub --decrypt /catapult/secrets/id_rsa.pub.gpg
 chmod 700 /catapult/secrets/id_rsa
 chmod 700 /catapult/secrets/id_rsa.pub
+# forward root's mail to company mail
+sudo cat > "/root/.forward" << EOF
+"$(echo "${configuration}" | shyaml get-value company.email)"
+EOF
 end=$(date +%s)
 echo "==> completed in ($(($end - $start)) seconds)"
 
 
-echo -e "\n\n==> Configuring time"
+echo -e "\n\n\n==> Configuring time"
 start=$(date +%s)
 source /catapult/provisioners/redhat/modules/time.sh
 provisionstart=$(date +%s)
@@ -46,7 +50,7 @@ end=$(date +%s)
 echo "==> completed in ($(($end - $start)) seconds)"
 
 
-echo -e "\n\n==> Installing Drush and WP-CLI"
+echo -e "\n\n\n==> Installing Drush and WP-CLI"
 start=$(date +%s)
 sudo yum install -y php-cli
 sudo yum install -y mariadb
@@ -66,45 +70,37 @@ end=$(date +%s)
 echo "==> completed in ($(($end - $start)) seconds)"
 
 
-echo -e "\n\n==> Installing MySQL"
+echo -e "\n\n\n==> Installing MySQL"
 start=$(date +%s)
 # install mariadb
 sudo yum -y install mariadb mariadb-server
 sudo systemctl enable mariadb.service
 sudo systemctl start mariadb.service
 end=$(date +%s)
-echo "==> completed in ($(($end - $start)) seconds)"
+echo -e "\n==> completed in ($(($end - $start)) seconds)"
 
 
-echo -e "\n\n==> Configuring git repositories (This may take a while...)"
+echo -e "\n\n\n==> Configuring git repositories (This may take a while...)"
 start=$(date +%s)
 source /catapult/provisioners/redhat/modules/git.sh
 end=$(date +%s)
-echo "==> completed in ($(($end - $start)) seconds)"
+echo -e "\n==> completed in ($(($end - $start)) seconds)"
 
 
-echo -e "\n\n==> Configuring MySQL"
+echo -e "\n\n\n==> Configuring MySQL"
 start=$(date +%s)
-# set variables from secrets/configuration.yml
-mysql_user="$(echo "${configuration}" | shyaml get-value environments.$1.servers.redhat_mysql.mysql.user)"
-mysql_user_password="$(echo "${configuration}" | shyaml get-value environments.$1.servers.redhat_mysql.mysql.user_password)"
-mysql_root_password="$(echo "${configuration}" | shyaml get-value environments.$1.servers.redhat_mysql.mysql.root_password)"
-drupal_admin_password="$(echo "${configuration}" | shyaml get-value environments.$1.software.drupal.admin_password)"
-wordpress_admin_password="$(echo "${configuration}" | shyaml get-value environments.$1.software.wordpress.admin_password)"
-company_email="$(echo "${configuration}" | shyaml get-value company.email)"
-
 # configure mysql conf so user/pass isn't logged in shell history or memory
 sudo cat > "/catapult/provisioners/redhat/installers/$1.cnf" << EOF
 [client]
 host = "localhost"
 user = "root"
-password = "$mysql_root_password"
+password = "$(echo "${configuration}" | shyaml get-value environments.$1.servers.redhat_mysql.mysql.root_password)"
 EOF
 dbconf="/catapult/provisioners/redhat/installers/$1.cnf"
 
 # only set root password on fresh install of mysql
 if mysqladmin --defaults-extra-file=$dbconf ping 2>&1 | grep -q "failed"; then
-    sudo mysqladmin -u root password "$mysql_root_password"
+    sudo mysqladmin -u root password "$(echo "${configuration}" | shyaml get-value environments.$1.servers.redhat_mysql.mysql.root_password)"
 fi
 
 # disable remote root login
@@ -132,14 +128,22 @@ for database in $(mysql --defaults-extra-file=$dbconf -e "show databases" | egre
     fi
 done
 
-# create global user
-# @ todo user per db? 16 char limit
-mysql --defaults-extra-file=$dbconf -e "GRANT USAGE ON *.* TO '$mysql_user'@'%'"
-mysql --defaults-extra-file=$dbconf -e "DROP USER '$mysql_user'@'%'"
-mysql --defaults-extra-file=$dbconf -e "CREATE USER '$mysql_user'@'%' IDENTIFIED BY '$mysql_user_password'"
+# create mysql user
+# @todo user per db? 16 char limit
+mysql --defaults-extra-file=$dbconf -e "GRANT USAGE ON *.* TO '$(echo "${configuration}" | shyaml get-value environments.$1.servers.redhat_mysql.mysql.user)'@'%'"
+mysql --defaults-extra-file=$dbconf -e "DROP USER '$(echo "${configuration}" | shyaml get-value environments.$1.servers.redhat_mysql.mysql.user)'@'%'"
+mysql --defaults-extra-file=$dbconf -e "CREATE USER '$(echo "${configuration}" | shyaml get-value environments.$1.servers.redhat_mysql.mysql.user)'@'%' IDENTIFIED BY '$(echo "${configuration}" | shyaml get-value environments.$1.servers.redhat_mysql.mysql.user_password)'"
+
+# create maintenance user
+mysql --defaults-extra-file=$dbconf -e "GRANT USAGE ON *.* TO 'maintenance'@'%'"
+mysql --defaults-extra-file=$dbconf -e "DROP USER 'maintenance'@'%'"
+mysql --defaults-extra-file=$dbconf -e "CREATE USER 'maintenance'@'%'"
 
 # flush privileges
 mysql --defaults-extra-file=$dbconf -e "FLUSH PRIVILEGES"
+
+# this overwrite all items in cron, we then add databases below
+cat <(echo "* 3 * * * mysqlcheck -u maintenance --all-databases --auto-repair --optimize") | crontab -
 
 echo "${configuration}" | shyaml get-values-0 websites.apache |
 while IFS='' read -r -d '' key; do
@@ -157,12 +161,24 @@ while IFS='' read -r -d '' key; do
         echo -e "\nNOTICE: ${1}.${domain}"
     fi
     if ! test -n "$software"; then
-        echo -e "\t* skipping database creation/restore as this website does not require a database"
+        echo -e "\t* this website has no software setting, skipping database workflow"
     else
         # respect software_workflow option
         if ([ "$1" = "production" ] && [ "$software_workflow" = "downstream" ] && [ "$software_dbexist" != "" ]) || ([ "$1" = "test" ] && [ "$software_workflow" = "upstream" ] && [ "$software_dbexist" != "" ]); then
-            echo -e "\t* skipping database creation/restore as this website's software_workflow is set to ${software_workflow} and this is the ${1} environment"
+            echo -e "\t* workflow is set to ${software_workflow} and this is the ${1} environment, performing a database backup"
+            if ! [ -f /var/www/repositories/apache/${domain}/_sql/$(date +"%Y%m%d").sql ]; then
+                mkdir -p "/var/www/repositories/apache/${domain}/_sql"
+                mysqldump --defaults-extra-file=$dbconf --single-transaction --quick ${1}_${domainvaliddbname} > /var/www/repositories/apache/${domain}/_sql/$(date +"%Y%m%d").sql
+                cd "/var/www/repositories/apache/${domain}" && git config --global user.name "Catapult" | sed "s/^/\t/"
+                cd "/var/www/repositories/apache/${domain}" && git config --global user.email "$(echo "${configuration}" | shyaml get-value company.email)" | sed "s/^/\t/"
+                cd "/var/www/repositories/apache/${domain}" && git add "/var/www/repositories/apache/${domain}/_sql/$(date +"%Y%m%d").sql" | sed "s/^/\t/"
+                cd "/var/www/repositories/apache/${domain}" && git commit -m "Catapult auto-commit." | sed "s/^/\t/"
+                cd "/var/www/repositories/apache/${domain}" && sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git push origin $(echo "${configuration}" | shyaml get-value environments.$1.branch)" | sed "s/^/\t/"
+            else
+                echo -e "\t\ta backup was already performed today"
+            fi
         else
+            echo -e "\t* workflow is set to ${software_workflow} and this is the ${1} environment, performing a database restore"
             # drop the database
             for database in $(mysql --defaults-extra-file=$dbconf -e "show databases" | egrep -v "Database|mysql|information_schema|performance_schema"); do
                 if [ ${database} = ${1}_${domainvaliddbname} ]; then
@@ -173,24 +189,23 @@ while IFS='' read -r -d '' key; do
             mysql --defaults-extra-file=$dbconf -e "CREATE DATABASE $1_$domainvaliddbname"
             # confirm we have a usable database backup
             if ! [ -d "/var/www/repositories/apache/$domain/_sql" ]; then
-                echo -e "\t* /repositories/$domain/_sql does not exist - $software will not function"
+                echo -e "\t* ~/_sql directory does not exist, ${software} will not function"
             else
-                echo -e "\t* /repositories/$domain/_sql directory exists"
+                echo -e "\t* ~/_sql directory exists, looking for a valid database dump to restore from"
                 filenewest=$(ls "/var/www/repositories/apache/$domain/_sql" | grep -E ^[0-9]{8}\.sql$ | sort -n | tail -1)
                 for file in /var/www/repositories/apache/$domain/_sql/*.*; do
-                    filename=$(basename "$file")
-                    filename="${filename%.*}"
-                    if [[ "$file" != *.sql ]]; then
-                        echo -e "\t[invalid] [ ].sql [ ]YYYYMMDD.sql [ ]newest => $file"
-                    elif ! [[ "$filename" =~ ^[0-9]{8}$ ]]; then
-                        echo -e "\t[invalid] [x].sql [ ]YYYYMMDD.sql [ ]newest => $file"
-                    elif [[ $(basename "$file") != "$filenewest" ]]; then
-                        echo -e "\t[invalid] [x].sql [x]YYYYMMDD.sql [ ]newest => $file"
+                    if [[ "${file}" != *.sql ]]; then
+                        echo -e "\t\t[invalid] [ ].sql [ ]YYYYMMDD.sql [ ]newest => $file"
+                    elif ! [[ "$(basename "${file}")" =~ ^[0-9]{8}.sql$ ]]; then
+                        echo -e "\t\t[invalid] [x].sql [ ]YYYYMMDD.sql [ ]newest => $file"
+                    elif [[ "$(basename "$file")" != "${filenewest}" ]]; then
+                        echo -e "\t\t[invalid] [x].sql [x]YYYYMMDD.sql [ ]newest => $file"
                     else
-                        echo -e "\t[valid]   [x].sql [x]YYYYMMDD.sql [x]newest => $file"
-                        echo -e "\t\trestoring..."
+                        echo -e "\t\t[valid]   [x].sql [x]YYYYMMDD.sql [x]newest => $file"
+                        echo -e "\t\t\trestoring..."
                         # match http:// and optionally www. then replace with http:// + optionally www. + either dev., test., or the production domain
                         if [[ "$software" != "wordpress" ]]; then
+                            echo -e "\t* updating ${software} database with ${1}.${domain} URLs"
                             sed -r -e "s/:\/\/(www\.)?${domain}/:\/\/\1${1}\.${domain}/g" "/var/www/repositories/apache/$domain/_sql/$(basename "$file")" > "/var/www/repositories/apache/$domain/_sql/$1.$(basename "$file")"
                         else
                             cp "/var/www/repositories/apache/$domain/_sql/$(basename "$file")" "/var/www/repositories/apache/$domain/_sql/$1.$(basename "$file")"
@@ -198,19 +213,19 @@ while IFS='' read -r -d '' key; do
                         mysql --defaults-extra-file=$dbconf $1_$domainvaliddbname < "/var/www/repositories/apache/$domain/_sql/$1.$(basename "$file")"
                         rm -f "/var/www/repositories/apache/$domain/_sql/$1.$(basename "$file")"
                         if [[ "$software" = "drupal6" ]]; then
-                            echo -e "\t\tresetting ${software} admin password..."
-                            mysql --defaults-extra-file=$dbconf $1_$domainvaliddbname -e "UPDATE ${software_dbprefix}users SET name='admin', mail='$company_email', pass=MD5('$drupal_admin_password'), status='1' WHERE uid = 1;"
+                            echo -e "\t* resetting ${software} admin password..."
+                            mysql --defaults-extra-file=$dbconf $1_$domainvaliddbname -e "UPDATE ${software_dbprefix}users SET name='admin', mail='$(echo "${configuration}" | shyaml get-value company.email)', pass=MD5('$(echo "${configuration}" | shyaml get-value environments.$1.software.drupal.admin_password)'), status='1' WHERE uid = 1;"
                         fi
                         if [[ "$software" = "drupal7" ]]; then
-                            echo -e "\t\tresetting ${software} admin password..."
-                            mysql --defaults-extra-file=$dbconf $1_$domainvaliddbname -e "UPDATE ${software_dbprefix}users SET name='admin', mail='$company_email', pass='\$S\$D149zKa2wanV2uiRSpTuhD.hiIiFo0rRmxrRLTQjtM4VV5xtNKPR', status='1' WHERE uid = 1;"
+                            echo -e "\t* resetting ${software} admin password..."
+                            mysql --defaults-extra-file=$dbconf $1_$domainvaliddbname -e "UPDATE ${software_dbprefix}users SET name='admin', mail='$(echo "${configuration}" | shyaml get-value company.email)', status='1' WHERE uid = 1;"
                         fi
                         if [[ "$software" = "wordpress" ]]; then
-                            echo -e "\t\tresetting ${software} admin password..."
-                            mysql --defaults-extra-file=$dbconf $1_$domainvaliddbname -e "UPDATE ${software_dbprefix}users SET user_login='admin', user_email='$company_email', user_pass=MD5('$wordpress_admin_password'), user_status='0' WHERE id = 1;"
-                            echo -e "\t\tupdating $software database with ${1}.${domainvaliddbname} URL"
+                            echo -e "\t* resetting ${software} admin password..."
+                            mysql --defaults-extra-file=$dbconf $1_$domainvaliddbname -e "UPDATE ${software_dbprefix}users SET user_login='admin', user_email='$(echo "${configuration}" | shyaml get-value company.email)', user_pass=MD5('$(echo "${configuration}" | shyaml get-value environments.$1.software.wordpress.admin_password)'), user_status='0' WHERE id = 1;"
+                            echo -e "\t* updating ${software} database with ${1}.${domain} URLs"
                             php /catapult/provisioners/redhat/installers/wp-cli.phar --path="/var/www/repositories/apache/$domain/" search-replace "$domain" "$1.$domain" | sed "s/^/\t\t/"
-                            mysql --defaults-extra-file=$dbconf $1_$domainvaliddbname -e "UPDATE ${software_dbprefix}options SET option_value='$company_email' WHERE option_name = 'admin_email';"
+                            mysql --defaults-extra-file=$dbconf $1_$domainvaliddbname -e "UPDATE ${software_dbprefix}options SET option_value='$(echo "${configuration}" | shyaml get-value company.email)' WHERE option_name = 'admin_email';"
                             mysql --defaults-extra-file=$dbconf $1_$domainvaliddbname -e "UPDATE ${software_dbprefix}options SET option_value='http://$1.$domain' WHERE option_name = 'home';"
                             mysql --defaults-extra-file=$dbconf $1_$domainvaliddbname -e "UPDATE ${software_dbprefix}options SET option_value='http://$1.$domain' WHERE option_name = 'siteurl';"
                         fi
@@ -218,21 +233,23 @@ while IFS='' read -r -d '' key; do
                 done
             fi
         fi
-        # grant user to database
-        mysql --defaults-extra-file=$dbconf -e "GRANT ALL ON $1_$domainvaliddbname.* TO '$mysql_user'@'%'";
+        # grant mysql user to database
+        mysql --defaults-extra-file=$dbconf -e "GRANT ALL ON $1_$domainvaliddbname.* TO '$(echo "${configuration}" | shyaml get-value environments.$1.servers.redhat_mysql.mysql.user)'@'%'";
+        # grant maintenance user to database
+        mysql --defaults-extra-file=$dbconf -e "GRANT ALL ON $1_$domainvaliddbname.* TO 'maintenance'@'%'";
         # flush privileges
         mysql --defaults-extra-file=$dbconf -e "FLUSH PRIVILEGES"
     fi
 
 done
 # remove .cnf file after usage
-sudo rm -f /catapult/provisioners/redhat/installers/$1.cnf
+rm -f /catapult/provisioners/redhat/installers/$1.cnf
 end=$(date +%s)
-echo "==> completed in ($(($end - $start)) seconds)"
+echo -e "\n==> completed in ($(($end - $start)) seconds)"
 
 
 provisionend=$(date +%s)
-echo -e "\n\n==> Provision complete ($(($provisionend - $provisionstart)) total seconds)"
+echo -e "\n\n\n==> Provision complete ($(($provisionend - $provisionstart)) total seconds)"
 
 
 exit 0
