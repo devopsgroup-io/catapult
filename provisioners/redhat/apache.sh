@@ -40,14 +40,7 @@ echo "==> completed in ($(($end - $start)) seconds)"
 
 echo -e "\n\n==> Configuring time"
 start=$(date +%s)
-# set timezone
-sudo timedatectl set-timezone "$(echo "${configuration}" | shyaml get-value company.timezone_redhat)"
-# configure ntp
-sudo yum install -y ntp
-sudo systemctl enable ntpd.service
-sudo systemctl start ntpd.service
-# echo datetimezone
-date
+source /catapult/provisioners/redhat/modules/time.sh
 provisionstart=$(date +%s)
 sudo touch /catapult/provisioners/redhat/logs/apache.log
 end=$(date +%s)
