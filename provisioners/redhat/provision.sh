@@ -44,3 +44,7 @@ else
     "Error: Cannot detect the instance type."
     exit 1
 fi
+
+
+
+echo -e "\n\n\n"
