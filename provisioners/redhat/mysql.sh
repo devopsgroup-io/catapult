@@ -169,11 +169,14 @@ while IFS='' read -r -d '' key; do
             if ! [ -f /var/www/repositories/apache/${domain}/_sql/$(date +"%Y%m%d").sql ]; then
                 mkdir -p "/var/www/repositories/apache/${domain}/_sql"
                 mysqldump --defaults-extra-file=$dbconf --single-transaction --quick ${1}_${domainvaliddbname} > /var/www/repositories/apache/${domain}/_sql/$(date +"%Y%m%d").sql
+                # database dumps are always committed to the develop branch to respect software_workflow
+                cd "/var/www/repositories/apache/${domain}" && git checkout develop
                 cd "/var/www/repositories/apache/${domain}" && git config --global user.name "Catapult" | sed "s/^/\t/"
                 cd "/var/www/repositories/apache/${domain}" && git config --global user.email "$(echo "${configuration}" | shyaml get-value company.email)" | sed "s/^/\t/"
                 cd "/var/www/repositories/apache/${domain}" && git add "/var/www/repositories/apache/${domain}/_sql/$(date +"%Y%m%d").sql" | sed "s/^/\t/"
                 cd "/var/www/repositories/apache/${domain}" && git commit -m "Catapult auto-commit." | sed "s/^/\t/"
                 cd "/var/www/repositories/apache/${domain}" && sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git push origin $(echo "${configuration}" | shyaml get-value environments.${1}.branch)" | sed "s/^/\t/"
+                cd "/var/www/repositories/apache/${domain}" && git checkout $(echo "${configuration}" | shyaml get-value environments.${1}.branch)
             else
                 echo -e "\t\ta backup was already performed today"
             fi
