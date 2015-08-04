@@ -629,15 +629,29 @@ configuration["websites"].each do |service,data|
       end
       # validate access to repo
       if "#{repo_split_2[0]}" == "bitbucket.org"
+        @api_bitbucket_repo_access = false
+        uri = URI("https://api.bitbucket.org/1.0/privileges/#{repo_split_3[0]}")
+        Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => OpenSSL::SSL::VERIFY_NONE) do |http|
+          request = Net::HTTP::Get.new uri.request_uri
+          request.basic_auth "#{configuration["company"]["bitbucket_username"]}", "#{configuration["company"]["bitbucket_password"]}"
+          response = http.request request # Net::HTTPResponse object
+          api_bitbucket_repo_privileges = JSON.parse(response.body)
+          api_bitbucket_repo_privileges.each do |member|
+            if member["privilege"] == "admin" || member["privilege"] == "write"
+              if member["user"]["username"] == "#{configuration["company"]["bitbucket_username"]}"
+                @api_bitbucket_repo_access = true
+              end
+            end
+          end
+        end
         uri = URI("https://api.bitbucket.org/1.0/group-privileges/#{repo_split_3[0]}")
         Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => OpenSSL::SSL::VERIFY_NONE) do |http|
           request = Net::HTTP::Get.new uri.request_uri
           request.basic_auth "#{configuration["company"]["bitbucket_username"]}", "#{configuration["company"]["bitbucket_password"]}"
           response = http.request request # Net::HTTPResponse object
           api_bitbucket_repo_group_privileges = JSON.parse(response.body)
-          @api_bitbucket_repo_access = false
           api_bitbucket_repo_group_privileges.each do |group|
-            if group["privilege"] == "write"
+            if group["privilege"] == "admin" || group["privilege"] == "write"
               group["group"]["members"].each do |member|
                 if member["username"] == "#{configuration["company"]["bitbucket_username"]}"
                   @api_bitbucket_repo_access = true
@@ -645,11 +659,11 @@ configuration["websites"].each do |service,data|
               end
             end
           end
-          unless @api_bitbucket_repo_access
-            catapult_exception("Your Bitbucket user #{configuration["company"]["bitbucket_username"]} does not have write access to this repository.")
-          else
-            puts "   - Verified your Bitbucket user #{configuration["company"]["bitbucket_username"]} has write access."
-          end
+        end
+        unless @api_bitbucket_repo_access
+          catapult_exception("Your Bitbucket user #{configuration["company"]["bitbucket_username"]} does not have write access to this repository.")
+        else
+          puts "   - Verified your Bitbucket user #{configuration["company"]["bitbucket_username"]} has write access."
         end
       end
       if "#{repo_split_2[0]}" == "github.com"
