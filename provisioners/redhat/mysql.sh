@@ -142,8 +142,10 @@ mysql --defaults-extra-file=$dbconf -e "CREATE USER 'maintenance'@'%'"
 # flush privileges
 mysql --defaults-extra-file=$dbconf -e "FLUSH PRIVILEGES"
 
-# this overwrite all items in cron, we then add databases below
-cat <(echo "* 3 * * * mysqlcheck -u maintenance --all-databases --auto-repair --optimize") | crontab -
+# this overwrite all items in cron, we write stdout to > /dev/null so that we only get emailed stderr
+cat <(echo "0 3 * * * mysqlcheck -u maintenance --all-databases --auto-repair --optimize > /dev/null") | crontab -
+# adding more cron tasks would look like this
+# cat <(crontab -l) <(echo "0 4 * * * mysqldump...") | crontab -
 
 echo "${configuration}" | shyaml get-values-0 websites.apache |
 while IFS='' read -r -d '' key; do
