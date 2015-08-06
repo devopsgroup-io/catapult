@@ -630,6 +630,18 @@ configuration["websites"].each do |service,data|
       # validate access to repo
       if "#{repo_split_2[0]}" == "bitbucket.org"
         @api_bitbucket_repo_access = false
+        uri = URI("https://api.bitbucket.org/2.0/repositories/#{repo_split_3[0]}")
+        Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => OpenSSL::SSL::VERIFY_NONE) do |http|
+          request = Net::HTTP::Get.new uri.request_uri
+          request.basic_auth "#{configuration["company"]["bitbucket_username"]}", "#{configuration["company"]["bitbucket_password"]}"
+          response = http.request request # Net::HTTPResponse object
+          api_bitbucket_repo_repositories = JSON.parse(response.body)
+          if response.code.to_f == 200
+            if api_bitbucket_repo_repositories["owner"]["username"] == "#{configuration["company"]["bitbucket_username"]}"
+              @api_bitbucket_repo_access = true
+            end
+          end
+        end
         uri = URI("https://api.bitbucket.org/1.0/privileges/#{repo_split_3[0]}")
         Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => OpenSSL::SSL::VERIFY_NONE) do |http|
           request = Net::HTTP::Get.new uri.request_uri
