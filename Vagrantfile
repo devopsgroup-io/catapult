@@ -102,10 +102,10 @@ else
   # get current branch
   branch = `#{@git} rev-parse --abbrev-ref HEAD`.strip
   # get current repo
-  repo = `#{@git} config --get remote.origin.url`
+  repo = `#{@git} config --get remote.origin.url`.strip
   puts " * Your repository: #{repo}"
   # set the correct upstream
-  repo_upstream = `#{@git} config --get remote.upstream.url`
+  repo_upstream = `#{@git} config --get remote.upstream.url`.strip
   repo_upstream_url = "https://github.com/devopsgroup-io/catapult-release-management.git"
   puts " * Will sync from: #{repo_upstream}"
   if repo_upstream.empty?
@@ -305,7 +305,7 @@ puts "\nVerification of configuration[\"software\"]:\n\n"
 if configuration["software"]["version"] != configuration_example["software"]["version"]
   catapult_exception("Your secrets/configuration.yml file is out of date. To retain your settings please manually duplicate entries from secrets/configuration.yml.template with your specific settings.\n*You may also delete your secrets/configuration.yml and re-run any vagrant command to have a vanilla version created.")
 end
-puts " * Status: Verified"
+puts " [verification complete]"
 puts "\nVerification of configuration[\"company\"]:\n\n"
 # validate configuration["company"]
 if configuration["company"]["name"] == nil
@@ -536,7 +536,6 @@ else
     end
   end
 end
-puts " * Status: Verified"
 puts "\nVerification of configuration[\"environments\"]:\n\n"
 # validate configuration["environments"]
 configuration["environments"].each do |environment,data|
@@ -586,10 +585,16 @@ configuration["environments"].each do |environment,data|
     end
   end
 end
-puts " * Status: Verified"
+puts " [verification complete]"
 puts "\nVerification of configuration[\"websites\"]:\n\n"
+# add catapult temporarily to verify repo and add bamboo services
+configuration["websites"]["catapult"] = *(["domain" => "#{repo}", "repo" => "#{repo}"])
 # validate configuration["websites"]
 configuration["websites"].each do |service,data|
+  if "#{service}" == "catapult"
+    puts "\nVerification of this Catapult instance:\n\n"
+  end
+  # create array of domains to later validate repo alpha order per service
   domains = Array.new
   domains_sorted = Array.new
   unless configuration["websites"]["#{service}"] == nil
@@ -602,30 +607,48 @@ configuration["websites"].each do |service,data|
           catapult_exception("There is an error in your secrets/configuration.yml file.\nThe force_https for websites => #{service} => domain => #{instance["domain"]} is invalid, it must be true or removed.")
         end
       end
-      # validate repo alpha order
+      # create array of domains to later validate repo alpha order per service
       domains.push("#{instance["domain"]}")
       domains_sorted.push("#{instance["domain"]}")
-      # validate repo format by first creating necessary split objects
-      # instance["repo"] => git@github.com:devopsgroup-io/devopsgroup-io.git
-      repo_split_1 = instance["repo"].split("@")
-      # repo_split_1[0] => git
-      # repo_split_1[1] => github.com:devopsgroup-io/devopsgroup-io.git
-      repo_split_2 = repo_split_1[1].split(":")
-      # repo_split_2[0] => github.com
-      # repo_split_2[1] => devopsgroup-io/devopsgroup-io.git
-      repo_split_3 = repo_split_2[1].split(".git")
-      # repo_split_3[0] => devopsgroup-io/devopsgroup-io
-      # validate repo type
-      unless "#{repo_split_1[0]}" == "git"
-        catapult_exception("There is an error in your secrets/configuration.yml file.\nThe repo for websites => #{service} => domain => #{instance["domain"]} is invalid, the format must be git@github.com:devopsgroup-io/devopsgroup-io.git")
+      # validate repo uri
+      if instance["repo"].include? "git@"
+        # instance["repo"] => git@github.com:devopsgroup-io/devopsgroup-io(.git)
+        repo_split_1 = instance["repo"].split("@")
+        # repo_split_1[0] => git
+        # repo_split_1[1] => github.com:devopsgroup-io/devopsgroup-io(.git)
+        repo_split_2 = repo_split_1[1].split(":")
+        # repo_split_2[0] => github.com
+        # repo_split_2[1] => devopsgroup-io/devopsgroup-io(.git)
+        repo_split_3 = repo_split_2[1].split(".git")
+        # repo_split_3[0] => devopsgroup-io/devopsgroup-io
+        # if there is a .git on the end, repo_split_3[0] will have a value, otherwise set equal to repo_split_2[1]
+        if repo_split_3[0]
+          repo_split_2[1] = repo_split_3[0]
+        end
+      else
+        # instance["repo"] => https://github.com/seth-reeser/catapult-release-management(.git)
+        repo_split_1 = instance["repo"].split("://")
+        # repo_split_1[0] => https
+        # repo_split_1[1] => github.com/seth-reeser/catapult-release-management(.git)
+        repo_split_2 = repo_split_1[1].split("/", 2)
+        # repo_split_2[0] => github.com
+        # repo_split_2[1] => seth-reeser/catapult-release-management(.git)
+        repo_split_3 = repo_split_2[1].split(".git")
+        # repo_split_3[0] => devopsgroup-io/devopsgroup-io
+        # if there is a .git on the end, repo_split_3[0] will have a value, otherwise set equal to repo_split_2[1]
+        if repo_split_3[0]
+          repo_split_2[1] = repo_split_3[0]
+        end
       end
-      # validate repo hosted at bitbucket.org or github.com
-      unless "#{repo_split_2[0]}" == "bitbucket.org" || "#{repo_split_2[0]}" == "github.com"
-        catapult_exception("There is an error in your secrets/configuration.yml file.\nThe repo for websites => #{service} => domain => #{instance["domain"]} is invalid, it must either be a bitbucket.org or github.com repository.")
-      end
-      # validate repo ends in .git
-      if "#{repo_split_3[0]}" == nil
-        catapult_exception("There is an error in your secrets/configuration.yml file.\nThe repo for websites => #{service} => domain => #{instance["domain"]} is invalid, it must end in .git")
+      unless "#{service}" == "catapult"
+        # validate repo is an ssh uri
+        unless "#{repo_split_1[0]}" == "git"
+          catapult_exception("There is an error in your secrets/configuration.yml file.\nThe repo for websites => #{service} => domain => #{instance["domain"]} is invalid, the format must be git@github.com:devopsgroup-io/devopsgroup-io.git")
+        end
+        # validate repo hosted at bitbucket.org or github.com
+        unless "#{repo_split_2[0]}" == "bitbucket.org" || "#{repo_split_2[0]}" == "github.com"
+          catapult_exception("There is an error in your secrets/configuration.yml file.\nThe repo for websites => #{service} => domain => #{instance["domain"]} is invalid, it must either be a bitbucket.org or github.com repository.")
+        end
       end
       # validate access to repo
       if "#{repo_split_2[0]}" == "bitbucket.org"
@@ -839,6 +862,7 @@ configuration["websites"].each do |service,data|
           end
         end
       end
+      puts "   - Configured Bamboo service for automated deployments."
       # validate software
       unless "#{instance["software"]}" == ""
         unless ["codeigniter2","drupal6","drupal7","wordpress","xenforo"].include?("#{instance["software"]}")
@@ -862,7 +886,8 @@ configuration["websites"].each do |service,data|
     catapult_exception("There is an error in your secrets/configuration.yml file.\nThe domains in secrets/configuration.yml are not in alpha order for websites => #{service} - please adjust.")
   end
 end
-puts " * Status: Verified"
+# remove catapult as this was done to temporarily verify repo and add bamboo services
+configuration["websites"].delete("catapult")
 
 
 # create arrays of domains for localdev hosts file
@@ -888,16 +913,16 @@ if ["status"].include?(ARGV[0])
   # start a new row
   puts "\n\n\nAvailable websites legend:"
   puts "\n[http response codes]"
-  puts "\n * 200 ok, 301 moved permanently, 302 found, 400 bad request, 401 unauthorized, 403 forbidden, 404 not found, 500 internal server error, 502 bad gateway, 503 service unavailable, 504 gateway timeout"
-  puts " * [reference] http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html"
+  puts " * 200 ok, 301 moved permanently, 302 found, 400 bad request, 401 unauthorized, 403 forbidden, 404 not found, 500 internal server error, 502 bad gateway, 503 service unavailable, 504 gateway timeout"
+  puts " * http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html"
   puts "\n[cert signature algorithm]"
-  puts "\n * [reference] https://www.openssl.org/docs/apps/ciphers.html"
+  puts " * https://www.openssl.org/docs/apps/ciphers.html"
   puts "\n\n\nAvailable websites:"
   puts "".ljust(30) + "[software]".ljust(15) + "[dev.]".ljust(22) + "[test.]".ljust(22) + "[qc.]".ljust(22) + "[production / cert expiry, signature algorithm, common name]".ljust(80) + "[alexa rank, 3m delta]".ljust(26)
 
   configuration["websites"].each do |service,data|
-    puts "\n[#{service}]"
     unless configuration["websites"]["#{service}"] == nil
+      puts "\n[#{service}]"
       configuration["websites"]["#{service}"].each do |instance|
         # count websites
         totalwebsites = totalwebsites + 1
