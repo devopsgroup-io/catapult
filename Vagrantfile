@@ -601,6 +601,43 @@ configuration["websites"].each do |service,data|
     puts " [#{service}]"
     configuration["websites"]["#{service}"].each do |instance|
       puts " * #{instance["domain"]}"
+      unless "#{service}" == "catapult"
+        # validate the domain to ensure it only includes the domain and not protocol
+        if instance["domain"].include? "://"
+          catapult_exception("There is an error in your secrets/configuration.yml file.\nThe domain for websites => #{service} => domain => #{instance["domain"]} is invalid, it must use the format example.com")
+        end
+        uri = URI("http://monitor.us/api?action=authToken&apikey=#{configuration["company"]["monitorus_api_key"]}&secretkey=#{configuration["company"]["monitorus_secret_key"]}")
+        Net::HTTP.start(uri.host, uri.port) do |http|
+          request = Net::HTTP::Get.new uri.request_uri
+          response = http.request request # Net::HTTPResponse object
+          @api_monitorus_authtoken = JSON.parse(response.body)
+          @api_monitorus_authtoken = @api_monitorus_authtoken["authToken"]
+        end
+        uri = URI("http://monitor.us/api")
+        Net::HTTP.start(uri.host, uri.port) do |http|
+          request = Net::HTTP::Post.new uri.request_uri
+          request.body = URI::encode\
+            (""\
+              "action=addExternalMonitor"\
+              "&authToken=#{@api_monitorus_authtoken}"\
+              "&apikey=#{configuration["company"]["monitorus_api_key"]}"\
+              "&interval=30"\
+              "&locationIds=1,3"\
+              "&name=#{instance["domain"]}"\
+              "&tag=#{instance["domain"]}"\
+              "&timestamp=#{Time.now.getutc}"\
+              "&type=http"\
+              "&url=#{instance["domain"]}"\
+            "")
+          response = http.request request # Net::HTTPResponse object
+          api_monitorus_monitor_http = JSON.parse(response.body)
+          puts api_monitorus_monitor_http
+          puts response.code
+          if response.code.to_f.between?(399,600)
+            catapult_exception("Unable to configure Bitbucket Bamboo service for websites => #{service} => domain => #{instance["domain"]}. Ensure the github_username defined in secrets/configuration.yml has correct access to the repository.")
+          end
+        end
+      end
       # validate force_https
       unless "#{instance["force_https"]}" == ""
         unless ["true"].include?("#{instance["force_https"]}")
