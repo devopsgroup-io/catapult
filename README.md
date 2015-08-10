@@ -21,7 +21,7 @@ As a **Developer**, you have to manage many websites and probably end up using t
 
   * Catapult is developed in Ruby and native Shell - no new languages or technologies to learn.
   * Catapult is very simple at its core - there is no black-box to decipher - everything is out in the open.
-  * Catapult uses the most popular APIs and services; inlcuding AWS, Bamboo, Bitbucket, CloudFlare, DigitalOcean, GitHub, and Vagrant.
+  * Catapult uses the most popular APIs and services; including AWS, Bamboo, Bitbucket, CloudFlare, DigitalOcean, GitHub, and Vagrant.
 
 Catapult manages all of this for you and is open-sourced, well-documented, developer-focused, and free to use. We also provide a service if you need some help getting started - if you do, let us know at https://devopsgroup.io. Catapult leverages the Services that you're already using, which collectively, costs $40/month to have a full-stack localDev, Test, Quality Control, and Production environment.
 
