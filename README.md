@@ -129,6 +129,7 @@ Catapult uses several third-party services to pull everything off - below is a l
 1. **Hosting:**    
     1. **DigitalOcean** sign-up and configuration
         1. Create an account at http://digitalocean.com
+           * Get a $10 credit and give us $25 once you spend $25 https://www.digitalocean.com/?refcode=6127912f3462
         2. Create a Personal Access Token at https://cloud.digitalocean.com/settings/applications named "Vagrant" and place the token value at `~/configuration.yml["company"]["digitalocean_personal_access_token"]`
         3. Add your newly created id_rsa.pub from ~/secrets/id_rsa.pub key in https://cloud.digitalocean.com/settings/security named "Vagrant"
 2. **Repositories:**    
