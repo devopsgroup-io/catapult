@@ -1287,7 +1287,7 @@ Vagrant.configure("2") do |config|
   config.vm.define "#{configuration["company"]["name"]}-dev-windows" do |config|
     config.vm.box = "opentable/win-2012r2-standard-amd64-nocm"
     config.vm.network "private_network", ip: configuration["environments"]["dev"]["servers"]["windows"]["ip"]
-    config.vm.network "forwarded_port", guest: 80, host: configuration["environments"]["dev"]["servers"]["redhat"]["port_80"]
+    config.vm.network "forwarded_port", guest: 80, host: configuration["environments"]["dev"]["servers"]["windows"]["port_80"]
     config.vm.provider :virtualbox do |provider|
       provider.memory = 512
       provider.cpus = 1
@@ -1301,7 +1301,7 @@ Vagrant.configure("2") do |config|
     config.vm.boot_timeout = 60 * 7
     config.ssh.insert_key = false
     config.vm.communicator = "winrm"
-    config.vm.network "forwarded_port", guest: 3389, host: configuration["environments"]["dev"]["servers"]["redhat"]["port_3389"]
+    config.vm.network "forwarded_port", guest: 3389, host: configuration["environments"]["dev"]["servers"]["windows"]["port_3389"]
   end
 
 end
