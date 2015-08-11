@@ -536,6 +536,28 @@ else
     end
   end
 end
+# http://www.monitor.us/api/api.html
+if configuration["company"]["monitorus_api_key"] == nil || configuration["company"]["monitorus_secret_key"] == nil
+  catapult_exception("Please set [\"company\"][\"monitorus_api_key\"] and [\"company\"][\"monitorus_secret_key\"] in secrets/configuration.yml")
+else
+    uri = URI("http://monitor.us/api?action=authToken&apikey=#{configuration["company"]["monitorus_api_key"]}&secretkey=#{configuration["company"]["monitorus_secret_key"]}")
+    Net::HTTP.start(uri.host, uri.port) do |http|
+      request = Net::HTTP::Get.new uri.request_uri
+      response = http.request request # Net::HTTPResponse object
+      if response.code.to_f.between?(399,600)
+        catapult_exception("The monitor.us API could not authenticate, please verify [\"company\"][\"monitorus_api_key\"] and [\"company\"][\"monitorus_secret_key\"].")
+      else
+        @api_monitorus = JSON.parse(response.body)
+        if @api_monitorus["error"]
+          catapult_exception("The monitor.us API could not authenticate, please verify [\"company\"][\"monitorus_api_key\"] and [\"company\"][\"monitorus_secret_key\"].")
+        else
+          puts " * monitor.us API authenticated successfully."
+          @api_monitorus_authtoken = @api_monitorus["authToken"]
+          puts "   - Successfully generated an authToken"
+        end
+      end
+    end
+end
 puts "\nVerification of configuration[\"environments\"]:\n\n"
 # validate configuration["environments"]
 configuration["environments"].each do |environment,data|
@@ -606,12 +628,31 @@ configuration["websites"].each do |service,data|
         if instance["domain"].include? "://"
           catapult_exception("There is an error in your secrets/configuration.yml file.\nThe domain for websites => #{service} => domain => #{instance["domain"]} is invalid, it must use the format example.com")
         end
-        uri = URI("http://monitor.us/api?action=authToken&apikey=#{configuration["company"]["monitorus_api_key"]}&secretkey=#{configuration["company"]["monitorus_secret_key"]}")
+        # monitor each production domain over http and https
+        uri = URI("http://monitor.us/api")
         Net::HTTP.start(uri.host, uri.port) do |http|
-          request = Net::HTTP::Get.new uri.request_uri
+          request = Net::HTTP::Post.new uri.request_uri
+          request.body = URI::encode\
+            (""\
+              "action=addExternalMonitor"\
+              "&authToken=#{@api_monitorus_authtoken}"\
+              "&apikey=#{configuration["company"]["monitorus_api_key"]}"\
+              "&interval=30"\
+              "&locationIds=1,3"\
+              "&name=http_#{instance["domain"]}"\
+              "&tag=http_#{instance["domain"]}"\
+              "&timestamp=#{Time.now.getutc}"\
+              "&type=http"\
+              "&url=#{instance["domain"]}"\
+            "")
           response = http.request request # Net::HTTPResponse object
-          @api_monitorus_authtoken = JSON.parse(response.body)
-          @api_monitorus_authtoken = @api_monitorus_authtoken["authToken"]
+          api_monitorus_monitor_http = JSON.parse(response.body)
+          # errorCode 11 => monitorUrlExists
+          if api_monitorus_monitor_http["status"] == "ok" || api_monitorus_monitor_http["errorCode"].to_f == 11
+            puts "   - Configured monitor.us http monitor."
+          else
+            catapult_exception("Unable to configure monitor.us http monitor for websites => #{service} => domain => #{instance["domain"]}.")
+          end
         end
         uri = URI("http://monitor.us/api")
         Net::HTTP.start(uri.host, uri.port) do |http|
@@ -623,18 +664,19 @@ configuration["websites"].each do |service,data|
               "&apikey=#{configuration["company"]["monitorus_api_key"]}"\
               "&interval=30"\
               "&locationIds=1,3"\
-              "&name=#{instance["domain"]}"\
-              "&tag=#{instance["domain"]}"\
+              "&name=https_#{instance["domain"]}"\
+              "&tag=https_#{instance["domain"]}"\
               "&timestamp=#{Time.now.getutc}"\
-              "&type=http"\
+              "&type=https"\
               "&url=#{instance["domain"]}"\
             "")
           response = http.request request # Net::HTTPResponse object
           api_monitorus_monitor_http = JSON.parse(response.body)
-          puts api_monitorus_monitor_http
-          puts response.code
-          if response.code.to_f.between?(399,600)
-            catapult_exception("Unable to configure Bitbucket Bamboo service for websites => #{service} => domain => #{instance["domain"]}. Ensure the github_username defined in secrets/configuration.yml has correct access to the repository.")
+          # errorCode 11 => monitorUrlExists
+          if api_monitorus_monitor_http["status"] == "ok" || api_monitorus_monitor_http["errorCode"].to_f == 11
+            puts "   - Configured monitor.us https monitor."
+          else
+            catapult_exception("Unable to configure monitor.us https monitor for websites => #{service} => domain => #{instance["domain"]}.")
           end
         end
       end
