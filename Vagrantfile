@@ -56,10 +56,29 @@ if (RbConfig::CONFIG['host_os'] =~ /mswin|msys|mingw|cygwin|bccwin|wince|emc/)
   else
     catapult_exception("Git is not installed at C:\\Program Files (x86)\\Git\\bin\\git.exe")
   end
+  begin
+     require "Win32/Console/ANSI"
+  rescue LoadError
+     catapult_exception('win32console is not installed, please run "gem install win32console"')
+  end
 elsif (RbConfig::CONFIG['host_os'] =~ /darwin|mac os|linux|solaris|bsd/)
   @git = "git"
 else
   catapult_exception("Cannot detect your operating system, please submit an issue at https://github.com/devopsgroup-io/catapult-release-management")
+end
+
+
+class Colors
+   NOCOLOR = "\033[0m"
+   RED = "\033[1;31;40m"
+   GREEN = "\033[1;32;40m"
+   YELLOW = "\033[1;33;40m"
+   WHITE = "\033[1;37;40m"
+end
+class String
+   def color(color)
+      return color + self + Colors::NOCOLOR
+   end
 end
 
 
@@ -97,7 +116,7 @@ remote = `#{@git} config --get remote.origin.url`
 if remote.include?("devopsgroup-io/")
   catapult_exception("In order to use Catapult Release Management, you must fork the repository so that the committed and encrypted configuration is unique to you! See https://github.com/devopsgroup-io/catapult-release-management for more information.")
 else
-  puts "\n\nSelf updating Catapult:\n\n"
+  puts "\n\nSelf updating Catapult:\n".color(Colors::WHITE)
   `#{@git} fetch`
   # get current branch
   branch = `#{@git} rev-parse --abbrev-ref HEAD`.strip
@@ -205,7 +224,7 @@ if configuration_user["settings"]["gpg_key"] == nil || configuration_user["setti
 end
 
 
-puts "\n\n\nVerification of encrypted Catapult configuration files:\n\n"
+puts "\n\n\nVerification of encrypted Catapult configuration files:\n".color(Colors::WHITE)
 if "#{branch}" == "develop-catapult"
   puts " * You are on the develop-catapult branch, this branch is automatically synced with Catapult core and is meant to contribute back to the core Catapult project."
   puts " * secrets/configuration.yml.gpg, secrets/id_rsa.gpg, and secrets/id_rsa.pub.gpg are checked out from the develop branch so that you're able to develop and test."
@@ -300,13 +319,13 @@ configuration_example = YAML.load_file("secrets/configuration.yml.template")
 
 
 
-puts "\nVerification of configuration[\"software\"]:\n\n"
+puts "\nVerification of configuration[\"software\"]:\n".color(Colors::WHITE)
 # validate configuration["software"]
 if configuration["software"]["version"] != configuration_example["software"]["version"]
   catapult_exception("Your secrets/configuration.yml file is out of date. To retain your settings please manually duplicate entries from secrets/configuration.yml.template with your specific settings.\n*You may also delete your secrets/configuration.yml and re-run any vagrant command to have a vanilla version created.")
 end
 puts " [verification complete]"
-puts "\nVerification of configuration[\"company\"]:\n\n"
+puts "\nVerification of configuration[\"company\"]:\n".color(Colors::WHITE)
 # validate configuration["company"]
 if configuration["company"]["name"] == nil
   catapult_exception("Please set [\"company\"][\"name\"] in secrets/configuration.yml")
@@ -558,7 +577,7 @@ else
       end
     end
 end
-puts "\nVerification of configuration[\"environments\"]:\n\n"
+puts "\nVerification of configuration[\"environments\"]:\n".color(Colors::WHITE)
 # validate configuration["environments"]
 configuration["environments"].each do |environment,data|
   unless configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["mysql"]["user_password"]
@@ -608,13 +627,13 @@ configuration["environments"].each do |environment,data|
   end
 end
 puts " [verification complete]"
-puts "\nVerification of configuration[\"websites\"]:\n\n"
+puts "\nVerification of configuration[\"websites\"]:\n".color(Colors::WHITE)
 # add catapult temporarily to verify repo and add bamboo services
 configuration["websites"]["catapult"] = *(["domain" => "#{repo}", "repo" => "#{repo}"])
 # validate configuration["websites"]
 configuration["websites"].each do |service,data|
   if "#{service}" == "catapult"
-    puts "\nVerification of this Catapult instance:\n\n"
+    puts "\nVerification of this Catapult instance:\n".color(Colors::WHITE)
   end
   # create array of domains to later validate repo alpha order per service
   domains = Array.new
@@ -990,13 +1009,13 @@ end
 if ["status"].include?(ARGV[0])
   totalwebsites = 0
   # start a new row
-  puts "\n\n\nAvailable websites legend:"
+  puts "\n\n\nAvailable websites legend:".color(Colors::WHITE)
   puts "\n[http response codes]"
   puts " * 200 ok, 301 moved permanently, 302 found, 400 bad request, 401 unauthorized, 403 forbidden, 404 not found, 500 internal server error, 502 bad gateway, 503 service unavailable, 504 gateway timeout"
   puts " * http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html"
   puts "\n[cert signature algorithm]"
   puts " * https://www.openssl.org/docs/apps/ciphers.html"
-  puts "\n\n\nAvailable websites:"
+  puts "\n\n\nAvailable websites:".color(Colors::WHITE)
   puts "".ljust(30) + "[software]".ljust(15) + "[dev.]".ljust(22) + "[test.]".ljust(22) + "[qc.]".ljust(22) + "[production / cert expiry, signature algorithm, common name]".ljust(80) + "[alexa rank, 3m delta]".ljust(26)
 
   configuration["websites"].each do |service,data|
