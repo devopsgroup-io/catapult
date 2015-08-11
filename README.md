@@ -355,6 +355,7 @@ Catapult uses many factors to make the best decision when it comes to choosing *
 * **monitor.us**
     * [08-10-2015] monitor.us does not have the greatest user interface, branding, or technology. However, it does something that no other application monitoring services do - it offers free http/https monitoring and an API that allows Catapult to add these monitors for you.
         * A service to watch would be New Relic, however, the blocker is that there is no API support for their synthetic monitoring.
+        * Other services researched were AppDynamics, DataDog, and StatusCake which fell short in pricing or API functionality.
 
 
 
