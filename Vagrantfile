@@ -1015,7 +1015,7 @@ if ["status"].include?(ARGV[0])
   puts " * http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html"
   puts "\n[cert signature algorithm]"
   puts " * https://www.openssl.org/docs/apps/ciphers.html"
-  puts "\n\n\nAvailable websites:".color(Colors::WHITE)
+  puts "\nAvailable websites:".color(Colors::WHITE)
   puts "".ljust(30) + "[software]".ljust(15) + "[dev.]".ljust(22) + "[test.]".ljust(22) + "[qc.]".ljust(22) + "[production / cert expiry, signature algorithm, common name]".ljust(80) + "[alexa rank, 3m delta]".ljust(26)
 
   configuration["websites"].each do |service,data|
