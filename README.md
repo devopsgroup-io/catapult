@@ -339,7 +339,7 @@ Once a website exists in the upstream environments (test, qc, production), autom
 Below is a list of known limitations with Catapult, if you're still having issues with Catapult, [submit a GitHub Issue](https://github.com/devopsgroup-io/catapult-release-management/issues/new).
 
 * **CloudFlare**
-    * [07-27-2015] If your `~/configuration.yml["websites"]["apache/iis"]["domain"]` includes more than 1 subdomain (drupal7.devopsgroup.io) the `force_https` option will not work as CloudFlare only supports a first-level subdomain. https://www.cloudflare.com/ssl
+    * [07-27-2015] If your `~/configuration.yml["websites"]["apache/iis"]["domain"]` is a subdomain (drupal7.devopsgroup.io) the `force_https` option will only work in localdev and production as CloudFlare only supports a first-level subdomain. https://www.cloudflare.com/ssl
 * **monitor.us**
     * [08-10-2015] If your `~/configuration.yml["websites"]["apache/iis"]["domain"]` includes the `force_https` option, you will need to login to monitor.us and enable SNI from Monitors > Monitor List > Actions > Basic Settings > Enable SNI support. 
 * **Vagrant**
