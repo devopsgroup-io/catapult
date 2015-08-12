@@ -6,7 +6,7 @@
 
 * Configuration Management via CloudFlare, DigitalOcean, Git, GPG, Shell, and Vagrant
 * Continuous Integration via Bamboo and AWS
-* Source Code Managment via Bitbucket and/or GitHub
+* Source Code Management via Bitbucket and/or GitHub
 * Website Uptime Monitoring via monitor.us (Monitis)
 
 
@@ -55,7 +55,7 @@ Catapult manages all of this for you and is open-sourced, well-documented, devel
 
 Catapult supports the following software:
 
-* Any website without a database dependancy built in PHP
+* Any website without a database dependency built in PHP
 * CodeIgniter 2.x
 * Drupal 6.x, Drupal 7.x
     * as required by Drush 7.0.0-rc1
@@ -118,7 +118,7 @@ Catapult is quick to setup. Fork the Github repository and start adding your con
         2. ~/secrets/id_rsa.pub as ~/secrets/id_rsa.pub.gpg
         3. ~/configuration.yml as ~/configuration.yml.gpg
     2. To enable **GPG Edit Mode**, set `~/configuration-user.yml["settings"]["gpg_edit"]` to true.
-    3. Once gpg_edit is set to true and while on your fork's develop branch, run `vagrant status`, this will encrypt your configuraiton that you will then be able to commit and push safely to your public Catapult fork.
+    3. Once gpg_edit is set to true and while on your fork's develop branch, run `vagrant status`, this will encrypt your configuration that you will then be able to commit and push safely to your public Catapult fork.
 
 
 
@@ -232,7 +232,7 @@ Catapult uses several third-party services to pull everything off - below is a l
 | **DNS:**                      |                                                                  |              |
 | CloudFlare                    | test., qc., and production global DNS                            | Free         |
 | **Monitoring:**               |                                                                  |              |
-| monitor.us                    | Produciton website updtime monitoring                            | Free         |
+| monitor.us                    | Production website updtime monitoring                            | Free         |
 | **Total**                     |                                                                  | $41 - $55    |
 
 
@@ -319,7 +319,7 @@ Once you add a new website to configuration.yml, it's time to test in localdev:
   * `vagrant provision ~/configuration.yml["company"]["name"]-dev-redhat`
   * `vagrant provision ~/configuration.yml["company"]["name"]-dev-redhat-mysql`
 
-Once you're satisfied with new website in localdev, it's time to commit configuration.yml.gpg to your Catapult fork's develop branch, this will kick off a automated deployment of test. Once you're satisifed with the website in test, it's time to create a pull request from your Catapult fork's develop branch into master - once the pull request is merged, this will kick off an automated deployment to qc. Once you're satisifed with the website in qc, it's time to login to Bamboo and press the deployment button for production.
+Once you're satisfied with new website in localdev, it's time to commit configuration.yml.gpg to your Catapult fork's develop branch, this will kick off a automated deployment of test. Once you're satisfied with the website in test, it's time to create a pull request from your Catapult fork's develop branch into master - once the pull request is merged, this will kick off an automated deployment to qc. Once you're satisfied with the website in qc, it's time to login to Bamboo and press the deployment button for production.
 
 Once a website exists in the upstream environments (test, qc, production), automated deployments will kick off if changes are detected on their respected branches (see chart below). The same workflow of moving a website upstream, exists when you make changes to a specific website's repository.
 
@@ -350,7 +350,7 @@ Below is a list of known limitations with Catapult, if you're still having issue
 
 # Service Justification #
 
-Catapult uses many factors to make the best decision when it comes to choosing **Services**, the following are taken into account - popularity, cost, API support, and user experience. The following is an outline of what we think the common questions may be when you see Catapult using a particular **Service**. Have you're own perspective? [Let us know](https://github.com/devopsgroup-io/catapult-release-management/issues/new).
+Catapult uses many factors to make the best decision when it comes to choosing **Services**, the following are taken into account - popularity, cost, API support, and user experience. The following is an outline of what we think the common questions may be when you see Catapult using a particular **Service**. Have your own perspective? [Let us know](https://github.com/devopsgroup-io/catapult-release-management/issues/new).
 
 * **monitor.us**
     * [08-10-2015] monitor.us does not have the greatest user interface, branding, or technology. However, it does something that no other application monitoring services do - it offers free http/https monitoring and an API that allows Catapult to add these monitors for you.
@@ -371,7 +371,7 @@ So you want to contribute... Great! Open source projects like Catapult Release M
   * Contribute to the Catapult wiki
   * Blog about your experiences with Catapult
 
-When you first setup Catapult a `develop-catapult` branch is created for you under your forked repository, with an upstream set to `https://github.com/devopsgroup-io/catapult-release-management.git` so that you can easily create a pull request. Also keep in mind when closing issues to submit a pull requst that includes [GitHub's: Closing issues via commit messages](https://help.github.com/articles/closing-issues-via-commit-messages/).
+When you first setup Catapult a `develop-catapult` branch is created for you under your forked repository, with an upstream set to `https://github.com/devopsgroup-io/catapult-release-management.git` so that you can easily create a pull request. Also keep in mind when closing issues to submit a pull request that includes [GitHub's: Closing issues via commit messages](https://help.github.com/articles/closing-issues-via-commit-messages/).
 
 
 
