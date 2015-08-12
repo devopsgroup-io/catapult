@@ -68,7 +68,7 @@ Catapult supports the following software:
 
 Catapult requires a [Developer Setup](#developer-setup), [Instance Setup](#instance-setup), and [Services Setup](#services-setup) as described in the following sections.
 
-**Please Note:** It is advised to turn off any antivirus software that you may have installed during Developer Setup and Usage of Catapult as necessary tasks such as forwarding ports and writing hosts files may be blocked.
+**Please Note:** It is advised to turn off any antivirus software that you may have installed during Developer Setup and Usage of Catapult, because necessary tasks such as forwarding ports and writing hosts files may be blocked.
 
 
 
@@ -355,7 +355,7 @@ Catapult uses many factors to make the best decision when it comes to choosing *
 * **monitor.us**
     * [08-10-2015] monitor.us does not have the greatest user interface, branding, or technology. However, it does something that no other application monitoring services do - it offers free http/https monitoring and an API that allows Catapult to add these monitors for you.
         * A service to watch would be New Relic, however, the blocker is that there is no API support for their synthetic monitoring.
-        * Other services researched were AppDynamics, DataDog, and StatusCake which fell short in pricing or API functionality.
+        * Other services researched were AppDynamics, DataDog, and StatusCake which all fell short in pricing or API functionality.
 
 
 
