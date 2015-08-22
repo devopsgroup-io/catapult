@@ -140,6 +140,7 @@ while IFS='' read -r -d '' key; do
         domain_environment=$1.$domain_environment
     fi
     domainvaliddbname=$(echo "$key" | grep -w "domain" | cut -d ":" -f 2 | tr -d " " | tr "." "_")
+    force_auth=$(echo "$key" | grep -w "force_auth" | cut -d ":" -f 2 | tr -d " ")
     force_https=$(echo "$key" | grep -w "force_https" | cut -d ":" -f 2 | tr -d " ")
     software=$(echo "$key" | grep -w "software" | cut -d ":" -f 2 | tr -d " ")
     software_dbprefix=$(echo "$key" | grep -w "software_dbprefix" | cut -d ":" -f 2 | tr -d " ")
@@ -326,6 +327,18 @@ while IFS='' read -r -d '' key; do
     sudo mkdir -p /var/log/httpd/${domain_environment}
     sudo touch /var/log/httpd/${domain_environment}/access.log
     sudo touch /var/log/httpd/${domain_environment}/error.log
+    if [ -z "${force_auth}" ]; then
+        force_auth_value=""
+    else
+        sudo htpasswd -b -c /etc/httpd/sites-enabled/${domain_environment}.htpasswd $force_auth $force_auth
+        force_auth_value="<Location />
+            # Force HTTP authentication
+            AuthType Basic
+            AuthName \"Authentication Required\"
+            AuthUserFile \"/etc/httpd/sites-enabled/${domain_environment}.htpasswd\"
+            Require valid-user
+        </Location>"
+    fi
     if [ "${force_https}" = true ]; then
         # rewrite all http traffic to https
         force_https_value="Redirect Permanent / https://${domain_environment}"
@@ -344,6 +357,7 @@ while IFS='' read -r -d '' key; do
         DocumentRoot /var/www/repositories/apache/$domain/$webroot
         ErrorLog /var/log/httpd/$domain_environment/error.log
         CustomLog /var/log/httpd/$domain_environment/access.log combined
+        $force_auth_value
         $force_https_value
     </VirtualHost> 
 
@@ -359,6 +373,7 @@ while IFS='' read -r -d '' key; do
             SSLEngine on
             SSLCertificateFile /etc/ssl/certs/httpd-dummy-cert.key.cert
             SSLCertificateKeyFile /etc/ssl/certs/httpd-dummy-cert.key.cert
+            $force_auth_value
         </VirtualHost>
     </IfModule>
 
