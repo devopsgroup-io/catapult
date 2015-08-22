@@ -214,10 +214,6 @@ end
 # parse secrets/configuration-user.yml and secrets/configuration-user.yml.template file
 configuration_user = YAML.load_file("secrets/configuration-user.yml")
 configuration_user_template = YAML.load_file("secrets/configuration-user.yml.template")
-# ensure version is up-to-date
-if configuration_user["settings"]["version"] != configuration_user_template["settings"]["version"]
-  catapult_exception("Your secrets/configuration-user.yml file is out of date. To retain your settings please manually merge entries from secrets/configuration-user.yml.template to secrets/configuration-user.yml with your specific settings.\n*You may also delete your secrets/configuration-user.yml and re-run any vagrant command to have a vanilla version created.")
-end
 # check for required fields
 if configuration_user["settings"]["gpg_key"] == nil || configuration_user["settings"]["gpg_key"].match(/\s/) || configuration_user["settings"]["gpg_key"].length < 20
   catapult_exception("Please set your team's gpg_key in secrets/configuration-user.yml - spaces are not permitted and must be at least 20 characters.")
@@ -319,12 +315,6 @@ configuration_example = YAML.load_file("secrets/configuration.yml.template")
 
 
 
-puts "\nVerification of configuration[\"software\"]:\n".color(Colors::WHITE)
-# validate configuration["software"]
-if configuration["software"]["version"] != configuration_example["software"]["version"]
-  catapult_exception("Your secrets/configuration.yml file is out of date. To retain your settings please manually duplicate entries from secrets/configuration.yml.template with your specific settings.\n*You may also delete your secrets/configuration.yml and re-run any vagrant command to have a vanilla version created.")
-end
-puts " [verification complete]"
 puts "\nVerification of configuration[\"company\"]:\n".color(Colors::WHITE)
 # validate configuration["company"]
 if configuration["company"]["name"] == nil
@@ -635,7 +625,7 @@ configuration["websites"].each do |service,data|
   if "#{service}" == "catapult"
     puts "\nVerification of this Catapult instance:\n".color(Colors::WHITE)
   end
-  # create array of domains to later validate repo alpha order per service
+  # create array of domains to later validate domain alpha order per service
   domains = Array.new
   domains_sorted = Array.new
   unless configuration["websites"]["#{service}"] == nil
@@ -645,7 +635,19 @@ configuration["websites"].each do |service,data|
       unless "#{service}" == "catapult"
         # validate the domain to ensure it only includes the domain and not protocol
         if instance["domain"].include? "://"
-          catapult_exception("There is an error in your secrets/configuration.yml file.\nThe domain for websites => #{service} => domain => #{instance["domain"]} is invalid, it must use the format example.com")
+          catapult_exception("There is an error in your secrets/configuration.yml file.\nThe domain for websites => #{service} => domain => #{instance["domain"]} is invalid, it must not include http:// or https://")
+        end
+        # validate the domain depth
+        domain_depth = instance["domain"].split(".")
+        if domain_depth.count > 3
+          catapult_exception("There is an error in your secrets/configuration.yml file.\nThe domain for websites => #{service} => domain => #{instance["domain"]} is invalid, there is a maximum of one subdomain")
+        end
+        # validate the domain_tld_overrided depth
+        unless instance["domain_tld_override"] == nil
+          domain_tld_override_depth = instance["domain_tld_override"].split(".")
+          if domain_tld_override_depth.count != 2
+            catapult_exception("There is an error in your secrets/configuration.yml file.\nThe domain_tld_override for websites => #{service} => domain => #{instance["domain"]} is invalid, it must only be one domain level (company.com)")
+          end
         end
         # monitor each production domain over http and https
         uri = URI("http://monitor.us/api")
@@ -703,6 +705,9 @@ configuration["websites"].each do |service,data|
       unless "#{instance["force_https"]}" == ""
         unless ["true"].include?("#{instance["force_https"]}")
           catapult_exception("There is an error in your secrets/configuration.yml file.\nThe force_https for websites => #{service} => domain => #{instance["domain"]} is invalid, it must be true or removed.")
+        end
+        unless instance["domain_tld_override"] == nil
+          catapult_exception("There is an error in your secrets/configuration.yml file.\nThe force_https for websites => #{service} => domain => #{instance["domain"]} cannot be used in conjuction with domain_tld_override.")
         end
       end
       # create array of domains to later validate repo alpha order per service
@@ -992,8 +997,13 @@ configuration["websites"].delete("catapult")
 redhathostsfile = Array.new
 unless configuration["websites"]["apache"] == nil
   configuration["websites"]["apache"].each do |instance|
-    redhathostsfile.push("dev.#{instance["domain"]}")
-    redhathostsfile.push("www.dev.#{instance["domain"]}")
+    if "#{instance["domain_tld_override"]}" == ""
+      redhathostsfile.push("dev.#{instance["domain"]}")
+      redhathostsfile.push("www.dev.#{instance["domain"]}")
+    else
+      redhathostsfile.push("dev.#{instance["domain"]}.#{instance["domain_tld_override"]}")
+      redhathostsfile.push("www.dev.#{instance["domain"]}.#{instance["domain_tld_override"]}")
+    end
   end
 end
 windowshostsfile = Array.new

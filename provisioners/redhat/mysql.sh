@@ -151,6 +151,7 @@ echo "${configuration}" | shyaml get-values-0 websites.apache |
 while IFS='' read -r -d '' key; do
 
     domain=$(echo "$key" | grep -w "domain" | cut -d ":" -f 2 | tr -d " ")
+    domain_tld_override=$(echo "$key" | grep -w "domain_tld_override" | cut -d ":" -f 2 | tr -d " ")
     domainvaliddbname=$(echo "$key" | grep -w "domain" | cut -d ":" -f 2 | tr -d " " | tr "." "_")
     software=$(echo "$key" | grep -w "software" | cut -d ":" -f 2 | tr -d " ")
     software_dbprefix=$(echo "$key" | grep -w "software_dbprefix" | cut -d ":" -f 2 | tr -d " ")
@@ -210,10 +211,16 @@ while IFS='' read -r -d '' key; do
                     else
                         echo -e "\t\t[valid]   [x].sql [x]YYYYMMDD.sql [x]newest => $file"
                         echo -e "\t\t\trestoring..."
+                        # support domain_tld_override for URL replacements
+                        if [ -z "${domain_tld_override}" ]; then
+                            domain_url="${1}.${domain}"
+                        else
+                            domain_url="${1}.${domain}.${domain_tld_override}"
+                        fi
                         # match http:// and optionally www. then replace with http:// + optionally www. + either dev., test., or the production domain
                         if [[ "${software}" != "wordpress" ]]; then
-                            echo -e "\t* updating ${software} database with ${1}.${domain} URLs"
-                            sed -r -e "s/:\/\/(www\.)?${domain}/:\/\/\1${1}\.${domain}/g" "/var/www/repositories/apache/${domain}/_sql/$(basename "$file")" > "/var/www/repositories/apache/${domain}/_sql/${1}.$(basename "$file")"
+                            echo -e "\t* updating ${software} database with ${domain_url} URLs"
+                            sed -r -e "s/:\/\/(www\.)?${domain}/:\/\/\1${domain_url}/g" "/var/www/repositories/apache/${domain}/_sql/$(basename "$file")" > "/var/www/repositories/apache/${domain}/_sql/${1}.$(basename "$file")"
                         else
                             cp "/var/www/repositories/apache/${domain}/_sql/$(basename "$file")" "/var/www/repositories/apache/${domain}/_sql/${1}.$(basename "$file")"
                         fi
@@ -230,11 +237,11 @@ while IFS='' read -r -d '' key; do
                         if [[ "${software}" = "wordpress" ]]; then
                             echo -e "\t* resetting ${software} admin password..."
                             mysql --defaults-extra-file=$dbconf ${1}_${domainvaliddbname} -e "UPDATE ${software_dbprefix}users SET user_login='admin', user_email='$(echo "${configuration}" | shyaml get-value company.email)', user_pass=MD5('$(echo "${configuration}" | shyaml get-value environments.${1}.software.wordpress.admin_password)'), user_status='0' WHERE id = 1;"
-                            echo -e "\t* updating ${software} database with ${1}.${domain} URLs"
-                            php /catapult/provisioners/redhat/installers/wp-cli.phar --path="/var/www/repositories/apache/${domain}/" search-replace "${domain}" "${1}.${domain}" | sed "s/^/\t\t/"
+                            echo -e "\t* updating ${software} database with ${domain_url} URLs"
+                            php /catapult/provisioners/redhat/installers/wp-cli.phar --path="/var/www/repositories/apache/${domain}/" search-replace "${domain}" "${domain_url}" | sed "s/^/\t\t/"
                             mysql --defaults-extra-file=$dbconf ${1}_${domainvaliddbname} -e "UPDATE ${software_dbprefix}options SET option_value='$(echo "${configuration}" | shyaml get-value company.email)' WHERE option_name = 'admin_email';"
-                            mysql --defaults-extra-file=$dbconf ${1}_${domainvaliddbname} -e "UPDATE ${software_dbprefix}options SET option_value='http://${1}.${domain}' WHERE option_name = 'home';"
-                            mysql --defaults-extra-file=$dbconf ${1}_${domainvaliddbname} -e "UPDATE ${software_dbprefix}options SET option_value='http://${1}.${domain}' WHERE option_name = 'siteurl';"
+                            mysql --defaults-extra-file=$dbconf ${1}_${domainvaliddbname} -e "UPDATE ${software_dbprefix}options SET option_value='http://${domain_url}' WHERE option_name = 'home';"
+                            mysql --defaults-extra-file=$dbconf ${1}_${domainvaliddbname} -e "UPDATE ${software_dbprefix}options SET option_value='http://${domain_url}' WHERE option_name = 'siteurl';"
                         fi
                     fi
                 done
