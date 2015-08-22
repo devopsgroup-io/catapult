@@ -282,6 +282,12 @@ The following options are available:
         * the domain name of what the website is/will be in production
         * this drives the domains of localdev (via hosts file) and test, qc, production (via cloudflare)
         * dev.example.com, test.example.com, qc.example.com, example.com
+* domain_tld_override:
+    * `mycompany.com`
+        * a domain name that will override the tld of the domain (.com in example.com)
+        * for when you do not have control of the domain (example.com), but still need a localdev and externally accessible test and qc instance
+            * to seamlessly cutover to example.com, remove this option
+        * dev.example.com, test.example.com, qc.example.com, example.com are replaced by dev.example.mycompany.com, test.example.mycompany.com, qc.example.mycompany.com, example.mycompany.com
 * force_auth:
     * `example`
         * forces http basic authentication, `example` is both the username and password
