@@ -214,10 +214,6 @@ end
 # parse secrets/configuration-user.yml and secrets/configuration-user.yml.template file
 configuration_user = YAML.load_file("secrets/configuration-user.yml")
 configuration_user_template = YAML.load_file("secrets/configuration-user.yml.template")
-# ensure version is up-to-date
-if configuration_user["settings"]["version"] != configuration_user_template["settings"]["version"]
-  catapult_exception("Your secrets/configuration-user.yml file is out of date. To retain your settings please manually merge entries from secrets/configuration-user.yml.template to secrets/configuration-user.yml with your specific settings.\n*You may also delete your secrets/configuration-user.yml and re-run any vagrant command to have a vanilla version created.")
-end
 # check for required fields
 if configuration_user["settings"]["gpg_key"] == nil || configuration_user["settings"]["gpg_key"].match(/\s/) || configuration_user["settings"]["gpg_key"].length < 20
   catapult_exception("Please set your team's gpg_key in secrets/configuration-user.yml - spaces are not permitted and must be at least 20 characters.")
@@ -319,12 +315,6 @@ configuration_example = YAML.load_file("secrets/configuration.yml.template")
 
 
 
-puts "\nVerification of configuration[\"software\"]:\n".color(Colors::WHITE)
-# validate configuration["software"]
-if configuration["software"]["version"] != configuration_example["software"]["version"]
-  catapult_exception("Your secrets/configuration.yml file is out of date. To retain your settings please manually duplicate entries from secrets/configuration.yml.template with your specific settings.\n*You may also delete your secrets/configuration.yml and re-run any vagrant command to have a vanilla version created.")
-end
-puts " [verification complete]"
 puts "\nVerification of configuration[\"company\"]:\n".color(Colors::WHITE)
 # validate configuration["company"]
 if configuration["company"]["name"] == nil
