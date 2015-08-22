@@ -992,8 +992,13 @@ configuration["websites"].delete("catapult")
 redhathostsfile = Array.new
 unless configuration["websites"]["apache"] == nil
   configuration["websites"]["apache"].each do |instance|
-    redhathostsfile.push("dev.#{instance["domain"]}")
-    redhathostsfile.push("www.dev.#{instance["domain"]}")
+    if "#{instance["domain_tld_override"]}" == ""
+      redhathostsfile.push("dev.#{instance["domain"]}")
+      redhathostsfile.push("www.dev.#{instance["domain"]}")
+    else
+      redhathostsfile.push("dev.#{instance["domain"]}.#{instance["domain_tld_override"]}")
+      redhathostsfile.push("www.dev.#{instance["domain"]}.#{instance["domain_tld_override"]}")
+    end
   end
 end
 windowshostsfile = Array.new
