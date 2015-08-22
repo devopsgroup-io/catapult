@@ -625,7 +625,7 @@ configuration["websites"].each do |service,data|
   if "#{service}" == "catapult"
     puts "\nVerification of this Catapult instance:\n".color(Colors::WHITE)
   end
-  # create array of domains to later validate repo alpha order per service
+  # create array of domains to later validate domain alpha order per service
   domains = Array.new
   domains_sorted = Array.new
   unless configuration["websites"]["#{service}"] == nil
@@ -635,7 +635,13 @@ configuration["websites"].each do |service,data|
       unless "#{service}" == "catapult"
         # validate the domain to ensure it only includes the domain and not protocol
         if instance["domain"].include? "://"
-          catapult_exception("There is an error in your secrets/configuration.yml file.\nThe domain for websites => #{service} => domain => #{instance["domain"]} is invalid, it must use the format example.com")
+          catapult_exception("There is an error in your secrets/configuration.yml file.\nThe domain for websites => #{service} => domain => #{instance["domain"]} is invalid, it must not include http:// or https://")
+        end
+        unless instance["domain_tld_override"] == nil
+          domain_tld_override_depth = instance["domain_tld_override"].split(".")
+          if domain_tld_override_depth.count != 2
+            catapult_exception("There is an error in your secrets/configuration.yml file.\nThe domain_tld_override for websites => #{service} => domain => #{instance["domain"]} is invalid, it must only be one domain level (company.com)")
+          end
         end
         # monitor each production domain over http and https
         uri = URI("http://monitor.us/api")
