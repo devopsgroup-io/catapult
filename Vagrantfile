@@ -702,7 +702,7 @@ configuration["websites"].each do |service,data|
         end
       end
       # validate force_https
-      unless "#{instance["force_https"]}" == ""
+      unless instance["force_https"] == nil
         unless ["true"].include?("#{instance["force_https"]}")
           catapult_exception("There is an error in your secrets/configuration.yml file.\nThe force_https for websites => #{service} => domain => #{instance["domain"]} is invalid, it must be true or removed.")
         end
@@ -967,7 +967,7 @@ configuration["websites"].each do |service,data|
       end
       puts "   - Configured Bamboo service for automated deployments."
       # validate software
-      unless "#{instance["software"]}" == ""
+      unless instance["software"] == nil
         unless ["codeigniter2","drupal6","drupal7","wordpress","xenforo"].include?("#{instance["software"]}")
           catapult_exception("There is an error in your secrets/configuration.yml file.\nThe software for websites => #{service} => domain => #{instance["domain"]} is invalid, it must be one of the following [\"codeigniter2\",\"drupal6\",\"drupal7\",\"wordpress\",\"xenforo\"].")
         end
@@ -976,7 +976,7 @@ configuration["websites"].each do |service,data|
         end
       end
       # validate webroot
-      unless "#{instance["webroot"]}" == ""
+      unless instance["webroot"] == nil
         unless "#{instance["webroot"]}"[-1,1] == "/"
           catapult_exception("There is an error in your secrets/configuration.yml file.\nThe webroot for websites => #{service} => domain => #{instance["domain"]} is invalid, it must include a trailing slash.")
         end
@@ -997,7 +997,7 @@ configuration["websites"].delete("catapult")
 redhathostsfile = Array.new
 unless configuration["websites"]["apache"] == nil
   configuration["websites"]["apache"].each do |instance|
-    if "#{instance["domain_tld_override"]}" == ""
+    if instance["domain_tld_override"] == nil
       redhathostsfile.push("dev.#{instance["domain"]}")
       redhathostsfile.push("www.dev.#{instance["domain"]}")
     else
@@ -1037,7 +1037,11 @@ if ["status"].include?(ARGV[0])
         # start new row
         row = Array.new
         # get domain name
-        row.push(" * #{instance["domain"]}".ljust(29))
+        if instance["domain_tld_override"] == nil
+          row.push(" * #{instance["domain"]}".ljust(29))
+        else
+          row.push(" * #{instance["domain"]}.#{instance["domain_tld_override"]}".ljust(29))
+        end
         # get software
         row.push((instance["software"] || "").ljust(14))
         # get http response code per environment
@@ -1065,7 +1069,11 @@ if ["status"].include?(ARGV[0])
                 end
               end
             end
-            row.push(http_repsonse("http://#{environment}#{instance["domain"]}").ljust(4))
+            if instance["domain_tld_override"] == nil
+              row.push(http_repsonse("http://#{environment}#{instance["domain"]}").ljust(4))
+            else
+              row.push(http_repsonse("http://#{environment}#{instance["domain"]}.#{instance["domain_tld_override"]}").ljust(4))
+            end
           rescue SocketError
             row.push("down".ljust(4))
           rescue Errno::ECONNREFUSED
@@ -1079,7 +1087,11 @@ if ["status"].include?(ARGV[0])
           end
           # nslookup production top-level domain
           begin
-            row.push((Resolv.getaddress "#{environment}#{instance["domain"]}").ljust(16))
+            if instance["domain_tld_override"] == nil
+              row.push((Resolv.getaddress "#{environment}#{instance["domain"]}").ljust(16))
+            else
+              row.push((Resolv.getaddress "#{environment}#{instance["domain"]}.#{instance["domain_tld_override"]}").ljust(16))
+            end
           rescue
             row.push("down".ljust(16))
           end
@@ -1087,7 +1099,11 @@ if ["status"].include?(ARGV[0])
         # ssl cert lookup
         begin 
           timeout(1) do
-            tcp_client = TCPSocket.new("#{instance["domain"]}", 443)
+            if instance["domain_tld_override"] == nil
+              tcp_client = TCPSocket.new("#{instance["domain"]}", 443)
+            else
+              tcp_client = TCPSocket.new("#{instance["domain"]}.#{instance["domain_tld_override"]}", 443)
+            end
             ssl_context = OpenSSL::SSL::SSLContext.new
             ssl_context.ssl_version = :TLSv1_2
             ssl_client = OpenSSL::SSL::SSLSocket.new(tcp_client, ssl_context)
@@ -1114,7 +1130,11 @@ if ["status"].include?(ARGV[0])
         end
         # alexa rank and 3 month deviation
         begin
-          uri = URI("http://data.alexa.com/data?cli=10&url=#{instance["domain"]}")
+          if instance["domain_tld_override"] == nil
+            uri = URI("http://data.alexa.com/data?cli=10&url=#{instance["domain"]}")
+          else
+            uri = URI("http://data.alexa.com/data?cli=10&url=#{instance["domain"]}.#{instance["domain_tld_override"]}")
+          end
           Net::HTTP.start(uri.host, uri.port) do |http|
             request = Net::HTTP::Get.new uri.request_uri
             response = http.request request
