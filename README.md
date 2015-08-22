@@ -271,46 +271,51 @@ Adding websites to Catapult is easy. The only requirement is that the website ne
 ```
 websites:
   apache:
-  - domain: "devopsgroup.io"
-    repo: "git@github.com:devopsgroup-io/devopsgroup-io.git"
+  - domain: devopsgroup.io
+    repo: git@github.com:devopsgroup-io/devopsgroup-io.git
 ```
 
 The following options are available:
 
 * domain:
-    * "example.com"
+    * `example.com`
         * the domain name of what the website is/will be in production
+        * this drives the domains of localdev (via hosts file) and test, qc, production (via cloudflare)
+        * dev.example.com, test.example.com, qc.example.com, example.com
+* force_auth:
+    * `example`
+        * forces http basic authentication, `example` is both the username and password
 * force_https:
-    * true
+    * `true`
         * rewrite all http traffic to https
 * repo:
-    * "git@github.com:devopsgroup-io/devopsgroup-io.git"
+    * `git@github.com:devopsgroup-io/devopsgroup-io.git`
         * GitHub and Bitbucket over SSH are supported, HTTPS is not supported
 * software:
-    * "codeigniter2"
+    * `codeigniter2`
         * generates codeigniter2 database config file ~/application/config/database.php, restores database
-    * "drupal6"
+    * `drupal6`
         * generates drupal6 database config file ~/sites/default/settings.php, resets drupal6 admin password, rsyncs ~/sites/default/files from production source, restores database
-    * "drupal7"
+    * `drupal7`
         * generates drupal7 database config file ~/sites/default/settings.php, resets drupal7 admin password, rsyncs ~/sites/default/files from production source, restores database
-    * "wordpress"
+    * `wordpress`
         * generates WordPress database config file ~/installers/wp-config.php, resets WordPress admin password, rsyncs ~/wp-content/uploads from production source, restores database
-    * "xenforo"
+    * `xenforo`
         * generates xenforo database config file ~/library/config.php, restores database
 * software_dbprefix:
-    * "wp_"
-        * usually used in Drupal for multisite installations ("wp_ is required for base Wordpress installs, Drupal has no prefix by default")
+    * `wp_`
+        * usually used in Drupal for multisite installations (`wp_ is required for base Wordpress installs, Drupal has no prefix by default`)
 * software_workflow:
-    * "downstream"
+    * `downstream`
         * production is the source for the database and untracked files
         * this option is used when maintaining a website
         * see the below chart for more details
-    * "upstream"
+    * `upstream`
         * test is the source for the database and untracked files
         * this option is used when launching a new website
         * see the below chart for more details
 * webroot:
-    * "www/"
+    * `www/`
         * if the webroot differs from the repo root, specify it here
         * must include the trailing slash
 
