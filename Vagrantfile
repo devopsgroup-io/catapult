@@ -694,6 +694,9 @@ configuration["websites"].each do |service,data|
         unless ["true"].include?("#{instance["force_https"]}")
           catapult_exception("There is an error in your secrets/configuration.yml file.\nThe force_https for websites => #{service} => domain => #{instance["domain"]} is invalid, it must be true or removed.")
         end
+        unless instance["domain_tld_override"] == nil
+          catapult_exception("There is an error in your secrets/configuration.yml file.\nThe force_https for websites => #{service} => domain => #{instance["domain"]} cannot be used in conjuction with domain_tld_override.")
+        end
       end
       # create array of domains to later validate repo alpha order per service
       domains.push("#{instance["domain"]}")
