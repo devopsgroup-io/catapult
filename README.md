@@ -280,6 +280,7 @@ The following options are available:
 * domain:
     * `example.com`
         * the domain name of what the website is/will be in production
+        * a maximum of one subdomain is supported (subdomain.example.com)
         * this drives the domains of localdev (via hosts file) and test, qc, production (via cloudflare)
         * dev.example.com, test.example.com, qc.example.com, example.com
 * domain_tld_override:

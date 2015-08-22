@@ -637,6 +637,12 @@ configuration["websites"].each do |service,data|
         if instance["domain"].include? "://"
           catapult_exception("There is an error in your secrets/configuration.yml file.\nThe domain for websites => #{service} => domain => #{instance["domain"]} is invalid, it must not include http:// or https://")
         end
+        # validate the domain depth
+        domain_depth = instance["domain"].split(".")
+        if domain_depth.count > 3
+          catapult_exception("There is an error in your secrets/configuration.yml file.\nThe domain for websites => #{service} => domain => #{instance["domain"]} is invalid, there is a maximum of one subdomain")
+        end
+        # validate the domain_tld_overrided depth
         unless instance["domain_tld_override"] == nil
           domain_tld_override_depth = instance["domain_tld_override"].split(".")
           if domain_tld_override_depth.count != 2
