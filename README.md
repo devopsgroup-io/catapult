@@ -2,7 +2,7 @@
 
 
 
-**Welcome to devopsgroup.io Catapult Release Management**, a complete DevOps Release Management solution featuring automated website deployment and continuous integration following Gitflow and SCRUM workflows. Built for Developers, simple enough to use by non-Developers.
+**Welcome to devopsgroup.io Catapult Release Management**, a complete DevOps Release Management solution featuring automated website deployment and continuous integration, while following Gitflow and SCRUM workflows. Built for Developers, but simple enough to use by non-Developers. Catapult's core technologies and features include:
 
 * Configuration Management via CloudFlare, DigitalOcean, Git, GPG, Shell, and Vagrant
 * Continuous Integration via Bamboo and AWS
@@ -10,7 +10,7 @@
 * Website Uptime Monitoring via monitor.us (Monitis)
 
 
-As a **non-Developer** you may think - *I already have a website, why do I need Catapult?* Over time you will find yourself or find yourself paying a freelancer or a development company hundreds or even thousands of dollars to manage or interact with the DevOps (Development Operations) and solve these problems:
+As a **non-Developer** you may think - *I already have a website, why do I need Catapult?* Over time you may find yourself overwhelmed with managing the the day to day Devops process of infrastrucrure , and end up paying a freelancer or a development company hundreds or even thousands of dollars to manage or interact with the DevOps (Development Operations) to solve these problems:
 
   * Production is down.
   * We need a test site.
@@ -20,13 +20,13 @@ As a **non-Developer** you may think - *I already have a website, why do I need 
   * Can I easily scale my website for more traffic?
   * What is my uptime?
 
-As a **Developer**, you have to manage many websites and probably end up using the same tools and APIs over and over again. Why not use something that has been developed just for you from Developers that have been down the same road as you and also have the ability to contribute back?
+As a **Developer**, you have to manage many websites and probably end up using the same set of tools and APIs over and over again. Why not use something that has been created from it's foundations by Devlopers that have been down the same road as you, and contribute back to the project at the same time?
 
-  * Catapult is developed in Ruby and native Shell - no new languages or technologies to learn.
-  * Catapult is very simple at its core - there is no black-box to decipher - everything is out in the open.
-  * Catapult uses the most popular APIs and services; including AWS, Bamboo, Bitbucket, CloudFlare, DigitalOcean, GitHub, and Vagrant.
+  * Catapult is developed in Ruby and native Shell - there are no new languages or technologies to learn.
+  * Catapult's simplicity is it's strength. There is no black-box to decipher - the functionality and methodology is out in      the open and accessible to anyone.
+  * Catapult uses the most popular APIs and services; including AWS, Bamboo, Bitbucket, CloudFlare, DigitalOcean, GitHub, and     Vagrant.
 
-Catapult manages all of this for you and is open-sourced, well-documented, developer-focused, and free to use. We also provide a service if you need some help getting started - if you do, let us know at https://devopsgroup.io. Catapult leverages the Services that you're already using, which collectively, costs $40/month to have a full-stack localDev, Test, Quality Control, and Production environment.
+Catapult can manage all of this for you through an open-source and well-documented platform, with a developer-focused point of view. We also provide a service and assistance if you need help getting started, or just have a question - just contact us at https://devopsgroup.io. Catapult leverages the Services that you're already using, which collectively, costs $40/month to have a full-stack localDev, Test, Quality Control, and Production environment.
 
 *Go ahead, give* **Catapult** *a* **shot**.
 
