@@ -175,13 +175,7 @@ Catapult uses several third-party services to pull everything off - below is a l
                     5. Plan key: TEST
                     6. Plan description:
                 * *Link repository to new build plan*
-                    1. Repository host: Link new repository > Other > GitHub
-                    2. Display name: Catapult
-                    3. Username: `~/configuration.yml["company"]["github_username"]`
-                    4. Password: `~/configuration.yml["company"]["github_password"]`
-                    5. Repository: Load Repositories > github_username/catapult-release-management
-                    6. Branch: master
-                    7. Repository access: Allow all users to reuse the configuration of this repository
+                    1. Repository host: Other > None
             2. **Create QC Plan**
                 * *Project and build plan name*
                     1. Project: Catapult
@@ -189,7 +183,7 @@ Catapult uses several third-party services to pull everything off - below is a l
                     5. Plan key: QC
                     6. Plan description:
                 * *Link repository to new build plan*
-                    1. Repository host: Previously linked repository > github_username/catapult-release-management
+                    1. Repository host: Other > None
             2. **Create PROD Plan**
                 * *Project and build plan name*
                     1. Project: Catapult
@@ -197,7 +191,7 @@ Catapult uses several third-party services to pull everything off - below is a l
                     5. Plan key: PROD
                     6. Plan description:
                 * *Link repository to new build plan*
-                    1. Repository host: Previously linked repository > github_username/catapult-release-management
+                    1. Repository host: Other > None
 4. **DNS:**    
     1. **CloudFlare** sign-up and configuration
         1. Create a CloudFlare account at https://www.cloudflare.com
