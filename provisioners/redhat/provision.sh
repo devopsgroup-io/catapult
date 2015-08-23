@@ -17,7 +17,9 @@ sudo yum install -y git
 # clone and pull catapult
 if ([ $1 = "dev" ] || [ $1 = "test" ]); then
     branch="develop"
-elif ([ $1 = "qc" ] || [ $1 = "production" ]); then
+elif ([ $1 = "qc" ]); then
+    branch="release"
+elif ([ $1 = "production" ]); then
     branch="master"
 fi
 if [ $1 != "dev" ]; then
