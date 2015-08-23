@@ -285,7 +285,7 @@ The following options are available:
         * dev.example.com, test.example.com, qc.example.com, example.com are replaced by dev.example.com.mycompany.com, test.example.com.mycompany.com, qc.example.com.mycompany.com, example.com.mycompany.com
 * force_auth:
     * `example`
-        * forces http basic authentication, `example` is both the username and password
+        * forces http basic authentication in test and qc, `example` is both the username and password
 * force_https:
     * `true`
         * rewrite all http traffic to https

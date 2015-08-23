@@ -481,7 +481,7 @@ while IFS='' read -r -d '' key; do
         domain_tld_override_value="ServerAlias ${domain_environment}.${domain_tld_override}
         ServerAlias www.${domain_environment}.${domain_tld_override}"
     fi
-    if [ -z "${force_auth}" ]; then
+    if ([ -z "${force_auth}" ]) && ([ "$1" != "dev" ] || [ "$1" != "production" ]); then
         force_auth_value=""
     else
         sudo htpasswd -b -c /etc/httpd/sites-enabled/${domain_environment}.htpasswd $force_auth $force_auth
