@@ -213,9 +213,17 @@ while IFS='' read -r -d '' key; do
                         echo -e "\t\t\trestoring..."
                         # support domain_tld_override for URL replacements
                         if [ -z "${domain_tld_override}" ]; then
-                            domain_url="${1}.${domain}"
+                            if [ "${1}" = "production" ]; then
+                                domain_url="${domain}"
+                            else
+                                domain_url="${1}.${domain}"
+                            fi
                         else
-                            domain_url="${1}.${domain}.${domain_tld_override}"
+                            if [ "${1}" = "production" ]; then
+                                domain_url="${domain}.${domain_tld_override}"
+                            else
+                                domain_url="${1}.${domain}.${domain_tld_override}"
+                            fi
                         fi
                         # match http:// and optionally www. then replace with http:// + optionally www. + either dev., test., or the production domain
                         if [[ "${software}" != "wordpress" ]]; then
