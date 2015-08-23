@@ -671,6 +671,9 @@ configuration["websites"].each do |service,data|
           # errorCode 11 => monitorUrlExists
           if api_monitorus_monitor_http["status"] == "ok" || api_monitorus_monitor_http["errorCode"].to_f == 11
             puts "   - Configured monitor.us http monitor."
+          # errorCode 14 => The URL is not resolved.
+          elsif api_monitorus_monitor_http["errorCode"].to_f == 14
+            puts "   - Could not add the monitor.us http monitor. The URL does not resolve."
           else
             catapult_exception("Unable to configure monitor.us http monitor for websites => #{service} => domain => #{instance["domain"]}.")
           end
@@ -692,10 +695,13 @@ configuration["websites"].each do |service,data|
               "&url=#{instance["domain"]}"\
             "")
           response = http.request request # Net::HTTPResponse object
-          api_monitorus_monitor_http = JSON.parse(response.body)
+          api_monitorus_monitor_https = JSON.parse(response.body)
           # errorCode 11 => monitorUrlExists
-          if api_monitorus_monitor_http["status"] == "ok" || api_monitorus_monitor_http["errorCode"].to_f == 11
+          if api_monitorus_monitor_https["status"] == "ok" || api_monitorus_monitor_https["errorCode"].to_f == 11
             puts "   - Configured monitor.us https monitor."
+          # errorCode 14 => The URL is not resolved.
+          elsif api_monitorus_monitor_https["errorCode"].to_f == 14
+            puts "   - Could not add the monitor.us https monitor. The URL does not resolve."
           else
             catapult_exception("Unable to configure monitor.us https monitor for websites => #{service} => domain => #{instance["domain"]}.")
           end
