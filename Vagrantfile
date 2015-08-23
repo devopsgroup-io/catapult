@@ -836,10 +836,14 @@ configuration["websites"].each do |service,data|
           response = http.request request # Net::HTTPResponse object
           api_bitbucket_repo_branches = JSON.parse(response.body)
           @api_bitbucket_repo_develop = false
+          @api_bitbucket_repo_release = false
           @api_bitbucket_repo_master = false
           api_bitbucket_repo_branches.each do |branch, array|
             if branch == "develop"
               @api_bitbucket_repo_develop = true
+            end
+            if branch == "release"
+              @api_bitbucket_repo_release = true
             end
             if branch == "master"
               @api_bitbucket_repo_master = true
@@ -849,6 +853,11 @@ configuration["websites"].each do |service,data|
             catapult_exception("Cannot find the develop branch for this repository, please create one.")
           else
             puts "   - Found the develop branch."
+          end
+          unless @api_bitbucket_repo_release
+            catapult_exception("Cannot find the release branch for this repository, please create one.")
+          else
+            puts "   - Found the release branch."
           end
           unless @api_bitbucket_repo_master
             catapult_exception("Cannot find the master branch for this repository, please create one.")
@@ -865,9 +874,13 @@ configuration["websites"].each do |service,data|
           response = http.request request # Net::HTTPResponse object
           api_github_repo_branches = JSON.parse(response.body)
           @api_github_repo_develop = false
+          @api_github_repo_release = false
           @api_github_repo_master = false
           api_github_repo_branches.each do |branch|
             if branch["name"] == "develop"
+              @api_github_repo_develop = true
+            end
+            if branch["name"] == "release"
               @api_github_repo_develop = true
             end
             if branch["name"] == "master"
@@ -878,6 +891,11 @@ configuration["websites"].each do |service,data|
             catapult_exception("Cannot find the develop branch for this repository, please create one.")
           else
             puts "   - Found the develop branch."
+          end
+          unless @api_github_repo_release
+            catapult_exception("Cannot find the release branch for this repository, please create one.")
+          else
+            puts "   - Found the release branch."
           end
           unless @api_github_repo_master
             catapult_exception("Cannot find the master branch for this repository, please create one.")
