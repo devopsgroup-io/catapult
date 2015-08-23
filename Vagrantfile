@@ -1192,7 +1192,7 @@ Vagrant.configure("2") do |config|
   config.hostmanager.include_offline = true
 
   # redhat localdev servers
-  config.vm.define "#{configuration["company"]["name"]}-dev-redhat" do |config|
+  config.vm.define "#{configuration["company"]["name"].downcase}-dev-redhat" do |config|
     config.vm.box = "chef/centos-7.0"
     config.vm.network "private_network", ip: configuration["environments"]["dev"]["servers"]["redhat"]["ip"]
     config.vm.network "forwarded_port", guest: 80, host: configuration["environments"]["dev"]["servers"]["redhat"]["port_80"]
@@ -1208,7 +1208,7 @@ Vagrant.configure("2") do |config|
     config.vm.synced_folder "repositories", "/var/www/repositories", type: "nfs"
     config.vm.provision "shell", path: "provisioners/redhat/provision.sh", args: ["dev","#{repo}","#{configuration_user["settings"]["gpg_key"]}","apache","#{configuration_user["settings"]["software_validation"]}"]
   end
-  config.vm.define "#{configuration["company"]["name"]}-dev-redhat-mysql" do |config|
+  config.vm.define "#{configuration["company"]["name"].downcase}-dev-redhat-mysql" do |config|
     config.vm.box = "chef/centos-7.0"
     config.vm.network "private_network", ip: configuration["environments"]["dev"]["servers"]["redhat_mysql"]["ip"]
     config.vm.provider :virtualbox do |provider|
@@ -1224,7 +1224,7 @@ Vagrant.configure("2") do |config|
   end
 
   # redhat test servers
-  config.vm.define "#{configuration["company"]["name"]}-test-redhat" do |config|
+  config.vm.define "#{configuration["company"]["name"].downcase}-test-redhat" do |config|
     config.vm.provider :digital_ocean do |provider,override|
       override.ssh.private_key_path = "secrets/id_rsa"
       override.vm.box = "digital_ocean"
@@ -1239,7 +1239,7 @@ Vagrant.configure("2") do |config|
     config.vm.synced_folder ".", "/vagrant", disabled: true
     config.vm.provision "shell", path: "provisioners/redhat/provision.sh", args: ["test","#{repo}","#{configuration_user["settings"]["gpg_key"]}","apache","false"]
   end
-  config.vm.define "#{configuration["company"]["name"]}-test-redhat-mysql" do |config|
+  config.vm.define "#{configuration["company"]["name"].downcase}-test-redhat-mysql" do |config|
     config.vm.provider :digital_ocean do |provider,override|
       override.ssh.private_key_path = "secrets/id_rsa"
       override.vm.box = "digital_ocean"
@@ -1256,7 +1256,7 @@ Vagrant.configure("2") do |config|
   end
 
   # redhat quality control servers
-  config.vm.define "#{configuration["company"]["name"]}-qc-redhat" do |config|
+  config.vm.define "#{configuration["company"]["name"].downcase}-qc-redhat" do |config|
     config.vm.provider :digital_ocean do |provider,override|
       override.ssh.private_key_path = "secrets/id_rsa"
       override.vm.box = "digital_ocean"
@@ -1271,7 +1271,7 @@ Vagrant.configure("2") do |config|
     config.vm.synced_folder ".", "/vagrant", disabled: true
     config.vm.provision "shell", path: "provisioners/redhat/provision.sh", args: ["qc","#{repo}","#{configuration_user["settings"]["gpg_key"]}","apache","false"]
   end
-  config.vm.define "#{configuration["company"]["name"]}-qc-redhat-mysql" do |config|
+  config.vm.define "#{configuration["company"]["name"].downcase}-qc-redhat-mysql" do |config|
     config.vm.provider :digital_ocean do |provider,override|
       override.ssh.private_key_path = "secrets/id_rsa"
       override.vm.box = "digital_ocean"
@@ -1288,7 +1288,7 @@ Vagrant.configure("2") do |config|
   end
 
   # redhat production servers
-  config.vm.define "#{configuration["company"]["name"]}-production-redhat" do |config|
+  config.vm.define "#{configuration["company"]["name"].downcase}-production-redhat" do |config|
     config.vm.provider :digital_ocean do |provider,override|
       override.ssh.private_key_path = "secrets/id_rsa"
       override.vm.box = "digital_ocean"
@@ -1303,7 +1303,7 @@ Vagrant.configure("2") do |config|
     config.vm.synced_folder ".", "/vagrant", disabled: true
     config.vm.provision "shell", path: "provisioners/redhat/provision.sh", args: ["production","#{repo}","#{configuration_user["settings"]["gpg_key"]}","apache","false"]
   end
-  config.vm.define "#{configuration["company"]["name"]}-production-redhat-mysql" do |config|
+  config.vm.define "#{configuration["company"]["name"].downcase}-production-redhat-mysql" do |config|
     config.vm.provider :digital_ocean do |provider,override|
       override.ssh.private_key_path = "secrets/id_rsa"
       override.vm.box = "digital_ocean"
@@ -1320,7 +1320,7 @@ Vagrant.configure("2") do |config|
   end
 
   # windows localdev servers
-  config.vm.define "#{configuration["company"]["name"]}-dev-windows" do |config|
+  config.vm.define "#{configuration["company"]["name"].downcase}-dev-windows" do |config|
     config.vm.box = "opentable/win-2012r2-standard-amd64-nocm"
     config.vm.network "private_network", ip: configuration["environments"]["dev"]["servers"]["windows"]["ip"]
     config.vm.network "forwarded_port", guest: 80, host: configuration["environments"]["dev"]["servers"]["windows"]["port_80"]
