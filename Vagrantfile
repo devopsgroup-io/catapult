@@ -596,7 +596,7 @@ configuration["environments"].each do |environment,data|
   end
   # if upstream digitalocean droplets are provisioned, get their ip addresses to write to secrets/configuration.yml
   unless environment == "dev"
-    droplet = @api_digitalocean["droplets"].find { |element| element['name'] == "#{configuration["company"]["name"]}-#{environment}-redhat" }
+    droplet = @api_digitalocean["droplets"].find { |element| element['name'] == "#{configuration["company"]["name"].downcase}-#{environment}-redhat" }
     unless droplet == nil
       unless configuration["environments"]["#{environment}"]["servers"]["redhat"]["ip"] == droplet["networks"]["v4"].first["ip_address"]
         configuration["environments"]["#{environment}"]["servers"]["redhat"]["ip"] = droplet["networks"]["v4"].first["ip_address"]
@@ -605,7 +605,7 @@ configuration["environments"].each do |environment,data|
         `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml.gpg --armor --cipher-algo AES256 --symmetric secrets/configuration.yml`
       end
     end
-    droplet = @api_digitalocean["droplets"].find { |element| element['name'] == "#{configuration["company"]["name"]}-#{environment}-redhat-mysql" }
+    droplet = @api_digitalocean["droplets"].find { |element| element['name'] == "#{configuration["company"]["name"].downcase}-#{environment}-redhat-mysql" }
     unless droplet == nil
       unless configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["ip"] == droplet["networks"]["v4"].first["ip_address"]
         configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["ip"] = droplet["networks"]["v4"].first["ip_address"]
