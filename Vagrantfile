@@ -155,10 +155,15 @@ else
   end
   branch_management("develop-catapult")
   branch_management("develop")
+  # create the release branch if it does not exist
+  if not @branches.find { |element| element.include?("refs/heads/release") }
+    `#{@git} checkout release`
+    `#{@git} push origin release`
+  end
   # checkout original branch
   `#{@git} checkout #{branch}`
 end
-# create a git pre-commit hook to ensure no configuration is committed to develop and only configuration is committed to master
+# create a git pre-commit hook to ensure no configuration is committed to develop-catapult
 FileUtils.mkdir_p(".git/hooks")
 File.write('.git/hooks/pre-commit',
 '#!/usr/bin/env ruby
@@ -192,9 +197,14 @@ elsif "#{branch}" == "develop"
     puts "To contribute to Catapult, please switch to the develop-catapult branch."
     exit 1
   end
+elsif "#{branch}" == "release"
+  unless staged.include?("secrets/configuration.yml.gpg") || staged.include?("secrets/id_rsa.gpg") || staged.include?("secrets/id_rsa.pub.gpg")
+    puts "You are trying to commit directly to the release branch, please create a pull request from develop into release instead."
+    exit 1
+  end
 elsif "#{branch}" == "master"
   unless staged.include?("secrets/configuration.yml.gpg") || staged.include?("secrets/id_rsa.gpg") || staged.include?("secrets/id_rsa.pub.gpg")
-    puts "You are trying to commit directly to the master branch, please create a pull request from develop into master instead."
+    puts "You are trying to commit directly to the master branch, please create a pull request from release into master instead."
     exit 1
   else 
     puts "To contribute to Catapult, please switch to the develop-catapult branch."
@@ -302,10 +312,14 @@ elsif "#{branch}" == "develop"
     `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output secrets/id_rsa --decrypt secrets/id_rsa.gpg`
     `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output secrets/id_rsa.pub --decrypt secrets/id_rsa.pub.gpg`
   end
+elsif "#{branch}" == "release"
+  puts " * You are on the release branch, this branch contains your unique secrets/configuration.yml.gpg, secrets/id_rsa.gpg, and secrets/id_rsa.pub.gpg secrets/configuration."
+  puts " * The release branch is running in the qc environment, please first test then commit your configuration to the develop branch."
+  puts " * Once you're satisified with your new configuration in localdev and test, create a pull request from develop into release."
 elsif "#{branch}" == "master"
   puts " * You are on the master branch, this branch contains your unique secrets/configuration.yml.gpg, secrets/id_rsa.gpg, and secrets/id_rsa.pub.gpg secrets/configuration."
-  puts " * The master branch is running in the qc and production environments, please first test then commit your configuration to the develop branch."
-  puts " * Once you're satisified with your new configuration in localdev and test, create a pull request from develop into master."
+  puts " * The master branch is running in the production environment, please first test then commit your configuration to the develop branch."
+  puts " * Once you're satisified with your new configuration in localdev and test, create a pull request from develop into release."
 end
 # create objects from secrets/configuration.yml.gpg and secrets/configuration.yml.template
 configuration = YAML.load(`gpg --batch --passphrase "#{configuration_user["settings"]["gpg_key"]}" --decrypt secrets/configuration.yml.gpg`)
@@ -881,7 +895,7 @@ configuration["websites"].each do |service,data|
               @api_github_repo_develop = true
             end
             if branch["name"] == "release"
-              @api_github_repo_develop = true
+              @api_github_repo_release = true
             end
             if branch["name"] == "master"
               @api_github_repo_master = true
