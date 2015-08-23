@@ -139,12 +139,12 @@ while IFS='' read -r -d '' key; do
     if [ "$1" != "production" ]; then
         domain_environment=$1.$domain_environment
     fi
-    if [ -z "${domain_tld_override}" ]; then
+    domain_tld_override=$(echo "$key" | grep -w "domain_tld_override" | cut -d ":" -f 2 | tr -d " ")
+    if [ ! -z "${domain_tld_override}" ]; then
         domain_root="${domain}.${domain_tld_override}"
     else
         domain_root="${domain}"
     fi
-    domain_tld_override=$(echo "$key" | grep -w "domain_tld_override" | cut -d ":" -f 2 | tr -d " ")
     domainvaliddbname=$(echo "$key" | grep -w "domain" | cut -d ":" -f 2 | tr -d " " | tr "." "_")
     force_auth=$(echo "$key" | grep -w "force_auth" | cut -d ":" -f 2 | tr -d " ")
     force_https=$(echo "$key" | grep -w "force_https" | cut -d ":" -f 2 | tr -d " ")
