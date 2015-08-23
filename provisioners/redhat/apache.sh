@@ -179,13 +179,12 @@ while IFS='' read -r -d '' key; do
             if [ "${cloudflare_zone_id}" = "[]" ]; then
                 # create cloudflare zone
                 echo "cloudflare zone does not exist" | sed "s/^/\t\t/"
-                cloudflare_zone_id=$(curl -s -X POST "https://api.cloudflare.com/client/v4/zones"\
+                curl -s -X POST "https://api.cloudflare.com/client/v4/zones"\
                 -H "X-Auth-Email: ${cloudflare_email}"\
                 -H "X-Auth-Key: ${cloudflare_api_key}"\
                 -H "Content-Type: application/json"\
                 --data "{\"name\":\"${domain_levels[0]}.${domain_levels[1]}\",\"jump_start\":false}"\
-                | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["result"]["id"]')
-                echo $cloudflare_zone_id | sed "s/^/\t\t/"
+                | sed "s/^/\t\t/"
             else
                 # get cloudflare zone
                 echo "cloudflare zone exists" | sed "s/^/\t\t/"
@@ -247,13 +246,12 @@ while IFS='' read -r -d '' key; do
             if [ "${cloudflare_zone_id}" = "[]" ]; then
                 # create cloudflare zone
                 echo "cloudflare zone does not exist" | sed "s/^/\t\t/"
-                cloudflare_zone_id=$(curl -s -X POST "https://api.cloudflare.com/client/v4/zones"\
+                curl -s -X POST "https://api.cloudflare.com/client/v4/zones"\
                 -H "X-Auth-Email: ${cloudflare_email}"\
                 -H "X-Auth-Key: ${cloudflare_api_key}"\
                 -H "Content-Type: application/json"\
                 --data "{\"name\":\"${domain_levels[1]}.${domain_levels[2]}\",\"jump_start\":false}"\
-                | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["result"]["id"]')
-                echo $cloudflare_zone_id | sed "s/^/\t\t/"
+                | sed "s/^/\t\t/"
             else
                 # get cloudflare zone
                 echo "cloudflare zone exists" | sed "s/^/\t\t/"
@@ -316,13 +314,12 @@ while IFS='' read -r -d '' key; do
             if [ "${cloudflare_zone_id}" = "[]" ]; then
                 # create cloudflare zone
                 echo "cloudflare zone does not exist" | sed "s/^/\t\t/"
-                cloudflare_zone_id=$(curl -s -X POST "https://api.cloudflare.com/client/v4/zones"\
+                curl -s -X POST "https://api.cloudflare.com/client/v4/zones"\
                 -H "X-Auth-Email: ${cloudflare_email}"\
                 -H "X-Auth-Key: ${cloudflare_api_key}"\
                 -H "Content-Type: application/json"\
                 --data "{\"name\":\"${domain_levels[2]}.${domain_levels[3]}\",\"jump_start\":false}"\
-                | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["result"]["id"]')
-                echo $cloudflare_zone_id | sed "s/^/\t\t/"
+                | sed "s/^/\t\t/"
             else
                 # get cloudflare zone
                 echo "cloudflare zone exists" | sed "s/^/\t\t/"
@@ -386,13 +383,12 @@ while IFS='' read -r -d '' key; do
             if [ "${cloudflare_zone_id}" = "[]" ]; then
                 # create cloudflare zone
                 echo "cloudflare zone does not exist" | sed "s/^/\t\t/"
-                cloudflare_zone_id=$(curl -s -X POST "https://api.cloudflare.com/client/v4/zones"\
+                curl -s -X POST "https://api.cloudflare.com/client/v4/zones"\
                 -H "X-Auth-Email: ${cloudflare_email}"\
                 -H "X-Auth-Key: ${cloudflare_api_key}"\
                 -H "Content-Type: application/json"\
                 --data "{\"name\":\"${domain_levels[3]}.${domain_levels[4]}\",\"jump_start\":false}"\
-                | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["result"]["id"]')
-                echo $cloudflare_zone_id | sed "s/^/\t\t/"
+                | sed "s/^/\t\t/"
             else
                 # get cloudflare zone
                 echo "cloudflare zone exists" | sed "s/^/\t\t/"
