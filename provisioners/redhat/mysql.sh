@@ -50,23 +50,9 @@ end=$(date +%s)
 echo "==> completed in ($(($end - $start)) seconds)"
 
 
-echo -e "\n\n\n==> Installing Drush and WP-CLI"
+echo -e "\n\n==> Installing stoftware tools"
 start=$(date +%s)
-sudo yum install -y php-cli
-sudo yum install -y php-mysql
-sudo yum install -y mariadb
-# install drush
-if [ ! -f /usr/bin/drush  ]; then
-    curl -sS https://getcomposer.org/installer | php
-    mv composer.phar /usr/local/bin/composer
-    ln -s /usr/local/bin/composer /usr/bin/composer
-    git clone https://github.com/drush-ops/drush.git /usr/local/src/drush
-    cd /usr/local/src/drush
-    git checkout 7.0.0-rc1
-    ln -s /usr/local/src/drush/drush /usr/bin/drush
-    composer install
-fi
-drush --version
+source /catapult/provisioners/redhat/modules/software_tools.sh
 end=$(date +%s)
 echo "==> completed in ($(($end - $start)) seconds)"
 
@@ -267,7 +253,7 @@ while IFS='' read -r -d '' key; do
                             echo -e "\t* resetting ${software} admin password..."
                             mysql --defaults-extra-file=$dbconf ${1}_${domainvaliddbname} -e "UPDATE ${software_dbprefix}users SET user_login='admin', user_email='$(echo "${configuration}" | shyaml get-value company.email)', user_pass=MD5('$(echo "${configuration}" | shyaml get-value environments.${1}.software.wordpress.admin_password)'), user_status='0' WHERE id = 1;"
                             echo -e "\t* updating ${software} database with ${domain_url} URLs"
-                            php /catapult/provisioners/redhat/installers/wp-cli.phar --path="/var/www/repositories/apache/${domain}/" search-replace "${domain}" "${domain_url}" | sed "s/^/\t\t/"
+                            php /catapult/provisioners/redhat/installers/wp-cli.phar --allow-root --path="/var/www/repositories/apache/${domain}/" search-replace "${domain}" "${domain_url}" | sed "s/^/\t\t/"
                             mysql --defaults-extra-file=$dbconf ${1}_${domainvaliddbname} -e "UPDATE ${software_dbprefix}options SET option_value='$(echo "${configuration}" | shyaml get-value company.email)' WHERE option_name = 'admin_email';"
                             mysql --defaults-extra-file=$dbconf ${1}_${domainvaliddbname} -e "UPDATE ${software_dbprefix}options SET option_value='http://${domain_url}' WHERE option_name = 'home';"
                             mysql --defaults-extra-file=$dbconf ${1}_${domainvaliddbname} -e "UPDATE ${software_dbprefix}options SET option_value='http://${domain_url}' WHERE option_name = 'siteurl';"
