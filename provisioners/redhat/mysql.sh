@@ -53,6 +53,7 @@ echo "==> completed in ($(($end - $start)) seconds)"
 echo -e "\n\n\n==> Installing Drush and WP-CLI"
 start=$(date +%s)
 sudo yum install -y php-cli
+sudo yum install -y php-mysql
 sudo yum install -y mariadb
 # install drush
 if [ ! -f /usr/bin/drush  ]; then

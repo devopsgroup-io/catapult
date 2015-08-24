@@ -64,6 +64,7 @@ echo "==> completed in ($(($end - $start)) seconds)"
 echo -e "\n\n==> Installing Drush and WP-CLI"
 start=$(date +%s)
 sudo yum install -y php-cli
+sudo yum install -y php-mysql
 sudo yum install -y mariadb
 # install drush
 if [ ! -f /usr/bin/drush  ]; then
@@ -557,8 +558,7 @@ EOF
     sudo ln -s /etc/httpd/sites-available/$domain_environment.conf /etc/httpd/sites-enabled/$domain_environment.conf
 
     # configure software
-    if [ "$software" = "codeigniter2" ]; then
-    elif [ "$software" = "drupal6" ]; then
+    if [ "$software" = "drupal6" ]; then
            echo -e "\t\trysncing $software ~/sites/default/files/"
             if ([ "$software_workflow" = "downstream" ] && [ "$1" != "production" ]); then
                 rsync  --archive --compress --copy-links --delete -e "ssh -oStrictHostKeyChecking=no -i /catapult/secrets/id_rsa" root@$(echo "${configuration}" | shyaml get-value environments.production.servers.redhat.ip):/var/www/repositories/apache/$domain/sites/default/files/ /var/www/repositories/apache/${domain}/${webroot}sites/default/files/ 2>&1 | sed "s/^/\t\t/"
@@ -601,7 +601,6 @@ EOF
             php /catapult/provisioners/redhat/installers/wp-cli.phar --path="/var/www/repositories/apache/${domain}/${webroot}" plugin list 2>&1 | sed "s/^/\t\t\t/"
             echo "$software theme list:" | sed "s/^/\t\t/"
             php /catapult/provisioners/redhat/installers/wp-cli.phar --path="/var/www/repositories/apache/${domain}/${webroot}" theme list 2>&1 | sed "s/^/\t\t\t/"
-    elif [ "$software" = "xenforo" ]; then
     fi
 
 done
