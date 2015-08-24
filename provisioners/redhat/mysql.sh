@@ -88,6 +88,13 @@ end=$(date +%s)
 echo -e "\n==> completed in ($(($end - $start)) seconds)"
 
 
+echo -e "\n\n==> RSYNCing files"
+start=$(date +%s)
+source /catapult/provisioners/redhat/modules/rsync.sh
+end=$(date +%s)
+echo "==> completed in ($(($end - $start)) seconds)"
+
+
 echo -e "\n\n==> Generating software database config files"
 start=$(date +%s)
 source /catapult/provisioners/redhat/modules/software_database_config.sh
