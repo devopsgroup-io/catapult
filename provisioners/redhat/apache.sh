@@ -101,6 +101,13 @@ end=$(date +%s)
 echo "==> completed in ($(($end - $start)) seconds)"
 
 
+echo -e "\n\n==> RSYNCing files"
+start=$(date +%s)
+source /catapult/provisioners/redhat/modules/rsync.sh
+end=$(date +%s)
+echo "==> completed in ($(($end - $start)) seconds)"
+
+
 echo -e "\n\n==> Generating software database config files"
 start=$(date +%s)
 source /catapult/provisioners/redhat/modules/software_database_config.sh
@@ -492,7 +499,7 @@ while IFS='' read -r -d '' key; do
     if ([ -z "${force_auth}" ]) && ([ "$1" != "dev" ] || [ "$1" != "production" ]); then
         force_auth_value=""
     else
-        sudo htpasswd -b -c /etc/httpd/sites-enabled/${domain_environment}.htpasswd $force_auth $force_auth
+        sudo htpasswd -b -c /etc/httpd/sites-enabled/${domain_environment}.htpasswd ${force_auth} ${force_auth}
         force_auth_value="<Location />
             # Force HTTP authentication
             AuthType Basic
@@ -559,48 +566,30 @@ EOF
 
     # configure software
     if [ "$software" = "drupal6" ]; then
-           echo -e "\t\trysncing $software ~/sites/default/files/"
-            if ([ "$software_workflow" = "downstream" ] && [ "$1" != "production" ]); then
-                rsync  --archive --compress --copy-links --delete -e "ssh -oStrictHostKeyChecking=no -i /catapult/secrets/id_rsa" root@$(echo "${configuration}" | shyaml get-value environments.production.servers.redhat.ip):/var/www/repositories/apache/$domain/sites/default/files/ /var/www/repositories/apache/${domain}/${webroot}sites/default/files/ 2>&1 | sed "s/^/\t\t/"
-            elif ([ "$software_workflow" = "upstream" ] && [ "$1" != "test" ]); then
-                rsync  --archive --compress --copy-links --delete -e "ssh -oStrictHostKeyChecking=no -i /catapult/secrets/id_rsa" root@$(echo "${configuration}" | shyaml get-value environments.test.servers.redhat.ip):/var/www/repositories/apache/$domain/sites/default/files/ /var/www/repositories/apache/${domain}/${webroot}sites/default/files/ 2>&1 | sed "s/^/\t\t/"
-            fi
-            echo "$software core version:" | sed "s/^/\t\t/"
-            cd "/var/www/repositories/apache/${domain}/${webroot}" && drush core-status --field-labels=0 --fields=drupal-version 2>&1 | sed "s/^/\t\t\t/"
-            echo "$software core-requirements:" | sed "s/^/\t\t/"
-            cd "/var/www/repositories/apache/${domain}/${webroot}" && drush core-requirements --severity=2 --format=table 2>&1 | sed "s/^/\t\t\t/"
-            echo "$software pm-updatestatus:" | sed "s/^/\t\t/"
-            cd "/var/www/repositories/apache/${domain}/${webroot}" && drush pm-updatestatus --format=table 2>&1 | sed "s/^/\t\t\t/"
+        echo "$software core version:" | sed "s/^/\t\t/"
+        cd "/var/www/repositories/apache/${domain}/${webroot}" && drush core-status --field-labels=0 --fields=drupal-version 2>&1 | sed "s/^/\t\t\t/"
+        echo "$software core-requirements:" | sed "s/^/\t\t/"
+        cd "/var/www/repositories/apache/${domain}/${webroot}" && drush core-requirements --severity=2 --format=table 2>&1 | sed "s/^/\t\t\t/"
+        echo "$software pm-updatestatus:" | sed "s/^/\t\t/"
+        cd "/var/www/repositories/apache/${domain}/${webroot}" && drush pm-updatestatus --format=table 2>&1 | sed "s/^/\t\t\t/"
     elif [ "$software" = "drupal7" ]; then
-            echo -e "\t\trysncing $software ~/sites/default/files/"
-            if ([ "$software_workflow" = "downstream" ] && [ "$1" != "production" ]); then
-                rsync  --archive --compress --copy-links --delete -e "ssh -oStrictHostKeyChecking=no -i /catapult/secrets/id_rsa" root@$(echo "${configuration}" | shyaml get-value environments.production.servers.redhat.ip):/var/www/repositories/apache/$domain/sites/default/files/ /var/www/repositories/apache/${domain}/${webroot}sites/default/files/ 2>&1 | sed "s/^/\t\t/"
-            elif ([ "$software_workflow" = "upstream" ] && [ "$1" != "test" ]); then
-                rsync  --archive --compress --copy-links --delete -e "ssh -oStrictHostKeyChecking=no -i /catapult/secrets/id_rsa" root@$(echo "${configuration}" | shyaml get-value environments.test.servers.redhat.ip):/var/www/repositories/apache/$domain/sites/default/files/ /var/www/repositories/apache/${domain}/${webroot}sites/default/files/ 2>&1 | sed "s/^/\t\t/"
-            fi
-            echo "$software core version:" | sed "s/^/\t\t/"
-            cd "/var/www/repositories/apache/${domain}/${webroot}" && drush core-status --field-labels=0 --fields=drupal-version 2>&1 | sed "s/^/\t\t\t/"
-            echo "$software core-requirements:" | sed "s/^/\t\t/"
-            cd "/var/www/repositories/apache/${domain}/${webroot}" && drush core-requirements --severity=2 --format=table 2>&1 | sed "s/^/\t\t\t/"
-            echo "$software pm-updatestatus:" | sed "s/^/\t\t/"
-            cd "/var/www/repositories/apache/${domain}/${webroot}" && drush pm-updatestatus --format=table 2>&1 | sed "s/^/\t\t\t/"
+        echo "$software core version:" | sed "s/^/\t\t/"
+        cd "/var/www/repositories/apache/${domain}/${webroot}" && drush core-status --field-labels=0 --fields=drupal-version 2>&1 | sed "s/^/\t\t\t/"
+        echo "$software core-requirements:" | sed "s/^/\t\t/"
+        cd "/var/www/repositories/apache/${domain}/${webroot}" && drush core-requirements --severity=2 --format=table 2>&1 | sed "s/^/\t\t\t/"
+        echo "$software pm-updatestatus:" | sed "s/^/\t\t/"
+        cd "/var/www/repositories/apache/${domain}/${webroot}" && drush pm-updatestatus --format=table 2>&1 | sed "s/^/\t\t\t/"
     elif [ "$software" = "wordpress" ]; then
-            echo -e "\t\trysncing $software ~/wp-content/"
-            if ([ "$software_workflow" = "downstream" ] && [ "$1" != "production" ]); then
-                rsync  --archive --compress --copy-links --delete -e "ssh -oStrictHostKeyChecking=no -i /catapult/secrets/id_rsa" root@$(echo "${configuration}" | shyaml get-value environments.production.servers.redhat.ip):/var/www/repositories/apache/${domain}/${webroot}wp-content/ /var/www/repositories/apache/${domain}/${webroot}wp-content/ 2>&1 | sed "s/^/\t\t/"
-            elif ([ "$software_workflow" = "upstream" ] && [ "$1" != "test" ]); then
-                rsync  --archive --compress --copy-links --delete -e "ssh -oStrictHostKeyChecking=no -i /catapult/secrets/id_rsa" root@$(echo "${configuration}" | shyaml get-value environments.test.servers.redhat.ip):/var/www/repositories/apache/${domain}/${webroot}wp-content/ /var/www/repositories/apache/${domain}/${webroot}wp-content/ 2>&1 | sed "s/^/\t\t/"
-            fi
-            echo "$software core version:" | sed "s/^/\t/\t"
-            php /catapult/provisioners/redhat/installers/wp-cli.phar --path="/var/www/repositories/apache/${domain}/${webroot}" core version 2>&1 | sed "s/^/\t\t\t/"
-            echo "$software core verify-checksums:" | sed "s/^/\t\t/"
-            php /catapult/provisioners/redhat/installers/wp-cli.phar --path="/var/www/repositories/apache/${domain}/${webroot}" core verify-checksums 2>&1 | sed "s/^/\t\t\t/"
-            echo "$software core check-update:" | sed "s/^/\t\t/"
-            php /catapult/provisioners/redhat/installers/wp-cli.phar --path="/var/www/repositories/apache/${domain}/${webroot}" core check-update 2>&1 | sed "s/^/\t\t\t/"
-            echo "$software plugin list:" | sed "s/^/\t\t/"
-            php /catapult/provisioners/redhat/installers/wp-cli.phar --path="/var/www/repositories/apache/${domain}/${webroot}" plugin list 2>&1 | sed "s/^/\t\t\t/"
-            echo "$software theme list:" | sed "s/^/\t\t/"
-            php /catapult/provisioners/redhat/installers/wp-cli.phar --path="/var/www/repositories/apache/${domain}/${webroot}" theme list 2>&1 | sed "s/^/\t\t\t/"
+        echo "$software core version:" | sed "s/^/\t/\t"
+        php /catapult/provisioners/redhat/installers/wp-cli.phar --path="/var/www/repositories/apache/${domain}/${webroot}" core version 2>&1 | sed "s/^/\t\t\t/"
+        echo "$software core verify-checksums:" | sed "s/^/\t\t/"
+        php /catapult/provisioners/redhat/installers/wp-cli.phar --path="/var/www/repositories/apache/${domain}/${webroot}" core verify-checksums 2>&1 | sed "s/^/\t\t\t/"
+        echo "$software core check-update:" | sed "s/^/\t\t/"
+        php /catapult/provisioners/redhat/installers/wp-cli.phar --path="/var/www/repositories/apache/${domain}/${webroot}" core check-update 2>&1 | sed "s/^/\t\t\t/"
+        echo "$software plugin list:" | sed "s/^/\t\t/"
+        php /catapult/provisioners/redhat/installers/wp-cli.phar --path="/var/www/repositories/apache/${domain}/${webroot}" plugin list 2>&1 | sed "s/^/\t\t\t/"
+        echo "$software theme list:" | sed "s/^/\t\t/"
+        php /catapult/provisioners/redhat/installers/wp-cli.phar --path="/var/www/repositories/apache/${domain}/${webroot}" theme list 2>&1 | sed "s/^/\t\t\t/"
     fi
 
 done
