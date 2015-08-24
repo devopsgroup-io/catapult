@@ -174,6 +174,12 @@ while IFS='' read -r -d '' key; do
     if ! test -n "${software}"; then
         echo -e "\t* this website has no software setting, skipping database workflow"
     else
+        # grant mysql user to database
+        mysql --defaults-extra-file=$dbconf -e "GRANT ALL ON ${1}_${domainvaliddbname}.* TO '$(echo "${configuration}" | shyaml get-value environments.${1}.servers.redhat_mysql.mysql.user)'@'%'";
+        # grant maintenance user to database
+        mysql --defaults-extra-file=$dbconf -e "GRANT ALL ON ${1}_${domainvaliddbname}.* TO 'maintenance'@'%'";
+        # flush privileges
+        mysql --defaults-extra-file=$dbconf -e "FLUSH PRIVILEGES"
         # respect software_workflow option
         if ([ "${1}" = "production" ] && [ "${software_workflow}" = "downstream" ] && [ "${software_dbexist}" != "" ]) || ([ "${1}" = "test" ] && [ "${software_workflow}" = "upstream" ] && [ "${software_dbexist}" != "" ]); then
             echo -e "\t* workflow is set to ${software_workflow} and this is the ${1} environment, performing a database backup"
@@ -263,12 +269,6 @@ while IFS='' read -r -d '' key; do
                 done
             fi
         fi
-        # grant mysql user to database
-        mysql --defaults-extra-file=$dbconf -e "GRANT ALL ON ${1}_${domainvaliddbname}.* TO '$(echo "${configuration}" | shyaml get-value environments.${1}.servers.redhat_mysql.mysql.user)'@'%'";
-        # grant maintenance user to database
-        mysql --defaults-extra-file=$dbconf -e "GRANT ALL ON ${1}_${domainvaliddbname}.* TO 'maintenance'@'%'";
-        # flush privileges
-        mysql --defaults-extra-file=$dbconf -e "FLUSH PRIVILEGES"
     fi
 
 done
