@@ -1068,7 +1068,7 @@ if ["status"].include?(ARGV[0])
   puts "\n[cert signature algorithm]"
   puts " * https://www.openssl.org/docs/apps/ciphers.html"
   puts "\nAvailable websites:".color(Colors::WHITE)
-  puts "".ljust(30) + "[software]".ljust(15) + "[dev.]".ljust(22) + "[test.]".ljust(22) + "[qc.]".ljust(22) + "[production / cert expiry, signature algorithm, common name]".ljust(80) + "[alexa rank, 3m delta]".ljust(26)
+  puts "".ljust(40) + "[software]".ljust(15) + "[dev.]".ljust(22) + "[test.]".ljust(22) + "[qc.]".ljust(22) + "[production / cert expiry, signature algorithm, common name]".ljust(80) + "[alexa rank, 3m delta]".ljust(26)
 
   configuration["websites"].each do |service,data|
     unless configuration["websites"]["#{service}"] == nil
@@ -1080,9 +1080,9 @@ if ["status"].include?(ARGV[0])
         row = Array.new
         # get domain name
         if instance["domain_tld_override"] == nil
-          row.push(" * #{instance["domain"]}".ljust(29))
+          row.push(" * #{instance["domain"]}".ljust(39))
         else
-          row.push(" * #{instance["domain"]}.#{instance["domain_tld_override"]}".ljust(29))
+          row.push(" * #{instance["domain"]}.#{instance["domain_tld_override"]}".ljust(39))
         end
         # get software
         row.push((instance["software"] || "").ljust(14))
