@@ -285,7 +285,11 @@ The following options are available:
         * dev.example.com, test.example.com, qc.example.com, example.com are replaced by dev.example.com.mycompany.com, test.example.com.mycompany.com, qc.example.com.mycompany.com, example.com.mycompany.com
 * force_auth:
     * `example`
-        * forces http basic authentication in test and qc, `example` is both the username and password
+        * forces http basic authentication in test, qc, and production
+        * `example` is both the username and password
+* force_auth_exclude:
+    * `["test","qc","production"]`
+        * array of exclusions exclusive to the force_auth option
 * force_https:
     * `true`
         * rewrite all http traffic to https
@@ -308,11 +312,11 @@ The following options are available:
         * usually used in Drupal for multisite installations (`wp_ is required for base Wordpress installs, Drupal has no prefix by default`)
 * software_workflow:
     * `downstream`
-        * production is the source for the database and untracked files
+        * production is the source for the database and upload directories of drupal and wordpress
         * this option is used when maintaining a website
         * see the below chart for more details
     * `upstream`
-        * test is the source for the database and untracked files
+        * test is the source for the database and upload directories of drupal and wordpress
         * this option is used when launching a new website
         * see the below chart for more details
 * webroot:

@@ -727,6 +727,18 @@ configuration["websites"].each do |service,data|
           end
         end
       end
+      # validate force_auth_exclude
+      unless instance["force_auth_exclude"] == nil
+        @force_auth_exclude_valid_values = true
+        instance["force_auth_exclude"].each do |value|
+          if not ["test","qc","production"].include?("#{value}")
+            @force_auth_exclude_valid_values = false
+          end
+        end
+        unless @force_auth_exclude_valid_values
+          catapult_exception("There is an error in your secrets/configuration.yml file.\nThe force_auth_exclude for websites => #{service} => domain => #{instance["domain"]} is invalid, it must only include one, some, or all of the following [\"test\",\"qc\",\"production\"].")
+        end
+      end
       # validate force_https
       unless instance["force_https"] == nil
         unless ["true"].include?("#{instance["force_https"]}")
