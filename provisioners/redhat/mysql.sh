@@ -53,6 +53,7 @@ echo "==> completed in ($(($end - $start)) seconds)"
 echo -e "\n\n\n==> Installing Drush and WP-CLI"
 start=$(date +%s)
 sudo yum install -y php-cli
+sudo yum install -y php-mysql
 sudo yum install -y mariadb
 # install drush
 if [ ! -f /usr/bin/drush  ]; then
@@ -85,6 +86,13 @@ start=$(date +%s)
 source /catapult/provisioners/redhat/modules/git.sh
 end=$(date +%s)
 echo -e "\n==> completed in ($(($end - $start)) seconds)"
+
+
+echo -e "\n\n==> Generating software database config files"
+start=$(date +%s)
+source /catapult/provisioners/redhat/modules/software_database_config.sh
+end=$(date +%s)
+echo "==> completed in ($(($end - $start)) seconds)"
 
 
 echo -e "\n\n\n==> Configuring MySQL"
@@ -166,6 +174,12 @@ while IFS='' read -r -d '' key; do
     if ! test -n "${software}"; then
         echo -e "\t* this website has no software setting, skipping database workflow"
     else
+        # grant mysql user to database
+        mysql --defaults-extra-file=$dbconf -e "GRANT ALL ON ${1}_${domainvaliddbname}.* TO '$(echo "${configuration}" | shyaml get-value environments.${1}.servers.redhat_mysql.mysql.user)'@'%'";
+        # grant maintenance user to database
+        mysql --defaults-extra-file=$dbconf -e "GRANT ALL ON ${1}_${domainvaliddbname}.* TO 'maintenance'@'%'";
+        # flush privileges
+        mysql --defaults-extra-file=$dbconf -e "FLUSH PRIVILEGES"
         # respect software_workflow option
         if ([ "${1}" = "production" ] && [ "${software_workflow}" = "downstream" ] && [ "${software_dbexist}" != "" ]) || ([ "${1}" = "test" ] && [ "${software_workflow}" = "upstream" ] && [ "${software_dbexist}" != "" ]); then
             echo -e "\t* workflow is set to ${software_workflow} and this is the ${1} environment, performing a database backup"
@@ -255,12 +269,6 @@ while IFS='' read -r -d '' key; do
                 done
             fi
         fi
-        # grant mysql user to database
-        mysql --defaults-extra-file=$dbconf -e "GRANT ALL ON ${1}_${domainvaliddbname}.* TO '$(echo "${configuration}" | shyaml get-value environments.${1}.servers.redhat_mysql.mysql.user)'@'%'";
-        # grant maintenance user to database
-        mysql --defaults-extra-file=$dbconf -e "GRANT ALL ON ${1}_${domainvaliddbname}.* TO 'maintenance'@'%'";
-        # flush privileges
-        mysql --defaults-extra-file=$dbconf -e "FLUSH PRIVILEGES"
     fi
 
 done
