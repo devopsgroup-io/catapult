@@ -490,15 +490,15 @@ while IFS='' read -r -d '' key; do
     sudo mkdir -p /var/log/httpd/${domain_environment}
     sudo touch /var/log/httpd/${domain_environment}/access.log
     sudo touch /var/log/httpd/${domain_environment}/error.log
+    # set domain_tld_override_alias_additions for vhost
     if [ -z "${domain_tld_override}" ]; then
-        domain_tld_override_value=""
+        domain_tld_override_alias_additions=""
     else
-        domain_tld_override_value="ServerAlias ${domain_environment}.${domain_tld_override}
+        domain_tld_override_alias_additions="ServerAlias ${domain_environment}.${domain_tld_override}
         ServerAlias www.${domain_environment}.${domain_tld_override}"
     fi
-    if ([ -z "${force_auth}" ]) && ([ "$1" != "dev" ] || [ "$1" != "production" ]); then
-        force_auth_value=""
-    else
+    # handle the force_auth option
+    if ([ ! -z "${force_auth}" ]) && ([ "$1" = "test" ] || [ "$1" = "qc" ]); then
         sudo htpasswd -b -c /etc/httpd/sites-enabled/${domain_environment}.htpasswd ${force_auth} ${force_auth}
         force_auth_value="<Location />
             # Force HTTP authentication
@@ -507,23 +507,25 @@ while IFS='' read -r -d '' key; do
             AuthUserFile \"/etc/httpd/sites-enabled/${domain_environment}.htpasswd\"
             Require valid-user
         </Location>"
+    else
+        force_auth_value=""
     fi
+    # handle the force_https option
     if [ "${force_https}" = true ]; then
-        # rewrite all http traffic to https
         force_https_value="Redirect Permanent / https://${domain_environment}"
     else
         force_https_value=""
     fi
+    # write vhost apache conf file
     sudo cat > /etc/httpd/sites-available/$domain_environment.conf << EOF
 
     RewriteEngine On
 
-    # must listen * to support cloudflare
-    <VirtualHost *:80>
+    <VirtualHost *:80> # must listen * to support cloudflare
         ServerAdmin $company_email
         ServerName $domain_environment
         ServerAlias www.$domain_environment
-        $domain_tld_override_value
+        $domain_tld_override_alias_additions
         DocumentRoot /var/www/repositories/apache/$domain/$webroot
         ErrorLog /var/log/httpd/$domain_environment/error.log
         CustomLog /var/log/httpd/$domain_environment/access.log combined
@@ -532,8 +534,7 @@ while IFS='' read -r -d '' key; do
     </VirtualHost> 
 
     <IfModule mod_ssl.c>
-        # must listen * to support cloudflare
-        <VirtualHost *:443>
+        <VirtualHost *:443> # must listen * to support cloudflare
             ServerAdmin $company_email
             ServerName $domain_environment
             ServerAlias www.$domain_environment
@@ -580,7 +581,7 @@ EOF
         echo "$software pm-updatestatus:" | sed "s/^/\t\t/"
         cd "/var/www/repositories/apache/${domain}/${webroot}" && drush pm-updatestatus --format=table 2>&1 | sed "s/^/\t\t\t/"
     elif [ "$software" = "wordpress" ]; then
-        echo "$software core version:" | sed "s/^/\t/\t"
+        echo "$software core version:" | sed "s/^/\t\t/"
         php /catapult/provisioners/redhat/installers/wp-cli.phar --path="/var/www/repositories/apache/${domain}/${webroot}" core version 2>&1 | sed "s/^/\t\t\t/"
         echo "$software core verify-checksums:" | sed "s/^/\t\t/"
         php /catapult/provisioners/redhat/installers/wp-cli.phar --path="/var/www/repositories/apache/${domain}/${webroot}" core verify-checksums 2>&1 | sed "s/^/\t\t\t/"
