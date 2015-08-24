@@ -87,6 +87,13 @@ end=$(date +%s)
 echo -e "\n==> completed in ($(($end - $start)) seconds)"
 
 
+echo -e "\n\n==> Generating software database config files"
+start=$(date +%s)
+source /catapult/provisioners/redhat/modules/software_database_config.sh
+end=$(date +%s)
+echo "==> completed in ($(($end - $start)) seconds)"
+
+
 echo -e "\n\n\n==> Configuring MySQL"
 start=$(date +%s)
 # configure mysql conf so user/pass isn't logged in shell history or memory

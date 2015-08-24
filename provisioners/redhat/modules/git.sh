@@ -3,10 +3,14 @@ sudo mkdir -p ~/.ssh
 sudo touch ~/.ssh/known_hosts
 sudo ssh-keyscan bitbucket.org > ~/.ssh/known_hosts
 sudo ssh-keyscan github.com >> ~/.ssh/known_hosts
+
 while IFS='' read -r -d '' key; do
+
     domain=$(echo "$key" | grep -w "domain" | cut -d ":" -f 2 | tr -d " ")
     repo=$(echo "$key" | grep -w "repo" | cut -d ":" -f 2,3 | tr -d " ")
+
     echo -e "\nNOTICE: $domain"
+
     if [ -d "/var/www/repositories/apache/$domain/.git" ]; then
         if [ "$(cd /var/www/repositories/apache/$domain && git config --get remote.origin.url)" != "$repo" ]; then
             echo "the repo has changed in secrets/configuration.yml, removing and cloning the new repository." | sed "s/^/\t/"
@@ -28,6 +32,7 @@ while IFS='' read -r -d '' key; do
         fi
         sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git clone --recursive -b $(echo "${configuration}" | shyaml get-value environments.$1.branch) $repo /var/www/repositories/apache/$domain" | sed "s/^/\t/"
     fi
+
 done < <(echo "${configuration}" | shyaml get-values-0 websites.apache)
 
 # create an array of domains
