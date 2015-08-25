@@ -1,3 +1,6 @@
+cloudflare_api_key="$(echo "${configuration}" | shyaml get-value company.cloudflare_api_key)"
+cloudflare_email="$(echo "${configuration}" | shyaml get-value company.cloudflare_email)"
+
 echo "${configuration}" | shyaml get-values-0 websites.apache |
 while IFS='' read -r -d '' key; do
 
