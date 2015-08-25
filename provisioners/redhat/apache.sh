@@ -570,6 +570,9 @@ EOF
 
     # configure software
     if [ "$software" = "drupal6" ]; then
+        echo "setting permissions for $software upload directory ~/sites/default/files" | sed "s/^/\t\t/"
+        sudo chown -R apache /var/www/repositories/apache/${domain}/${webroot}sites/default/files
+        sudo chmod -R 0700 /var/www/repositories/apache/${domain}/${webroot}sites/default/files
         echo "$software core version:" | sed "s/^/\t\t/"
         cd "/var/www/repositories/apache/${domain}/${webroot}" && drush core-status --field-labels=0 --fields=drupal-version 2>&1 | sed "s/^/\t\t\t/"
         echo "$software core-requirements:" | sed "s/^/\t\t/"
@@ -577,6 +580,9 @@ EOF
         echo "$software pm-updatestatus:" | sed "s/^/\t\t/"
         cd "/var/www/repositories/apache/${domain}/${webroot}" && drush pm-updatestatus --format=table 2>&1 | sed "s/^/\t\t\t/"
     elif [ "$software" = "drupal7" ]; then
+        echo "setting permissions for $software upload directory ~/sites/default/files" | sed "s/^/\t\t/"
+        sudo chown -R apache /var/www/repositories/apache/${domain}/${webroot}sites/default/files
+        sudo chmod -R 0700 /var/www/repositories/apache/${domain}/${webroot}sites/default/files
         echo "$software core version:" | sed "s/^/\t\t/"
         cd "/var/www/repositories/apache/${domain}/${webroot}" && drush core-status --field-labels=0 --fields=drupal-version 2>&1 | sed "s/^/\t\t\t/"
         echo "$software core-requirements:" | sed "s/^/\t\t/"
@@ -584,6 +590,9 @@ EOF
         echo "$software pm-updatestatus:" | sed "s/^/\t\t/"
         cd "/var/www/repositories/apache/${domain}/${webroot}" && drush pm-updatestatus --format=table 2>&1 | sed "s/^/\t\t\t/"
     elif [ "$software" = "wordpress" ]; then
+        echo "setting permissions for $software upload directory ~/wp-content/uploads" | sed "s/^/\t\t/"
+        sudo chown -R apache /var/www/repositories/apache/${domain}/${webroot}wp-content/uploads
+        sudo chmod -R 0700 /var/www/repositories/apache/${domain}/${webroot}wp-content/uploads
         echo "$software core version:" | sed "s/^/\t\t/"
         php /catapult/provisioners/redhat/installers/wp-cli.phar --allow-root --path="/var/www/repositories/apache/${domain}/${webroot}" core version 2>&1 | sed "s/^/\t\t\t/"
         echo "$software core verify-checksums:" | sed "s/^/\t\t/"
