@@ -60,7 +60,7 @@ end=$(date +%s)
 echo "==> completed in ($(($end - $start)) seconds)"
 
 
-echo -e "\n\n==> Installing stoftware tools"
+echo -e "\n\n==> Installing software tools"
 start=$(date +%s)
 source /catapult/provisioners/redhat/modules/software_tools.sh
 end=$(date +%s)
@@ -116,8 +116,6 @@ mysql_root_password="$(echo "${configuration}" | shyaml get-value environments.$
 redhat_ip="$(echo "${configuration}" | shyaml get-value environments.$1.servers.redhat.ip)"
 redhat_mysql_ip="$(echo "${configuration}" | shyaml get-value environments.$1.servers.redhat_mysql.ip)"
 company_email="$(echo "${configuration}" | shyaml get-value company.email)"
-cloudflare_api_key="$(echo "${configuration}" | shyaml get-value company.cloudflare_api_key)"
-cloudflare_email="$(echo "${configuration}" | shyaml get-value company.cloudflare_email)"
 
 # configure vhosts
 # this is a debianism - but it makes things easier for cross-distro

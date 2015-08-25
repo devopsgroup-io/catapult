@@ -50,7 +50,7 @@ end=$(date +%s)
 echo "==> completed in ($(($end - $start)) seconds)"
 
 
-echo -e "\n\n==> Installing stoftware tools"
+echo -e "\n\n==> Installing software tools"
 start=$(date +%s)
 source /catapult/provisioners/redhat/modules/software_tools.sh
 end=$(date +%s)
