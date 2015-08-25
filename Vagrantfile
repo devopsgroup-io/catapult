@@ -1066,7 +1066,7 @@ configuration["websites"].each do |service,data|
               "\"config\":"\
                 "{"\
                   "\"base_url\":\"#{configuration["company"]["bamboo_base_url"]}\","\
-                  "\"build_key\":\"develop:CAT-TEST,master:CAT-QC\","\
+                  "\"build_key\":\"develop:CAT-TEST,release:CAT-QC\","\
                   "\"username\":\"#{configuration["company"]["bamboo_username"]}\","\
                   "\"password\":\"#{configuration["company"]["bamboo_password"]}\""\
                 "}"\
