@@ -683,17 +683,21 @@ configuration["websites"].each do |service,data|
               "&url=#{instance["domain"]}"\
             "")
           response = http.request request # Net::HTTPResponse object
-          api_monitorus_monitor_http = JSON.parse(response.body)
-          # errorCode 11 => monitorUrlExists
-          if api_monitorus_monitor_http["status"] == "ok" || api_monitorus_monitor_http["errorCode"].to_f == 11
-            puts "   - Configured monitor.us http monitor."
-          # errorCode 14 => The URL is not resolved.
-          elsif api_monitorus_monitor_http["errorCode"].to_f == 14
-            puts "   - Could not add the monitor.us http monitor. The URL does not resolve."
-          elsif api_monitorus_monitor_http["error"].include?("out of limit")
-            puts "   - monitor.us api limit of 1000 requests per hour has been hit, skipping for now."
+          if response.code.to_f.between?(399,600)
+            puts "   - The monitor.us API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
           else
-            catapult_exception("Unable to configure monitor.us http monitor for websites => #{service} => domain => #{instance["domain"]}.")
+            api_monitorus_monitor_http = JSON.parse(response.body)
+            # errorCode 11 => monitorUrlExists
+            if api_monitorus_monitor_http["status"] == "ok" || api_monitorus_monitor_http["errorCode"].to_f == 11
+              puts "   - Configured monitor.us http monitor."
+            # errorCode 14 => The URL is not resolved.
+            elsif api_monitorus_monitor_http["errorCode"].to_f == 14
+              puts "   - Could not add the monitor.us http monitor. The URL does not resolve."
+            elsif api_monitorus_monitor_http["error"].include?("out of limit")
+              puts "   - monitor.us api limit of 1000 requests per hour has been hit, skipping for now."
+            else
+              catapult_exception("Unable to configure monitor.us http monitor for websites => #{service} => domain => #{instance["domain"]}.")
+            end
           end
         end
         uri = URI("http://monitor.us/api")
@@ -713,17 +717,21 @@ configuration["websites"].each do |service,data|
               "&url=#{instance["domain"]}"\
             "")
           response = http.request request # Net::HTTPResponse object
-          api_monitorus_monitor_https = JSON.parse(response.body)
-          # errorCode 11 => monitorUrlExists
-          if api_monitorus_monitor_https["status"] == "ok" || api_monitorus_monitor_https["errorCode"].to_f == 11
-            puts "   - Configured monitor.us https monitor."
-          # errorCode 14 => The URL is not resolved.
-          elsif api_monitorus_monitor_https["errorCode"].to_f == 14
-            puts "   - Could not add the monitor.us https monitor. The URL does not resolve."
-          elsif api_monitorus_monitor_https["error"].include?("out of limit")
-            puts "   - monitor.us api limit of 1000 requests per hour has been hit, skipping for now."
+          if response.code.to_f.between?(399,600)
+            puts "   - The monitor.us API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
           else
-            catapult_exception("Unable to configure monitor.us https monitor for websites => #{service} => domain => #{instance["domain"]}.")
+            api_monitorus_monitor_https = JSON.parse(response.body)
+            # errorCode 11 => monitorUrlExists
+            if api_monitorus_monitor_https["status"] == "ok" || api_monitorus_monitor_https["errorCode"].to_f == 11
+              puts "   - Configured monitor.us https monitor."
+            # errorCode 14 => The URL is not resolved.
+            elsif api_monitorus_monitor_https["errorCode"].to_f == 14
+              puts "   - Could not add the monitor.us https monitor. The URL does not resolve."
+            elsif api_monitorus_monitor_https["error"].include?("out of limit")
+              puts "   - monitor.us api limit of 1000 requests per hour has been hit, skipping for now."
+            else
+              catapult_exception("Unable to configure monitor.us https monitor for websites => #{service} => domain => #{instance["domain"]}.")
+            end
           end
         end
       end
@@ -799,10 +807,14 @@ configuration["websites"].each do |service,data|
           request = Net::HTTP::Get.new uri.request_uri
           request.basic_auth "#{configuration["company"]["bitbucket_username"]}", "#{configuration["company"]["bitbucket_password"]}"
           response = http.request request # Net::HTTPResponse object
-          api_bitbucket_repo_repositories = JSON.parse(response.body)
-          if response.code.to_f == 200
-            if api_bitbucket_repo_repositories["owner"]["username"] == "#{configuration["company"]["bitbucket_username"]}"
-              @api_bitbucket_repo_access = true
+          if response.code.to_f.between?(399,600)
+            @api_bitbucket_repo_access = 500
+          else
+            api_bitbucket_repo_repositories = JSON.parse(response.body)
+            if response.code.to_f == 200
+              if api_bitbucket_repo_repositories["owner"]["username"] == "#{configuration["company"]["bitbucket_username"]}"
+                @api_bitbucket_repo_access = true
+              end
             end
           end
         end
@@ -811,11 +823,15 @@ configuration["websites"].each do |service,data|
           request = Net::HTTP::Get.new uri.request_uri
           request.basic_auth "#{configuration["company"]["bitbucket_username"]}", "#{configuration["company"]["bitbucket_password"]}"
           response = http.request request # Net::HTTPResponse object
-          api_bitbucket_repo_privileges = JSON.parse(response.body)
-          api_bitbucket_repo_privileges.each do |member|
-            if member["privilege"] == "admin" || member["privilege"] == "write"
-              if member["user"]["username"] == "#{configuration["company"]["bitbucket_username"]}"
-                @api_bitbucket_repo_access = true
+          if response.code.to_f.between?(399,600)
+            @api_bitbucket_repo_access = 500
+          else
+            api_bitbucket_repo_privileges = JSON.parse(response.body)
+            api_bitbucket_repo_privileges.each do |member|
+              if member["privilege"] == "admin" || member["privilege"] == "write"
+                if member["user"]["username"] == "#{configuration["company"]["bitbucket_username"]}"
+                  @api_bitbucket_repo_access = true
+                end
               end
             end
           end
@@ -825,20 +841,26 @@ configuration["websites"].each do |service,data|
           request = Net::HTTP::Get.new uri.request_uri
           request.basic_auth "#{configuration["company"]["bitbucket_username"]}", "#{configuration["company"]["bitbucket_password"]}"
           response = http.request request # Net::HTTPResponse object
-          api_bitbucket_repo_group_privileges = JSON.parse(response.body)
-          api_bitbucket_repo_group_privileges.each do |group|
-            if group["privilege"] == "admin" || group["privilege"] == "write"
-              group["group"]["members"].each do |member|
-                if member["username"] == "#{configuration["company"]["bitbucket_username"]}"
-                  @api_bitbucket_repo_access = true
+          if response.code.to_f.between?(399,600)
+            @api_bitbucket_repo_access = 500
+          else
+            api_bitbucket_repo_group_privileges = JSON.parse(response.body)
+            api_bitbucket_repo_group_privileges.each do |group|
+              if group["privilege"] == "admin" || group["privilege"] == "write"
+                group["group"]["members"].each do |member|
+                  if member["username"] == "#{configuration["company"]["bitbucket_username"]}"
+                    @api_bitbucket_repo_access = true
+                  end
                 end
               end
             end
           end
         end
-        unless @api_bitbucket_repo_access
+        if @api_bitbucket_repo_access == 500
+            puts "   - The Bitbucket API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
+        elsif @api_bitbucket_repo_access === false
           catapult_exception("Your Bitbucket user #{configuration["company"]["bitbucket_username"]} does not have write access to this repository.")
-        else
+        elsif @api_bitbucket_repo_access === true
           puts "   - Verified your Bitbucket user #{configuration["company"]["bitbucket_username"]} has write access."
         end
       end
@@ -848,10 +870,14 @@ configuration["websites"].each do |service,data|
           request = Net::HTTP::Get.new uri.request_uri
           request.basic_auth "#{configuration["company"]["github_username"]}", "#{configuration["company"]["github_password"]}"
           response = http.request request # Net::HTTPResponse object
-          if response.code.to_f == 204
-            puts "   - Verified your GitHub user #{configuration["company"]["github_username"]} has write access."
+          if response.code.to_f.between?(399,600)
+            puts "   - The GitHub API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
           else
-            catapult_exception("Your GitHub user #{configuration["company"]["github_username"]} does not have write access to this repository.")
+            if response.code.to_f == 204
+              puts "   - Verified your GitHub user #{configuration["company"]["github_username"]} has write access."
+            else
+              catapult_exception("Your GitHub user #{configuration["company"]["github_username"]} does not have write access to this repository.")
+            end
           end
         end
       end
@@ -862,35 +888,39 @@ configuration["websites"].each do |service,data|
           request = Net::HTTP::Get.new uri.request_uri
           request.basic_auth "#{configuration["company"]["bitbucket_username"]}", "#{configuration["company"]["bitbucket_password"]}"
           response = http.request request # Net::HTTPResponse object
-          api_bitbucket_repo_branches = JSON.parse(response.body)
-          @api_bitbucket_repo_develop = false
-          @api_bitbucket_repo_release = false
-          @api_bitbucket_repo_master = false
-          api_bitbucket_repo_branches.each do |branch, array|
-            if branch == "develop"
-              @api_bitbucket_repo_develop = true
-            end
-            if branch == "release"
-              @api_bitbucket_repo_release = true
-            end
-            if branch == "master"
-              @api_bitbucket_repo_master = true
-            end
-          end
-          unless @api_bitbucket_repo_develop
-            catapult_exception("Cannot find the develop branch for this repository, please create one.")
+          if response.code.to_f.between?(399,600)
+            puts "   - The Bitbucket API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
           else
-            puts "   - Found the develop branch."
-          end
-          unless @api_bitbucket_repo_release
-            catapult_exception("Cannot find the release branch for this repository, please create one.")
-          else
-            puts "   - Found the release branch."
-          end
-          unless @api_bitbucket_repo_master
-            catapult_exception("Cannot find the master branch for this repository, please create one.")
-          else
-            puts "   - Found the master branch."
+            api_bitbucket_repo_branches = JSON.parse(response.body)
+            @api_bitbucket_repo_develop = false
+            @api_bitbucket_repo_release = false
+            @api_bitbucket_repo_master = false
+            api_bitbucket_repo_branches.each do |branch, array|
+              if branch == "develop"
+                @api_bitbucket_repo_develop = true
+              end
+              if branch == "release"
+                @api_bitbucket_repo_release = true
+              end
+              if branch == "master"
+                @api_bitbucket_repo_master = true
+              end
+            end
+            unless @api_bitbucket_repo_develop
+              catapult_exception("Cannot find the develop branch for this repository, please create one.")
+            else
+              puts "   - Found the develop branch."
+            end
+            unless @api_bitbucket_repo_release
+              catapult_exception("Cannot find the release branch for this repository, please create one.")
+            else
+              puts "   - Found the release branch."
+            end
+            unless @api_bitbucket_repo_master
+              catapult_exception("Cannot find the master branch for this repository, please create one.")
+            else
+              puts "   - Found the master branch."
+            end
           end
         end
       end
@@ -900,35 +930,39 @@ configuration["websites"].each do |service,data|
           request = Net::HTTP::Get.new uri.request_uri
           request.basic_auth "#{configuration["company"]["github_username"]}", "#{configuration["company"]["github_password"]}"
           response = http.request request # Net::HTTPResponse object
-          api_github_repo_branches = JSON.parse(response.body)
-          @api_github_repo_develop = false
-          @api_github_repo_release = false
-          @api_github_repo_master = false
-          api_github_repo_branches.each do |branch|
-            if branch["name"] == "develop"
-              @api_github_repo_develop = true
-            end
-            if branch["name"] == "release"
-              @api_github_repo_release = true
-            end
-            if branch["name"] == "master"
-              @api_github_repo_master = true
-            end
-          end
-          unless @api_github_repo_develop
-            catapult_exception("Cannot find the develop branch for this repository, please create one.")
+          if response.code.to_f.between?(399,600)
+            puts "   - The GitHub API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
           else
-            puts "   - Found the develop branch."
-          end
-          unless @api_github_repo_release
-            catapult_exception("Cannot find the release branch for this repository, please create one.")
-          else
-            puts "   - Found the release branch."
-          end
-          unless @api_github_repo_master
-            catapult_exception("Cannot find the master branch for this repository, please create one.")
-          else
-            puts "   - Found the master branch."
+            api_github_repo_branches = JSON.parse(response.body)
+            @api_github_repo_develop = false
+            @api_github_repo_release = false
+            @api_github_repo_master = false
+            api_github_repo_branches.each do |branch|
+              if branch["name"] == "develop"
+                @api_github_repo_develop = true
+              end
+              if branch["name"] == "release"
+                @api_github_repo_release = true
+              end
+              if branch["name"] == "master"
+                @api_github_repo_master = true
+              end
+            end
+            unless @api_github_repo_develop
+              catapult_exception("Cannot find the develop branch for this repository, please create one.")
+            else
+              puts "   - Found the develop branch."
+            end
+            unless @api_github_repo_release
+              catapult_exception("Cannot find the release branch for this repository, please create one.")
+            else
+              puts "   - Found the release branch."
+            end
+            unless @api_github_repo_master
+              catapult_exception("Cannot find the master branch for this repository, please create one.")
+            else
+              puts "   - Found the master branch."
+            end
           end
         end
       end
@@ -940,58 +974,62 @@ configuration["websites"].each do |service,data|
           request = Net::HTTP::Get.new uri.request_uri
           request.basic_auth "#{configuration["company"]["bitbucket_username"]}", "#{configuration["company"]["bitbucket_password"]}"
           response = http.request request # Net::HTTPResponse object
-          api_bitbucket_services = JSON.parse(response.body)
-          @api_bitbucket_services_bamboo_cat_test = false
-          @api_bitbucket_services_bamboo_cat_qc = false
-          api_bitbucket_services.each do |service|
-            if service["service"]["type"] == "Bamboo"
-              service["service"]["fields"].each do |field|
-                if field["name"] == "Plan Key"
-                  if field["value"] == "CAT-TEST"
-                    @api_bitbucket_services_bamboo_cat_test = true
-                  end
-                  if field["value"] == "CAT-QC"
-                    @api_bitbucket_services_bamboo_cat_qc = true
+          if response.code.to_f.between?(399,600)
+            puts "   - The Bitbucket API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
+          else
+            api_bitbucket_services = JSON.parse(response.body)
+            @api_bitbucket_services_bamboo_cat_test = false
+            @api_bitbucket_services_bamboo_cat_qc = false
+            api_bitbucket_services.each do |service|
+              if service["service"]["type"] == "Bamboo"
+                service["service"]["fields"].each do |field|
+                  if field["name"] == "Plan Key"
+                    if field["value"] == "CAT-TEST"
+                      @api_bitbucket_services_bamboo_cat_test = true
+                    end
+                    if field["value"] == "CAT-QC"
+                      @api_bitbucket_services_bamboo_cat_qc = true
+                    end
                   end
                 end
               end
             end
-          end
-          unless @api_bitbucket_services_bamboo_cat_test
-            uri = URI("https://api.bitbucket.org/1.0/repositories/#{repo_split_3[0]}/services")
-            Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => OpenSSL::SSL::VERIFY_NONE) do |http|
-              request = Net::HTTP::Post.new uri.request_uri
-              request.basic_auth "#{configuration["company"]["bitbucket_username"]}", "#{configuration["company"]["bitbucket_password"]}"
-              request.body = URI::encode\
-                (""\
-                  "type=Bamboo"\
-                  "&URL=#{configuration["company"]["bamboo_base_url"]}"\
-                  "&Plan Key=CAT-TEST"\
-                  "&Username=#{configuration["company"]["bamboo_username"]}"\
-                  "&Password=#{configuration["company"]["bamboo_password"]}"\
-                "")
-              response = http.request request # Net::HTTPResponse object
-              if response.code.to_f.between?(399,600)
-                catapult_exception("Unable to configure Bitbucket Bamboo service for websites => #{service} => domain => #{instance["domain"]}. Ensure the github_username defined in secrets/configuration.yml has correct access to the repository.")
+            unless @api_bitbucket_services_bamboo_cat_test
+              uri = URI("https://api.bitbucket.org/1.0/repositories/#{repo_split_3[0]}/services")
+              Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => OpenSSL::SSL::VERIFY_NONE) do |http|
+                request = Net::HTTP::Post.new uri.request_uri
+                request.basic_auth "#{configuration["company"]["bitbucket_username"]}", "#{configuration["company"]["bitbucket_password"]}"
+                request.body = URI::encode\
+                  (""\
+                    "type=Bamboo"\
+                    "&URL=#{configuration["company"]["bamboo_base_url"]}"\
+                    "&Plan Key=CAT-TEST"\
+                    "&Username=#{configuration["company"]["bamboo_username"]}"\
+                    "&Password=#{configuration["company"]["bamboo_password"]}"\
+                  "")
+                response = http.request request # Net::HTTPResponse object
+                if response.code.to_f.between?(399,600)
+                  catapult_exception("Unable to configure Bitbucket Bamboo service for websites => #{service} => domain => #{instance["domain"]}. Ensure the github_username defined in secrets/configuration.yml has correct access to the repository.")
+                end
               end
             end
-          end
-          unless @api_bitbucket_services_bamboo_cat_qc
-            uri = URI("https://api.bitbucket.org/1.0/repositories/#{repo_split_3[0]}/services")
-            Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => OpenSSL::SSL::VERIFY_NONE) do |http|
-              request = Net::HTTP::Post.new uri.request_uri
-              request.basic_auth "#{configuration["company"]["bitbucket_username"]}", "#{configuration["company"]["bitbucket_password"]}"
-              request.body = URI::encode\
-                (""\
-                  "type=Bamboo"\
-                  "&URL=#{configuration["company"]["bamboo_base_url"]}"\
-                  "&Plan Key=CAT-QC"\
-                  "&Username=#{configuration["company"]["bamboo_username"]}"\
-                  "&Password=#{configuration["company"]["bamboo_password"]}"\
-                "")
-              response = http.request request # Net::HTTPResponse object
-              if response.code.to_f.between?(399,600)
-                catapult_exception("Unable to configure Bitbucket Bamboo service for websites => #{service} => domain => #{instance["domain"]}. Ensure the github_username defined in secrets/configuration.yml has correct access to the repository.")
+            unless @api_bitbucket_services_bamboo_cat_qc
+              uri = URI("https://api.bitbucket.org/1.0/repositories/#{repo_split_3[0]}/services")
+              Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => OpenSSL::SSL::VERIFY_NONE) do |http|
+                request = Net::HTTP::Post.new uri.request_uri
+                request.basic_auth "#{configuration["company"]["bitbucket_username"]}", "#{configuration["company"]["bitbucket_password"]}"
+                request.body = URI::encode\
+                  (""\
+                    "type=Bamboo"\
+                    "&URL=#{configuration["company"]["bamboo_base_url"]}"\
+                    "&Plan Key=CAT-QC"\
+                    "&Username=#{configuration["company"]["bamboo_username"]}"\
+                    "&Password=#{configuration["company"]["bamboo_password"]}"\
+                  "")
+                response = http.request request # Net::HTTPResponse object
+                if response.code.to_f.between?(399,600)
+                  catapult_exception("Unable to configure Bitbucket Bamboo service for websites => #{service} => domain => #{instance["domain"]}. Ensure the github_username defined in secrets/configuration.yml has correct access to the repository.")
+                end
               end
             end
           end
@@ -1016,7 +1054,9 @@ configuration["websites"].each do |service,data|
                 "}"\
             "}"
           response = http.request request # Net::HTTPResponse object
-          if response.code.to_f.between?(399,600)
+          if response.code.to_f.between?(500,600)
+            puts "   - The GitHub API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
+          elsif response.code.to_f.between?(399,499)
             catapult_exception("Unable to configure GitHub Bamboo service for websites => #{service} => domain => #{instance["domain"]}. Ensure the github_username defined in secrets/configuration.yml has correct access to the repository.")
           end
         end
