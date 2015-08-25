@@ -354,8 +354,10 @@ else
     request = Net::HTTP::Get.new uri.request_uri
     request.add_field "Authorization", "Bearer #{configuration["company"]["digitalocean_personal_access_token"]}"
     response = http.request request
-    if response.code.to_f.between?(399,600)
+    if response.code.to_f.between?(399,499)
       catapult_exception("The DigitalOcean API could not authenticate, please verify [\"company\"][\"digitalocean_personal_access_token\"].")
+    elsif response.code.to_f.between?(500,600)
+      puts "   - The DigitalOcean API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
     else
       puts " * DigitalOcean API authenticated successfully."
       @api_digitalocean = JSON.parse(response.body)
@@ -398,8 +400,10 @@ else
     request = Net::HTTP::Get.new uri.request_uri
     request.basic_auth "#{configuration["company"]["bitbucket_username"]}", "#{configuration["company"]["bitbucket_password"]}"
     response = http.request request
-    if response.code.to_f.between?(399,600)
+    if response.code.to_f.between?(399,499)
       catapult_exception("The Bitbucket API could not authenticate, please verify [\"company\"][\"bitbucket_username\"] and [\"company\"][\"bitbucket_password\"].")
+    elsif response.code.to_f.between?(500,600)
+      puts "   - The Bitbucket API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
     else
       puts " * Bitbucket API authenticated successfully."
       @api_bitbucket = JSON.parse(response.body)
@@ -445,8 +449,10 @@ else
     request = Net::HTTP::Get.new uri.request_uri
     request.basic_auth "#{configuration["company"]["github_username"]}", "#{configuration["company"]["github_password"]}"
     response = http.request request
-    if response.code.to_f.between?(399,600)
+    if response.code.to_f.between?(399,499)
       catapult_exception("The GitHub API could not authenticate, please verify [\"company\"][\"github_username\"] and [\"company\"][\"github_password\"].")
+    elsif response.code.to_f.between?(500,600)
+      puts "   - The GitHub API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
     else
       puts " * GitHub API authenticated successfully."
       @api_github = JSON.parse(response.body)
@@ -492,8 +498,10 @@ else
     request = Net::HTTP::Get.new uri.request_uri
     request.basic_auth "#{configuration["company"]["bamboo_username"]}", "#{configuration["company"]["bamboo_password"]}"
     response = http.request request
-    if response.code.to_f.between?(399,600)
+    if response.code.to_f.between?(399,499)
       catapult_exception("The Bamboo API could not authenticate, please verify [\"company\"][\"bamboo_base_url\"] and [\"company\"][\"bamboo_username\"] and [\"company\"][\"bamboo_password\"].")
+    elsif response.code.to_f.between?(500,600)
+      puts "   - The Bamboo API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
     else
       puts " * Bamboo API authenticated successfully."
       @api_bamboo = JSON.parse(response.body)
@@ -513,8 +521,10 @@ else
       request = Net::HTTP::Get.new uri.request_uri
       request.basic_auth "#{configuration["company"]["bamboo_username"]}", "#{configuration["company"]["bamboo_password"]}"
       response = http.request request
-      if response.code.to_f.between?(399,600)
+      if response.code.to_f.between?(399,499)
         catapult_exception("Could not find the plan key \"TEST\" in Bamboo, please follow the Services Setup for Bamboo at https://github.com/devopsgroup-io/catapult-release-management#services-setup")
+      elsif response.code.to_f.between?(500,600)
+        puts "   - The Bamboo API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
       else
         puts "   - Found the plan key \"TEST\""
       end
@@ -524,8 +534,10 @@ else
       request = Net::HTTP::Get.new uri.request_uri
       request.basic_auth "#{configuration["company"]["bamboo_username"]}", "#{configuration["company"]["bamboo_password"]}"
       response = http.request request
-      if response.code.to_f.between?(399,600)
+      if response.code.to_f.between?(399,499)
         catapult_exception("Could not find the plan key \"QC\" in Bamboo, please follow the Services Setup for Bamboo at https://github.com/devopsgroup-io/catapult-release-management#services-setup")
+      elsif response.code.to_f.between?(500,600)
+        puts "   - The Bamboo API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
       else
         puts "   - Found the plan key \"QC\""
       end
@@ -535,8 +547,10 @@ else
       request = Net::HTTP::Get.new uri.request_uri
       request.basic_auth "#{configuration["company"]["bamboo_username"]}", "#{configuration["company"]["bamboo_password"]}"
       response = http.request request
-      if response.code.to_f.between?(399,600)
+      if response.code.to_f.between?(399,499)
         catapult_exception("Could not find the plan key \"PROD\" in Bamboo, please follow the Services Setup for Bamboo at https://github.com/devopsgroup-io/catapult-release-management#services-setup")
+      elsif response.code.to_f.between?(500,600)
+        puts "   - The Bamboo API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
       else
         puts "   - Found the plan key \"PROD\""
       end
@@ -553,8 +567,10 @@ else
     request.add_field "X-Auth-Key", "#{configuration["company"]["cloudflare_api_key"]}"
     request.add_field "X-Auth-Email", "#{configuration["company"]["cloudflare_email"]}"
     response = http.request request
-    if response.code.to_f.between?(399,600)
+    if response.code.to_f.between?(399,499)
       catapult_exception("The CloudFlare API could not authenticate, please verify [\"company\"][\"cloudflare_api_key\"] and [\"company\"][\"cloudflare_email\"].")
+    elsif response.code.to_f.between?(500,600)
+      puts "   - The CloudFlare API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
     else
       puts " * CloudFlare API authenticated successfully."
       @api_cloudflare = JSON.parse(response.body)
@@ -569,8 +585,10 @@ else
     Net::HTTP.start(uri.host, uri.port) do |http|
       request = Net::HTTP::Get.new uri.request_uri
       response = http.request request # Net::HTTPResponse object
-      if response.code.to_f.between?(399,600)
+      if response.code.to_f.between?(399,499)
         catapult_exception("The monitor.us API could not authenticate, please verify [\"company\"][\"monitorus_api_key\"] and [\"company\"][\"monitorus_secret_key\"].")
+      elsif response.code.to_f.between?(500,600)
+        puts "   - The Bitbucket API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
       else
         @api_monitorus = JSON.parse(response.body)
         if @api_monitorus["error"]
