@@ -144,6 +144,7 @@ else
         `#{@git} checkout -- secrets/id_rsa.pub.gpg`
       end
       `#{@git} checkout #{branch}`
+      `#{@git} pull origin #{branch}`
       `#{@git} pull upstream master`
       `#{@git} push origin #{branch}`
     else
