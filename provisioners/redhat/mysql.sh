@@ -236,28 +236,34 @@ while IFS='' read -r -d '' key; do
                                 domain_url="${1}.${domain}.${domain_tld_override}"
                             fi
                         fi
+                        # for software without a search and replace tool (handles serialized arrays, etc), use sed
                         # match http:// and optionally www. then replace with http:// + optionally www. + either dev., test., or the production domain
-                        if [[ "${software}" != "wordpress" ]]; then
+                        if ([ "${software}" = "codeigniter2" ] || [ "${software}" = "drupal6" ] || [ "${software}" = "drupal7" ] || [ "${software}" = "silverstripe" ] || [ "${software}" = "xenforo" ]); then
                             echo -e "\t* updating ${software} database with ${domain_url} URLs"
-                            sed -r -e "s/:\/\/(www\.)?${domain}/:\/\/\1${domain_url}/g" "/var/www/repositories/apache/${domain}/_sql/$(basename "$file")" > "/var/www/repositories/apache/${domain}/_sql/${1}.$(basename "$file")"
+                            # replace production, test, and dev urls in the case of downstream software_workflow
+                            sed -r -e "s/:\/\/(www\.)?(dev\.|test\.)?${domain}/:\/\/\1${domain_url}/g" "/var/www/repositories/apache/${domain}/_sql/$(basename "$file")" > "/var/www/repositories/apache/${domain}/_sql/${1}.$(basename "$file")"
                         else
                             cp "/var/www/repositories/apache/${domain}/_sql/$(basename "$file")" "/var/www/repositories/apache/${domain}/_sql/${1}.$(basename "$file")"
                         fi
+                        # restore the database
                         mysql --defaults-extra-file=$dbconf ${1}_${domainvaliddbname} < "/var/www/repositories/apache/${domain}/_sql/${1}.$(basename "$file")"
                         rm -f "/var/www/repositories/apache/${domain}/_sql/${1}.$(basename "$file")"
                         if [[ "${software}" = "drupal6" ]]; then
                             echo -e "\t* resetting ${software} admin password..."
                             mysql --defaults-extra-file=$dbconf ${1}_${domainvaliddbname} -e "UPDATE ${software_dbprefix}users SET name='admin', mail='$(echo "${configuration}" | shyaml get-value company.email)', pass=MD5('$(echo "${configuration}" | shyaml get-value environments.${1}.software.drupal.admin_password)'), status='1' WHERE uid = 1;"
-                        fi
-                        if [[ "${software}" = "drupal7" ]]; then
+                        elif [[ "${software}" = "drupal7" ]]; then
                             echo -e "\t* resetting ${software} admin password..."
                             mysql --defaults-extra-file=$dbconf ${1}_${domainvaliddbname} -e "UPDATE ${software_dbprefix}users SET name='admin', mail='$(echo "${configuration}" | shyaml get-value company.email)', status='1' WHERE uid = 1;"
-                        fi
-                        if [[ "${software}" = "wordpress" ]]; then
+                        elif [[ "${software}" = "wordpress" ]]; then
                             echo -e "\t* resetting ${software} admin password..."
                             mysql --defaults-extra-file=$dbconf ${1}_${domainvaliddbname} -e "UPDATE ${software_dbprefix}users SET user_login='admin', user_email='$(echo "${configuration}" | shyaml get-value company.email)', user_pass=MD5('$(echo "${configuration}" | shyaml get-value environments.${1}.software.wordpress.admin_password)'), user_status='0' WHERE id = 1;"
                             echo -e "\t* updating ${software} database with ${domain_url} URLs"
+                            # replace production urls in the case of downstream software_workflow
                             php /catapult/provisioners/redhat/installers/wp-cli.phar --allow-root --path="/var/www/repositories/apache/${domain}/" search-replace "${domain}" "${domain_url}" | sed "s/^/\t\t/"
+                            # replace test urls in the case of upstream software_workflow
+                            php /catapult/provisioners/redhat/installers/wp-cli.phar --allow-root --path="/var/www/repositories/apache/${domain}/" search-replace "test.${domain}" "${domain_url}" | sed "s/^/\t\t/"
+                            # replace dev urls in the case of upstream software_workflow
+                            php /catapult/provisioners/redhat/installers/wp-cli.phar --allow-root --path="/var/www/repositories/apache/${domain}/" search-replace "dev.${domain}" "${domain_url}" | sed "s/^/\t\t/"
                             mysql --defaults-extra-file=$dbconf ${1}_${domainvaliddbname} -e "UPDATE ${software_dbprefix}options SET option_value='$(echo "${configuration}" | shyaml get-value company.email)' WHERE option_name = 'admin_email';"
                             mysql --defaults-extra-file=$dbconf ${1}_${domainvaliddbname} -e "UPDATE ${software_dbprefix}options SET option_value='http://${domain_url}' WHERE option_name = 'home';"
                             mysql --defaults-extra-file=$dbconf ${1}_${domainvaliddbname} -e "UPDATE ${software_dbprefix}options SET option_value='http://${domain_url}' WHERE option_name = 'siteurl';"
