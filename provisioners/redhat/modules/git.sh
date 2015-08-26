@@ -21,6 +21,9 @@ while IFS='' read -r -d '' key; do
             sudo rm -rf /var/www/repositories/apache/$domain
             sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git clone --recursive -b $(echo "${configuration}" | shyaml get-value environments.$1.branch) $repo /var/www/repositories/apache/$domain" | sed "s/^/\t/"
         else
+            cd /var/www/repositories/apache/$domain && git reset -q --hard HEAD --
+            cd /var/www/repositories/apache/$domain && git checkout .
+            cd /var/www/repositories/apache/$domain && git clean -fd
             cd /var/www/repositories/apache/$domain && git checkout $(echo "${configuration}" | shyaml get-value environments.$1.branch)
             cd /var/www/repositories/apache/$domain && sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git pull origin $(echo "${configuration}" | shyaml get-value environments.$1.branch)" | sed "s/^/\t/"
         fi
