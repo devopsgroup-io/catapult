@@ -58,9 +58,11 @@ Catapult supports the following software:
 * Any website without a database dependency built in PHP
 * CodeIgniter 2.x
 * Drupal 6.x, Drupal 7.x
-    * as required by Drush 7.0.0-rc1
+    * as required by Drush 7.0.0
+* SilverStripe 2.x
 * WordPress 3.5.2+, WordPress 4.x
     * as required by WP-CLI
+* XenForo 1.x
 
 
 
@@ -300,11 +302,13 @@ The following options are available:
     * `codeigniter2`
         * generates codeigniter2 database config file ~/application/config/database.php, restores database
     * `drupal6`
-        * generates drupal6 database config file ~/sites/default/settings.php, resets drupal6 admin password, rsyncs ~/sites/default/files from production source, restores database
+        * generates drupal6 database config file ~/sites/default/settings.php, resets Drupal admin password, rsyncs ~/sites/default/files, restores database
     * `drupal7`
-        * generates drupal7 database config file ~/sites/default/settings.php, resets drupal7 admin password, rsyncs ~/sites/default/files from production source, restores database
+        * generates drupal7 database config file ~/sites/default/settings.php, resets Drupal admin password, rsyncs ~/sites/default/files, restores database
+    * `silverstripe`
+        * generates silverstripe database config file ~/mysite/_config.php, restores database
     * `wordpress`
-        * generates WordPress database config file ~/installers/wp-config.php, resets WordPress admin password, rsyncs ~/wp-content/uploads from production source, restores database
+        * generates WordPress database config file ~/installers/wp-config.php, resets WordPress admin password, rsyncs ~/wp-content/uploads, restores database
     * `xenforo`
         * generates xenforo database config file ~/library/config.php, restores database
 * software_dbprefix:
