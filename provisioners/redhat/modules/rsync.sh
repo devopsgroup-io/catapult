@@ -9,28 +9,28 @@ while IFS='' read -r -d '' key; do
     echo -e "\nNOTICE: $domain"
 
     if [ "${software}" = "drupal6" ]; then
-        echo -e "\trysncing ${software} ~/sites/default/files"
+        echo -e "\t * rysncing ${software} ~/sites/default/files"
         if ([ "${software_workflow}" = "downstream" ] && [ "$1" != "production" ]); then
             sudo rsync  --archive --compress --copy-links --delete -e "ssh -oStrictHostKeyChecking=no -i /catapult/secrets/id_rsa" root@$(echo "${configuration}" | shyaml get-value environments.production.servers.redhat.ip):/var/www/repositories/apache/${domain}/sites/default/files /var/www/repositories/apache/${domain}/${webroot}sites/default/files 2>&1 | sed "s/^/\t\t/"
         elif ([ "${software_workflow}" = "upstream" ] && [ "$1" != "test" ]); then
             sudo rsync  --archive --compress --copy-links --delete -e "ssh -oStrictHostKeyChecking=no -i /catapult/secrets/id_rsa" root@$(echo "${configuration}" | shyaml get-value environments.test.servers.redhat.ip):/var/www/repositories/apache/${domain}/sites/default/files /var/www/repositories/apache/${domain}/${webroot}sites/default/files 2>&1 | sed "s/^/\t\t/"
         fi
     elif [ "${software}" = "drupal7" ]; then
-        echo -e "\trysncing ${software} ~/sites/default/files"
+        echo -e "\t * rysncing ${software} ~/sites/default/files"
         if ([ "${software_workflow}" = "downstream" ] && [ "$1" != "production" ]); then
             sudo rsync  --archive --compress --copy-links --delete -e "ssh -oStrictHostKeyChecking=no -i /catapult/secrets/id_rsa" root@$(echo "${configuration}" | shyaml get-value environments.production.servers.redhat.ip):/var/www/repositories/apache/${domain}/sites/default/files /var/www/repositories/apache/${domain}/${webroot}sites/default/files 2>&1 | sed "s/^/\t\t/"
         elif ([ "${software_workflow}" = "upstream" ] && [ "$1" != "test" ]); then
             sudo rsync  --archive --compress --copy-links --delete -e "ssh -oStrictHostKeyChecking=no -i /catapult/secrets/id_rsa" root@$(echo "${configuration}" | shyaml get-value environments.test.servers.redhat.ip):/var/www/repositories/apache/${domain}/sites/default/files /var/www/repositories/apache/${domain}/${webroot}sites/default/files 2>&1 | sed "s/^/\t\t/"
         fi
     elif [ "${software}" = "wordpress" ]; then
-        echo -e "\trysncing ${software} ~/wp-content/uploads"
+        echo -e "\t * rysncing ${software} ~/wp-content/uploads"
         if ([ "${software_workflow}" = "downstream" ] && [ "$1" != "production" ]); then
             sudo rsync  --archive --compress --copy-links --delete -e "ssh -oStrictHostKeyChecking=no -i /catapult/secrets/id_rsa" root@$(echo "${configuration}" | shyaml get-value environments.production.servers.redhat.ip):/var/www/repositories/apache/${domain}/${webroot}wp-content/uploads /var/www/repositories/apache/${domain}/${webroot}wp-content/uploads 2>&1 | sed "s/^/\t\t/"
         elif ([ "${software_workflow}" = "upstream" ] && [ "$1" != "test" ]); then
             sudo rsync  --archive --compress --copy-links --delete -e "ssh -oStrictHostKeyChecking=no -i /catapult/secrets/id_rsa" root@$(echo "${configuration}" | shyaml get-value environments.test.servers.redhat.ip):/var/www/repositories/apache/${domain}/${webroot}wp-content/uploads /var/www/repositories/apache/${domain}/${webroot}wp-content/uploads 2>&1 | sed "s/^/\t\t/"
         fi
     else
-        echo -e "\tno rsync needed, skipping"
+        echo -e "\t * no rsync needed, skipping"
     fi
 
 done
