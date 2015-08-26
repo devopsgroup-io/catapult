@@ -177,7 +177,11 @@ while IFS='' read -r -d '' key; do
         if ([ "${1}" = "production" ] && [ "${software_workflow}" = "downstream" ] && [ "${software_dbexist}" != "" ]) || ([ "${1}" = "test" ] && [ "${software_workflow}" = "upstream" ] && [ "${software_dbexist}" != "" ]); then
             echo -e "\t* workflow is set to ${software_workflow} and this is the ${1} environment, performing a database backup"
             # database dumps are always committed to the develop branch to respect software_workflow
-            cd "/var/www/repositories/apache/${domain}" && git checkout develop
+            cd "/var/www/repositories/apache/${domain}" && git checkout develop | sed "s/^/\t/"
+            cd "/var/www/repositories/apache/${domain}" && git reset -q --hard HEAD -- | sed "s/^/\t/"
+            cd "/var/www/repositories/apache/${domain}" && git checkout . | sed "s/^/\t/"
+            cd "/var/www/repositories/apache/${domain}" && git clean -fd | sed "s/^/\t/"
+            cd "/var/www/repositories/apache/${domain}" && sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git pull origin develop" | sed "s/^/\t/"
             if ! [ -f /var/www/repositories/apache/${domain}/_sql/$(date +"%Y%m%d").sql ]; then
                 mkdir -p "/var/www/repositories/apache/${domain}/_sql"
                 mysqldump --defaults-extra-file=$dbconf --single-transaction --quick ${1}_${domainvaliddbname} > /var/www/repositories/apache/${domain}/_sql/$(date +"%Y%m%d").sql
