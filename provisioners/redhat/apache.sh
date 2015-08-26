@@ -185,7 +185,7 @@ while IFS='' read -r -d '' key; do
             if ([[ "${force_auth_excludes[@]}" =~ "$1" ]]); then
                 force_auth_value=""
             else
-                sudo htpasswd -b -c /etc/httpd/sites-enabled/${domain_environment}.htpasswd ${force_auth} ${force_auth} 2>&1 | sed "s/^/\t\t\t/"
+                sudo htpasswd -b -c /etc/httpd/sites-enabled/${domain_environment}.htpasswd ${force_auth} ${force_auth} 2>&1 | sed "s/^/\t\t/"
                 force_auth_value="<Location />
                     # Force HTTP authentication
                     AuthType Basic
@@ -195,7 +195,7 @@ while IFS='' read -r -d '' key; do
                 </Location>"
             fi
         else
-            sudo htpasswd -b -c /etc/httpd/sites-enabled/${domain_environment}.htpasswd ${force_auth} ${force_auth} 2>&1 | sed "s/^/\t\t\t/"
+            sudo htpasswd -b -c /etc/httpd/sites-enabled/${domain_environment}.htpasswd ${force_auth} ${force_auth} 2>&1 | sed "s/^/\t\t/"
             force_auth_value="<Location />
                 # Force HTTP authentication
                 AuthType Basic
@@ -263,24 +263,26 @@ EOF
     # enable vhost
     sudo ln -s /etc/httpd/sites-available/$domain_environment.conf /etc/httpd/sites-enabled/$domain_environment.conf
 
-    # configure software
-    if [ "$software" = "drupal6" ]; then
-        if [ -d "/var/www/repositories/apache/${domain}/${webroot}sites/default/files" ]; then
-            echo "setting permissions for $software upload directory ~/sites/default/files" | sed "s/^/\t\t/"
-            sudo chown -R apache /var/www/repositories/apache/${domain}/${webroot}sites/default/files
-            sudo chmod -R 0700 /var/www/repositories/apache/${domain}/${webroot}sites/default/files
-        fi
-    elif [ "$software" = "drupal7" ]; then
-        if [ -d "/var/www/repositories/apache/${domain}/${webroot}sites/default/files" ]; then
-            echo "setting permissions for $software upload directory ~/sites/default/files" | sed "s/^/\t\t/"
-            sudo chown -R apache /var/www/repositories/apache/${domain}/${webroot}sites/default/files
-            sudo chmod -R 0700 /var/www/repositories/apache/${domain}/${webroot}sites/default/files
-        fi
-    elif [ "$software" = "wordpress" ]; then
-        if [ -d "/var/www/repositories/apache/${domain}/${webroot}wp-content/uploads" ]; then
-            echo "setting permissions for $software upload directory ~/wp-content/uploads" | sed "s/^/\t\t/"
-            sudo chown -R apache /var/www/repositories/apache/${domain}/${webroot}wp-content/uploads
-            sudo chmod -R 0700 /var/www/repositories/apache/${domain}/${webroot}wp-content/uploads
+    # set ownership of uploads directory in upstream servers
+    if [ "$1" != "dev" ]; then
+        if [ "$software" = "drupal6" ]; then
+            if [ -d "/var/www/repositories/apache/${domain}/${webroot}sites/default/files" ]; then
+                echo -e "\t * setting permissions for $software upload directory ~/sites/default/files"
+                sudo chown -R apache /var/www/repositories/apache/${domain}/${webroot}sites/default/files
+                sudo chmod -R 0700 /var/www/repositories/apache/${domain}/${webroot}sites/default/files
+            fi
+        elif [ "$software" = "drupal7" ]; then
+            if [ -d "/var/www/repositories/apache/${domain}/${webroot}sites/default/files" ]; then
+                echo -e "\t * setting permissions for $software upload directory ~/sites/default/files"
+                sudo chown -R apache /var/www/repositories/apache/${domain}/${webroot}sites/default/files
+                sudo chmod -R 0700 /var/www/repositories/apache/${domain}/${webroot}sites/default/files
+            fi
+        elif [ "$software" = "wordpress" ]; then
+            if [ -d "/var/www/repositories/apache/${domain}/${webroot}wp-content/uploads" ]; then
+                echo -e "\t * setting permissions for $software upload directory ~/wp-content/uploads"
+                sudo chown -R apache /var/www/repositories/apache/${domain}/${webroot}wp-content/uploads
+                sudo chmod -R 0700 /var/www/repositories/apache/${domain}/${webroot}wp-content/uploads
+            fi
         fi
     fi
 
