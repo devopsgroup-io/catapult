@@ -181,6 +181,7 @@ while IFS='' read -r -d '' key; do
             cd "/var/www/repositories/apache/${domain}" && git reset -q --hard HEAD -- | sed "s/^/\t/"
             cd "/var/www/repositories/apache/${domain}" && git checkout . | sed "s/^/\t/"
             cd "/var/www/repositories/apache/${domain}" && git clean -fd | sed "s/^/\t/"
+            cd "/var/www/repositories/apache/${domain}" && sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git fetch" | sed "s/^/\t/"
             cd "/var/www/repositories/apache/${domain}" && sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git pull origin develop" | sed "s/^/\t/"
             if ! [ -f /var/www/repositories/apache/${domain}/_sql/$(date +"%Y%m%d").sql ]; then
                 mkdir -p "/var/www/repositories/apache/${domain}/_sql"
@@ -239,7 +240,6 @@ while IFS='' read -r -d '' key; do
                         # for software without a search and replace tool (handles serialized arrays, etc), use sed
                         # match http:// and optionally www. then replace with http:// + optionally www. + either dev., test., or the production domain
                         if ([ "${software}" = "codeigniter2" ] || [ "${software}" = "drupal6" ] || [ "${software}" = "drupal7" ] || [ "${software}" = "silverstripe" ] || [ "${software}" = "xenforo" ]); then
-                            echo -e "\t* updating ${software} database with ${domain_url} URLs"
                             # replace production, test, and dev urls in the case of downstream software_workflow
                             sed -r -e "s/:\/\/(www\.)?(dev\.|test\.)?${domain}/:\/\/\1${domain_url}/g" "/var/www/repositories/apache/${domain}/_sql/$(basename "$file")" > "/var/www/repositories/apache/${domain}/_sql/${1}.$(basename "$file")"
                         else
@@ -257,7 +257,6 @@ while IFS='' read -r -d '' key; do
                         elif [[ "${software}" = "wordpress" ]]; then
                             echo -e "\t* resetting ${software} admin password..."
                             mysql --defaults-extra-file=$dbconf ${1}_${domainvaliddbname} -e "UPDATE ${software_dbprefix}users SET user_login='admin', user_email='$(echo "${configuration}" | shyaml get-value company.email)', user_pass=MD5('$(echo "${configuration}" | shyaml get-value environments.${1}.software.wordpress.admin_password)'), user_status='0' WHERE id = 1;"
-                            echo -e "\t* updating ${software} database with ${domain_url} URLs"
                             # replace production urls in the case of downstream software_workflow
                             php /catapult/provisioners/redhat/installers/wp-cli.phar --allow-root --path="/var/www/repositories/apache/${domain}/" search-replace "${domain}" "${domain_url}" | sed "s/^/\t\t/"
                             # replace test urls in the case of upstream software_workflow
