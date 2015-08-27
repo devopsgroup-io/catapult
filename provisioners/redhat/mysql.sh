@@ -197,7 +197,11 @@ while IFS='' read -r -d '' key; do
             # after verifying database dump, checkout the correct branch again
             cd "/var/www/repositories/apache/${domain}" && git checkout $(echo "${configuration}" | shyaml get-value environments.${1}.branch)
         else
-            echo -e "\t* workflow is set to ${software_workflow} and this is the ${1} environment, performing a database restore"
+            if [ -z "${software_dbexist}" ]; then
+                echo -e "\t* workflow is set to ${software_workflow} and this is the ${1} environment, performing a database restore"
+            else
+                echo -e "\t* workflow is set to ${software_workflow} and this is the ${1} environment, however this is a new website and the database does not exist, performing a database restore"
+            fi
             # drop the database
             # the loop is necessary just in case the database doesn't yet exist
             for database in $(mysql --defaults-extra-file=$dbconf -e "show databases" | egrep -v "Database|mysql|information_schema|performance_schema"); do
