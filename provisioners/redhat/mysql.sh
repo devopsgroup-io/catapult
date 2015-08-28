@@ -116,6 +116,9 @@ iptables -I OUTPUT -p tcp --sport 3306 -m state --state ESTABLISHED -j ACCEPT
 # clear out all users except root
 mysql --defaults-extra-file=$dbconf -e "DELETE FROM mysql.user WHERE user!='root'"
 
+# tune mysql
+mysql --defaults-extra-file=$dbconf -e "SET global max_allowed_packet=1024 * 1024 * 64;"
+
 # create an array of domainvaliddbnames
 while IFS='' read -r -d '' key; do
     domainvaliddbname=$(echo "$key" | grep -w "domain" | cut -d ":" -f 2 | tr -d " " | tr "." "_")
