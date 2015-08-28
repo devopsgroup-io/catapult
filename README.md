@@ -2,7 +2,7 @@
 
 
 
-**Welcome to devopsgroup.io Catapult Release Management**, a complete DevOps Release Management solution featuring automated website deployment and continuous integration following Gitflow and SCRUM workflows. Built for Developers, simple enough to use by non-Developers.
+**Welcome to devopsgroup.io Catapult Release Management**, a complete DevOps Release Management solution featuring automated website deployment and continuous integration, while following Gitflow and SCRUM workflows. Built for Developers, but simple enough to use by non-Developers. Catapult's core technologies and features include:
 
 * Configuration Management via CloudFlare, DigitalOcean, Git, GPG, Shell, and Vagrant
 * Continuous Integration via Bamboo and AWS
@@ -10,7 +10,7 @@
 * Website Uptime Monitoring via monitor.us (Monitis)
 
 
-As a **non-Developer** you may think - *I already have a website, why do I need Catapult?* Over time you will find yourself or find yourself paying a freelancer or a development company hundreds or even thousands of dollars to manage or interact with the DevOps (Development Operations) and solve these problems:
+As a **non-Developer** you may think - *I already have a website, why do I need Catapult?* Over time you may find yourself overwhelmed with managing the the day to day Devops process of infrastrucrure , and end up paying a freelancer or a development company hundreds or even thousands of dollars to manage or interact with the DevOps (Development Operations) to solve these problems:
 
   * Production is down.
   * We need a test site.
@@ -20,13 +20,13 @@ As a **non-Developer** you may think - *I already have a website, why do I need 
   * Can I easily scale my website for more traffic?
   * What is my uptime?
 
-As a **Developer**, you have to manage many websites and probably end up using the same tools and APIs over and over again. Why not use something that has been developed just for you from Developers that have been down the same road as you and also have the ability to contribute back?
+As a **Developer**, you have to manage many websites and probably end up using the same set of tools and APIs over and over again. Why not use something that has been created from it's foundations by Devlopers that have been down the same road as you, and contribute back to the project at the same time?
 
-  * Catapult is developed in Ruby and native Shell - no new languages or technologies to learn.
-  * Catapult is very simple at its core - there is no black-box to decipher - everything is out in the open.
-  * Catapult uses the most popular APIs and services; including AWS, Bamboo, Bitbucket, CloudFlare, DigitalOcean, GitHub, and Vagrant.
+  * Catapult is developed in Ruby and native Shell - there are no new languages or technologies to learn.
+  * Catapult's simplicity is it's strength. There is no black-box to decipher - the functionality and methodology is out in      the open and accessible to anyone.
+  * Catapult uses the most popular APIs and services; including AWS, Bamboo, Bitbucket, CloudFlare, DigitalOcean, GitHub, and     Vagrant.
 
-Catapult manages all of this for you and is open-sourced, well-documented, developer-focused, and free to use. We also provide a service if you need some help getting started - if you do, let us know at https://devopsgroup.io. Catapult leverages the Services that you're already using, which collectively, costs $40/month to have a full-stack localDev, Test, Quality Control, and Production environment.
+Catapult can manage all of this for you through an open-source and well-documented platform, with a developer-focused point of view. We also provide a service and assistance if you need help getting started, or just have a question - just contact us at https://devopsgroup.io. Catapult leverages the Services that you're already using, which collectively, costs $40/month to have a full-stack localDev, Test, Quality Control, and Production environment.
 
 *Go ahead, give* **Catapult** *a* **shot**.
 
@@ -58,9 +58,11 @@ Catapult supports the following software:
 * Any website without a database dependency built in PHP
 * CodeIgniter 2.x
 * Drupal 6.x, Drupal 7.x
-    * as required by Drush 7.0.0-rc1
+    * as required by Drush 7.0.0
+* SilverStripe 2.x
 * WordPress 3.5.2+, WordPress 4.x
     * as required by WP-CLI
+* XenForo 1.x
 
 
 
@@ -175,13 +177,7 @@ Catapult uses several third-party services to pull everything off - below is a l
                     5. Plan key: TEST
                     6. Plan description:
                 * *Link repository to new build plan*
-                    1. Repository host: Link new repository > Other > GitHub
-                    2. Display name: Catapult
-                    3. Username: `~/configuration.yml["company"]["github_username"]`
-                    4. Password: `~/configuration.yml["company"]["github_password"]`
-                    5. Repository: Load Repositories > github_username/catapult-release-management
-                    6. Branch: master
-                    7. Repository access: Allow all users to reuse the configuration of this repository
+                    1. Repository host: Other > None
             2. **Create QC Plan**
                 * *Project and build plan name*
                     1. Project: Catapult
@@ -189,7 +185,7 @@ Catapult uses several third-party services to pull everything off - below is a l
                     5. Plan key: QC
                     6. Plan description:
                 * *Link repository to new build plan*
-                    1. Repository host: Previously linked repository > github_username/catapult-release-management
+                    1. Repository host: Other > None
             2. **Create PROD Plan**
                 * *Project and build plan name*
                     1. Project: Catapult
@@ -197,7 +193,7 @@ Catapult uses several third-party services to pull everything off - below is a l
                     5. Plan key: PROD
                     6. Plan description:
                 * *Link repository to new build plan*
-                    1. Repository host: Previously linked repository > github_username/catapult-release-management
+                    1. Repository host: Other > None
 4. **DNS:**    
     1. **CloudFlare** sign-up and configuration
         1. Create a CloudFlare account at https://www.cloudflare.com
@@ -271,46 +267,64 @@ Adding websites to Catapult is easy. The only requirement is that the website ne
 ```
 websites:
   apache:
-  - domain: "devopsgroup.io"
-    repo: "git@github.com:devopsgroup-io/devopsgroup-io.git"
+  - domain: devopsgroup.io
+    repo: git@github.com:devopsgroup-io/devopsgroup-io.git
 ```
 
 The following options are available:
 
 * domain:
-    * "example.com"
+    * `example.com`
         * the domain name of what the website is/will be in production
+        * a maximum of one subdomain is supported (subdomain.example.com)
+        * this drives the domains of localdev (via hosts file) and test, qc, production (via cloudflare)
+        * dev.example.com, test.example.com, qc.example.com, example.com
+* domain_tld_override:
+    * `mycompany.com`
+        * a domain name that will override the tld of the domain for when you do not have control of the domain (example.com), but still need a localdev and externally accessible test and qc instance
+        * this drives the domains of localdev (via hosts file) and test, qc, production (via cloudflare)
+            * to seamlessly cutover to example.com, remove this option
+        * dev.example.com, test.example.com, qc.example.com, example.com are replaced by dev.example.com.mycompany.com, test.example.com.mycompany.com, qc.example.com.mycompany.com, example.com.mycompany.com
+* force_auth:
+    * `example`
+        * forces http basic authentication in test, qc, and production
+        * `example` is both the username and password
+* force_auth_exclude:
+    * `["test","qc","production"]`
+        * array of exclusions exclusive to the force_auth option
 * force_https:
-    * true
+    * `true`
         * rewrite all http traffic to https
 * repo:
-    * "git@github.com:devopsgroup-io/devopsgroup-io.git"
+    * `git@github.com:devopsgroup-io/devopsgroup-io.git`
         * GitHub and Bitbucket over SSH are supported, HTTPS is not supported
 * software:
-    * "codeigniter2"
+    * `codeigniter2`
         * generates codeigniter2 database config file ~/application/config/database.php, restores database
-    * "drupal6"
-        * generates drupal6 database config file ~/sites/default/settings.php, resets drupal6 admin password, rsyncs ~/sites/default/files from production source, restores database
-    * "drupal7"
-        * generates drupal7 database config file ~/sites/default/settings.php, resets drupal7 admin password, rsyncs ~/sites/default/files from production source, restores database
-    * "wordpress"
-        * generates WordPress database config file ~/installers/wp-config.php, resets WordPress admin password, rsyncs ~/wp-content/uploads from production source, restores database
-    * "xenforo"
+    * `drupal6`
+        * generates drupal6 database config file ~/sites/default/settings.php, resets Drupal admin password, rsyncs ~/sites/default/files, restores database
+    * `drupal7`
+        * generates drupal7 database config file ~/sites/default/settings.php, resets Drupal admin password, rsyncs ~/sites/default/files, restores database
+    * `silverstripe`
+        * generates silverstripe database config file ~/mysite/_config.php, restores database
+    * `wordpress`
+        * generates WordPress database config file ~/installers/wp-config.php, resets WordPress admin password, rsyncs ~/wp-content/uploads, restores database
+    * `xenforo`
         * generates xenforo database config file ~/library/config.php, restores database
 * software_dbprefix:
-    * "wp_"
-        * usually used in Drupal for multisite installations ("wp_ is required for base Wordpress installs, Drupal has no prefix by default")
+    * `wp_`
+        * usually used in Drupal for multisite installations (`wp_` is required for base Wordpress installs, Drupal has no prefix by default)
 * software_workflow:
-    * "downstream"
-        * production is the source for the database and untracked files
+    * `downstream`
+        * production is the source for the database and upload directories of drupal and wordpress
         * this option is used when maintaining a website
         * see the below chart for more details
-    * "upstream"
-        * test is the source for the database and untracked files
+    * `upstream`
+        * test is the source for the database and upload directories of drupal and wordpress
         * this option is used when launching a new website
         * see the below chart for more details
 * webroot:
-    * "www/"
+    * `www/`
         * if the webroot differs from the repo root, specify it here
         * must include the trailing slash
 
@@ -325,13 +339,13 @@ Once a website exists in the upstream environments (test, qc, production), autom
 
 | Environment                    | dev                                                         | test                                                            | qc                                                             | production                                                    |
 |--------------------------------|-------------------------------------------------------------|-----------------------------------------------------------------|----------------------------------------------------------------|---------------------------------------------------------------|
-| **Running Branch**             | *develop*                                                   | *develop*                                                       | *master*                                                       | *master*                                                      |
-| **New Website Provisioning**   | Manually via Vagrant                                        | Automatically via Bamboo (new commits to **develop**)           | Automatically via Bamboo (new commits to **master**)           | Manually via Bamboo                                           |
+| **Running Branch**             | *develop*                                                   | *develop*                                                       | *release*                                                      | *master*                                                      |
+| **New Website Provisioning**   | Manually via Vagrant                                        | Automatically via Bamboo (new commits to **develop**)           | Automatically via Bamboo (new commits to **release**)          | Manually via Bamboo                                           |
 | **Downstream Database**        | Restore from **develop** ~/_sql folder of website repo      | Restore from **develop** ~/_sql folder of website repo          | Restore from **master** ~/_sql folder of website repo          | Daily backup to **develop** ~/_sql folder of website repo     |
 | **Upstream Database**          | Restore from **develop** ~/_sql folder of website repo      | Daily backup to **develop** ~/_sql folder of website repo       | Restore from **master** ~/_sql folder of website repo          | Restore from **master** ~/_sql folder of website repo         |
 | **Downstream Untracked Files** | rsync files from **production**                             | rsync files from **production**                                 | rsync files from **production**                                | --                                                            |
 | **Upstream Untracked Files**   | rsync files from **test**                                   | --                                                              | rsync files from **test**                                      | rsync files from **test**                                     |
-| **Automated Deployments**      | Manually via `vagrant provision`                            | Automatically via Bamboo (new commits to **develop**)           | Automatically via Bamboo (new commits to **master**)           | Manually via Bamboo                                           |
+| **Automated Deployments**      | Manually via `vagrant provision`                            | Automatically via Bamboo (new commits to **develop**)           | Automatically via Bamboo (new commits to **release**)          | Manually via Bamboo                                           |
 
 
 
