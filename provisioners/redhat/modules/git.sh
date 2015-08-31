@@ -32,18 +32,18 @@ while IFS='' read -r -d '' key; do
         if [ "$(cd /var/www/repositories/apache/$domain && git config --get remote.origin.url)" != "$repo" ]; then
             echo "the repo has changed in secrets/configuration.yml, removing and cloning the new repository." | sed "s/^/\t/"
             sudo rm -rf /var/www/repositories/apache/$domain
-            sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git clone --recursive -b $(echo "${configuration}" | shyaml get-value environments.$1.branch) $repo /var/www/repositories/apache/$domain" | sed "s/^/\t/"
+            sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git clone --recursive -b $(echo "${configuration}" | shyaml get-value environments.$1.branch) $repo /var/www/repositories/apache/$domain" 2>&1 | sed "s/^/\t/"
         elif [ "$(cd /var/www/repositories/apache/$domain && git rev-list HEAD | tail -n 1 )" != "$(cd /var/www/repositories/apache/$domain && git rev-list origin/master | tail -n 1 )" ]; then
             echo "the repo has changed, removing and cloning the new repository." | sed "s/^/\t/"
             sudo rm -rf /var/www/repositories/apache/$domain
-            sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git clone --recursive -b $(echo "${configuration}" | shyaml get-value environments.$1.branch) $repo /var/www/repositories/apache/$domain" | sed "s/^/\t/"
+            sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git clone --recursive -b $(echo "${configuration}" | shyaml get-value environments.$1.branch) $repo /var/www/repositories/apache/$domain" 2>&1 | sed "s/^/\t/"
         else
-            cd /var/www/repositories/apache/$domain && git reset -q --hard HEAD --
-            cd /var/www/repositories/apache/$domain && git checkout .
-            cd /var/www/repositories/apache/$domain && git clean -fd
-            cd /var/www/repositories/apache/$domain && git checkout $(echo "${configuration}" | shyaml get-value environments.$1.branch)
-            cd /var/www/repositories/apache/$domain && sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git fetch" | sed "s/^/\t/"
-            cd /var/www/repositories/apache/$domain && sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git pull origin $(echo "${configuration}" | shyaml get-value environments.$1.branch)" | sed "s/^/\t/"
+            cd /var/www/repositories/apache/$domain && git reset -q --hard HEAD -- 2>&1 | sed "s/^/\t/"
+            cd /var/www/repositories/apache/$domain && git checkout . 2>&1 | sed "s/^/\t/"
+            cd /var/www/repositories/apache/$domain && git clean -fd 2>&1 | sed "s/^/\t/"
+            cd /var/www/repositories/apache/$domain && git checkout $(echo "${configuration}" | shyaml get-value environments.$1.branch) 2>&1 | sed "s/^/\t/"
+            cd /var/www/repositories/apache/$domain && sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git fetch" 2>&1 | sed "s/^/\t/"
+            cd /var/www/repositories/apache/$domain && sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git pull origin $(echo "${configuration}" | shyaml get-value environments.$1.branch)" 2>&1 | sed "s/^/\t/"
         fi
     else
         if [ -d "/var/www/repositories/apache/$domain" ]; then
@@ -51,7 +51,7 @@ while IFS='' read -r -d '' key; do
             sudo chmod 0777 -R /var/www/repositories/apache/$domain
             sudo rm -rf /var/www/repositories/apache/$domain
         fi
-        sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git clone --recursive -b $(echo "${configuration}" | shyaml get-value environments.$1.branch) $repo /var/www/repositories/apache/$domain" | sed "s/^/\t/"
+        sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git clone --recursive -b $(echo "${configuration}" | shyaml get-value environments.$1.branch) $repo /var/www/repositories/apache/$domain" 2>&1 | sed "s/^/\t/"
     fi
 
 done < <(echo "${configuration}" | shyaml get-values-0 websites.apache)
