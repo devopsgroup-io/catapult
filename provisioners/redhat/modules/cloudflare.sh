@@ -1,21 +1,22 @@
-cloudflare_api_key="$(echo "${configuration}" | shyaml get-value company.cloudflare_api_key)"
-cloudflare_email="$(echo "${configuration}" | shyaml get-value company.cloudflare_email)"
-redhat_ip="$(echo "${configuration}" | shyaml get-value environments.$1.servers.redhat.ip)"
+if [ "$1" = "dev" ]; then
+    echo -e "\t * skipping cloudflare as global dns is not required in dev..."
+else
 
-echo "${configuration}" | shyaml get-values-0 websites.apache |
-while IFS='' read -r -d '' key; do
+    cloudflare_api_key="$(echo "${configuration}" | shyaml get-value company.cloudflare_api_key)"
+    cloudflare_email="$(echo "${configuration}" | shyaml get-value company.cloudflare_email)"
+    redhat_ip="$(echo "${configuration}" | shyaml get-value environments.$1.servers.redhat.ip)"
 
-    domain=$(echo "$key" | grep -w "domain" | cut -d ":" -f 2 | tr -d " ")
-    domain_tld_override=$(echo "$key" | grep -w "domain_tld_override" | cut -d ":" -f 2 | tr -d " ")
-    if [ ! -z "${domain_tld_override}" ]; then
-        domain_root="${domain}.${domain_tld_override}"
-    else
-        domain_root="${domain}"
-    fi
+    echo "${configuration}" | shyaml get-values-0 websites.apache |
+    while IFS='' read -r -d '' key; do
 
-    if [ "$1" = "dev" ]; then
-        echo -e "\t * skipping cloudflare as global dns is not required in dev..."
-    else
+        domain=$(echo "$key" | grep -w "domain" | cut -d ":" -f 2 | tr -d " ")
+        domain_tld_override=$(echo "$key" | grep -w "domain_tld_override" | cut -d ":" -f 2 | tr -d " ")
+        if [ ! -z "${domain_tld_override}" ]; then
+            domain_root="${domain}.${domain_tld_override}"
+        else
+            domain_root="${domain}"
+        fi
+
         if [ "$1" = "production" ]; then
             echo -e "\nNOTICE: ${domain_root}"
         else
@@ -324,6 +325,6 @@ while IFS='' read -r -d '' key; do
         --data "{\"purge_everything\":true}"\
         | sed "s/^/\t\t/"
 
-    fi
+    done
 
-done
+fi
