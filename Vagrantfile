@@ -630,7 +630,7 @@ configuration["environments"].each do |environment,data|
     droplet = @api_digitalocean["droplets"].find { |element| element['name'] == "#{configuration["company"]["name"].downcase}-#{environment}-redhat" }
     # if redhat digitalocean droplet has been created
     if droplet != nil
-      puts " * DigitalOcean droplet #{configuration["company"]["name"].downcase}-#{environment}-redhat_mysql has been found."
+      puts " * DigitalOcean droplet #{configuration["company"]["name"].downcase}-#{environment}-redhat has been found."
       puts "   - status: #{droplet["status"]}, memory: #{droplet["size"]["memory"]}, vcpus: #{droplet["size"]["vcpus"]}, disk: #{droplet["size"]["disk"]}, $/month: $#{droplet["size"]["price_monthly"]}"
       puts "   - created: #{droplet["created_at"]}, slug: #{droplet["size"]["slug"]}, region: #{droplet["region"]["name"]}, kernel: #{droplet["kernel"]["name"]}"
       puts "   - ipv4: #{droplet["networks"]["v4"].first["ip_address"]}, ipv6: #{droplet["networks"]["v6"].first["ip_address"]}"
@@ -654,7 +654,7 @@ configuration["environments"].each do |environment,data|
     elsif not @api_digitalocean_slugs.include?("#{configuration["environments"]["#{environment}"]["servers"]["redhat"]["slug"]}")
       catapult_exception("There is an error in your secrets/configuration.yml file.\nThe slug (DigitalOcean droplet size) for #{environment} => servers => redhat is invalid and the droplet has not been created. Please choose from the following (see DigitalOcean.com for pricing):\n#{@api_digitalocean_slugs}")
     else
-      puts " * DigitalOcean droplet #{configuration["company"]["name"].downcase}-#{environment}-redhat has not been create, please vagrant up #{configuration["company"]["name"].downcase}-#{environment}-redhat"
+      puts " * DigitalOcean droplet #{configuration["company"]["name"].downcase}-#{environment}-redhat has not been created, please vagrant up #{configuration["company"]["name"].downcase}-#{environment}-redhat"
     end
 
     # redhat_mysql droplet
@@ -685,7 +685,7 @@ configuration["environments"].each do |environment,data|
     elsif not @api_digitalocean_slugs.include?("#{configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["slug"]}")
       catapult_exception("There is an error in your secrets/configuration.yml file.\nThe slug (DigitalOcean droplet size) for #{environment} => servers => redhat_mysql is invalid and the droplet has not been created. Please choose from the following (see DigitalOcean.com for pricing):\n#{@api_digitalocean_slugs}")
     else
-      puts " * DigitalOcean droplet #{configuration["company"]["name"].downcase}-#{environment}-redhat_mysql has not been create, please vagrant up #{configuration["company"]["name"].downcase}-#{environment}-redhat_mysql"
+      puts " * DigitalOcean droplet #{configuration["company"]["name"].downcase}-#{environment}-redhat_mysql has not been created, please vagrant up #{configuration["company"]["name"].downcase}-#{environment}-redhat_mysql"
     end
   
   end
