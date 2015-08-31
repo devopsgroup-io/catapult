@@ -86,7 +86,7 @@ end=$(date +%s)
 echo "==> completed in ($(($end - $start)) seconds)"
 
 
-echo -e "\n\n==> RSYNCing files"
+echo -e "\n\n==> RSyncing files"
 start=$(date +%s)
 source /catapult/provisioners/redhat/modules/rsync.sh
 end=$(date +%s)
@@ -117,25 +117,82 @@ redhat_ip="$(echo "${configuration}" | shyaml get-value environments.$1.servers.
 redhat_mysql_ip="$(echo "${configuration}" | shyaml get-value environments.$1.servers.redhat_mysql.ip)"
 company_email="$(echo "${configuration}" | shyaml get-value company.email)"
 
-# configure vhosts
-# this is a debianism - but it makes things easier for cross-distro
+# use sites-available, sites-enabled convention. this is a debianism - but the convention is common and easy understand
 sudo mkdir -p /etc/httpd/sites-available
 sudo mkdir -p /etc/httpd/sites-enabled
 if ! grep -q "IncludeOptional sites-enabled/*.conf" "/etc/httpd/conf/httpd.conf"; then
    sudo bash -c 'echo "IncludeOptional sites-enabled/*.conf" >> "/etc/httpd/conf/httpd.conf"'
 fi
+
 # define the server's servername
 # suppress this - httpd: Could not reliably determine the server's fully qualified domain name, using localhost.localdomain. Set the 'ServerName' directive globally to suppress this message
 if ! grep -q "ServerName localhost" "/etc/httpd/conf/httpd.conf"; then
    sudo bash -c 'echo "ServerName localhost" >> /etc/httpd/conf/httpd.conf'
 fi
 
-# start fresh remove all logs, vhosts, and kill the welcome file
-sudo rm -rf /var/log/httpd/*
-sudo rm -rf /etc/httpd/sites-available/*
-sudo rm -rf /etc/httpd/sites-enabled/*
+# null out httpd log files
+sudo cat /dev/null > /var/log/httpd/access_log
+sudo cat /dev/null > /var/log/httpd/error_log
+
+# @todo null the welcome conf, ideally we should make a catapult welcome file, remember that conf files are read alpa
 sudo cat /dev/null > /etc/httpd/conf.d/welcome.conf
 
+# remove directories from /var/www/repositories/apache/ that no longer exist in configuration
+# create an array of domains
+while IFS='' read -r -d '' key; do
+    domain_environment=$(echo "$key" | grep -w "domain" | cut -d ":" -f 2 | tr -d " ")
+    if [ "$1" != "production" ]; then
+        domain_environment=$1.$domain_environment
+    fi
+    array_domain_environment+=("${domain_environment}")
+    array_conf_domain_environment+=("${domain_environment}.conf")
+    array_htpasswd_domain_environment+=("${domain_environment}.htpasswd")
+done < <(echo "${configuration}" | shyaml get-values-0 websites.apache)
+# cleanup /var/log/httpd/*/access.log and /var/log/httpd/*/error.log
+for directory in /var/log/httpd/*/; do
+    folder_domain_environment=$(basename $directory)
+    if ! [[ "${array_domain_environment[*]}" =~ "${folder_domain_environment}" ]]; then
+        echo -e "\t * cleaning up /var/log/httpd/${folder_domain_environment}/ as the website has been removed for your configuration..."
+        sudo chmod 0777 -R $directory
+        sudo rm -rf $directory
+    else
+        echo -e "\t * emptying log files in /var/log/httpd/${folder_domain_environment}/..."
+        sudo cat /dev/null > /var/log/httpd/${folder_domain_environment}/access.log
+        sudo cat /dev/null > /var/log/httpd/${folder_domain_environment}/error.log
+    fi
+done
+# cleanup /etc/httpd/sites-enabled/*.htpasswd files
+for file in /etc/httpd/sites-enabled/*.htpasswd; do
+    # there may not be a .htpasswd
+    if [ -e "$file" ]; then
+        file_domain_environment=$(basename $file)
+        if ! [[ "${array_htpasswd_domain_environment[*]}" =~ "${file_domain_environment}" ]]; then
+            echo -e "\t * cleaning up /etc/httpd/sites-enabled/${file_domain_environment} as the website has been removed for your configuration..."
+            sudo chmod 0777 -R $file
+            sudo rm -f $file
+        fi
+    fi
+done
+# cleanup /etc/httpd/sites-enabled/*.conf files
+for file in /etc/httpd/sites-enabled/*.conf; do
+    file_domain_environment=$(basename $file)
+    if ! [[ "${array_conf_domain_environment[*]}" =~ "${file_domain_environment}" ]]; then
+        echo -e "\t * cleaning up /etc/httpd/sites-enabled/${file_domain_environment} as the website has been removed for your configuration..."
+        sudo chmod 0777 -R $file
+        sudo rm -f $file
+    fi
+done
+# cleanup /etc/httpd/sites-available/*.conf files
+for file in /etc/httpd/sites-available/*.conf; do
+    file_domain_environment=$(basename $file)
+    if ! [[ "${array_conf_domain_environment[*]}" =~ "${file_domain_environment}" ]]; then
+        echo -e "\t * cleaning up /etc/httpd/sites-available/${file_domain_environment} as the website has been removed for your configuration.."
+        sudo chmod 0777 -R $file
+        sudo rm -f $file
+    fi
+done
+
+# create a vhost per website
 echo "${configuration}" | shyaml get-values-0 websites.apache |
 while IFS='' read -r -d '' key; do
 
@@ -159,15 +216,12 @@ while IFS='' read -r -d '' key; do
     software_workflow=$(echo "$key" | grep -w "software_workflow" | cut -d ":" -f 2 | tr -d " ")
     webroot=$(echo "$key" | grep -w "webroot" | cut -d ":" -f 2 | tr -d " ")
 
-    # configure apache
-    if [ "$1" = "production" ]; then
-        echo -e "\nNOTICE: ${domain_root}"
-    else
-        echo -e "\nNOTICE: ${1}.${domain_root}"
-    fi
-
     # configure vhost
-    echo -e "\t * configuring vhost"
+    if [ "$1" = "production" ]; then
+        echo -e "\t * configuring vhost for ${domain_root}"
+    else
+        echo -e "\t * configuring vhost for ${1}.${domain_root}"
+    fi
     sudo mkdir -p /var/log/httpd/${domain_environment}
     sudo touch /var/log/httpd/${domain_environment}/access.log
     sudo touch /var/log/httpd/${domain_environment}/error.log
@@ -260,8 +314,10 @@ while IFS='' read -r -d '' key; do
 
 EOF
 
-    # enable vhost
-    sudo ln -s /etc/httpd/sites-available/$domain_environment.conf /etc/httpd/sites-enabled/$domain_environment.conf
+    # if the vhost has not been linked, link the vhost
+    if [ ! -f /etc/httpd/sites-enabled/$domain_environment.conf ]; then
+        sudo ln -s /etc/httpd/sites-available/$domain_environment.conf /etc/httpd/sites-enabled/$domain_environment.conf
+    fi
 
     # set ownership of uploads directory in upstream servers
     if [ "$1" != "dev" ]; then
@@ -294,8 +350,7 @@ echo "==> completed in ($(($end - $start)) seconds)"
 
 echo -e "\n\n==> Restarting Apache"
 start=$(date +%s)
-sudo apachectl stop
-sudo apachectl start
+sudo apachectl restart
 sudo apachectl configtest
 sudo systemctl is-active httpd.service
 end=$(date +%s)
