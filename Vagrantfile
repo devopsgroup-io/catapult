@@ -1258,6 +1258,8 @@ if ["status"].include?(ARGV[0])
             row.push("down".ljust(4))
           rescue EOFError
             row.push("down".ljust(4))
+          rescue Net::ReadTimeout
+            row.push("down".ljust(4))
           rescue OpenSSL::SSL::SSLError
             row.push("err".ljust(4))
           rescue Exception => ex
