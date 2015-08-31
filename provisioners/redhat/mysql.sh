@@ -74,7 +74,7 @@ end=$(date +%s)
 echo -e "\n==> completed in ($(($end - $start)) seconds)"
 
 
-echo -e "\n\n==> RSYNCing files"
+echo -e "\n\n==> RSyncing files"
 start=$(date +%s)
 source /catapult/provisioners/redhat/modules/rsync.sh
 end=$(date +%s)
