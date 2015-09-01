@@ -12,8 +12,10 @@
 
 
 echo -e "==> Receiving your Catapult Instance"
-# git clones
+
+# install git
 sudo yum install -y git
+
 # clone and pull catapult
 if ([ $1 = "dev" ] || [ $1 = "test" ]); then
     branch="develop"
@@ -36,8 +38,7 @@ else
     fi
 fi
 
-
-
+# kick off instance provisioner
 if [ "${4}" = "apache" ]; then
     bash /catapult/provisioners/redhat/apache.sh $1 $2 $3 $4 $5 | tee -a /catapult/provisioners/redhat/logs/apache.log
 elif [ "${4}" = "mysql" ]; then

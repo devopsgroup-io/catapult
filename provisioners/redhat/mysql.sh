@@ -13,30 +13,7 @@
 
 echo -e "==> Updating existing packages and installing utilities"
 start=$(date +%s)
-# only allow authentication via ssh key pair
-# suppress this - There were 34877 failed login attempts since the last successful login.
-if ! grep -q "PasswordAuthentication no" "/etc/ssh/sshd_config"; then
-   sudo bash -c 'echo "PasswordAuthentication no" >> /etc/ssh/sshd_config'
-fi
-sudo systemctl stop sshd.service
-sudo systemctl start sshd.service
-# update yum
-sudo yum update -y
-# git clones
-sudo yum install -y git
-# parse yaml
-sudo easy_install pip
-sudo pip install --upgrade pip
-sudo pip install shyaml --upgrade
-configuration=$(gpg --batch --passphrase ${3} --decrypt /catapult/secrets/configuration.yml.gpg)
-gpg --verbose --batch --yes --passphrase ${3} --output /catapult/secrets/id_rsa --decrypt /catapult/secrets/id_rsa.gpg
-gpg --verbose --batch --yes --passphrase ${3} --output /catapult/secrets/id_rsa.pub --decrypt /catapult/secrets/id_rsa.pub.gpg
-chmod 700 /catapult/secrets/id_rsa
-chmod 700 /catapult/secrets/id_rsa.pub
-# forward root's mail to company mail
-sudo cat > "/root/.forward" << EOF
-"$(echo "${configuration}" | shyaml get-value company.email)"
-EOF
+source /catapult/provisioners/redhat/modules/system.sh
 end=$(date +%s)
 echo "==> completed in ($(($end - $start)) seconds)"
 
