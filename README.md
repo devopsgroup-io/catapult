@@ -333,7 +333,7 @@ Once you add a new website to configuration.yml, it's time to test in localdev:
   * `vagrant provision ~/configuration.yml["company"]["name"]-dev-redhat`
   * `vagrant provision ~/configuration.yml["company"]["name"]-dev-redhat-mysql`
 
-Once you're satisfied with new website in localdev, it's time to commit configuration.yml.gpg to your Catapult fork's develop branch, this will kick off a automated deployment of test. Once you're satisfied with the website in test, it's time to create a pull request from your Catapult fork's develop branch into master - once the pull request is merged, this will kick off an automated deployment to qc. Once you're satisfied with the website in qc, it's time to login to Bamboo and press the deployment button for production.
+Once you're satisfied with new website in localdev, it's time to commit configuration.yml.gpg to your Catapult fork's develop branch, this will kick off a automated deployment of test. Once you're satisfied with the website in test, it's time to create a pull request from your Catapult fork's develop branch into release - once the pull request is merged, this will kick off an automated deployment to qc. Once you're satisfied with the website in qc, it's time to create a pull request from your Catapult fork's release branch into master. Production does not have any automated deployments, to deploy your website to production it's time to login to Bamboo and press the deployment button for production.
 
 Once a website exists in the upstream environments (test, qc, production), automated deployments will kick off if changes are detected on their respected branches (see chart below). The same workflow of moving a website upstream, exists when you make changes to a specific website's repository.
 
