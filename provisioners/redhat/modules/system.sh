@@ -42,10 +42,10 @@ if [ "$1" != "dev" ]; then
         fi
         force_auth=$(echo "$key" | grep -w "force_auth" | cut -d ":" -f 2 | tr -d " ")
         force_auth_exclude=$(echo "$key" | grep -w "force_auth_exclude" | tr -d " ")
-        sudo echo -e "domain: ${domain_root}" >> /tmp/email.txt
+        sudo echo -e "domain: http://${domain_root}" >> /tmp/email.txt
         sudo echo -e "force_auth: ${force_auth}" >> /tmp/email.txt
         sudo echo -e "force_auth_exclude: ${force_auth_exclude}" >> /tmp/email.txt
-        sudo echo -e "\n"
+        sudo echo -e "\n\n"
     done
     sendmail -F"Catapult" "$(echo "${configuration}" | shyaml get-value company.email)" < /tmp/email.txt
     sudo cat /dev/null > /tmp/email.txt
