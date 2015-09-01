@@ -45,8 +45,10 @@ if [ "$1" != "dev" ]; then
         sudo echo -e "domain: http://${domain_root}" >> /tmp/email.txt
         sudo echo -e "force_auth: ${force_auth}" >> /tmp/email.txt
         sudo echo -e "force_auth_exclude: ${force_auth_exclude}" >> /tmp/email.txt
-        sudo echo -e "\n\n"
+        sudo echo -e "\n" >> /tmp/email.txt
     done
+    sudo echo -e "\n" >> /tmp/email.txt
+    sudo echo -e "https://devopsgroup.io/" >> /tmp/email.txt
     sendmail -F"Catapult" "$(echo "${configuration}" | shyaml get-value company.email)" < /tmp/email.txt
     sudo cat /dev/null > /tmp/email.txt
 fi
