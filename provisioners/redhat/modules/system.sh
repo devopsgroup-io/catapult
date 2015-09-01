@@ -29,6 +29,7 @@ EOF
 # send an email with catapult stack
 if [ "$1" != "dev" ]; then
     sudo touch /tmp/email.txt
+    sudo echo -e "Subject: Catapult \($(echo "${configuration}" | shyaml get-value company.name)\) - ${1} Environment Update" >> /tmp/email.txt
     echo "${configuration}" | shyaml get-values-0 websites.apache |
     while IFS='' read -r -d '' key; do
         domain=$(echo "$key" | grep -w "domain" | cut -d ":" -f 2 | tr -d " ")
@@ -45,6 +46,6 @@ if [ "$1" != "dev" ]; then
         sudo echo -e "force_auth_exclude: ${force_auth_exclude}" >> /tmp/email.txt
         sudo echo -e "\n"
     done
-    sendmail -F"Catapult \($(echo "${configuration}" | shyaml get-value company.name)\) - ${1} Environment Update" "$(echo "${configuration}" | shyaml get-value company.email)" < /tmp/email.txt
+    sendmail -F"Catapult" "$(echo "${configuration}" | shyaml get-value company.email)" < /tmp/email.txt
     sudo cat /dev/null > /tmp/email.txt
 fi
