@@ -45,6 +45,6 @@ if [ "$1" != "dev" ]; then
         sudo echo -e "force_auth_exclude: ${force_auth_exclude}" >> /tmp/email.txt
         sudo echo -e "\n"
     done
-    sendmail -F"Catapult \($(echo "${configuration}" | shyaml get-value company.name)\) - ${1} Environment Update" sdreeser@gmail.com < /tmp/email.txt
+    sendmail -F"Catapult \($(echo "${configuration}" | shyaml get-value company.name)\) - ${1} Environment Update" "$(echo "${configuration}" | shyaml get-value company.email)" < /tmp/email.txt
     sudo cat /dev/null > /tmp/email.txt
 fi
