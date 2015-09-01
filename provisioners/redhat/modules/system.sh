@@ -42,10 +42,15 @@ if [ "$1" != "dev" ]; then
         fi
         force_auth=$(echo "$key" | grep -w "force_auth" | cut -d ":" -f 2 | tr -d " ")
         force_auth_exclude=$(echo "$key" | grep -w "force_auth_exclude" | tr -d " ")
+        if ([ ! -z "${force_auth_exclude}" ]); then
+            force_auth_excludes=( $(echo "${key}" | shyaml get-values force_auth_exclude) )
+        else
+            force_auth_excludes=""
+        fi
         sudo echo -e "domain: http://${domain_root}" >> /tmp/email.txt
         sudo echo -e "force_auth: ${force_auth}" >> /tmp/email.txt
-        sudo echo -e "force_auth_exclude: ${force_auth_exclude}" >> /tmp/email.txt
-        sudo echo -e "\n" >> /tmp/email.txt
+        sudo echo -e "force_auth_exclude: ${force_auth_excludes}" >> /tmp/email.txt
+        sudo echo -e " " >> /tmp/email.txt
     done
     sudo echo -e "\n" >> /tmp/email.txt
     sudo echo -e "https://devopsgroup.io/" >> /tmp/email.txt
