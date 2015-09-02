@@ -221,11 +221,16 @@ while IFS='' read -r -d '' key; do
                                 domain_url="${1}.${domain}.${domain_tld_override}"
                             fi
                         fi
-                        # for software without a search and replace tool (handles serialized arrays, etc), use sed
-                        # match :// and optionally www. then replace with :// + optionally www. + either dev., test., or the production domain
+                        # replace variances of the following during a restore to match the environment
+                        # ://dev.devopsgroup.io
+                        # ://www.dev.devopsgroup.io
+                        # ://test.devopsgroup.io
+                        # ://www.test.devopsgroup.io
+                        # ://devopsgroup.io
+                        # ://www.devopsgroup.io
                         if ([ "${software}" = "codeigniter2" ] || [ "${software}" = "drupal6" ] || [ "${software}" = "drupal7" ] || [ "${software}" = "silverstripe" ] || [ "${software}" = "xenforo" ]); then
-                            # replace production, test, and dev urls in the case of downstream software_workflow
-                            sed -r --expression="s/:\/\/(www\.)?(dev\.|test\.)?${domain}/:\/\/\1${domain_url}/g" --expression="s/:\/\/(www\.)?(dev\.|test\.)?${domain_url}/:\/\/\1${domain_url}/g" "/var/www/repositories/apache/${domain}/_sql/$(basename "$file")" > "/var/www/repositories/apache/${domain}/_sql/${1}.$(basename "$file")"
+                            echo -e "\t* replacing URLs in the database to align with the enivronment..."
+                            sed -r --expression="s/:\/\/(www\.)?(dev\.|test\.)?(${domain}|${domain_url})/:\/\/\1${domain_url}/g" "/var/www/repositories/apache/${domain}/_sql/$(basename "$file")" > "/var/www/repositories/apache/${domain}/_sql/${1}.$(basename "$file")"
                         else
                             cp "/var/www/repositories/apache/${domain}/_sql/$(basename "$file")" "/var/www/repositories/apache/${domain}/_sql/${1}.$(basename "$file")"
                         fi
@@ -241,22 +246,8 @@ while IFS='' read -r -d '' key; do
                         elif [[ "${software}" = "wordpress" ]]; then
                             echo -e "\t* resetting ${software} admin password..."
                             mysql --defaults-extra-file=$dbconf ${1}_${domainvaliddbname} -e "UPDATE ${software_dbprefix}users SET user_login='admin', user_email='$(echo "${configuration}" | shyaml get-value company.email)', user_pass=MD5('$(echo "${configuration}" | shyaml get-value environments.${1}.software.wordpress.admin_password)'), user_status='0' WHERE id = 1;"
-                            # consider using search-replace --regex here, although claims of being 15-20x slower
-                            # replace production urls in the case of downstream software_workflow
-                            php /catapult/provisioners/redhat/installers/wp-cli.phar --allow-root --path="/var/www/repositories/apache/${domain}/" search-replace "://${domain}" "://${domain_url}" | sed "s/^/\t\t/"
-                            php /catapult/provisioners/redhat/installers/wp-cli.phar --allow-root --path="/var/www/repositories/apache/${domain}/" search-replace "://www.${domain}" "://www.${domain_url}" | sed "s/^/\t\t/"
-                            php /catapult/provisioners/redhat/installers/wp-cli.phar --allow-root --path="/var/www/repositories/apache/${domain}/" search-replace "://${domain_url}" "://${domain_url}" | sed "s/^/\t\t/"
-                            php /catapult/provisioners/redhat/installers/wp-cli.phar --allow-root --path="/var/www/repositories/apache/${domain}/" search-replace "://www.${domain_url}" "://www.${domain_url}" | sed "s/^/\t\t/"
-                            # replace test urls in the case of upstream software_workflow
-                            php /catapult/provisioners/redhat/installers/wp-cli.phar --allow-root --path="/var/www/repositories/apache/${domain}/" search-replace "://test.${domain}" "://${domain_url}" | sed "s/^/\t\t/"
-                            php /catapult/provisioners/redhat/installers/wp-cli.phar --allow-root --path="/var/www/repositories/apache/${domain}/" search-replace "://www.test.${domain}" "://www.${domain_url}" | sed "s/^/\t\t/"
-                            php /catapult/provisioners/redhat/installers/wp-cli.phar --allow-root --path="/var/www/repositories/apache/${domain}/" search-replace "://test.${domain_url}" "://${domain_url}" | sed "s/^/\t\t/"
-                            php /catapult/provisioners/redhat/installers/wp-cli.phar --allow-root --path="/var/www/repositories/apache/${domain}/" search-replace "://www.test.${domain_url}" "://www.${domain_url}" | sed "s/^/\t\t/"
-                            # replace dev urls in the case of upstream software_workflow
-                            php /catapult/provisioners/redhat/installers/wp-cli.phar --allow-root --path="/var/www/repositories/apache/${domain}/" search-replace "://dev.${domain}" "://${domain_url}" | sed "s/^/\t\t/"
-                            php /catapult/provisioners/redhat/installers/wp-cli.phar --allow-root --path="/var/www/repositories/apache/${domain}/" search-replace "://www.dev.${domain}" "://www.${domain_url}" | sed "s/^/\t\t/"
-                            php /catapult/provisioners/redhat/installers/wp-cli.phar --allow-root --path="/var/www/repositories/apache/${domain}/" search-replace "://dev.${domain_url}" "://${domain_url}" | sed "s/^/\t\t/"
-                            php /catapult/provisioners/redhat/installers/wp-cli.phar --allow-root --path="/var/www/repositories/apache/${domain}/" search-replace "://www.dev.${domain_url}" "://www.${domain_url}" | sed "s/^/\t\t/"
+                            echo -e "\t* replacing URLs in the database to align with the enivronment..."
+                            php /catapult/provisioners/redhat/installers/wp-cli.phar --allow-root --path="/var/www/repositories/apache/${domain}/" search-replace ":\/\/(www\.)?(dev\.|test\.)?(${domain}|${domain_url})" "://${domain_url}" --regex | sed "s/^/\t\t/"
                             mysql --defaults-extra-file=$dbconf ${1}_${domainvaliddbname} -e "UPDATE ${software_dbprefix}options SET option_value='$(echo "${configuration}" | shyaml get-value company.email)' WHERE option_name = 'admin_email';"
                             mysql --defaults-extra-file=$dbconf ${1}_${domainvaliddbname} -e "UPDATE ${software_dbprefix}options SET option_value='http://${domain_url}' WHERE option_name = 'home';"
                             mysql --defaults-extra-file=$dbconf ${1}_${domainvaliddbname} -e "UPDATE ${software_dbprefix}options SET option_value='http://${domain_url}' WHERE option_name = 'siteurl';"
