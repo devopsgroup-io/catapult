@@ -47,7 +47,7 @@ Catapult can manage all of this for you through an open-source and well-document
 - [Troubleshooting](#troubleshooting)
 - [Service Justification](#service-justification)
 - [Contributing](#contributing)
-    - [Versioning](#versioning)
+    - [Releases](#releases)
 
 
 
@@ -391,12 +391,16 @@ When you first setup Catapult a `develop-catapult` branch is created for you und
 
 
 
-## Versioning ##
+## Releases ##
 
-Given a version number MAJOR.MINOR.PATCH, increment the:
+Releases are driven by the devopsgroup.io Team and occur when accepting new pull requests from contributors like you. Releases follow Semantic Versioning 2.0.0., given a version number MAJOR.MINOR.PATCH, increment the:
 
 1. MAJOR version when you make incompatible API changes,
 2. MINOR version when you add functionality in a backwards-compatible manner, and
 3. PATCH version when you make backwards-compatible bug fixes.
 
-See http://semver.org/ for more information.
+In addition, the release will be prefaced with a `v` (v1.0.0) to conform standard practice.
+
+During a new release, the version number in VERSION.yml will be incremented and tagged with the same version number along with a [GitHub Release](https://help.github.com/articles/about-releases/).
+
+See http://semver.org/spec/v2.0.0.html for more information.
