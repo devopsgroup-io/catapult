@@ -35,6 +35,8 @@ else
     if ! [ -e "/catapult/secrets/configuration.yml.gpg" ]; then
         echo -e "Cannot read from /catapult/secrets/configuration.yml.gpg, please vagrant reload the virtual machine."
         exit 1
+    else
+        echo -e "Your Catapult instance is being synced from your host machine."
     fi
 fi
 
