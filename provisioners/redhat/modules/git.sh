@@ -6,11 +6,14 @@ while IFS='' read -r -d '' key; do
 done < <(echo "${configuration}" | shyaml get-values-0 websites.apache)
 # cleanup directories from domains array
 for directory in /var/www/repositories/apache/*/; do
-    domain=$(basename $directory)
-    if ! [[ ${domains[*]} =~ $domain ]]; then
-        echo "Cleaning up the ${domain} repo because it has been removed from your configuration..."
-        sudo chmod 0777 -R $directory
-        sudo rm -rf $directory
+    # on a new provision, there will be no directories
+    if [ -e "$directory" ]; then
+        domain=$(basename $directory)
+        if ! [[ ${domains[*]} =~ $domain ]]; then
+            echo "Cleaning up the ${domain} repo because it has been removed from your configuration..."
+            sudo chmod 0777 -R $directory
+            sudo rm -rf $directory
+        fi
     fi
 done
 
