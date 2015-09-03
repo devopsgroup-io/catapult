@@ -47,7 +47,7 @@ Catapult can manage all of this for you through an open-source and well-document
 - [Troubleshooting](#troubleshooting)
 - [Service Justification](#service-justification)
 - [Contributing](#contributing)
-    - [Versioning](#versioning)
+    - [Releases](#releases)
 
 
 
@@ -333,7 +333,7 @@ Once you add a new website to configuration.yml, it's time to test in localdev:
   * `vagrant provision ~/configuration.yml["company"]["name"]-dev-redhat`
   * `vagrant provision ~/configuration.yml["company"]["name"]-dev-redhat-mysql`
 
-Once you're satisfied with new website in localdev, it's time to commit configuration.yml.gpg to your Catapult fork's develop branch, this will kick off a automated deployment of test. Once you're satisfied with the website in test, it's time to create a pull request from your Catapult fork's develop branch into master - once the pull request is merged, this will kick off an automated deployment to qc. Once you're satisfied with the website in qc, it's time to login to Bamboo and press the deployment button for production.
+Once you're satisfied with new website in localdev, it's time to commit configuration.yml.gpg to your Catapult fork's develop branch, this will kick off a automated deployment of test. Once you're satisfied with the website in test, it's time to create a pull request from your Catapult fork's develop branch into release - once the pull request is merged, this will kick off an automated deployment to qc. Once you're satisfied with the website in qc, it's time to create a pull request from your Catapult fork's release branch into master. Production does not have any automated deployments, to deploy your website to production it's time to login to Bamboo and press the deployment button for production.
 
 Once a website exists in the upstream environments (test, qc, production), automated deployments will kick off if changes are detected on their respected branches (see chart below). The same workflow of moving a website upstream, exists when you make changes to a specific website's repository.
 
@@ -355,6 +355,8 @@ Below is a list of known limitations with Catapult, if you're still having issue
 
 * **CloudFlare**
     * [07-27-2015] If your `~/configuration.yml["websites"]["apache/iis"]["domain"]` is a subdomain (drupal7.devopsgroup.io) the `force_https` option will only work in localdev and production as CloudFlare only supports a first-level subdomain. https://www.cloudflare.com/ssl
+* **DigitalOcean**
+    * [09-01-2015] vagrant rebuild was failing with a `The configured shell (config.ssh.shell) is invalid and unable to properly execute commands.` it is due to DigitalOcean's API not re-inserting the SSH key that was originally used during the first vagrant up (creation of the droplet). To rebuild, you must use the DigitalOcean console, run through the first root password reset workflow that was emailed to you, then vi /etc/sudoers and remove the Defaults requiretty line and save and exit. You can then run vagrant provision successfully.
 * **monitor.us**
     * [08-10-2015] If your `~/configuration.yml["websites"]["apache/iis"]["domain"]` includes the `force_https` option, you will need to login to monitor.us and enable SNI from Monitors > Monitor List > Actions > Basic Settings > Enable SNI support. 
 * **Vagrant**
@@ -389,12 +391,16 @@ When you first setup Catapult a `develop-catapult` branch is created for you und
 
 
 
-## Versioning ##
+## Releases ##
 
-Given a version number MAJOR.MINOR.PATCH, increment the:
+Releases are driven by the devopsgroup.io Team and occur when accepting new pull requests from contributors like you. Releases follow Semantic Versioning 2.0.0., given a version number MAJOR.MINOR.PATCH, increment the:
 
 1. MAJOR version when you make incompatible API changes,
 2. MINOR version when you add functionality in a backwards-compatible manner, and
 3. PATCH version when you make backwards-compatible bug fixes.
 
-See http://semver.org/ for more information.
+In addition, the release will be prefaced with a `v` (v1.0.0) to conform standard practice.
+
+During a new release, the version number in VERSION.yml will be incremented and tagged with the same version number along with a [GitHub Release](https://help.github.com/articles/about-releases/).
+
+See http://semver.org/spec/v2.0.0.html for more information.

@@ -12,8 +12,10 @@
 
 
 echo -e "==> Receiving your Catapult Instance"
-# git clones
+
+# install git
 sudo yum install -y git
+
 # clone and pull catapult
 if ([ $1 = "dev" ] || [ $1 = "test" ]); then
     branch="develop"
@@ -33,11 +35,12 @@ else
     if ! [ -e "/catapult/secrets/configuration.yml.gpg" ]; then
         echo -e "Cannot read from /catapult/secrets/configuration.yml.gpg, please vagrant reload the virtual machine."
         exit 1
+    else
+        echo -e "Your Catapult instance is being synced from your host machine."
     fi
 fi
 
-
-
+# kick off instance provisioner
 if [ "${4}" = "apache" ]; then
     bash /catapult/provisioners/redhat/apache.sh $1 $2 $3 $4 $5 | tee -a /catapult/provisioners/redhat/logs/apache.log
 elif [ "${4}" = "mysql" ]; then
