@@ -774,7 +774,7 @@ configuration["websites"].each do |service,data|
               puts "   - Configured monitor.us http monitor."
             # errorCode 14 => The URL is not resolved.
             elsif api_monitorus_monitor_http["errorCode"].to_f == 14
-              puts "   - Could not add the monitor.us http monitor. The URL does not resolve."
+              puts "   - Could not add the monitor.us http monitor. The domain name is not registered."
             elsif api_monitorus_monitor_http["error"].include?("out of limit")
               puts "   - monitor.us api limit of 1000 requests per hour has been hit, skipping for now."
             else
