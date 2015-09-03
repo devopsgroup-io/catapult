@@ -254,7 +254,6 @@ while IFS='' read -r -d '' key; do
                         elif [[ "${software}" = "drupal7" ]]; then
                             echo -e "\t* resetting ${software} admin password..."
                             password_hash=$(cd "/var/www/repositories/apache/${domain}/${webroot}" && php ./scripts/password-hash.sh $(echo "${configuration}" | shyaml get-value environments.${1}.software.drupal.admin_password))
-                            echo -e "${password_hash}"
                             password_hash=$(echo "${password_hash}" | awk '{ print $4 }' | tr -d " " | tr -d "\n")
                             mysql --defaults-extra-file=$dbconf ${1}_${domainvaliddbname} -e "INSERT INTO ${software_dbprefix}users (uid, pass, mail, status) VALUES ('1','${password_hash}','$(echo "${configuration}" | shyaml get-value company.email)','1') ON DUPLICATE KEY UPDATE name='admin', mail='$(echo "${configuration}" | shyaml get-value company.email)', pass='${password_hash}', status='1';"
                             mysql --defaults-extra-file=$dbconf ${1}_${domainvaliddbname} -e "INSERT INTO ${software_dbprefix}users_roles (uid, rid) VALUES ('1','3') ON DUPLICATE KEY UPDATE rid='3';"
