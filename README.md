@@ -173,7 +173,7 @@ Catapult uses several third-party services to pull everything off - below is a l
                     1. Project > New Project
                     2. Project name: Catapult
                     3. Project key: CAT
-                    4. Plan name: test
+                    4. Plan name: TEST
                     5. Plan key: TEST
                     6. Plan description:
                 * *Link repository to new build plan*
@@ -181,7 +181,7 @@ Catapult uses several third-party services to pull everything off - below is a l
             2. **Create QC Plan**
                 * *Project and build plan name*
                     1. Project: Catapult
-                    4. Plan name: qc
+                    4. Plan name: QC
                     5. Plan key: QC
                     6. Plan description:
                 * *Link repository to new build plan*
@@ -189,7 +189,7 @@ Catapult uses several third-party services to pull everything off - below is a l
             2. **Create PROD Plan**
                 * *Project and build plan name*
                     1. Project: Catapult
-                    4. Plan name: production
+                    4. Plan name: PRODUCTION
                     5. Plan key: PROD
                     6. Plan description:
                 * *Link repository to new build plan*
