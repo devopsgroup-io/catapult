@@ -631,9 +631,9 @@ configuration["environments"].each do |environment,data|
     # if redhat digitalocean droplet has been created
     if droplet != nil
       puts " * DigitalOcean droplet #{configuration["company"]["name"].downcase}-#{environment}-redhat has been found."
-      puts "   - status: #{droplet["status"]}, memory: #{droplet["size"]["memory"]}, vcpus: #{droplet["size"]["vcpus"]}, disk: #{droplet["size"]["disk"]}, $/month: $#{droplet["size"]["price_monthly"]}"
-      puts "   - created: #{droplet["created_at"]}, slug: #{droplet["size"]["slug"]}, region: #{droplet["region"]["name"]}, kernel: #{droplet["kernel"]["name"]}"
-      puts "   - ipv4: #{droplet["networks"]["v4"].first["ip_address"]}, ipv6: #{droplet["networks"]["v6"].first["ip_address"]}"
+      puts "   - [status] #{droplet["status"]} [memory] #{droplet["size"]["memory"]} [vcpus] #{droplet["size"]["vcpus"]} [disk] #{droplet["size"]["disk"]} [$/month] $#{droplet["size"]["price_monthly"]}"
+      puts "   - [created] #{droplet["created_at"]} [slug] #{droplet["size"]["slug"]} [region] #{droplet["region"]["name"]} [kernel] #{droplet["kernel"]["name"]}"
+      puts "   - [ipv4] #{droplet["networks"]["v4"].first["ip_address"]} [ipv6] #{droplet["networks"]["v6"].first["ip_address"]}"
       # get ip address and write to secrets/configuration.yml
       unless configuration["environments"]["#{environment}"]["servers"]["redhat"]["ip"] == droplet["networks"]["v4"].first["ip_address"]
         configuration["environments"]["#{environment}"]["servers"]["redhat"]["ip"] = droplet["networks"]["v4"].first["ip_address"]
@@ -662,9 +662,9 @@ configuration["environments"].each do |environment,data|
     # if redhat_mysql digitalocean droplet has been created
     if droplet != nil
       puts " * DigitalOcean droplet #{configuration["company"]["name"].downcase}-#{environment}-redhat_mysql has been found."
-      puts "   - status: #{droplet["status"]}, memory: #{droplet["size"]["memory"]}, vcpus: #{droplet["size"]["vcpus"]}, disk: #{droplet["size"]["disk"]}, $/month: $#{droplet["size"]["price_monthly"]}"
-      puts "   - created: #{droplet["created_at"]}, slug: #{droplet["size"]["slug"]}, region: #{droplet["region"]["name"]}, kernel: #{droplet["kernel"]["name"]}"
-      puts "   - ipv4: #{droplet["networks"]["v4"].first["ip_address"]}, ipv6: #{droplet["networks"]["v6"].first["ip_address"]}"
+      puts "   - [status] #{droplet["status"]} [memory] #{droplet["size"]["memory"]} [vcpus] #{droplet["size"]["vcpus"]} [disk] #{droplet["size"]["disk"]} [$/month] $#{droplet["size"]["price_monthly"]}"
+      puts "   - [created] #{droplet["created_at"]} [slug] #{droplet["size"]["slug"]} [region] #{droplet["region"]["name"]} [kernel] #{droplet["kernel"]["name"]}"
+      puts "   - [ipv4] #{droplet["networks"]["v4"].first["ip_address"]} [ipv6] #{droplet["networks"]["v6"].first["ip_address"]}"
       # get ip address and write to secrets/configuration.yml
       unless configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["ip"] == droplet["networks"]["v4"].first["ip_address"]
         configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["ip"] = droplet["networks"]["v4"].first["ip_address"]
@@ -1204,10 +1204,13 @@ if ["status"].include?(ARGV[0])
   puts "\n[cert signature algorithm]"
   puts " * https://www.openssl.org/docs/apps/ciphers.html"
   puts "\nAvailable websites:".color(Colors::WHITE)
-  puts "".ljust(40) + "[software]".ljust(15) + "[dev.]".ljust(22) + "[test.]".ljust(22) + "[qc.]".ljust(22) + "[production / cert expiry, signature algorithm, common name]".ljust(80) + "[alexa rank, 3m delta]".ljust(26)
+  puts "".ljust(42) + "[software]".ljust(14) + "[alexa rank, 3m delta]".ljust(24) + "[dev.]".ljust(22) + "[test.]".ljust(22) + "[qc.]".ljust(22) + "[production / cert expiry, signature algorithm, common name]".ljust(80)
 
   configuration["websites"].each do |service,data|
-    unless configuration["websites"]["#{service}"] == nil
+    if configuration["websites"]["#{service}"] == nil
+      puts "\n[#{service}]"
+      puts " * none"
+    else
       puts "\n[#{service}]"
       configuration["websites"]["#{service}"].each do |instance|
         # count websites
@@ -1216,12 +1219,45 @@ if ["status"].include?(ARGV[0])
         row = Array.new
         # get domain name
         if instance["domain_tld_override"] == nil
-          row.push(" * #{instance["domain"]}".ljust(39))
+          row.push(" * #{instance["domain"]}".ljust(41))
         else
-          row.push(" * #{instance["domain"]}.#{instance["domain_tld_override"]}".ljust(39))
+          row.push(" * #{instance["domain"]}.#{instance["domain_tld_override"]}".ljust(41))
         end
         # get software
-        row.push((instance["software"] || "").ljust(14))
+        row.push((instance["software"] || "").ljust(13))
+        # alexa rank and 3 month deviation
+        begin
+          if instance["domain_tld_override"] == nil
+            uri = URI("http://data.alexa.com/data?cli=10&url=#{instance["domain"]}")
+          else
+            uri = URI("http://data.alexa.com/data?cli=10&url=#{instance["domain"]}.#{instance["domain_tld_override"]}")
+          end
+          Net::HTTP.start(uri.host, uri.port) do |http|
+            request = Net::HTTP::Get.new uri.request_uri
+            response = http.request request
+            response = Nokogiri::XML(response.body)
+            if "#{response.xpath('//ALEXA//SD//POPULARITY')}" != ""
+              response.xpath('//ALEXA//SD//POPULARITY').each do |attribute|
+                row.push(attribute["TEXT"].to_s.reverse.gsub(/...(?=.)/,'\&,').reverse.ljust(11))
+              end
+            else
+              row.push("".ljust(11))
+            end
+            if "#{response.xpath('//ALEXA//SD//RANK')}" != ""
+              response.xpath('//ALEXA//SD//RANK').each do |attribute|
+                if attribute["DELTA"].match(/\+\d+/)
+                  operator = "+"
+                elsif attribute["DELTA"].match(/\-\d+/)
+                  operator = "-"
+                end
+                delta = attribute["DELTA"].split(/[+,-]/)
+                row.push("#{operator}#{delta[1].to_s.reverse.gsub(/...(?=.)/,'\&,').reverse}".ljust(11))
+              end
+            else
+              row.push("".ljust(11))
+            end
+          end
+        end
         # get http response code per environment
         configuration["environments"].each do |environment,data|
           response = nil
@@ -1307,39 +1343,6 @@ if ["status"].include?(ARGV[0])
           row.push("cannot read cert, missing local cipher?".ljust(57))
         rescue Exception => ex
           row.push("#{ex.class}".ljust(57))
-        end
-        # alexa rank and 3 month deviation
-        begin
-          if instance["domain_tld_override"] == nil
-            uri = URI("http://data.alexa.com/data?cli=10&url=#{instance["domain"]}")
-          else
-            uri = URI("http://data.alexa.com/data?cli=10&url=#{instance["domain"]}.#{instance["domain_tld_override"]}")
-          end
-          Net::HTTP.start(uri.host, uri.port) do |http|
-            request = Net::HTTP::Get.new uri.request_uri
-            response = http.request request
-            response = Nokogiri::XML(response.body)
-            if "#{response.xpath('//ALEXA//SD//POPULARITY')}" != ""
-              response.xpath('//ALEXA//SD//POPULARITY').each do |attribute|
-                row.push(attribute["TEXT"].to_s.reverse.gsub(/...(?=.)/,'\&,').reverse.ljust(11))
-              end
-            else
-              row.push("".ljust(11))
-            end
-            if "#{response.xpath('//ALEXA//SD//RANK')}" != ""
-              response.xpath('//ALEXA//SD//RANK').each do |attribute|
-                if attribute["DELTA"].match(/\+\d+/)
-                  operator = "+"
-                elsif attribute["DELTA"].match(/\-\d+/)
-                  operator = "-"
-                end
-                delta = attribute["DELTA"].split(/[+,-]/)
-                row.push("#{operator}#{delta[1].to_s.reverse.gsub(/...(?=.)/,'\&,').reverse}".ljust(13))
-              end
-            else
-              row.push("".ljust(13))
-            end
-          end
         end
         puts row.join(" ")
       end
