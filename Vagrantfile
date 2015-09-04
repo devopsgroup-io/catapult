@@ -49,6 +49,12 @@ def catapult_exception(error)
 end
 
 
+# ensure the user is in the correct directory when running vagrant commands to prevent git from pulling in catapult upstream master into repositories
+unless File.exist?('LICENSE.txt') && File.exist?('README.md') && File.exist?('VERSION.yml')
+  catapult_exception("You are outside of the Catapult root, please change to the Catapult root directory.")
+end
+
+
 # set variables based on operating system
 if (RbConfig::CONFIG['host_os'] =~ /mswin|msys|mingw|cygwin|bccwin|wince|emc/)
   if File.exist?('C:\Program Files (x86)\Git\bin\git.exe')
