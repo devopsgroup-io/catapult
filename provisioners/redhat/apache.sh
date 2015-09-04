@@ -344,8 +344,10 @@ echo "==> completed in ($(($end - $start)) seconds)"
 
 echo -e "\n\n==> Restarting Apache"
 start=$(date +%s)
-sudo apachectl restart
-sudo apachectl configtest
+sudo apachectl graceful
+# sometimes there are zombie processes left over, httpd start cleans this up properly? (service httpd only supports start|stop|restart)
+sudo service httpd start
+sudo service httpd configtest
 sudo systemctl is-active httpd.service
 end=$(date +%s)
 echo "==> completed in ($(($end - $start)) seconds)"
