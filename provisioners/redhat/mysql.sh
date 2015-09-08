@@ -163,18 +163,42 @@ while IFS='' read -r -d '' key; do
             cd "/var/www/repositories/apache/${domain}" && git clean -fd 2>&1 | sed "s/^/\t/"
             cd "/var/www/repositories/apache/${domain}" && sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git fetch" 2>&1 | sed "s/^/\t/"
             cd "/var/www/repositories/apache/${domain}" && sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git pull origin develop" 2>&1 | sed "s/^/\t/"
+            # dump the database as long as it hasn't been dumped for the day already
+            # @todo this is intended so that a developer can commit a dump from active work in localdev then the process detect this and kick off the restore rather than dump workflow
             if ! [ -f /var/www/repositories/apache/${domain}/_sql/$(date +"%Y%m%d").sql ]; then
                 mkdir -p "/var/www/repositories/apache/${domain}/_sql"
                 mysqldump --defaults-extra-file=$dbconf --single-transaction --quick ${1}_${domainvaliddbname} > /var/www/repositories/apache/${domain}/_sql/$(date +"%Y%m%d").sql
+                # ensure no more than 500mb or at least the one, newest, .sql file exists
+                directory_size=$(du --null "/var/www/repositories/apache/${domain}/_sql" | awk '{ print $1 }')
+                directory_size_maximum=$(( 1024 * 500 ))
+                echo -e "\t* the _sql folder is $(( ${directory_size} / 1024 ))MB, the maximum is $(( ${directory_size_maximum} / 1024 ))MB or the one, newest, .sql file"
+                if [ "${directory_size}" -gt "${directory_size_maximum}" ]; then
+                    echo -e "\t\t removing the oldest database dumps to get just under the $(( ${directory_size_maximum} / 1024 ))MB maximum or the one, newest, .sql file"
+                    directory_size_count=0
+                    file_newest=$(ls "/var/www/repositories/apache/${domain}/_sql" | grep -E ^[0-9]{8}\.sql$ | sort --numeric-sort | tail -1)
+                    # add up each file from newest to oldest and remove files that push the total past the maximum _sql directory size
+                    for file in $(ls "/var/www/repositories/apache/${domain}/_sql" | grep -E ^[0-9]{8}\.sql$ | sort --numeric-sort --reverse); do
+                        file_size=$(du --null "/var/www/repositories/apache/${domain}/_sql/${file}" | awk '{ print $1 }')
+                        directory_size_count=$(( ${directory_size_count} +  ${file_size} ))
+                        if [ "${directory_size_count}" -gt "${directory_size_maximum}" ]; then
+                            # keep at least the newest file, in case the database dump is greater than the maximum _sql directory size
+                            if [[ "$(basename "$file")" != "${file_newest}" ]]; then
+                                echo -e "\t\t removing /var/www/repositories/apache/${domain}/_sql/${file}..."
+                                sudo rm -f "/var/www/repositories/apache/${domain}/_sql/${file}"
+                            fi
+                        fi
+                    done
+                fi
+                # git add and commit the _sql folder changes
                 cd "/var/www/repositories/apache/${domain}" && git config --global user.name "Catapult" 2>&1 | sed "s/^/\t/"
                 cd "/var/www/repositories/apache/${domain}" && git config --global user.email "$(echo "${configuration}" | shyaml get-value company.email)" 2>&1 | sed "s/^/\t/"
-                cd "/var/www/repositories/apache/${domain}" && git add "/var/www/repositories/apache/${domain}/_sql/$(date +"%Y%m%d").sql" 2>&1 | sed "s/^/\t/"
-                cd "/var/www/repositories/apache/${domain}" && git commit -m "Catapult auto-commit from ${1} driven by this website's software_workflow being set to ${software_workflow}. See https://github.com/devopsgroup-io/catapult-release-management for more information. *This is the only type of commit that Catapult makes for you, this is to ensure the database of the website travels with the website's repository." 2>&1 | sed "s/^/\t/"
+                cd "/var/www/repositories/apache/${domain}" && git add --all "/var/www/repositories/apache/${domain}/_sql" 2>&1 | sed "s/^/\t/"
+                cd "/var/www/repositories/apache/${domain}" && git commit -m "Catapult auto-commit ${1}:${software_workflow}. See https://github.com/devopsgroup-io/catapult-release-management for more information. *This is the only type of commit that Catapult makes for you, this is to ensure the database of the website travels with the website's repository." 2>&1 | sed "s/^/\t/"
                 cd "/var/www/repositories/apache/${domain}" && sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git push origin develop" 2>&1 | sed "s/^/\t/"
             else
                 echo -e "\t\ta backup was already performed today"
             fi
-            # after verifying database dump, checkout the correct branch again
+            # after verifying database dumps, checkout the correct branch again
             cd "/var/www/repositories/apache/${domain}" && git checkout $(echo "${configuration}" | shyaml get-value environments.${1}.branch) 2>&1 | sed "s/^/\t/"
         else
             if [ -z "${software_dbexist}" ]; then
@@ -196,7 +220,7 @@ while IFS='' read -r -d '' key; do
                 echo -e "\t* ~/_sql directory does not exist, ${software} will not function"
             else
                 echo -e "\t* ~/_sql directory exists, looking for a valid database dump to restore from"
-                filenewest=$(ls "/var/www/repositories/apache/${domain}/_sql" | grep -E ^[0-9]{8}\.sql$ | sort -n | tail -1)
+                filenewest=$(ls "/var/www/repositories/apache/${domain}/_sql" | grep -E ^[0-9]{8}\.sql$ | sort --numeric-sort | tail -1)
                 for file in /var/www/repositories/apache/${domain}/_sql/*.*; do
                     if [[ "${file}" != *.sql ]]; then
                         echo -e "\t\t[invalid] [ ].sql [ ]YYYYMMDD.sql [ ]newest => $file"

@@ -357,6 +357,8 @@ Below is a list of known limitations with Catapult, if you're still having issue
     * [07-27-2015] If your `~/configuration.yml["websites"]["apache/iis"]["domain"]` is a subdomain (drupal7.devopsgroup.io) the `force_https` option will only work in localdev and production as CloudFlare only supports a first-level subdomain. https://www.cloudflare.com/ssl
 * **DigitalOcean**
     * [09-01-2015] vagrant rebuild was failing with a `The configured shell (config.ssh.shell) is invalid and unable to properly execute commands.` it is due to DigitalOcean's API not re-inserting the SSH key that was originally used during the first vagrant up (creation of the droplet). To rebuild, you must use the DigitalOcean console, run through the first root password reset workflow that was emailed to you, then vi /etc/sudoers and remove the Defaults requiretty line and save and exit. You can then run vagrant provision successfully.
+* **Git**
+    * [09-08-2015] Some database dumps exceed 100MB, so it's recommened to use Bitbucket in those instances as Catapult auto-commits database dumps to your website's repository, up to 500MB worth of database dumps or the one, newest database dump. [Bitbucket](https://help.github.com/articles/what-is-my-disk-quota/) has a 2GB hard repo push limit with no documented file limit and [GitHub](https://help.github.com/articles/what-is-my-disk-quota/) has a 1GB soft repo limit with a 100MB file size limit.
 * **monitor.us**
     * [08-10-2015] If your `~/configuration.yml["websites"]["apache/iis"]["domain"]` includes the `force_https` option, you will need to login to monitor.us and enable SNI from Monitors > Monitor List > Actions > Basic Settings > Enable SNI support. 
 * **Vagrant**
@@ -393,7 +395,7 @@ When you first setup Catapult a `develop-catapult` branch is created for you und
 
 ## Releases ##
 
-Releases are driven by the devopsgroup.io Team and occur when accepting new pull requests from contributors like you. Releases follow Semantic Versioning 2.0.0., given a version number MAJOR.MINOR.PATCH, increment the:
+Releases are driven by the devopsgroup.io team and occur when accepting new pull requests from contributors like you. Releases follow Semantic Versioning 2.0.0., given a version number MAJOR.MINOR.PATCH, increment the:
 
 1. MAJOR version when you make incompatible API changes,
 2. MINOR version when you add functionality in a backwards-compatible manner, and
