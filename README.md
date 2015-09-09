@@ -43,6 +43,7 @@ Catapult can manage all of this for you through an open-source and well-document
     - [Services Setup](#services-setup)
 - [Usage](#usage)
     - [Provision Environments](#provision-environments)
+    - [Configure Automated Deployments](#configure-automated-deployments)
     - [Provision Websites](#provision-websites)
 - [Troubleshooting](#troubleshooting)
 - [Service Justification](#service-justification)
@@ -235,7 +236,7 @@ Catapult uses several third-party services to pull everything off - below is a l
 
 # Usage #
 
-To use Catapult you will first need to [Provision Environments](#provision-environments) then [Provision Websites](#provision-websites).
+To use Catapult you will need to [Provision Environments](#provision-environments), [Configure Automated Deployments](#configure-automated-deployments), then [Provision Websites](#provision-websites).
 
 
 
@@ -247,6 +248,7 @@ To use Catapult you will first need to [Provision Environments](#provision-envir
 | **Server Provisioning**       | Manually via Vagrant                                        | Manually via Vagrant                                          | Manually via Vagrant                                          | Manually via Vagrant                                          |
 
 For each **Environment** you will need to:
+
 * **Web Servers**
     * `vagrant up ~/configuration.yml["company"]["name"]-dev-redhat`
     * `vagrant up ~/configuration.yml["company"]["name"]-test-redhat`
@@ -257,6 +259,76 @@ For each **Environment** you will need to:
     * `vagrant up ~/configuration.yml["company"]["name"]-test-redhat-mysql`
     * `vagrant up ~/configuration.yml["company"]["name"]-qc-redhat-mysql`
     * `vagrant up ~/configuration.yml["company"]["name"]-production-redhat-mysql`
+
+
+
+## Configure Automated Deployments ##
+
+Once the Web and Database Servers are up and running, it's then time to configure your Bamboo Catapult project's TEST, QC, and PROD plans.
+
+1. Sign in to your new custom Bamboo instance https://[your-name-here].atlassian.net
+2. Click Build > All build plans from the header:
+3. From the Build Dashboard and under the Catapult project:
+    * **Configure Catapult Project TEST Plan**
+        1. Click the edit icon for the TEST plan
+        2. From the Stages tab, select Default Job
+        3. Remove all tasks that may have been added by default during initial setup
+        4. Click Add task
+            1. Search for SSH Task and select it
+            2. Host: `~/configuration.yml["environments"]["test"]["servers"]["redhat"]["ip"]`
+            3. Username: `root`
+            4. Authentication Type: `Key without passphrase`
+            5. SSH Key: `~/secrets/id_rsa`
+            6. SSH command: `bash /catapult/provisioners/redhat/provision.sh "test" "https://github.com/[your-name-here]/catapult-release-management" "~/configuration-user.yml["settings"]["gpg_key"]" "apache"`
+            7. Click Save
+        5. Click Add task
+            1. Search for SSH Task and select it
+            2. Host: `~/configuration.yml["environments"]["test"]["servers"]["redhat_mysql"]["ip"]`
+            3. Username: `root`
+            4. Authentication Type: `Key without passphrase`
+            5. SSH Key: `~/secrets/id_rsa`
+            6. SSH command: `bash /catapult/provisioners/redhat/provision.sh "test" "https://github.com/[your-name-here]/catapult-release-management" "~/configuration-user.yml["settings"]["gpg_key"]" "mysql"`
+            7. Click Save
+    * **Configure Catapult Project QC Plan**
+        1. Click the edit icon for the QC plan
+        2. From the Stages tab, select Default Job
+        3. Remove all tasks that may have been added by default during initial setup
+        4. Click Add task
+            1. Search for SSH Task and select it
+            2. Host: `~/configuration.yml["environments"]["qc"]["servers"]["redhat"]["ip"]`
+            3. Username: `root`
+            4. Authentication Type: `Key without passphrase`
+            5. SSH Key: `~/secrets/id_rsa`
+            6. SSH command: `bash /catapult/provisioners/redhat/provision.sh "qc" "https://github.com/[your-name-here]/catapult-release-management" "~/configuration-user.yml["settings"]["gpg_key"]" "apache"`
+            7. Click Save
+        5. Click Add task
+            1. Search for SSH Task and select it
+            2. Host: `~/configuration.yml["environments"]["qc"]["servers"]["redhat_mysql"]["ip"]`
+            3. Username: `root`
+            4. Authentication Type: `Key without passphrase`
+            5. SSH Key: `~/secrets/id_rsa`
+            6. SSH command: `bash /catapult/provisioners/redhat/provision.sh "qc" "https://github.com/[your-name-here]/catapult-release-management" "~/configuration-user.yml["settings"]["gpg_key"]" "mysql"`
+            7. Click Save
+    * **Configure Catapult Project PRODUCTION Plan**
+        1. Click the edit icon for the PRODUCTION plan
+        2. From the Stages tab, select Default Job
+        3. Remove all tasks that may have been added by default during initial setup
+        4. Click Add task
+            1. Search for SSH Task and select it
+            2. Host: `~/configuration.yml["environments"]["production"]["servers"]["redhat"]["ip"]`
+            3. Username: `root`
+            4. Authentication Type: `Key without passphrase`
+            5. SSH Key: `~/secrets/id_rsa`
+            6. SSH command: `bash /catapult/provisioners/redhat/provision.sh "production" "https://github.com/[your-name-here]/catapult-release-management" "~/configuration-user.yml["settings"]["gpg_key"]" "apache"`
+            7. Click Save
+        5. Click Add task
+            1. Search for SSH Task and select it
+            2. Host: `~/configuration.yml["environments"]["production"]["servers"]["redhat_mysql"]["ip"]`
+            3. Username: `root`
+            4. Authentication Type: `Key without passphrase`
+            5. SSH Key: `~/secrets/id_rsa`
+            6. SSH command: `bash /catapult/provisioners/redhat/provision.sh "production" "https://github.com/your-name-here/catapult-release-management" "~/configuration-user.yml["settings"]["gpg_key"]" "mysql"`
+            7. Click Save
 
 
 
