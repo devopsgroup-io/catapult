@@ -1,6 +1,7 @@
 # only allow authentication via ssh key pair
 # suppress this - There were 34877 failed login attempts since the last successful login.
-lastb | wc -l
+echo -e "$(lastb | head -n -2 | wc -l) failed login attempts"
+echo -e "$(last | head -n -2 | wc -l) successful login attempts"
 sed -i -e "/PasswordAuthentication/d" /etc/ssh/sshd_config
 if ! grep -q "PasswordAuthentication no" "/etc/ssh/sshd_config"; then
    sudo bash -c 'echo "PasswordAuthentication no" >> /etc/ssh/sshd_config'
@@ -9,8 +10,7 @@ sed -i -e "/PubkeyAuthentication/d" /etc/ssh/sshd_config
 if ! grep -q "PubkeyAuthentication yes" "/etc/ssh/sshd_config"; then
    sudo bash -c 'echo "PubkeyAuthentication yes" >> /etc/ssh/sshd_config'
 fi
-sudo systemctl stop sshd.service
-sudo systemctl start sshd.service
+sudo systemctl reload sshd.service
 
 # update packages
 sudo yum update -y
