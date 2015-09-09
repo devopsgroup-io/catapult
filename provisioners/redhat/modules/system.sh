@@ -1,10 +1,11 @@
 # only allow authentication via ssh key pair
 # suppress this - There were 34877 failed login attempts since the last successful login.
-sed -i -e "#PasswordAuthentication#d" /etc/ssh/sshd_config
+lastb | wc -l
+sed -i -e "/PasswordAuthentication/d" /etc/ssh/sshd_config
 if ! grep -q "PasswordAuthentication no" "/etc/ssh/sshd_config"; then
    sudo bash -c 'echo "PasswordAuthentication no" >> /etc/ssh/sshd_config'
 fi
-sed -i -e "#PubkeyAuthentication#d" /etc/ssh/sshd_config
+sed -i -e "/PubkeyAuthentication/d" /etc/ssh/sshd_config
 if ! grep -q "PubkeyAuthentication yes" "/etc/ssh/sshd_config"; then
    sudo bash -c 'echo "PubkeyAuthentication yes" >> /etc/ssh/sshd_config'
 fi
