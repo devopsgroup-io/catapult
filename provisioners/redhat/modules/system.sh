@@ -1,5 +1,6 @@
 # only allow authentication via ssh key pair
 # suppress this - There were 34877 failed login attempts since the last successful login.
+sed -i -e "s#PasswordAuthentication##g" /etc/ssh/sshd_config
 if ! grep -q "PasswordAuthentication no" "/etc/ssh/sshd_config"; then
    sudo bash -c 'echo "PasswordAuthentication no" >> /etc/ssh/sshd_config'
 fi
