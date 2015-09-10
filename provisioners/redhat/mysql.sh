@@ -167,8 +167,8 @@ while IFS='' read -r -d '' key; do
             if ! [ -f /var/www/repositories/apache/${domain}/_sql/$(date +"%Y%m%d").sql ]; then
                 # flush meta tables before mysqldump to cut size, prevent potential issues restoring, and good house cleaning
                 if ([ "${software}" = "drupal6" ] || [ "${software}" = "drupal7" ]); then
-                    cd "/var/www/repositories/apache/${domain}/${webroot}" && drush watchdog-delete all -y
-                    cd "/var/www/repositories/apache/${domain}/${webroot}" && drush cache-clear all -y
+                    cd "/var/www/repositories/apache/${domain}/${webroot}" && drush watchdog-delete all -y | sed "s/^/\t\t/"
+                    cd "/var/www/repositories/apache/${domain}/${webroot}" && drush cache-clear all -y | sed "s/^/\t\t/"
                 elif [ "${software}" = "wordpress" ]; then
                     php /catapult/provisioners/redhat/installers/wp-cli.phar --allow-root cache flush
                 fi
