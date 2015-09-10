@@ -11,18 +11,18 @@ while IFS='' read -r -d '' key; do
     elif [ "${software}" = "drupal6" ]; then
         if ([ "${software_workflow}" = "downstream" ] && [ "$1" != "production" ]); then
             echo -e "\t * rysncing /var/www/repositories/apache/${domain}/${webroot}sites/default/files/ from production..."
-            sudo rsync --compress --delete --recursive -e "ssh -oStrictHostKeyChecking=no -i /catapult/secrets/id_rsa" root@$(echo "${configuration}" | shyaml get-value environments.production.servers.redhat.ip):/var/www/repositories/apache/${domain}/${webroot}sites/default/files/ /var/www/repositories/apache/${domain}/${webroot}sites/default/files/ 2>&1 | sed "s/^/\t\t/"
+            sudo rsync --compress --delete --recursive --exclude="css/" --exclude="js/" -e "ssh -oStrictHostKeyChecking=no -i /catapult/secrets/id_rsa" root@$(echo "${configuration}" | shyaml get-value environments.production.servers.redhat.ip):/var/www/repositories/apache/${domain}/${webroot}sites/default/files/ /var/www/repositories/apache/${domain}/${webroot}sites/default/files/ 2>&1 | sed "s/^/\t\t/"
         elif ([ "${software_workflow}" = "upstream" ] && [ "$1" != "test" ]); then
             echo -e "\t * rysncing /var/www/repositories/apache/${domain}/${webroot}sites/default/files/ from test..."
-            sudo rsync --compress --delete --recursive -e "ssh -oStrictHostKeyChecking=no -i /catapult/secrets/id_rsa" root@$(echo "${configuration}" | shyaml get-value environments.test.servers.redhat.ip):/var/www/repositories/apache/${domain}/${webroot}sites/default/files/ /var/www/repositories/apache/${domain}/${webroot}sites/default/files/ 2>&1 | sed "s/^/\t\t/"
+            sudo rsync --compress --delete --recursive --exclude="css/" --exclude="js/" -e "ssh -oStrictHostKeyChecking=no -i /catapult/secrets/id_rsa" root@$(echo "${configuration}" | shyaml get-value environments.test.servers.redhat.ip):/var/www/repositories/apache/${domain}/${webroot}sites/default/files/ /var/www/repositories/apache/${domain}/${webroot}sites/default/files/ 2>&1 | sed "s/^/\t\t/"
         fi
     elif [ "${software}" = "drupal7" ]; then
         if ([ "${software_workflow}" = "downstream" ] && [ "$1" != "production" ]); then
             echo -e "\t * rysncing /var/www/repositories/apache/${domain}/${webroot}sites/default/files/ from production..."
-            sudo rsync --compress --delete --recursive -e "ssh -oStrictHostKeyChecking=no -i /catapult/secrets/id_rsa" root@$(echo "${configuration}" | shyaml get-value environments.production.servers.redhat.ip):/var/www/repositories/apache/${domain}/${webroot}sites/default/files/ /var/www/repositories/apache/${domain}/${webroot}sites/default/files/ 2>&1 | sed "s/^/\t\t/"
+            sudo rsync --compress --delete --recursive --exclude="css/" --exclude="js/" -e "ssh -oStrictHostKeyChecking=no -i /catapult/secrets/id_rsa" root@$(echo "${configuration}" | shyaml get-value environments.production.servers.redhat.ip):/var/www/repositories/apache/${domain}/${webroot}sites/default/files/ /var/www/repositories/apache/${domain}/${webroot}sites/default/files/ 2>&1 | sed "s/^/\t\t/"
         elif ([ "${software_workflow}" = "upstream" ] && [ "$1" != "test" ]); then
             echo -e "\t * rysncing /var/www/repositories/apache/${domain}/${webroot}sites/default/files/ from test..."
-            sudo rsync --compress --delete --recursive -e "ssh -oStrictHostKeyChecking=no -i /catapult/secrets/id_rsa" root@$(echo "${configuration}" | shyaml get-value environments.test.servers.redhat.ip):/var/www/repositories/apache/${domain}/${webroot}sites/default/files/ /var/www/repositories/apache/${domain}/${webroot}sites/default/files/ 2>&1 | sed "s/^/\t\t/"
+            sudo rsync --compress --delete --recursive --exclude="css/" --exclude="js/" -e "ssh -oStrictHostKeyChecking=no -i /catapult/secrets/id_rsa" root@$(echo "${configuration}" | shyaml get-value environments.test.servers.redhat.ip):/var/www/repositories/apache/${domain}/${webroot}sites/default/files/ /var/www/repositories/apache/${domain}/${webroot}sites/default/files/ 2>&1 | sed "s/^/\t\t/"
         fi
     elif [ "${software}" = "wordpress" ]; then
         if ([ "${software_workflow}" = "downstream" ] && [ "$1" != "production" ]); then
