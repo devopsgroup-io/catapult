@@ -15,6 +15,8 @@ while IFS='' read -r -d '' key; do
         elif ([ "${software_workflow}" = "upstream" ] && [ "$1" != "test" ]); then
             echo -e "\t * rysncing /var/www/repositories/apache/${domain}/${webroot}sites/default/files/ from test..."
             sudo rsync --compress --delete --recursive --exclude="css/" --exclude="js/" -e "ssh -oStrictHostKeyChecking=no -i /catapult/secrets/id_rsa" root@$(echo "${configuration}" | shyaml get-value environments.test.servers.redhat.ip):/var/www/repositories/apache/${domain}/${webroot}sites/default/files/ /var/www/repositories/apache/${domain}/${webroot}sites/default/files/ 2>&1 | sed "s/^/\t\t/"
+        else
+            echo -e "\t * software_workflow is set to ${software_workflow} and this is ${1} - no rsync needed, skipping..."
         fi
     elif [ "${software}" = "drupal7" ]; then
         if ([ "${software_workflow}" = "downstream" ] && [ "$1" != "production" ]); then
@@ -23,6 +25,8 @@ while IFS='' read -r -d '' key; do
         elif ([ "${software_workflow}" = "upstream" ] && [ "$1" != "test" ]); then
             echo -e "\t * rysncing /var/www/repositories/apache/${domain}/${webroot}sites/default/files/ from test..."
             sudo rsync --compress --delete --recursive --exclude="css/" --exclude="js/" -e "ssh -oStrictHostKeyChecking=no -i /catapult/secrets/id_rsa" root@$(echo "${configuration}" | shyaml get-value environments.test.servers.redhat.ip):/var/www/repositories/apache/${domain}/${webroot}sites/default/files/ /var/www/repositories/apache/${domain}/${webroot}sites/default/files/ 2>&1 | sed "s/^/\t\t/"
+        else
+            echo -e "\t * software_workflow is set to ${software_workflow} and this is ${1} - no rsync needed, skipping..."
         fi
     elif [ "${software}" = "wordpress" ]; then
         if ([ "${software_workflow}" = "downstream" ] && [ "$1" != "production" ]); then
@@ -31,9 +35,9 @@ while IFS='' read -r -d '' key; do
         elif ([ "${software_workflow}" = "upstream" ] && [ "$1" != "test" ]); then
             echo -e "\t * rysncing /var/www/repositories/apache/${domain}/${webroot}wp-content/uploads/ from test..."
             sudo rsync --compress --delete --recursive -e "ssh -oStrictHostKeyChecking=no -i /catapult/secrets/id_rsa" root@$(echo "${configuration}" | shyaml get-value environments.test.servers.redhat.ip):/var/www/repositories/apache/${domain}/${webroot}wp-content/uploads/ /var/www/repositories/apache/${domain}/${webroot}wp-content/uploads/ 2>&1 | sed "s/^/\t\t/"
+        else
+            echo -e "\t * software_workflow is set to ${software_workflow} and this is ${1} - no rsync needed, skipping..."
         fi
-    else
-        echo -e "\t * software_workflow is set to ${software_workflow} and this is ${1} - no rsync needed, skipping..."
     fi
 
 done
