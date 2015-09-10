@@ -7,8 +7,23 @@
 # $2 => repository
 # $3 => gpg key
 # $4 => instance
-# $5 => software_validation
 
+
+
+echo -e "\n\n"
+echo "                   mdQQQb                       "
+echo "                ---- 4SSEO                      "
+echo "                \    \SSQ'                      "
+echo "                 \ \Y \Sp                       "
+echo "                  \;\\\\_\                        "
+echo "                .;'  \\\\                         "
+echo "              .;'     \\\\                        "
+echo "            .;'        \\\\                       "
+echo "    ____  .;'____       \\\\   ____     ____      "
+echo "   / / _\_L / /  \ ______\\\\_/_/__\__ / /  \     "
+echo "  | | |____| | ++ |_________________| | ++ |    "
+echo "   \_\__/   \_\__/          \_\__/   \_\__/     "
+echo -e "\n\n"
 
 
 echo -e "==> Receiving your Catapult Instance"
@@ -42,9 +57,9 @@ fi
 
 # kick off instance provisioner
 if [ "${4}" = "apache" ]; then
-    bash /catapult/provisioners/redhat/apache.sh $1 $2 $3 $4 $5 | tee -a /catapult/provisioners/redhat/logs/apache.log
+    bash /catapult/provisioners/redhat/apache.sh $1 $2 $3 $4 | tee -a /catapult/provisioners/redhat/logs/apache.log
 elif [ "${4}" = "mysql" ]; then
-    bash /catapult/provisioners/redhat/mysql.sh $1 $2 $3 $4 $5 | tee -a /catapult/provisioners/redhat/logs/mysql.log
+    bash /catapult/provisioners/redhat/mysql.sh $1 $2 $3 $4 | tee -a /catapult/provisioners/redhat/logs/mysql.log
 else
     "Error: Cannot detect the instance type."
     exit 1
