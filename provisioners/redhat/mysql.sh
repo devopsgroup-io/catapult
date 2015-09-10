@@ -7,15 +7,14 @@
 # $2 => repository
 # $3 => gpg key
 # $4 => instance
-# $5 => software_validation
 
 
 
-echo -e "==> Updating existing packages and installing utilities"
+echo -e "\n\n\n==> Updating existing packages and installing utilities"
 start=$(date +%s)
 source /catapult/provisioners/redhat/modules/system.sh
 end=$(date +%s)
-echo "==> completed in ($(($end - $start)) seconds)"
+echo -e "\n==> completed in ($(($end - $start)) seconds)"
 
 
 echo -e "\n\n\n==> Configuring time"
@@ -24,14 +23,14 @@ source /catapult/provisioners/redhat/modules/time.sh
 provisionstart=$(date +%s)
 sudo touch /catapult/provisioners/redhat/logs/mysql.log
 end=$(date +%s)
-echo "==> completed in ($(($end - $start)) seconds)"
+echo -e "\n==> completed in ($(($end - $start)) seconds)"
 
 
-echo -e "\n\n==> Installing software tools"
+echo -e "\n\n\n==> Installing software tools"
 start=$(date +%s)
 source /catapult/provisioners/redhat/modules/software_tools.sh
 end=$(date +%s)
-echo "==> completed in ($(($end - $start)) seconds)"
+echo -e "\n==> completed in ($(($end - $start)) seconds)"
 
 
 echo -e "\n\n\n==> Installing MySQL"
@@ -51,18 +50,18 @@ end=$(date +%s)
 echo -e "\n==> completed in ($(($end - $start)) seconds)"
 
 
-echo -e "\n\n==> RSyncing files"
+echo -e "\n\n\n==> RSyncing files"
 start=$(date +%s)
 source /catapult/provisioners/redhat/modules/rsync.sh
 end=$(date +%s)
-echo "==> completed in ($(($end - $start)) seconds)"
+echo -e "\n==> completed in ($(($end - $start)) seconds)"
 
 
-echo -e "\n\n==> Generating software database config files"
+echo -e "\n\n\n==> Generating software database config files"
 start=$(date +%s)
 source /catapult/provisioners/redhat/modules/software_database_config.sh
 end=$(date +%s)
-echo "==> completed in ($(($end - $start)) seconds)"
+echo -e "\n==> completed in ($(($end - $start)) seconds)"
 
 
 echo -e "\n\n\n==> Configuring MySQL"
