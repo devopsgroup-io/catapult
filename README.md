@@ -195,6 +195,17 @@ Catapult uses several third-party services to pull everything off - below is a l
                     6. Plan description:
                 * *Link repository to new build plan*
                     1. Repository host: Other > None
+        8. Click the settings gear from the top right in the header and select Elastic instances:
+            1. Click Image configurations from the left
+                1. Disable all of the elastic images
+                2. Create elastic image configuration:
+                    1. Name: `Catapult`
+                    2. AMI ID: `ami-eb5b8080`
+                    3. Instance type: `T2 Burstable Performance Micro`
+                    4. Availability Zone: `Chosen by EC2`
+                    5. Product: `Linux/UNIX`
+                    6. Click Save
+
 4. **DNS:**    
     1. **CloudFlare** sign-up and configuration
         1. Create a CloudFlare account at https://www.cloudflare.com
