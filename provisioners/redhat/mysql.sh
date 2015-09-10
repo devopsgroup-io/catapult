@@ -165,6 +165,13 @@ while IFS='' read -r -d '' key; do
             # dump the database as long as it hasn't been dumped for the day already
             # @todo this is intended so that a developer can commit a dump from active work in localdev then the process detect this and kick off the restore rather than dump workflow
             if ! [ -f /var/www/repositories/apache/${domain}/_sql/$(date +"%Y%m%d").sql ]; then
+                # flush meta tables before mysqldump to cut size, prevent potential issues restoring, and good house cleaning
+                if ([ "${software}" = "drupal6" ] || [ "${software}" = "drupal7" ]); then
+                    cd "/var/www/repositories/apache/${domain}/${webroot}" && drush watchdog-delete all -y | sed "s/^/\t\t/"
+                    cd "/var/www/repositories/apache/${domain}/${webroot}" && drush cache-clear all -y | sed "s/^/\t\t/"
+                elif [ "${software}" = "wordpress" ]; then
+                    php /catapult/provisioners/redhat/installers/wp-cli.phar --allow-root cache flush
+                fi
                 mkdir -p "/var/www/repositories/apache/${domain}/_sql"
                 mysqldump --defaults-extra-file=$dbconf --single-transaction --quick ${1}_${domainvaliddbname} > /var/www/repositories/apache/${domain}/_sql/$(date +"%Y%m%d").sql
                 # ensure no more than 500mb or at least the one, newest, .sql file exists
