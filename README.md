@@ -153,7 +153,7 @@ Catapult uses several third-party services to pull everything off - below is a l
         2. Sign in to your new AWS console https://console.aws.amazon.com
         3. Go to your AWS Identity and Access Management (IAM) Users Dashboard https://console.aws.amazon.com/iam/home#users
             1. Create a "Bamboo" user.
-            2. Please note both the Access Key ID and Secret Access Key.
+            2. **Please note both the Access Key ID and Secret Access Key.**
         4. Go to your AWS Identity and Access Management (IAM) Groups Dashboard https://console.aws.amazon.com/iam/home#groups
             1. Create a "Bamboo" group.
             2. Attach the "AmazonEC2FullAccess" policy to the "Bamboo" group.
@@ -163,12 +163,35 @@ Catapult uses several third-party services to pull everything off - below is a l
     2. **Bamboo** sign-up and configuration
         1. Create a Bamboo Cloud account at https://www.atlassian.com/software/bamboo
         2. Sign in to your new custom Bamboo instance https://[your-name-here].atlassian.net
-        3. Go to your Elastic Bamboo configuration https://[your-name-here].atlassian.net/builds/admin/elastic/editElasticConfig.action
-            1. Set your AWS EC2 "Bamboo" Access Key ID and Secret Access Key
-        4. Place your Bamboo base URL at `~/configuration.yml["company"]["bamboo_base_url"]`, the format should be https://[your-name-here].atlassian.net/builds/
-        5. Place your Bamboo username (usually admin) at `~/configuration.yml["company"]["bamboo_username"]`
-        6. Place your Bamboo password (usually admin) at `~/configuration.yml["company"]["bamboo_password"]`
-        7. Click Create > Create a new plan from the header:
+        3. Place your Bamboo base URL at `~/configuration.yml["company"]["bamboo_base_url"]`, the format should be https://[your-name-here].atlassian.net/builds/
+        4. Place your Bamboo username (usually admin) at `~/configuration.yml["company"]["bamboo_username"]`
+        5. Place your Bamboo password (usually admin) at `~/configuration.yml["company"]["bamboo_password"]`
+        6. Click the settings gear from the top right in the header and select Elastic instances:
+            1. Click Configuration from the left
+            2. Click Edit configuration
+                1. **Amazon Web Services configuration**
+                    1. Set your AWS EC2 "Bamboo" Access Key ID and Secret Access Key
+                    2. Region: `US East (Northern Virginia)`
+                2. **Automatic elastic instance management**
+                    1. Elastic instance management: `Custom`
+                    2. Idle agent shutdown delay: `10`
+                    3. Allowed non-Bamboo instances: `1`
+                    4. Maximum number of instances to start at once: `2`
+                    5. Number of builds in queue threshold: `1`
+                    6. Number of elastic builds in queue threshold: `1`
+                    7. Average queue time threshold: `2`
+                3. Click Save
+        7. Click the settings gear from the top right in the header and select Elastic instances:
+            1. Click Image configurations from the left
+                1. Disable all of the elastic images
+                2. Create elastic image configuration:
+                    1. Name: `Catapult`
+                    2. AMI ID: `ami-eb5b8080`
+                    3. Instance type: `T2 Burstable Performance Micro`
+                    4. Availability Zone: `Chosen by EC2`
+                    5. Product: `Linux/UNIX`
+                    6. Click Save
+        8. Click Create > Create a new plan from the header:
             1. **Create Catapult Project and create TEST Plan**
                 * *Project and build plan name*
                     1. Project > New Project
@@ -195,17 +218,6 @@ Catapult uses several third-party services to pull everything off - below is a l
                     6. Plan description:
                 * *Link repository to new build plan*
                     1. Repository host: Other > None
-        8. Click the settings gear from the top right in the header and select Elastic instances:
-            1. Click Image configurations from the left
-                1. Disable all of the elastic images
-                2. Create elastic image configuration:
-                    1. Name: `Catapult`
-                    2. AMI ID: `ami-eb5b8080`
-                    3. Instance type: `T2 Burstable Performance Micro`
-                    4. Availability Zone: `Chosen by EC2`
-                    5. Product: `Linux/UNIX`
-                    6. Click Save
-
 4. **DNS:**    
     1. **CloudFlare** sign-up and configuration
         1. Create a CloudFlare account at https://www.cloudflare.com
