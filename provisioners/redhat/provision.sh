@@ -10,7 +10,7 @@
 
 
 
-echo -e "\n\n"
+echo -e "\n\n\n"
 echo "                   mdQQQb                       "
 echo "                ---- 4SSEO                      "
 echo "                \    \SSQ'                      "
@@ -23,14 +23,21 @@ echo "    ____  .;'____       \\\\   ____     ____      "
 echo "   / / _\_L / /  \ ______\\\\_/_/__\__ / /  \     "
 echo "  | | |____| | ++ |_________________| | ++ |    "
 echo "   \_\__/   \_\__/          \_\__/   \_\__/     "
-echo -e "\n\n"
 
 
-echo -e "==> Receiving your Catapult Instance"
+echo -e "\n\n\n==> System Information"
+echo -e "CPU"
+cat /proc/cpuinfo | grep 'model name' | cut -d: -f2 | awk 'NR==1' | tr -d " "
+echo -e "$(top -bn 1 | awk '{print $9}' | tail -n +8 | awk '{s+=$1} END {print s}')% utilization"
+echo -e "\nHDD"
+df -h
+echo -e "\nRAM"
+free -h
 
+
+echo -e "\n\n\n==> Receiving your Catapult Instance"
 # install git
 sudo yum install -y git
-
 # clone and pull catapult
 if ([ $1 = "dev" ] || [ $1 = "test" ]); then
     branch="develop"
