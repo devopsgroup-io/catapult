@@ -1280,12 +1280,24 @@ if ["status"].include?(ARGV[0])
                 response = Net::HTTP.get_response(URI(uri_str))
                 case response
                 when Net::HTTPSuccess then
-                  return response.code
+                  if response.code.to_f.between?(200,399)
+                    return response.code.color(Colors::GREEN)
+                  elsif response.code.to_f.between?(400,499)
+                    return response.code.color(Colors::YELLOW)
+                  elsif response.code.to_f.between?(500,599)
+                    return response.code.color(Colors::RED)
+                  end
                 when Net::HTTPRedirection then
                   location = response['location']
                   http_repsonse(location, limit - 1)
                 else
-                  return response.code
+                  if response.code.to_f.between?(200,399)
+                    return response.code.color(Colors::GREEN)
+                  elsif response.code.to_f.between?(400,499)
+                    return response.code.color(Colors::YELLOW)
+                  elsif response.code.to_f.between?(500,599)
+                    return response.code.color(Colors::RED)
+                  end
                 end
               end
             end
@@ -1295,17 +1307,17 @@ if ["status"].include?(ARGV[0])
               row.push(http_repsonse("http://#{environment}#{instance["domain"]}.#{instance["domain_tld_override"]}").ljust(4))
             end
           rescue SocketError
-            row.push("down".ljust(4))
+            row.push("down".color(Colors::RED).ljust(4))
           rescue Errno::ECONNREFUSED
-            row.push("down".ljust(4))
+            row.push("down".color(Colors::RED).ljust(4))
           rescue EOFError
-            row.push("down".ljust(4))
+            row.push("down".color(Colors::RED).ljust(4))
           rescue Net::ReadTimeout
-            row.push("down".ljust(4))
+            row.push("down".color(Colors::RED).ljust(4))
           rescue OpenSSL::SSL::SSLError
-            row.push("err".ljust(4))
+            row.push("err".color(Colors::RED).ljust(4))
           rescue Exception => ex
-            row.push("#{ex.class}".ljust(4))
+            row.push("#{ex.class}".color(Colors::RED).ljust(4))
           end
           # nslookup production top-level domain
           begin
@@ -1315,7 +1327,7 @@ if ["status"].include?(ARGV[0])
               row.push((Resolv.getaddress "#{environment}#{instance["domain"]}.#{instance["domain_tld_override"]}").ljust(16))
             end
           rescue
-            row.push("down".ljust(16))
+            row.push("down".ljust(15).color(Colors::RED))
           end
         end
         # ssl cert lookup
@@ -1338,7 +1350,7 @@ if ["status"].include?(ARGV[0])
             row.push("#{date.strftime('%F')} #{cert.signature_algorithm} #{cert.subject.to_a.select{|name, _, _| name == 'CN' }.first[1]}".downcase.ljust(57))
           end
         rescue SocketError
-          row.push("down".ljust(57))
+          row.push("down".ljust(57).color(Colors::RED))
         rescue Errno::ECONNREFUSED
           row.push("connection refused".ljust(57))
         rescue Errno::ECONNRESET
