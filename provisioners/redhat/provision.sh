@@ -7,15 +7,37 @@
 # $2 => repository
 # $3 => gpg key
 # $4 => instance
-# $5 => software_validation
 
 
 
-echo -e "==> Receiving your Catapult Instance"
+echo -e "\n\n\n"
+echo "                   mdQQQb                       "
+echo "                ---- 4SSEO                      "
+echo "                \    \SSQ'                      "
+echo "                 \ \Y \Sp                       "
+echo "                  \;\\\\_\                        "
+echo "                .;'  \\\\                         "
+echo "              .;'     \\\\                        "
+echo "            .;'        \\\\                       "
+echo "    ____  .;'____       \\\\   ____     ____      "
+echo "   / / _\_L / /  \ ______\\\\_/_/__\__ / /  \     "
+echo "  | | |____| | ++ |_________________| | ++ |    "
+echo "   \_\__/   \_\__/          \_\__/   \_\__/     "
 
+
+echo -e "\n\n\n==> System Information"
+echo -e "CPU"
+cat /proc/cpuinfo | grep 'model name' | cut -d: -f2 | awk 'NR==1' | tr -d " "
+echo -e "$(top -bn 1 | awk '{print $9}' | tail -n +8 | awk '{s+=$1} END {print s}')% utilization"
+echo -e "\nHDD"
+df -h
+echo -e "\nRAM"
+free -h
+
+
+echo -e "\n\n\n==> Receiving your Catapult Instance"
 # install git
 sudo yum install -y git
-
 # clone and pull catapult
 if ([ $1 = "dev" ] || [ $1 = "test" ]); then
     branch="develop"
@@ -42,9 +64,9 @@ fi
 
 # kick off instance provisioner
 if [ "${4}" = "apache" ]; then
-    bash /catapult/provisioners/redhat/apache.sh $1 $2 $3 $4 $5 | tee -a /catapult/provisioners/redhat/logs/apache.log
+    bash /catapult/provisioners/redhat/apache.sh $1 $2 $3 $4 | tee -a /catapult/provisioners/redhat/logs/apache.log
 elif [ "${4}" = "mysql" ]; then
-    bash /catapult/provisioners/redhat/mysql.sh $1 $2 $3 $4 $5 | tee -a /catapult/provisioners/redhat/logs/mysql.log
+    bash /catapult/provisioners/redhat/mysql.sh $1 $2 $3 $4 | tee -a /catapult/provisioners/redhat/logs/mysql.log
 else
     "Error: Cannot detect the instance type."
     exit 1

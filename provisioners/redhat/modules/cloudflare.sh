@@ -1,5 +1,7 @@
 if [ "$1" = "dev" ]; then
+
     echo -e "\t * skipping cloudflare as global dns is not required in dev..."
+
 else
 
     cloudflare_api_key="$(echo "${configuration}" | shyaml get-value company.cloudflare_api_key)"
@@ -22,7 +24,6 @@ else
         else
             echo -e "\nNOTICE: ${1}.${domain_root}"
         fi
-        echo -e "\t * configuring cloudflare dns"
         IFS=. read -a domain_levels <<< "${domain_root}"
         if [ "${#domain_levels[@]}" = "2" ]; then
 
@@ -38,57 +39,83 @@ else
 
             if [ "${cloudflare_zone_id}" = "[]" ]; then
                 # create cloudflare zone
-                echo "cloudflare zone does not exist" | sed "s/^/\t\t/"
-                cloudflare_zone_id=$(curl -s -X POST "https://api.cloudflare.com/client/v4/zones"\
+                echo "* cloudflare zone does not exist, creating..." | sed "s/^/\t/"
+                cloudflare_zone=$(curl -s -X POST "https://api.cloudflare.com/client/v4/zones"\
                 -H "X-Auth-Email: ${cloudflare_email}"\
                 -H "X-Auth-Key: ${cloudflare_api_key}"\
                 -H "Content-Type: application/json"\
-                --data "{\"name\":\"${domain_levels[0]}.${domain_levels[1]}\",\"jump_start\":false}"\
-                | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["result"]["id"]')
-                echo $cloudflare_zone_id | sed "s/^/\t\t/"
+                --data "{\"name\":\"${domain_levels[0]}.${domain_levels[1]}\",\"jump_start\":false}")
+                if [ "$(echo "${cloudflare_zone}" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["success"]' )" == "False" ]; then
+                    echo "${cloudflare_zone}" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["errors"][0]["message"]' | sed "s/^/\t\t/"
+                else
+                    cloudflare_zone_id=$(echo "${cloudflare_zone}" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["result"]["id"]' )
+                    echo "success" | sed "s/^/\t\t/"
+                fi
             else
                 # get cloudflare zone
-                echo "cloudflare zone exists" | sed "s/^/\t\t/"
-                cloudflare_zone_id=$(curl -s -X GET "https://api.cloudflare.com/client/v4/zones?name=${domain_levels[0]}.${domain_levels[1]}"\
+                echo "* cloudflare zone exists, retrieving..." | sed "s/^/\t/"
+                cloudflare_zone=$(curl -s -X GET "https://api.cloudflare.com/client/v4/zones?name=${domain_levels[0]}.${domain_levels[1]}"\
                 -H "X-Auth-Email: ${cloudflare_email}"\
                 -H "X-Auth-Key: ${cloudflare_api_key}"\
-                -H "Content-Type: application/json"\
-                | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["result"][0]["id"]')
-                echo $cloudflare_zone_id | sed "s/^/\t\t/"
+                -H "Content-Type: application/json")
+                if [ "$(echo "${cloudflare_zone}" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["success"]' )" == "False" ]; then
+                    echo "${cloudflare_zone}" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["errors"][0]["message"]' | sed "s/^/\t\t/"
+                else
+                    cloudflare_zone_id=$(echo "${cloudflare_zone}" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["result"][0]["id"]' )
+                    echo "success" | sed "s/^/\t\t/"
+                fi
             fi
 
-            if [ "$1" = "production" ]; then
-                # set dns a record for environment
-                curl -s -X POST "https://api.cloudflare.com/client/v4/zones/${cloudflare_zone_id}/dns_records"\
-                -H "X-Auth-Email: ${cloudflare_email}"\
-                -H "X-Auth-Key: ${cloudflare_api_key}"\
-                -H "Content-Type: application/json"\
-                --data "{\"type\":\"A\",\"name\":\"${domain_levels[0]}.${domain_levels[1]}\",\"content\":\"${redhat_ip}\",\"ttl\":1,\"proxied\":true}"\
-                | sed "s/^/\t\t/"
-
-                # set dns a record for www.environment
-                curl -s -X POST "https://api.cloudflare.com/client/v4/zones/${cloudflare_zone_id}/dns_records"\
-                -H "X-Auth-Email: ${cloudflare_email}"\
-                -H "X-Auth-Key: ${cloudflare_api_key}"\
-                -H "Content-Type: application/json"\
-                --data "{\"type\":\"A\",\"name\":\"www\",\"content\":\"${redhat_ip}\",\"ttl\":1,\"proxied\":true}"\
-                | sed "s/^/\t\t/"
-            else
-                # set dns a record for environment
-                curl -s -X POST "https://api.cloudflare.com/client/v4/zones/${cloudflare_zone_id}/dns_records"\
-                -H "X-Auth-Email: ${cloudflare_email}"\
-                -H "X-Auth-Key: ${cloudflare_api_key}"\
-                -H "Content-Type: application/json"\
-                --data "{\"type\":\"A\",\"name\":\"${1}\",\"content\":\"${redhat_ip}\",\"ttl\":1,\"proxied\":true}"\
-                | sed "s/^/\t\t/"
-
-                # set dns a record for www.environment
-                curl -s -X POST "https://api.cloudflare.com/client/v4/zones/${cloudflare_zone_id}/dns_records"\
-                -H "X-Auth-Email: ${cloudflare_email}"\
-                -H "X-Auth-Key: ${cloudflare_api_key}"\
-                -H "Content-Type: application/json"\
-                --data "{\"type\":\"A\",\"name\":\"www.${1}\",\"content\":\"${redhat_ip}\",\"ttl\":1,\"proxied\":true}"\
-                | sed "s/^/\t\t/"
+            # set dns a records only if we were able to create/get zone id
+            if [ "$(echo "${cloudflare_zone}" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["success"]' )" == "True" ]; then
+                echo "* creating dns a records..." | sed "s/^/\t/"
+                if [ "$1" = "production" ]; then
+                    # set dns a record for environment
+                    cloudflare_zone_dns_records_a1=$(curl -s -X POST "https://api.cloudflare.com/client/v4/zones/${cloudflare_zone_id}/dns_records"\
+                    -H "X-Auth-Email: ${cloudflare_email}"\
+                    -H "X-Auth-Key: ${cloudflare_api_key}"\
+                    -H "Content-Type: application/json"\
+                    --data "{\"type\":\"A\",\"name\":\"${domain_levels[0]}.${domain_levels[1]}\",\"content\":\"${redhat_ip}\",\"ttl\":1,\"proxied\":true}")
+                    if [ "$(echo "${cloudflare_zone_dns_records_a1}" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["success"]' )" == "False" ]; then
+                        echo "${cloudflare_zone_dns_records_a1}" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["errors"][0]["message"]' | sed "s/^/\t\t/"
+                    else
+                        echo "success" | sed "s/^/\t\t/"
+                    fi
+                    # set dns a record for www.environment
+                    cloudflare_zone_dns_records_a2=$(curl -s -X POST "https://api.cloudflare.com/client/v4/zones/${cloudflare_zone_id}/dns_records"\
+                    -H "X-Auth-Email: ${cloudflare_email}"\
+                    -H "X-Auth-Key: ${cloudflare_api_key}"\
+                    -H "Content-Type: application/json"\
+                    --data "{\"type\":\"A\",\"name\":\"www\",\"content\":\"${redhat_ip}\",\"ttl\":1,\"proxied\":true}")
+                    if [ "$(echo "${cloudflare_zone_dns_records_a2}" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["success"]' )" == "False" ]; then
+                        echo "${cloudflare_zone_dns_records_a2}" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["errors"][0]["message"]' | sed "s/^/\t\t/"
+                    else
+                        echo "success" | sed "s/^/\t\t/"
+                    fi
+                else
+                    # set dns a record for environment
+                    cloudflare_zone_dns_records_a1=$(curl -s -X POST "https://api.cloudflare.com/client/v4/zones/${cloudflare_zone_id}/dns_records"\
+                    -H "X-Auth-Email: ${cloudflare_email}"\
+                    -H "X-Auth-Key: ${cloudflare_api_key}"\
+                    -H "Content-Type: application/json"\
+                    --data "{\"type\":\"A\",\"name\":\"${1}\",\"content\":\"${redhat_ip}\",\"ttl\":1,\"proxied\":true}")
+                    if [ "$(echo "${cloudflare_zone_dns_records_a1}" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["success"]' )" == "False" ]; then
+                        echo "${cloudflare_zone_dns_records_a1}" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["errors"][0]["message"]' | sed "s/^/\t\t/"
+                    else
+                        echo "success" | sed "s/^/\t\t/"
+                    fi
+                    # set dns a record for www.environment
+                    cloudflare_zone_dns_records_a2=$(curl -s -X POST "https://api.cloudflare.com/client/v4/zones/${cloudflare_zone_id}/dns_records"\
+                    -H "X-Auth-Email: ${cloudflare_email}"\
+                    -H "X-Auth-Key: ${cloudflare_api_key}"\
+                    -H "Content-Type: application/json"\
+                    --data "{\"type\":\"A\",\"name\":\"www.${1}\",\"content\":\"${redhat_ip}\",\"ttl\":1,\"proxied\":true}")
+                    if [ "$(echo "${cloudflare_zone_dns_records_a2}" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["success"]' )" == "False" ]; then
+                        echo "${cloudflare_zone_dns_records_a2}" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["errors"][0]["message"]' | sed "s/^/\t\t/"
+                    else
+                        echo "success" | sed "s/^/\t\t/"
+                    fi
+                fi
             fi
 
         elif [ "${#domain_levels[@]}" = "3" ]; then
@@ -106,57 +133,83 @@ else
 
             if [ "${cloudflare_zone_id}" = "[]" ]; then
                 # create cloudflare zone
-                echo "cloudflare zone does not exist" | sed "s/^/\t\t/"
-                cloudflare_zone_id=$(curl -s -X POST "https://api.cloudflare.com/client/v4/zones"\
+                echo "* cloudflare zone does not exist, creating..." | sed "s/^/\t/"
+                cloudflare_zone=$(curl -s -X POST "https://api.cloudflare.com/client/v4/zones"\
                 -H "X-Auth-Email: ${cloudflare_email}"\
                 -H "X-Auth-Key: ${cloudflare_api_key}"\
                 -H "Content-Type: application/json"\
-                --data "{\"name\":\"${domain_levels[1]}.${domain_levels[2]}\",\"jump_start\":false}"\
-                | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["result"]["id"]')
-                echo $cloudflare_zone_id | sed "s/^/\t\t/"
+                --data "{\"name\":\"${domain_levels[1]}.${domain_levels[2]}\",\"jump_start\":false}")
+                if [ "$(echo "${cloudflare_zone}" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["success"]' )" == "False" ]; then
+                    echo "${cloudflare_zone}" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["errors"][0]["message"]' | sed "s/^/\t\t/"
+                else
+                    cloudflare_zone_id=$(echo "${cloudflare_zone}" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["result"]["id"]' )
+                    echo "success" | sed "s/^/\t\t/"
+                fi
             else
                 # get cloudflare zone
-                echo "cloudflare zone exists" | sed "s/^/\t\t/"
-                cloudflare_zone_id=$(curl -s -X GET "https://api.cloudflare.com/client/v4/zones?name=${domain_levels[1]}.${domain_levels[2]}"\
+                echo "* cloudflare zone exists, retrieving..." | sed "s/^/\t/"
+                cloudflare_zone=$(curl -s -X GET "https://api.cloudflare.com/client/v4/zones?name=${domain_levels[1]}.${domain_levels[2]}"\
                 -H "X-Auth-Email: ${cloudflare_email}"\
                 -H "X-Auth-Key: ${cloudflare_api_key}"\
-                -H "Content-Type: application/json"\
-                | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["result"][0]["id"]')
-                echo $cloudflare_zone_id | sed "s/^/\t\t/"
+                -H "Content-Type: application/json")
+                if [ "$(echo "${cloudflare_zone}" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["success"]' )" == "False" ]; then
+                    echo "${cloudflare_zone}" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["errors"][0]["message"]' | sed "s/^/\t\t/"
+                else
+                    cloudflare_zone_id=$(echo "${cloudflare_zone}" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["result"][0]["id"]' )
+                    echo "success" | sed "s/^/\t\t/"
+                fi
             fi
 
-            if [ "$1" = "production" ]; then
-                # set dns a record for environment
-                curl -s -X POST "https://api.cloudflare.com/client/v4/zones/${cloudflare_zone_id}/dns_records"\
-                -H "X-Auth-Email: ${cloudflare_email}"\
-                -H "X-Auth-Key: ${cloudflare_api_key}"\
-                -H "Content-Type: application/json"\
-                --data "{\"type\":\"A\",\"name\":\"${domain_levels[0]}\",\"content\":\"${redhat_ip}\",\"ttl\":1,\"proxied\":true}"\
-                | sed "s/^/\t\t/"
-
-                # set dns a record for www.environment
-                curl -s -X POST "https://api.cloudflare.com/client/v4/zones/${cloudflare_zone_id}/dns_records"\
-                -H "X-Auth-Email: ${cloudflare_email}"\
-                -H "X-Auth-Key: ${cloudflare_api_key}"\
-                -H "Content-Type: application/json"\
-                --data "{\"type\":\"A\",\"name\":\"www.${domain_levels[0]}\",\"content\":\"${redhat_ip}\",\"ttl\":1,\"proxied\":true}"\
-                | sed "s/^/\t\t/"
-            else
-                # set dns a record for environment
-                curl -s -X POST "https://api.cloudflare.com/client/v4/zones/${cloudflare_zone_id}/dns_records"\
-                -H "X-Auth-Email: ${cloudflare_email}"\
-                -H "X-Auth-Key: ${cloudflare_api_key}"\
-                -H "Content-Type: application/json"\
-                --data "{\"type\":\"A\",\"name\":\"${1}.${domain_levels[0]}\",\"content\":\"${redhat_ip}\",\"ttl\":1,\"proxied\":true}"\
-                | sed "s/^/\t\t/"
-
-                # set dns a record for www.environment
-                curl -s -X POST "https://api.cloudflare.com/client/v4/zones/${cloudflare_zone_id}/dns_records"\
-                -H "X-Auth-Email: ${cloudflare_email}"\
-                -H "X-Auth-Key: ${cloudflare_api_key}"\
-                -H "Content-Type: application/json"\
-                --data "{\"type\":\"A\",\"name\":\"www.${1}.${domain_levels[0]}\",\"content\":\"${redhat_ip}\",\"ttl\":1,\"proxied\":true}"\
-                | sed "s/^/\t\t/"
+            # set dns a records only if we were able to create/get zone id
+            if [ "$(echo "${cloudflare_zone}" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["success"]' )" == "True" ]; then
+                echo "* creating dns a records..." | sed "s/^/\t/"
+                if [ "$1" = "production" ]; then
+                    # set dns a record for environment
+                    cloudflare_zone_dns_records_a1=$(curl -s -X POST "https://api.cloudflare.com/client/v4/zones/${cloudflare_zone_id}/dns_records"\
+                    -H "X-Auth-Email: ${cloudflare_email}"\
+                    -H "X-Auth-Key: ${cloudflare_api_key}"\
+                    -H "Content-Type: application/json"\
+                    --data "{\"type\":\"A\",\"name\":\"${domain_levels[0]}\",\"content\":\"${redhat_ip}\",\"ttl\":1,\"proxied\":true}")
+                    if [ "$(echo "${cloudflare_zone_dns_records_a1}" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["success"]' )" == "False" ]; then
+                        echo "${cloudflare_zone_dns_records_a1}" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["errors"][0]["message"]' | sed "s/^/\t\t/"
+                    else
+                        echo "success" | sed "s/^/\t\t/"
+                    fi
+                    # set dns a record for www.environment
+                    cloudflare_zone_dns_records_a2=$(curl -s -X POST "https://api.cloudflare.com/client/v4/zones/${cloudflare_zone_id}/dns_records"\
+                    -H "X-Auth-Email: ${cloudflare_email}"\
+                    -H "X-Auth-Key: ${cloudflare_api_key}"\
+                    -H "Content-Type: application/json"\
+                    --data "{\"type\":\"A\",\"name\":\"www.${domain_levels[0]}\",\"content\":\"${redhat_ip}\",\"ttl\":1,\"proxied\":true}")
+                    if [ "$(echo "${cloudflare_zone_dns_records_a2}" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["success"]' )" == "False" ]; then
+                        echo "${cloudflare_zone_dns_records_a2}" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["errors"][0]["message"]' | sed "s/^/\t\t/"
+                    else
+                        echo "success" | sed "s/^/\t\t/"
+                    fi
+                else
+                    # set dns a record for environment
+                    cloudflare_zone_dns_records_a1=$(curl -s -X POST "https://api.cloudflare.com/client/v4/zones/${cloudflare_zone_id}/dns_records"\
+                    -H "X-Auth-Email: ${cloudflare_email}"\
+                    -H "X-Auth-Key: ${cloudflare_api_key}"\
+                    -H "Content-Type: application/json"\
+                    --data "{\"type\":\"A\",\"name\":\"${1}.${domain_levels[0]}\",\"content\":\"${redhat_ip}\",\"ttl\":1,\"proxied\":true}")
+                    if [ "$(echo "${cloudflare_zone_dns_records_a1}" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["success"]' )" == "False" ]; then
+                        echo "${cloudflare_zone_dns_records_a1}" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["errors"][0]["message"]' | sed "s/^/\t\t/"
+                    else
+                        echo "success" | sed "s/^/\t\t/"
+                    fi
+                    # set dns a record for www.environment
+                    cloudflare_zone_dns_records_a2=$(curl -s -X POST "https://api.cloudflare.com/client/v4/zones/${cloudflare_zone_id}/dns_records"\
+                    -H "X-Auth-Email: ${cloudflare_email}"\
+                    -H "X-Auth-Key: ${cloudflare_api_key}"\
+                    -H "Content-Type: application/json"\
+                    --data "{\"type\":\"A\",\"name\":\"www.${1}.${domain_levels[0]}\",\"content\":\"${redhat_ip}\",\"ttl\":1,\"proxied\":true}")
+                    if [ "$(echo "${cloudflare_zone_dns_records_a2}" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["success"]' )" == "False" ]; then
+                        echo "${cloudflare_zone_dns_records_a2}" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["errors"][0]["message"]' | sed "s/^/\t\t/"
+                    else
+                        echo "success" | sed "s/^/\t\t/"
+                    fi
+                fi
             fi
 
         elif [ "${#domain_levels[@]}" = "4" ]; then
@@ -175,57 +228,83 @@ else
 
             if [ "${cloudflare_zone_id}" = "[]" ]; then
                 # create cloudflare zone
-                echo "cloudflare zone does not exist" | sed "s/^/\t\t/"
-                cloudflare_zone_id=$(curl -s -X POST "https://api.cloudflare.com/client/v4/zones"\
+                echo "* cloudflare zone does not exist, creating..." | sed "s/^/\t/"
+                cloudflare_zone=$(curl -s -X POST "https://api.cloudflare.com/client/v4/zones"\
                 -H "X-Auth-Email: ${cloudflare_email}"\
                 -H "X-Auth-Key: ${cloudflare_api_key}"\
                 -H "Content-Type: application/json"\
-                --data "{\"name\":\"${domain_levels[2]}.${domain_levels[3]}\",\"jump_start\":false}"\
-                | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["result"]["id"]')
-                echo $cloudflare_zone_id | sed "s/^/\t\t/"
+                --data "{\"name\":\"${domain_levels[2]}.${domain_levels[3]}\",\"jump_start\":false}")
+                if [ "$(echo "${cloudflare_zone}" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["success"]' )" == "False" ]; then
+                    echo "${cloudflare_zone}" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["errors"][0]["message"]' | sed "s/^/\t\t/"
+                else
+                    cloudflare_zone_id=$(echo "${cloudflare_zone}" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["result"]["id"]' )
+                    echo "success" | sed "s/^/\t\t/"
+                fi
             else
                 # get cloudflare zone
-                echo "cloudflare zone exists" | sed "s/^/\t\t/"
-                cloudflare_zone_id=$(curl -s -X GET "https://api.cloudflare.com/client/v4/zones?name=${domain_levels[2]}.${domain_levels[3]}"\
+                echo "* cloudflare zone exists, retrieving..." | sed "s/^/\t/"
+                cloudflare_zone=$(curl -s -X GET "https://api.cloudflare.com/client/v4/zones?name=${domain_levels[2]}.${domain_levels[3]}"\
                 -H "X-Auth-Email: ${cloudflare_email}"\
                 -H "X-Auth-Key: ${cloudflare_api_key}"\
-                -H "Content-Type: application/json"\
-                | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["result"][0]["id"]')
-                echo $cloudflare_zone_id | sed "s/^/\t\t/"
+                -H "Content-Type: application/json")
+                if [ "$(echo "${cloudflare_zone}" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["success"]' )" == "False" ]; then
+                    echo "${cloudflare_zone}" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["errors"][0]["message"]' | sed "s/^/\t\t/"
+                else
+                    cloudflare_zone_id=$(echo "${cloudflare_zone}" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["result"][0]["id"]' )
+                    echo "success" | sed "s/^/\t\t/"
+                fi
             fi
 
-            if [ "$1" = "production" ]; then
-                # set dns a record for environment
-                curl -s -X POST "https://api.cloudflare.com/client/v4/zones/${cloudflare_zone_id}/dns_records"\
-                -H "X-Auth-Email: ${cloudflare_email}"\
-                -H "X-Auth-Key: ${cloudflare_api_key}"\
-                -H "Content-Type: application/json"\
-                --data "{\"type\":\"A\",\"name\":\"${domain_levels[0]}.${domain_levels[1]}\",\"content\":\"${redhat_ip}\",\"ttl\":1,\"proxied\":true}"\
-                | sed "s/^/\t\t/"
-
-                # set dns a record for www.environment
-                curl -s -X POST "https://api.cloudflare.com/client/v4/zones/${cloudflare_zone_id}/dns_records"\
-                -H "X-Auth-Email: ${cloudflare_email}"\
-                -H "X-Auth-Key: ${cloudflare_api_key}"\
-                -H "Content-Type: application/json"\
-                --data "{\"type\":\"A\",\"name\":\"www.${domain_levels[0]}.${domain_levels[1]}\",\"content\":\"${redhat_ip}\",\"ttl\":1,\"proxied\":true}"\
-                | sed "s/^/\t\t/"
-            else
-                # set dns a record for environment
-                curl -s -X POST "https://api.cloudflare.com/client/v4/zones/${cloudflare_zone_id}/dns_records"\
-                -H "X-Auth-Email: ${cloudflare_email}"\
-                -H "X-Auth-Key: ${cloudflare_api_key}"\
-                -H "Content-Type: application/json"\
-                --data "{\"type\":\"A\",\"name\":\"${1}.${domain_levels[0]}.${domain_levels[1]}\",\"content\":\"${redhat_ip}\",\"ttl\":1,\"proxied\":true}"\
-                | sed "s/^/\t\t/"
-
-                # set dns a record for www.environment
-                curl -s -X POST "https://api.cloudflare.com/client/v4/zones/${cloudflare_zone_id}/dns_records"\
-                -H "X-Auth-Email: ${cloudflare_email}"\
-                -H "X-Auth-Key: ${cloudflare_api_key}"\
-                -H "Content-Type: application/json"\
-                --data "{\"type\":\"A\",\"name\":\"www.${1}.${domain_levels[0]}.${domain_levels[1]}\",\"content\":\"${redhat_ip}\",\"ttl\":1,\"proxied\":true}"\
-                | sed "s/^/\t\t/"
+            # set dns a records only if we were able to create/get zone id
+            if [ "$(echo "${cloudflare_zone}" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["success"]' )" == "True" ]; then
+                echo "* creating dns a records..." | sed "s/^/\t/"
+                if [ "$1" = "production" ]; then
+                    # set dns a record for environment
+                    cloudflare_zone_dns_records_a1=$(curl -s -X POST "https://api.cloudflare.com/client/v4/zones/${cloudflare_zone_id}/dns_records"\
+                    -H "X-Auth-Email: ${cloudflare_email}"\
+                    -H "X-Auth-Key: ${cloudflare_api_key}"\
+                    -H "Content-Type: application/json"\
+                    --data "{\"type\":\"A\",\"name\":\"${domain_levels[0]}.${domain_levels[1]}\",\"content\":\"${redhat_ip}\",\"ttl\":1,\"proxied\":true}")
+                    if [ "$(echo "${cloudflare_zone_dns_records_a1}" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["success"]' )" == "False" ]; then
+                        echo "${cloudflare_zone_dns_records_a1}" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["errors"][0]["message"]' | sed "s/^/\t\t/"
+                    else
+                        echo "success" | sed "s/^/\t\t/"
+                    fi
+                    # set dns a record for www.environment
+                    cloudflare_zone_dns_records_a2=$(curl -s -X POST "https://api.cloudflare.com/client/v4/zones/${cloudflare_zone_id}/dns_records"\
+                    -H "X-Auth-Email: ${cloudflare_email}"\
+                    -H "X-Auth-Key: ${cloudflare_api_key}"\
+                    -H "Content-Type: application/json"\
+                    --data "{\"type\":\"A\",\"name\":\"www.${domain_levels[0]}.${domain_levels[1]}\",\"content\":\"${redhat_ip}\",\"ttl\":1,\"proxied\":true}")
+                    if [ "$(echo "${cloudflare_zone_dns_records_a2}" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["success"]' )" == "False" ]; then
+                        echo "${cloudflare_zone_dns_records_a2}" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["errors"][0]["message"]' | sed "s/^/\t\t/"
+                    else
+                        echo "success" | sed "s/^/\t\t/"
+                    fi
+                else
+                    # set dns a record for environment
+                    cloudflare_zone_dns_records_a1=$(curl -s -X POST "https://api.cloudflare.com/client/v4/zones/${cloudflare_zone_id}/dns_records"\
+                    -H "X-Auth-Email: ${cloudflare_email}"\
+                    -H "X-Auth-Key: ${cloudflare_api_key}"\
+                    -H "Content-Type: application/json"\
+                    --data "{\"type\":\"A\",\"name\":\"${1}.${domain_levels[0]}.${domain_levels[1]}\",\"content\":\"${redhat_ip}\",\"ttl\":1,\"proxied\":true}")
+                    if [ "$(echo "${cloudflare_zone_dns_records_a1}" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["success"]' )" == "False" ]; then
+                        echo "${cloudflare_zone_dns_records_a1}" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["errors"][0]["message"]' | sed "s/^/\t\t/"
+                    else
+                        echo "success" | sed "s/^/\t\t/"
+                    fi
+                    # set dns a record for www.environment
+                    cloudflare_zone_dns_records_a2=$(curl -s -X POST "https://api.cloudflare.com/client/v4/zones/${cloudflare_zone_id}/dns_records"\
+                    -H "X-Auth-Email: ${cloudflare_email}"\
+                    -H "X-Auth-Key: ${cloudflare_api_key}"\
+                    -H "Content-Type: application/json"\
+                    --data "{\"type\":\"A\",\"name\":\"www.${1}.${domain_levels[0]}.${domain_levels[1]}\",\"content\":\"${redhat_ip}\",\"ttl\":1,\"proxied\":true}")
+                    if [ "$(echo "${cloudflare_zone_dns_records_a2}" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["success"]' )" == "False" ]; then
+                        echo "${cloudflare_zone_dns_records_a2}" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["errors"][0]["message"]' | sed "s/^/\t\t/"
+                    else
+                        echo "success" | sed "s/^/\t\t/"
+                    fi
+                fi
             fi
 
         elif [ "${#domain_levels[@]}" = "5" ]; then
@@ -245,85 +324,125 @@ else
 
             if [ "${cloudflare_zone_id}" = "[]" ]; then
                 # create cloudflare zone
-                echo "cloudflare zone does not exist" | sed "s/^/\t\t/"
-                cloudflare_zone_id=$(curl -s -X POST "https://api.cloudflare.com/client/v4/zones"\
+                echo "* cloudflare zone does not exist, creating..." | sed "s/^/\t/"
+                cloudflare_zone=$(curl -s -X POST "https://api.cloudflare.com/client/v4/zones"\
                 -H "X-Auth-Email: ${cloudflare_email}"\
                 -H "X-Auth-Key: ${cloudflare_api_key}"\
                 -H "Content-Type: application/json"\
-                --data "{\"name\":\"${domain_levels[3]}.${domain_levels[4]}\",\"jump_start\":false}"\
-                | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["result"]["id"]')
-                echo $cloudflare_zone_id | sed "s/^/\t\t/"
+                --data "{\"name\":\"${domain_levels[3]}.${domain_levels[4]}\",\"jump_start\":false}")
+                if [ "$(echo "${cloudflare_zone}" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["success"]' )" == "False" ]; then
+                    echo "${cloudflare_zone}" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["errors"][0]["message"]' | sed "s/^/\t\t/"
+                else
+                    cloudflare_zone_id=$(echo "${cloudflare_zone}" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["result"]["id"]' )
+                    echo "success" | sed "s/^/\t\t/"
+                fi
             else
                 # get cloudflare zone
-                echo "cloudflare zone exists" | sed "s/^/\t\t/"
-                cloudflare_zone_id=$(curl -s -X GET "https://api.cloudflare.com/client/v4/zones?name=${domain_levels[3]}.${domain_levels[4]}"\
+                echo "* cloudflare zone exists, retrieving..." | sed "s/^/\t/"
+                cloudflare_zone=$(curl -s -X GET "https://api.cloudflare.com/client/v4/zones?name=${domain_levels[3]}.${domain_levels[4]}"\
                 -H "X-Auth-Email: ${cloudflare_email}"\
                 -H "X-Auth-Key: ${cloudflare_api_key}"\
-                -H "Content-Type: application/json"\
-                | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["result"][0]["id"]')
-                echo $cloudflare_zone_id | sed "s/^/\t\t/"
+                -H "Content-Type: application/json")
+                if [ "$(echo "${cloudflare_zone}" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["success"]' )" == "False" ]; then
+                    echo "${cloudflare_zone}" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["errors"][0]["message"]' | sed "s/^/\t\t/"
+                else
+                    cloudflare_zone_id=$(echo "${cloudflare_zone}" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["result"][0]["id"]' )
+                    echo "success" | sed "s/^/\t\t/"
+                fi
             fi
 
-            if [ "$1" = "production" ]; then
-                # set dns a record for environment
-                curl -s -X POST "https://api.cloudflare.com/client/v4/zones/${cloudflare_zone_id}/dns_records"\
-                -H "X-Auth-Email: ${cloudflare_email}"\
-                -H "X-Auth-Key: ${cloudflare_api_key}"\
-                -H "Content-Type: application/json"\
-                --data "{\"type\":\"A\",\"name\":\"${domain_levels[0]}.${domain_levels[1]}.${domain_levels[2]}\",\"content\":\"${redhat_ip}\",\"ttl\":1,\"proxied\":true}"\
-                | sed "s/^/\t\t/"
-
-                # set dns a record for www.environment
-                curl -s -X POST "https://api.cloudflare.com/client/v4/zones/${cloudflare_zone_id}/dns_records"\
-                -H "X-Auth-Email: ${cloudflare_email}"\
-                -H "X-Auth-Key: ${cloudflare_api_key}"\
-                -H "Content-Type: application/json"\
-                --data "{\"type\":\"A\",\"name\":\"www.${domain_levels[0]}.${domain_levels[1]}.${domain_levels[2]}\",\"content\":\"${redhat_ip}\",\"ttl\":1,\"proxied\":true}"\
-                | sed "s/^/\t\t/"
-            else
-                # set dns a record for environment
-                curl -s -X POST "https://api.cloudflare.com/client/v4/zones/${cloudflare_zone_id}/dns_records"\
-                -H "X-Auth-Email: ${cloudflare_email}"\
-                -H "X-Auth-Key: ${cloudflare_api_key}"\
-                -H "Content-Type: application/json"\
-                --data "{\"type\":\"A\",\"name\":\"${1}.${domain_levels[0]}.${domain_levels[1]}.${domain_levels[2]}\",\"content\":\"${redhat_ip}\",\"ttl\":1,\"proxied\":true}"\
-                | sed "s/^/\t\t/"
-
-                # set dns a record for www.environment
-                curl -s -X POST "https://api.cloudflare.com/client/v4/zones/${cloudflare_zone_id}/dns_records"\
-                -H "X-Auth-Email: ${cloudflare_email}"\
-                -H "X-Auth-Key: ${cloudflare_api_key}"\
-                -H "Content-Type: application/json"\
-                --data "{\"type\":\"A\",\"name\":\"www.${1}.${domain_levels[0]}.${domain_levels[1]}.${domain_levels[2]}\",\"content\":\"${redhat_ip}\",\"ttl\":1,\"proxied\":true}"\
-                | sed "s/^/\t\t/"
+            # set dns a records only if we were able to create/get zone id
+            if [ "$(echo "${cloudflare_zone}" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["success"]' )" == "True" ]; then
+                echo "* creating dns a records..." | sed "s/^/\t/"
+                if [ "$1" = "production" ]; then
+                    # set dns a record for environment
+                    cloudflare_zone_dns_records_a1=$(curl -s -X POST "https://api.cloudflare.com/client/v4/zones/${cloudflare_zone_id}/dns_records"\
+                    -H "X-Auth-Email: ${cloudflare_email}"\
+                    -H "X-Auth-Key: ${cloudflare_api_key}"\
+                    -H "Content-Type: application/json"\
+                    --data "{\"type\":\"A\",\"name\":\"${domain_levels[0]}.${domain_levels[1]}.${domain_levels[2]}\",\"content\":\"${redhat_ip}\",\"ttl\":1,\"proxied\":true}")
+                    if [ "$(echo "${cloudflare_zone_dns_records_a1}" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["success"]' )" == "False" ]; then
+                        echo "${cloudflare_zone_dns_records_a1}" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["errors"][0]["message"]' | sed "s/^/\t\t/"
+                    else
+                        echo "success" | sed "s/^/\t\t/"
+                    fi
+                    # set dns a record for www.environment
+                    cloudflare_zone_dns_records_a2=$(curl -s -X POST "https://api.cloudflare.com/client/v4/zones/${cloudflare_zone_id}/dns_records"\
+                    -H "X-Auth-Email: ${cloudflare_email}"\
+                    -H "X-Auth-Key: ${cloudflare_api_key}"\
+                    -H "Content-Type: application/json"\
+                    --data "{\"type\":\"A\",\"name\":\"www.${domain_levels[0]}.${domain_levels[1]}.${domain_levels[2]}\",\"content\":\"${redhat_ip}\",\"ttl\":1,\"proxied\":true}")
+                    if [ "$(echo "${cloudflare_zone_dns_records_a2}" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["success"]' )" == "False" ]; then
+                        echo "${cloudflare_zone_dns_records_a2}" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["errors"][0]["message"]' | sed "s/^/\t\t/"
+                    else
+                        echo "success" | sed "s/^/\t\t/"
+                    fi
+                else
+                    # set dns a record for environment
+                    cloudflare_zone_dns_records_a1=$(curl -s -X POST "https://api.cloudflare.com/client/v4/zones/${cloudflare_zone_id}/dns_records"\
+                    -H "X-Auth-Email: ${cloudflare_email}"\
+                    -H "X-Auth-Key: ${cloudflare_api_key}"\
+                    -H "Content-Type: application/json"\
+                    --data "{\"type\":\"A\",\"name\":\"${1}.${domain_levels[0]}.${domain_levels[1]}.${domain_levels[2]}\",\"content\":\"${redhat_ip}\",\"ttl\":1,\"proxied\":true}")
+                    if [ "$(echo "${cloudflare_zone_dns_records_a1}" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["success"]' )" == "False" ]; then
+                        echo "${cloudflare_zone_dns_records_a1}" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["errors"][0]["message"]' | sed "s/^/\t\t/"
+                    else
+                        echo "success" | sed "s/^/\t\t/"
+                    fi
+                    # set dns a record for www.environment
+                    cloudflare_zone_dns_records_a2=$(curl -s -X POST "https://api.cloudflare.com/client/v4/zones/${cloudflare_zone_id}/dns_records"\
+                    -H "X-Auth-Email: ${cloudflare_email}"\
+                    -H "X-Auth-Key: ${cloudflare_api_key}"\
+                    -H "Content-Type: application/json"\
+                    --data "{\"type\":\"A\",\"name\":\"www.${1}.${domain_levels[0]}.${domain_levels[1]}.${domain_levels[2]}\",\"content\":\"${redhat_ip}\",\"ttl\":1,\"proxied\":true}")
+                    if [ "$(echo "${cloudflare_zone_dns_records_a2}" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["success"]' )" == "False" ]; then
+                        echo "${cloudflare_zone_dns_records_a2}" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["errors"][0]["message"]' | sed "s/^/\t\t/"
+                    else
+                        echo "success" | sed "s/^/\t\t/"
+                    fi
+                fi
             fi
 
         fi
 
-        # set cloudflare ssl setting per zone
-        curl -s -X PATCH "https://api.cloudflare.com/client/v4/zones/${cloudflare_zone_id}/settings/ssl"\
-        -H "X-Auth-Email: ${cloudflare_email}"\
-        -H "X-Auth-Key: ${cloudflare_api_key}"\
-        -H "Content-Type: application/json"\
-        --data "{\"value\":\"full\"}"\
-        | sed "s/^/\t\t/"
+        # set cloudflare ssl setting per zone, providing zone is valid
+        if [ "$(echo "${cloudflare_zone}" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["success"]' )" == "True" ]; then
+            echo "* setting cloudflare zone ssl to full" | sed "s/^/\t/"
+            cloudflare_zone_ssl=$(curl -s -X PATCH "https://api.cloudflare.com/client/v4/zones/${cloudflare_zone_id}/settings/ssl"\
+            -H "X-Auth-Email: ${cloudflare_email}"\
+            -H "X-Auth-Key: ${cloudflare_api_key}"\
+            -H "Content-Type: application/json"\
+            --data "{\"value\":\"full\"}")
+            if [ "$(echo "${cloudflare_zone_ssl}" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["success"]' )" == "False" ]; then
+                echo "${cloudflare_zone_ssl}" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["errors"][0]["message"]' | sed "s/^/\t\t/"
+            else
+                echo "success" | sed "s/^/\t\t/"
+            fi
 
-        # set cloudflare tls setting per zone
-        curl -s -X PATCH "https://api.cloudflare.com/client/v4/zones/${cloudflare_zone_id}/settings/tls_client_auth"\
-        -H "X-Auth-Email: ${cloudflare_email}"\
-        -H "X-Auth-Key: ${cloudflare_api_key}"\
-        -H "Content-Type: application/json"\
-        --data "{\"value\":\"on\"}"\
-        | sed "s/^/\t\t/"
+            echo "* setting cloudflare zone authenticated origin pulls to on" | sed "s/^/\t/"
+            cloudflare_zone_tls_client_auth=$(curl -s -X PATCH "https://api.cloudflare.com/client/v4/zones/${cloudflare_zone_id}/settings/tls_client_auth"\
+            -H "X-Auth-Email: ${cloudflare_email}"\
+            -H "X-Auth-Key: ${cloudflare_api_key}"\
+            -H "Content-Type: application/json"\
+            --data "{\"value\":\"on\"}")
+            if [ "$(echo "${cloudflare_zone_tls_client_auth}" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["success"]' )" == "False" ]; then
+                echo "${cloudflare_zone_tls_client_auth}" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["errors"][0]["message"]' | sed "s/^/\t\t/"
+            else
+                echo "success" | sed "s/^/\t\t/"
+            fi
 
-        # purge cloudflare cache per zone
-        echo "clearing cloudflare cache" | sed "s/^/\t\t/"
-        curl -s -X DELETE "https://api.cloudflare.com/client/v4/zones/${cloudflare_zone_id}/purge_cache"\
-        -H "X-Auth-Email: ${cloudflare_email}"\
-        -H "X-Auth-Key: ${cloudflare_api_key}"\
-        -H "Content-Type: application/json"\
-        --data "{\"purge_everything\":true}"\
-        | sed "s/^/\t\t/"
+            echo "* clearing cloudflare zone cache" | sed "s/^/\t/"
+            cloudflare_zone_cache=$(curl -s -X DELETE "https://api.cloudflare.com/client/v4/zones/${cloudflare_zone_id}/purge_cache"\
+            -H "X-Auth-Email: ${cloudflare_email}"\
+            -H "X-Auth-Key: ${cloudflare_api_key}"\
+            -H "Content-Type: application/json"\
+            --data "{\"purge_everything\":true}")
+            if [ "$(echo "${cloudflare_zone_cache}" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["success"]' )" == "False" ]; then
+                echo "${cloudflare_zone_cache}" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["errors"][0]["message"]' | sed "s/^/\t\t/"
+            else
+                echo "success" | sed "s/^/\t\t/"
+            fi
+        fi
 
     done
 
