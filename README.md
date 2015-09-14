@@ -10,7 +10,7 @@
 * Website Uptime Monitoring via monitor.us (Monitis)
 
 
-As a **non-Developer** you may think - *I already have a website, why do I need Catapult?* Over time you may find yourself overwhelmed with managing the the day to day Devops process of infrastrucrure , and end up paying a freelancer or a development company hundreds or even thousands of dollars to manage or interact with the DevOps (Development Operations) to solve these problems:
+As a **non-Developer** you may think - *I already have a website, why do I need Catapult?* Over time you may find yourself overwhelmed with managing the the day to day DevOps process of infrastrucrure , and end up paying a freelancer or a development company hundreds or even thousands of dollars to manage or interact with the DevOps (Development Operations) to solve these problems:
 
   * Production is down.
   * We need a test site.
@@ -23,10 +23,10 @@ As a **non-Developer** you may think - *I already have a website, why do I need 
 As a **Developer**, you have to manage many websites and probably end up using the same set of tools and APIs over and over again. Why not use something that has been created from it's foundations by Devlopers that have been down the same road as you, and contribute back to the project at the same time?
 
   * Catapult is developed in Ruby and native Shell - there are no new languages or technologies to learn.
-  * Catapult's simplicity is it's strength. There is no black-box to decipher - the functionality and methodology is out in      the open and accessible to anyone.
-  * Catapult uses the most popular APIs and services; including AWS, Bamboo, Bitbucket, CloudFlare, DigitalOcean, GitHub, and     Vagrant.
+  * Catapult's simplicity is it's strength. There is no black-box to decipher - the functionality and methodology is out in the open and accessible to anyone.
+  * Catapult uses the most popular APIs and services; including AWS, Bamboo, Bitbucket, CloudFlare, DigitalOcean, GitHub, and Vagrant.
 
-Catapult can manage all of this for you through an open-source and well-documented platform, with a developer-focused point of view. We also provide a service and assistance if you need help getting started, or just have a question - just contact us at https://devopsgroup.io. Catapult leverages the Services that you're already using, which collectively, costs $40/month to have a full-stack localDev, Test, Quality Control, and Production environment.
+Catapult manages all of this for you through an open-source and well-documented platform, with a developer-focused point of view. We also provide a service and assistance if you need help getting started, or just have a question - just contact us at https://devopsgroup.io. Catapult leverages the Services that you're already using, which collectively, costs $40/month to have a full-stack localDev, Test, Quality Control, and Production environment.
 
 *Go ahead, give* **Catapult** *a* **shot**.
 
