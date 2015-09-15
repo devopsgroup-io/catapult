@@ -643,14 +643,14 @@ configuration["environments"].each do |environment,data|
       puts "   - [created] #{droplet["created_at"]} [slug] #{droplet["size"]["slug"]} [region] #{droplet["region"]["name"]} [kernel] #{droplet["kernel"]["name"]}"
       puts "   - [ipv4_public] #{droplet_ip["ip_address"]} [ipv4_private] #{droplet_ip_private["ip_address"]}"
       # get public ip address and write to secrets/configuration.yml
-      unless configuration["environments"]["#{environment}"]["servers"]["redhat"]["ip"] == "#{droplet_ip["ip_address"]}"
+      unless configuration["environments"]["#{environment}"]["servers"]["redhat"]["ip"] == droplet_ip["ip_address"]
         configuration["environments"]["#{environment}"]["servers"]["redhat"]["ip"] = "#{droplet_ip["ip_address"]}"
         `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml --decrypt secrets/configuration.yml.gpg`
         File.open('secrets/configuration.yml', 'w') {|f| f.write configuration.to_yaml }
         `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml.gpg --armor --cipher-algo AES256 --symmetric secrets/configuration.yml`
       end
       # get private ip address and write to secrets/configuration.yml
-      unless configuration["environments"]["#{environment}"]["servers"]["redhat"]["ip_private"] == "#{droplet_ip_private["ip_address"]}"
+      unless configuration["environments"]["#{environment}"]["servers"]["redhat"]["ip_private"] == droplet_ip_private["ip_address"]
         configuration["environments"]["#{environment}"]["servers"]["redhat"]["ip_private"] = "#{droplet_ip_private["ip_address"]}"
         `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml --decrypt secrets/configuration.yml.gpg`
         File.open('secrets/configuration.yml', 'w') {|f| f.write configuration.to_yaml }
@@ -683,14 +683,14 @@ configuration["environments"].each do |environment,data|
       puts "   - [created] #{droplet["created_at"]} [slug] #{droplet["size"]["slug"]} [region] #{droplet["region"]["name"]} [kernel] #{droplet["kernel"]["name"]}"
       puts "   - [ipv4_public] #{droplet_ip["ip_address"]} [ipv4_private] #{droplet_ip_private["ip_address"]}"
       # get public ip address and write to secrets/configuration.yml
-      unless configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["ip"] == "#{droplet_ip["ip_address"]}"
+      unless configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["ip"] == droplet_ip["ip_address"]
         configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["ip"] = "#{droplet_ip["ip_address"]}"
         `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml --decrypt secrets/configuration.yml.gpg`
         File.open('secrets/configuration.yml', 'w') {|f| f.write configuration.to_yaml }
         `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml.gpg --armor --cipher-algo AES256 --symmetric secrets/configuration.yml`
       end
       # get private ip address and write to secrets/configuration.yml
-      unless configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["ip_private"] == "#{droplet_ip_private["ip_address"]}"
+      unless configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["ip_private"] == droplet_ip_private["ip_address"]
         configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["ip_private"] = "#{droplet_ip_private["ip_address"]}"
         `gpg --verbose --batch --yes --passphrase "#{configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml --decrypt secrets/configuration.yml.gpg`
         File.open('secrets/configuration.yml', 'w') {|f| f.write configuration.to_yaml }
