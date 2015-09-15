@@ -17,6 +17,13 @@ end=$(date +%s)
 echo -e "\n==> completed in ($(($end - $start)) seconds)"
 
 
+echo -e "\n\n\n==> Configuring IPTables"
+start=$(date +%s)
+source /catapult/provisioners/redhat/modules/iptables.sh
+end=$(date +%s)
+echo -e "\n==> completed in ($(($end - $start)) seconds)"
+
+
 echo -e "\n\n\n==> Configuring time"
 start=$(date +%s)
 source /catapult/provisioners/redhat/modules/time.sh
@@ -84,10 +91,6 @@ fi
 mysql --defaults-extra-file=$dbconf -e "DELETE FROM mysql.user WHERE user='root' AND host NOT IN ('localhost', '127.0.0.1', '::1')"
 # remove anonymous user
 mysql --defaults-extra-file=$dbconf -e "DELETE FROM mysql.user WHERE user=''"
-
-# configure outside access to mysql
-iptables -I INPUT -p tcp --dport 3306 -m state --state NEW,ESTABLISHED -j ACCEPT
-iptables -I OUTPUT -p tcp --sport 3306 -m state --state ESTABLISHED -j ACCEPT
 
 # clear out all users except root
 mysql --defaults-extra-file=$dbconf -e "DELETE FROM mysql.user WHERE user!='root'"
