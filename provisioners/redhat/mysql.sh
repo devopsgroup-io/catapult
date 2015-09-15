@@ -211,7 +211,7 @@ while IFS='' read -r -d '' key; do
             cd "/var/www/repositories/apache/${domain}" && git checkout $(echo "${configuration}" | shyaml get-value environments.${1}.branch) 2>&1 | sed "s/^/\t/"
         else
             if [ -z "${software_dbexist}" ]; then
-                echo -e "\t* workflow is set to ${software_workflow} and this is the ${1} environment, however this is a new website and the database does not exist, performing a database restore"
+                echo -e "\t* workflow is set to ${software_workflow} and this is the ${1} environment, however, the database does not exist. performing a database restore"
             else
                 echo -e "\t* workflow is set to ${software_workflow} and this is the ${1} environment, performing a database restore"
             fi

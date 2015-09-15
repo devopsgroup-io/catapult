@@ -36,7 +36,7 @@ sudo iptables\
     --jump ACCEPT
 # allow for outbound mail
 sudo iptables\
-    -append OUTPUT\
+    --append OUTPUT\
     --protocol tcp\
     --dport 25\
     --jump ACCEPT

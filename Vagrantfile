@@ -1399,7 +1399,7 @@ Vagrant.configure("2") do |config|
     config.hostmanager.aliases = redhathostsfile
     config.vm.synced_folder ".", "/vagrant", disabled: true
     config.vm.synced_folder ".", "/catapult", type: "nfs"
-    # this takes place of git clones
+    # sym link the git clones for local access
     config.vm.synced_folder "repositories", "/var/www/repositories", type: "nfs"
     config.vm.provision "shell", path: "provisioners/redhat/provision.sh", args: ["dev","#{repo}","#{configuration_user["settings"]["gpg_key"]}","apache","#{configuration_user["settings"]["software_validation"]}"]
   end
@@ -1412,7 +1412,7 @@ Vagrant.configure("2") do |config|
     end
     config.vm.synced_folder ".", "/vagrant", disabled: true
     config.vm.synced_folder ".", "/catapult", type: "nfs"
-    # this takes place of git clones
+    # sym link the git clones for local access
     config.vm.synced_folder "repositories", "/var/www/repositories", type: "nfs"
     config.vm.provision :hostmanager
     config.vm.provision "shell", path: "provisioners/redhat/provision.sh", args: ["dev","#{repo}","#{configuration_user["settings"]["gpg_key"]}","mysql","#{configuration_user["settings"]["software_validation"]}"]
@@ -1444,6 +1444,7 @@ Vagrant.configure("2") do |config|
       provider.region = "nyc3"
       provider.size = "#{configuration["environments"]["test"]["servers"]["redhat_mysql"]["slug"]}"
       provider.ipv6 = true
+      provider.private_networking = true
       provider.backups_enabled = true
     end
     config.vm.synced_folder ".", "/vagrant", disabled: true
@@ -1476,6 +1477,7 @@ Vagrant.configure("2") do |config|
       provider.region = "nyc3"
       provider.size = "#{configuration["environments"]["qc"]["servers"]["redhat_mysql"]["slug"]}"
       provider.ipv6 = true
+      provider.private_networking = true
       provider.backups_enabled = true
     end
     config.vm.synced_folder ".", "/vagrant", disabled: true
@@ -1508,6 +1510,7 @@ Vagrant.configure("2") do |config|
       provider.region = "nyc3"
       provider.size = "#{configuration["environments"]["production"]["servers"]["redhat_mysql"]["slug"]}"
       provider.ipv6 = true
+      provider.private_networking = true
       provider.backups_enabled = true
     end
     config.vm.synced_folder ".", "/vagrant", disabled: true
