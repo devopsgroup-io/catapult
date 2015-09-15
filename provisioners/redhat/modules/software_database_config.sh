@@ -1,7 +1,11 @@
-mysql_user="$(echo "${configuration}" | shyaml get-value environments.$1.servers.redhat_mysql.mysql.user)"
-mysql_user_password="$(echo "${configuration}" | shyaml get-value environments.$1.servers.redhat_mysql.mysql.user_password)"
-mysql_root_password="$(echo "${configuration}" | shyaml get-value environments.$1.servers.redhat_mysql.mysql.root_password)"
-redhat_mysql_ip="$(echo "${configuration}" | shyaml get-value environments.$1.servers.redhat_mysql.ip)"
+mysql_user="$(echo "${configuration}" | shyaml get-value environments.${1}.servers.redhat_mysql.mysql.user)"
+mysql_user_password="$(echo "${configuration}" | shyaml get-value environments.${1}.servers.redhat_mysql.mysql.user_password)"
+mysql_root_password="$(echo "${configuration}" | shyaml get-value environments.${1}.servers.redhat_mysql.mysql.root_password)"
+if [ "${1}" == "dev" ]; then
+    redhat_mysql_ip="$(echo "${configuration}" | shyaml get-value environments.${1}.servers.redhat_mysql.ip)"
+else
+    redhat_mysql_ip="$(echo "${configuration}" | shyaml get-value environments.${1}.servers.redhat_mysql.ip_private)"
+fi
 
 echo "${configuration}" | shyaml get-values-0 websites.apache |
 while IFS='' read -r -d '' key; do
