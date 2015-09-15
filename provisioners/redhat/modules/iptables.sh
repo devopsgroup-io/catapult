@@ -1,5 +1,4 @@
 redhat_ip="$(echo "${configuration}" | shyaml get-value environments.${1}.servers.redhat.ip)"
-redhat_mysql_ip="$(echo "${configuration}" | shyaml get-value environments.${1}.servers.redhat_mysql.ip)"
 
 # remove all rules
 sudo iptables --flush
@@ -35,9 +34,14 @@ sudo iptables\
     --match state\
     --state ESTABLISHED,RELATED\
     --jump ACCEPT
-
+# allow for outbound mail
+sudo iptables\
+    -append OUTPUT\
+    --protocol tcp\
+    --dport 25\
+    --jump ACCEPT
+# allow incoming web traffic from the world
 if [ "${4}" == "apache" ]; then
-    # allow incoming web traffic from the world
     sudo iptables\
         --append INPUT\
         --in-interface eth0\
@@ -54,15 +58,15 @@ if [ "${4}" == "apache" ]; then
         --match state\
         --state ESTABLISHED\
         --jump ACCEPT
+# allow incoming database traffic
 elif [ "${4}" == "mysql" ]; then
     if [ "${1}" == "dev"  ]; then
-        # allow incoming database traffic from developer machine
+        # from developer machine
         sudo iptables\
             --append INPUT\
             --in-interface eth0\
             --protocol tcp\
             --dport 3306\
-            --sport 3306\
             --match state\
             --state NEW,ESTABLISHED\
             --jump ACCEPT
@@ -70,21 +74,18 @@ elif [ "${4}" == "mysql" ]; then
             --append OUTPUT\
             --out-interface eth0\
             --protocol tcp\
-            --dport 3306\
             --sport 3306\
             --match state\
             --state ESTABLISHED\
             --jump ACCEPT
     else
-        # allow incoming database traffic from the redhat server
+        # from the redhat server
         sudo iptables\
             --append INPUT\
             --in-interface eth0\
             --protocol tcp\
-            --destination ${redhat_mysql_ip}\
             --dport 3306\
             --source ${redhat_ip}\
-            --sport 3306\
             --match state\
             --state NEW,ESTABLISHED\
             --jump ACCEPT
@@ -93,8 +94,6 @@ elif [ "${4}" == "mysql" ]; then
             --out-interface eth0\
             --protocol tcp\
             --destination ${redhat_ip}\
-            --dport 3306\
-            --source ${redhat_mysql_ip}\
             --sport 3306\
             --match state\
             --state ESTABLISHED\
@@ -108,4 +107,3 @@ sudo iptables --policy INPUT DROP
 sudo iptables --policy OUTPUT DROP
 # output the iptables
 sudo iptables --list
-
