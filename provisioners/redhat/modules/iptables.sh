@@ -21,15 +21,19 @@ sudo iptables\
 # allow server to access the web for packages, updates, etc
 sudo iptables\
     --append INPUT\
-    --in-interface eth0\
     --match state\
     --state ESTABLISHED,RELATED\
+    --jump ACCEPT
+# allow ntp over 123
+sudo iptables\
+    --append INPUT\
+    --protocol udp\
+    --dport 123\
     --jump ACCEPT
 # allow incoming web traffic from the world
 if [ "${4}" == "apache" ]; then
     sudo iptables\
         --append INPUT\
-        --in-interface eth0\
         --protocol tcp\
         --dport 80\
         --match state\
@@ -37,7 +41,6 @@ if [ "${4}" == "apache" ]; then
         --jump ACCEPT
     sudo iptables\
         --append INPUT\
-        --in-interface eth0\
         --protocol tcp\
         --dport 443\
         --match state\
@@ -49,7 +52,6 @@ elif [ "${4}" == "mysql" ]; then
         # from developer machine
         sudo iptables\
             --append INPUT\
-            --in-interface eth0\
             --protocol tcp\
             --dport 3306\
             --match state\
@@ -59,7 +61,6 @@ elif [ "${4}" == "mysql" ]; then
         # from the redhat server
         sudo iptables\
             --append INPUT\
-            --in-interface eth0\
             --protocol tcp\
             --dport 3306\
             --source ${redhat_ip}\
