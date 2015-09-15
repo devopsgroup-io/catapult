@@ -19,7 +19,7 @@ echo -e "\n==> completed in ($(($end - $start)) seconds)"
 
 echo -e "\n\n\n==> Configuring IPTables"
 start=$(date +%s)
-source /catapult/provisioners/redhat/modules/iptables.sh
+#source /catapult/provisioners/redhat/modules/iptables.sh
 end=$(date +%s)
 echo -e "\n==> completed in ($(($end - $start)) seconds)"
 
