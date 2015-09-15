@@ -1,5 +1,8 @@
 redhat_ip="$(echo "${configuration}" | shyaml get-value environments.${1}.servers.redhat.ip)"
+redhat_ip_private="$(echo "${configuration}" | shyaml get-value environments.${1}.servers.redhat.ip)"
 
+# list adapters
+ifconfig
 # remove all rules
 sudo iptables --flush
 # we're not a router
