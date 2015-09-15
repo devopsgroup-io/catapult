@@ -9,12 +9,11 @@
 # $4 => instance
 
 
-
 echo -e "\n\n\n"
-echo "                   mdQQQb                       "
-echo "                ---- 4SSEO                      "
-echo "                \    \SSQ'                      "
-echo "                 \ \Y \Sp                       "
+echo "                   seTHRe                       "
+echo "                ---- ESERb                      "
+echo "                \    \AHA'                      "
+echo "                 \ \Y \Ha                       "
 echo "                  \;\\\\_\                        "
 echo "                .;'  \\\\                         "
 echo "              .;'     \\\\                        "

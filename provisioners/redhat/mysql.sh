@@ -17,6 +17,13 @@ end=$(date +%s)
 echo -e "\n==> completed in ($(($end - $start)) seconds)"
 
 
+echo -e "\n\n\n==> Configuring IPTables"
+start=$(date +%s)
+source /catapult/provisioners/redhat/modules/iptables.sh
+end=$(date +%s)
+echo -e "\n==> completed in ($(($end - $start)) seconds)"
+
+
 echo -e "\n\n\n==> Configuring time"
 start=$(date +%s)
 source /catapult/provisioners/redhat/modules/time.sh
@@ -84,10 +91,6 @@ fi
 mysql --defaults-extra-file=$dbconf -e "DELETE FROM mysql.user WHERE user='root' AND host NOT IN ('localhost', '127.0.0.1', '::1')"
 # remove anonymous user
 mysql --defaults-extra-file=$dbconf -e "DELETE FROM mysql.user WHERE user=''"
-
-# configure outside access to mysql
-iptables -I INPUT -p tcp --dport 3306 -m state --state NEW,ESTABLISHED -j ACCEPT
-iptables -I OUTPUT -p tcp --sport 3306 -m state --state ESTABLISHED -j ACCEPT
 
 # clear out all users except root
 mysql --defaults-extra-file=$dbconf -e "DELETE FROM mysql.user WHERE user!='root'"
@@ -208,7 +211,7 @@ while IFS='' read -r -d '' key; do
             cd "/var/www/repositories/apache/${domain}" && git checkout $(echo "${configuration}" | shyaml get-value environments.${1}.branch) 2>&1 | sed "s/^/\t/"
         else
             if [ -z "${software_dbexist}" ]; then
-                echo -e "\t* workflow is set to ${software_workflow} and this is the ${1} environment, however this is a new website and the database does not exist, performing a database restore"
+                echo -e "\t* workflow is set to ${software_workflow} and this is the ${1} environment, however, the database does not exist. performing a database restore"
             else
                 echo -e "\t* workflow is set to ${software_workflow} and this is the ${1} environment, performing a database restore"
             fi
