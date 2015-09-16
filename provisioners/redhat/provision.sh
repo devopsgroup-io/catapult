@@ -30,6 +30,8 @@ cat /proc/cpuinfo | grep 'model name' | cut -d: -f2 | awk 'NR==1' | tr -d " "
 echo -e "$(top -bn 1 | awk '{print $9}' | tail -n +8 | awk '{s+=$1} END {print s}')% utilization"
 echo -e "\nHDD"
 df -h
+echo -e "\nNET"
+ifconfig
 echo -e "\nRAM"
 free -h
 
