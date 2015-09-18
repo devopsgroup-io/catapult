@@ -45,8 +45,9 @@ Catapult manages all of this for you through an open-source and well-documented 
     - [Provision Environments](#provision-environments)
     - [Configure Automated Deployments](#configure-automated-deployments)
     - [Provision Websites](#provision-websites)
+    - [Develop Websites](#develop-websites)
 - [Troubleshooting](#troubleshooting)
-- [Service Justification](#service-justification)
+- [Services Justification](#services-justification)
 - [Contributing](#contributing)
     - [Releases](#releases)
 
@@ -119,8 +120,8 @@ Catapult is quick to setup. Fork the Github repository and start adding your con
     1. When **GPG Edit Mode** is enabled (disabled by default) the following files are encrypted using your **GPG Key**:
         1. ~/secrets/id_rsa as ~/secrets/id_rsa.gpg
         2. ~/secrets/id_rsa.pub as ~/secrets/id_rsa.pub.gpg
-        3. ~/configuration.yml as ~/configuration.yml.gpg
-    2. To enable **GPG Edit Mode**, set `~/configuration-user.yml["settings"]["gpg_edit"]` to true.
+        3. ~/secrets/configuration.yml as ~/secrets/configuration.yml.gpg
+    2. To enable **GPG Edit Mode**, set `~/secrets/configuration-user.yml["settings"]["gpg_edit"]` to true.
     3. Once gpg_edit is set to true and while on your fork's develop branch, run `vagrant status`, this will encrypt your configuration that you will then be able to commit and push safely to your public Catapult fork.
 
 
@@ -133,19 +134,19 @@ Catapult uses several third-party services to pull everything off - below is a l
     1. **DigitalOcean** sign-up and configuration
         1. Create an account at http://digitalocean.com
            * Get a $10 credit and give us $25 once you spend $25 https://www.digitalocean.com/?refcode=6127912f3462
-        2. Create a Personal Access Token at https://cloud.digitalocean.com/settings/applications named "Vagrant" and place the token value at `~/configuration.yml["company"]["digitalocean_personal_access_token"]`
+        2. Create a Personal Access Token at https://cloud.digitalocean.com/settings/applications named "Vagrant" and place the token value at `~/secrets/configuration.yml["company"]["digitalocean_personal_access_token"]`
         3. Add your newly created id_rsa.pub from ~/secrets/id_rsa.pub key in https://cloud.digitalocean.com/settings/security named "Vagrant"
 2. **Repositories:**    
     Bitbucket provides free private repositories and GitHub provides free public repositories, you will need to sign up for both. If you already have Bitbucket and GitHub accounts you may use them, however, it's best to setup a [machine user](https://developer.github.com/guides/managing-deploy-keys/#machine-users) if you're using Catapult with your team.
     1. **Bitbucket** sign-up and configuration
         1. Create an account at https://bitbucket.org
-            1. Place the username (not the email address) that you used to sign up for Bitbucket at `~/configuration.yml["company"]["bitbucket_username"]`
-            2. Place the password of the account for Bitbucket at `~/configuration.yml["company"]["bitbucket_password"]`
+            1. Place the username (not the email address) that you used to sign up for Bitbucket at `~/secrets/configuration.yml["company"]["bitbucket_username"]`
+            2. Place the password of the account for Bitbucket at `~/secrets/configuration.yml["company"]["bitbucket_password"]`
         2. Add your newly created id_rsa.pub from ~/secrets/id_rsa.pub key in https://bitbucket.org/account/user/`your-user-here`/ssh-keys/ named "Catapult"
     2. **GitHub** sign-up and configuration
         1. Create an account at https://github.com
-            1. Place the username (not the email address) that you used to sign up for GitHub at `~/configuration.yml["company"]["github_username"]`
-            2. Place the password of the account for GitHub at `~/configuration.yml["company"]["github_password"]`
+            1. Place the username (not the email address) that you used to sign up for GitHub at `~/secrets/configuration.yml["company"]["github_username"]`
+            2. Place the password of the account for GitHub at `~/secrets/configuration.yml["company"]["github_password"]`
         2. Add your newly created id_rsa.pub from ~/secrets/id_rsa.pub key in https://github.com/settings/ssh named "Catapult"
 3. **Automated Deployments:**    
     1. **Amazon Web Services** (AWS) EC2 sign-up and configuration (Required for Bamboo)
@@ -163,9 +164,9 @@ Catapult uses several third-party services to pull everything off - below is a l
     2. **Bamboo** sign-up and configuration
         1. Create a Bamboo Cloud account at https://www.atlassian.com/software/bamboo
         2. Sign in to your new custom Bamboo instance https://[your-name-here].atlassian.net
-        3. Place your Bamboo base URL at `~/configuration.yml["company"]["bamboo_base_url"]`, the format should be https://[your-name-here].atlassian.net/builds/
-        4. Place your Bamboo username (usually admin) at `~/configuration.yml["company"]["bamboo_username"]`
-        5. Place your Bamboo password (usually admin) at `~/configuration.yml["company"]["bamboo_password"]`
+        3. Place your Bamboo base URL at `~/secrets/configuration.yml["company"]["bamboo_base_url"]`, the format should be https://[your-name-here].atlassian.net/builds/
+        4. Place your Bamboo username (usually admin) at `~/secrets/configuration.yml["company"]["bamboo_username"]`
+        5. Place your Bamboo password (usually admin) at `~/secrets/configuration.yml["company"]["bamboo_password"]`
         6. Click the settings gear from the top right in the header and select Elastic instances:
             1. Click Configuration from the left
             2. Click Edit configuration
@@ -222,27 +223,27 @@ Catapult uses several third-party services to pull everything off - below is a l
     1. **CloudFlare** sign-up and configuration
         1. Create a CloudFlare account at https://www.cloudflare.com
         2. Sign in to your new CloudFlare account
-        3. Visit your My Account section at https://www.cloudflare.com/a/account/my-account and scroll down to your API Key and place the token value at `~/configuration.yml["company"]["cloudflare_api_key"]`
-        4. Place the email address of the email address that you used to sign up for CloudFlare at `~/configuration.yml["company"]["cloudflare_email"]`
+        3. Visit your My Account section at https://www.cloudflare.com/a/account/my-account and scroll down to your API Key and place the token value at `~/secrets/configuration.yml["company"]["cloudflare_api_key"]`
+        4. Place the email address of the email address that you used to sign up for CloudFlare at `~/secrets/configuration.yml["company"]["cloudflare_email"]`
 5. **Monitoring:**
     1. **monitor.us** sign-up and configuration
         1. Create a monitor.us account at http://www.monitor.us
         2. Sign in to your new monitor.us account
         3. Go to Tools > API > API Key.
-        4. Place your API key at `~/configuration.yml["company"]["monitorus_api_key"]`
-        5. Place your Secret key at `~/configuration.yml["company"]["monitorus_secret_key"]`
+        4. Place your API key at `~/secrets/configuration.yml["company"]["monitorus_api_key"]`
+        5. Place your Secret key at `~/secrets/configuration.yml["company"]["monitorus_secret_key"]`
 6. **Verify Configuration:**    
     1. To verify all of the configuration that you just set, open your command line and cd into your fork of Catapult, then run `vagrant status`. Catapult will confirm connection to all of the Services and inform you of any problems.
 
 | Service                       | Description                                                      | Monthly Cost |
 |-------------------------------|------------------------------------------------------------------|-------------:|
 | **Hosting:**                  |                                                                  |              |
-| DigitalOcean                  | `~/configuration.yml["company"]["name"]-test-redhat`             | $5           |
-| DigitalOcean                  | `~/configuration.yml["company"]["name"]-qc-redhat`               | $5           |
-| DigitalOcean                  | `~/configuration.yml["company"]["name"]-production-redhat`       | $5           |
-| DigitalOcean                  | `~/configuration.yml["company"]["name"]-test-redhat-mysql`       | $5           |
-| DigitalOcean                  | `~/configuration.yml["company"]["name"]-qc-redhat-mysql`         | $5           |
-| DigitalOcean                  | `~/configuration.yml["company"]["name"]-production-redhat-mysql` | $5           |
+| DigitalOcean                  | `~/secrets/configuration.yml["company"]["name"]-test-redhat`             | $5           |
+| DigitalOcean                  | `~/secrets/configuration.yml["company"]["name"]-qc-redhat`               | $5           |
+| DigitalOcean                  | `~/secrets/configuration.yml["company"]["name"]-production-redhat`       | $5           |
+| DigitalOcean                  | `~/secrets/configuration.yml["company"]["name"]-test-redhat-mysql`       | $5           |
+| DigitalOcean                  | `~/secrets/configuration.yml["company"]["name"]-qc-redhat-mysql`         | $5           |
+| DigitalOcean                  | `~/secrets/configuration.yml["company"]["name"]-production-redhat-mysql` | $5           |
 | **Repositories:**             |                                                                  |              |
 | Bitbucket                     | Private Repositories                                             | Free         |
 | GitHub                        | Public Repositories                                              | Free         |
@@ -273,15 +274,15 @@ To use Catapult you will need to [Provision Environments](#provision-environment
 For each **Environment** you will need to:
 
 * **Web Servers**
-    * `vagrant up ~/configuration.yml["company"]["name"]-dev-redhat`
-    * `vagrant up ~/configuration.yml["company"]["name"]-test-redhat`
-    * `vagrant up ~/configuration.yml["company"]["name"]-qc-redhat`
-    * `vagrant up ~/configuration.yml["company"]["name"]-production-redhat`
+    * `vagrant up ~/secrets/configuration.yml["company"]["name"]-dev-redhat`
+    * `vagrant up ~/secrets/configuration.yml["company"]["name"]-test-redhat`
+    * `vagrant up ~/secrets/configuration.yml["company"]["name"]-qc-redhat`
+    * `vagrant up ~/secrets/configuration.yml["company"]["name"]-production-redhat`
 * **Database Servers**
-    * `vagrant up ~/configuration.yml["company"]["name"]-dev-redhat-mysql`
-    * `vagrant up ~/configuration.yml["company"]["name"]-test-redhat-mysql`
-    * `vagrant up ~/configuration.yml["company"]["name"]-qc-redhat-mysql`
-    * `vagrant up ~/configuration.yml["company"]["name"]-production-redhat-mysql`
+    * `vagrant up ~/secrets/configuration.yml["company"]["name"]-dev-redhat-mysql`
+    * `vagrant up ~/secrets/configuration.yml["company"]["name"]-test-redhat-mysql`
+    * `vagrant up ~/secrets/configuration.yml["company"]["name"]-qc-redhat-mysql`
+    * `vagrant up ~/secrets/configuration.yml["company"]["name"]-production-redhat-mysql`
 
 
 
@@ -298,19 +299,19 @@ Once the Web and Database Servers are up and running, it's then time to configur
         3. Remove all tasks that may have been added by default during initial setup
         4. Click Add task
             1. Search for SSH Task and select it
-            2. Host: `~/configuration.yml["environments"]["test"]["servers"]["redhat"]["ip"]`
+            2. Host: `~/secrets/configuration.yml["environments"]["test"]["servers"]["redhat"]["ip"]`
             3. Username: `root`
             4. Authentication Type: `Key without passphrase`
             5. SSH Key: `~/secrets/id_rsa`
-            6. SSH command: `bash /catapult/provisioners/redhat/provision.sh "test" "https://github.com/[your-name-here]/catapult-release-management" "~/configuration-user.yml["settings"]["gpg_key"]" "apache"`
+            6. SSH command: `bash /catapult/provisioners/redhat/provision.sh "test" "https://github.com/[your-name-here]/catapult-release-management" "~/secrets/configuration-user.yml["settings"]["gpg_key"]" "apache"`
             7. Click Save
         5. Click Add task
             1. Search for SSH Task and select it
-            2. Host: `~/configuration.yml["environments"]["test"]["servers"]["redhat_mysql"]["ip"]`
+            2. Host: `~/secrets/configuration.yml["environments"]["test"]["servers"]["redhat_mysql"]["ip"]`
             3. Username: `root`
             4. Authentication Type: `Key without passphrase`
             5. SSH Key: `~/secrets/id_rsa`
-            6. SSH command: `bash /catapult/provisioners/redhat/provision.sh "test" "https://github.com/[your-name-here]/catapult-release-management" "~/configuration-user.yml["settings"]["gpg_key"]" "mysql"`
+            6. SSH command: `bash /catapult/provisioners/redhat/provision.sh "test" "https://github.com/[your-name-here]/catapult-release-management" "~/secrets/configuration-user.yml["settings"]["gpg_key"]" "mysql"`
             7. Click Save
     * **Configure Catapult Project QC Plan**
         1. Click the edit icon for the QC plan
@@ -318,19 +319,19 @@ Once the Web and Database Servers are up and running, it's then time to configur
         3. Remove all tasks that may have been added by default during initial setup
         4. Click Add task
             1. Search for SSH Task and select it
-            2. Host: `~/configuration.yml["environments"]["qc"]["servers"]["redhat"]["ip"]`
+            2. Host: `~/secrets/configuration.yml["environments"]["qc"]["servers"]["redhat"]["ip"]`
             3. Username: `root`
             4. Authentication Type: `Key without passphrase`
             5. SSH Key: `~/secrets/id_rsa`
-            6. SSH command: `bash /catapult/provisioners/redhat/provision.sh "qc" "https://github.com/[your-name-here]/catapult-release-management" "~/configuration-user.yml["settings"]["gpg_key"]" "apache"`
+            6. SSH command: `bash /catapult/provisioners/redhat/provision.sh "qc" "https://github.com/[your-name-here]/catapult-release-management" "~/secrets/configuration-user.yml["settings"]["gpg_key"]" "apache"`
             7. Click Save
         5. Click Add task
             1. Search for SSH Task and select it
-            2. Host: `~/configuration.yml["environments"]["qc"]["servers"]["redhat_mysql"]["ip"]`
+            2. Host: `~/secrets/configuration.yml["environments"]["qc"]["servers"]["redhat_mysql"]["ip"]`
             3. Username: `root`
             4. Authentication Type: `Key without passphrase`
             5. SSH Key: `~/secrets/id_rsa`
-            6. SSH command: `bash /catapult/provisioners/redhat/provision.sh "qc" "https://github.com/[your-name-here]/catapult-release-management" "~/configuration-user.yml["settings"]["gpg_key"]" "mysql"`
+            6. SSH command: `bash /catapult/provisioners/redhat/provision.sh "qc" "https://github.com/[your-name-here]/catapult-release-management" "~/secrets/configuration-user.yml["settings"]["gpg_key"]" "mysql"`
             7. Click Save
     * **Configure Catapult Project PRODUCTION Plan**
         1. Click the edit icon for the PRODUCTION plan
@@ -338,19 +339,19 @@ Once the Web and Database Servers are up and running, it's then time to configur
         3. Remove all tasks that may have been added by default during initial setup
         4. Click Add task
             1. Search for SSH Task and select it
-            2. Host: `~/configuration.yml["environments"]["production"]["servers"]["redhat"]["ip"]`
+            2. Host: `~/secrets/configuration.yml["environments"]["production"]["servers"]["redhat"]["ip"]`
             3. Username: `root`
             4. Authentication Type: `Key without passphrase`
             5. SSH Key: `~/secrets/id_rsa`
-            6. SSH command: `bash /catapult/provisioners/redhat/provision.sh "production" "https://github.com/[your-name-here]/catapult-release-management" "~/configuration-user.yml["settings"]["gpg_key"]" "apache"`
+            6. SSH command: `bash /catapult/provisioners/redhat/provision.sh "production" "https://github.com/[your-name-here]/catapult-release-management" "~/secrets/configuration-user.yml["settings"]["gpg_key"]" "apache"`
             7. Click Save
         5. Click Add task
             1. Search for SSH Task and select it
-            2. Host: `~/configuration.yml["environments"]["production"]["servers"]["redhat_mysql"]["ip"]`
+            2. Host: `~/secrets/configuration.yml["environments"]["production"]["servers"]["redhat_mysql"]["ip"]`
             3. Username: `root`
             4. Authentication Type: `Key without passphrase`
             5. SSH Key: `~/secrets/id_rsa`
-            6. SSH command: `bash /catapult/provisioners/redhat/provision.sh "production" "https://github.com/your-name-here/catapult-release-management" "~/configuration-user.yml["settings"]["gpg_key"]" "mysql"`
+            6. SSH command: `bash /catapult/provisioners/redhat/provision.sh "production" "https://github.com/your-name-here/catapult-release-management" "~/secrets/configuration-user.yml["settings"]["gpg_key"]" "mysql"`
             7. Click Save
 
 
@@ -425,8 +426,8 @@ The following options are available:
 
 Once you add a new website to configuration.yml, it's time to test in localdev:
 
-  * `vagrant provision ~/configuration.yml["company"]["name"]-dev-redhat`
-  * `vagrant provision ~/configuration.yml["company"]["name"]-dev-redhat-mysql`
+  * `vagrant provision ~/secrets/configuration.yml["company"]["name"]-dev-redhat`
+  * `vagrant provision ~/secrets/configuration.yml["company"]["name"]-dev-redhat-mysql`
 
 Once you're satisfied with new website in localdev, it's time to commit configuration.yml.gpg to your Catapult fork's develop branch, this will kick off a automated deployment of test. Once you're satisfied with the website in test, it's time to create a pull request from your Catapult fork's develop branch into release - once the pull request is merged, this will kick off an automated deployment to qc. Once you're satisfied with the website in qc, it's time to create a pull request from your Catapult fork's release branch into master. Production does not have any automated deployments, to deploy your website to production it's time to login to Bamboo and press the deployment button for production.
 
@@ -444,24 +445,33 @@ Once a website exists in the upstream environments (test, qc, production), autom
 
 
 
+## Develop Websites ##
+
+Once you Provision Websites and it's time to work on a website, there are a few things to consider:
+
+* Using the `software_workflow` flag for `upstream` websites is great, you can develop your code in localDev then have anyone in your company enter content into Drupal, Wordpress, etc. However, in the cercumstance that you absolutely need to move your localDev database `upstream`, it's as easy as saving a .sql dump to your website's repository develop branch under the _sql folder with today's date (following the YYYYMMDD.sql format). You can then `vagrant rebuild` the `~/secrets/configuration.yml["company"]["name"]-test-redhat-mysql` server and it will restore from your new sql dump.
+
+
+
+
 # Troubleshooting #
 
 Below is a list of known limitations with Catapult, if you're still having issues with Catapult, [submit a GitHub Issue](https://github.com/devopsgroup-io/catapult-release-management/issues/new).
 
 * **CloudFlare**
-    * [07-27-2015] If your `~/configuration.yml["websites"]["apache/iis"]["domain"]` is a subdomain (drupal7.devopsgroup.io) the `force_https` option will only work in localdev and production as CloudFlare only supports a first-level subdomain. https://www.cloudflare.com/ssl
+    * [07-27-2015] If your `~/secrets/configuration.yml["websites"]["apache/iis"]["domain"]` is a subdomain (drupal7.devopsgroup.io) the `force_https` option will only work in localdev and production as CloudFlare only supports a first-level subdomain. https://www.cloudflare.com/ssl
 * **DigitalOcean**
     * [09-01-2015] vagrant rebuild was failing with a `The configured shell (config.ssh.shell) is invalid and unable to properly execute commands.` it is due to DigitalOcean's API not re-inserting the SSH key that was originally used during the first vagrant up (creation of the droplet). To rebuild, you must use the DigitalOcean console, run through the first root password reset workflow that was emailed to you, then vi /etc/sudoers and remove the Defaults requiretty line and save and exit. You can then run vagrant provision successfully.
 * **Git**
     * [09-08-2015] Some database dumps exceed 100MB, so it's recommened to use Bitbucket in those instances as Catapult auto-commits database dumps to your website's repository, up to 500MB worth of database dumps or the one, newest database dump. [Bitbucket](https://help.github.com/articles/what-is-my-disk-quota/) has a 2GB hard repo push limit with no documented file limit and [GitHub](https://help.github.com/articles/what-is-my-disk-quota/) has a 1GB soft repo limit with a 100MB file size limit.
 * **monitor.us**
-    * [08-10-2015] If your `~/configuration.yml["websites"]["apache/iis"]["domain"]` includes the `force_https` option, you will need to login to monitor.us and enable SNI from Monitors > Monitor List > Actions > Basic Settings > Enable SNI support. 
+    * [08-10-2015] If your `~/secrets/configuration.yml["websites"]["apache/iis"]["domain"]` includes the `force_https` option, you will need to login to monitor.us and enable SNI from Monitors > Monitor List > Actions > Basic Settings > Enable SNI support. 
 * **Vagrant**
-    * [07-27-2015] If your `~/configuration.yml["websites"]["apache/iis"]["domain"]` includes the `force_https` option, during `vagrant status` you will receive an err for the http response code for `.dev` as this is a self-signed cert and not routing through CloudFlare.
+    * [07-27-2015] If your `~/secrets/configuration.yml["websites"]["apache/iis"]["domain"]` includes the `force_https` option, during `vagrant status` you will receive an err for the http response code for `.dev` as this is a self-signed cert and not routing through CloudFlare.
 
 
 
-# Service Justification #
+# Services Justification #
 
 Catapult uses many factors to make the best decision when it comes to choosing **Services**, the following are taken into account - popularity, cost, API support, and user experience. The following is an outline of what we think the common questions may be when you see Catapult using a particular **Service**. Have your own perspective? [Let us know](https://github.com/devopsgroup-io/catapult-release-management/issues/new).
 
