@@ -1406,7 +1406,7 @@ Vagrant.configure("2") do |config|
 
   # redhat localdev servers
   config.vm.define "#{configuration["company"]["name"].downcase}-dev-redhat" do |config|
-    config.vm.box = "chef/centos-7.0"
+    config.vm.box = "puppetlabs/centos-7.0-64-nocm"
     config.vm.network "private_network", ip: configuration["environments"]["dev"]["servers"]["redhat"]["ip"]
     config.vm.network "forwarded_port", guest: 80, host: configuration["environments"]["dev"]["servers"]["redhat"]["port_80"]
     config.vm.provider :virtualbox do |provider|
@@ -1422,7 +1422,7 @@ Vagrant.configure("2") do |config|
     config.vm.provision "shell", path: "provisioners/redhat/provision.sh", args: ["dev","#{repo}","#{configuration_user["settings"]["gpg_key"]}","apache","#{configuration_user["settings"]["software_validation"]}"]
   end
   config.vm.define "#{configuration["company"]["name"].downcase}-dev-redhat-mysql" do |config|
-    config.vm.box = "chef/centos-7.0"
+    config.vm.box = "puppetlabs/centos-7.0-64-nocm"
     config.vm.network "private_network", ip: configuration["environments"]["dev"]["servers"]["redhat_mysql"]["ip"]
     config.vm.provider :virtualbox do |provider|
       provider.memory = 512
