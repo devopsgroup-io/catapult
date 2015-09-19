@@ -88,6 +88,15 @@ class String
 end
 
 
+# locking in order to prevent multiple executions occurring at once (e.g. competing command line and Bamboo executions)
+if File.exist?('.lock')
+  catapult_exception("The .lock file is present in this directory. This indicates that another process, such as provisioning, may be"\
+    " under way in another session or that a process ended unexpectedly. Once verifying that no conflict exists,"\
+    " remove the .lock file and try again.")
+end
+FileUtils.touch('.lock')
+
+
 # check for an internet connection
 dns_resolver = Resolv::DNS.new()
 begin
@@ -1215,6 +1224,10 @@ windowshostsfile = Array.new
     windowshostsfile.push("www.dev.#{instance["domain"]}")
   end
 end
+
+
+# remove lock file
+File.delete('.lock')
 
 
 # vagrant status binding
