@@ -82,5 +82,3 @@ fi
 sudo iptables --policy INPUT DROP
 # output the iptables
 sudo iptables --list
-# persist the iptables rules and policies
-sudo /sbin/service iptables save
