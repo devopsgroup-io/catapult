@@ -205,6 +205,10 @@ staged = `#{git} diff --name-only --staged --word-diff=porcelain`
 staged = staged.split($/)
 
 if "#{branch}" == "develop-catapult"
+  unless staged.include?("VERSION.yml")
+    puts "Please increment the version in VERSION.yml for every commit, see http://semver.org/ for more information."
+    exit 1
+  end
   if staged.include?("secrets/configuration.yml.gpg")
     puts "Please commit secrets/configuration.yml.gpg on the develop branch. You are on the develop-catapult branch, which is meant for contribution back to Catapult and should not contain your configuration files."
     exit 1
