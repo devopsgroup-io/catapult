@@ -350,11 +350,8 @@ echo -e "\n==> completed in ($(($end - $start)) seconds)"
 
 echo -e "\n\n\n==> Restarting Apache"
 start=$(date +%s)
-sudo apachectl graceful
-# sometimes there are zombie processes left over, httpd graceful cleans this up properly? (service httpd only supports start|stop|restart)
-sudo service httpd graceful
-sudo service httpd configtest
-sudo systemctl is-active httpd.service
+sudo systemctl reload httpd.service
+sudo systemctl status httpd.service
 end=$(date +%s)
 echo -e "\n==> completed in ($(($end - $start)) seconds)"
 
