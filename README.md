@@ -50,6 +50,7 @@ Catapult manages all of this for you through an open-source and well-documented 
 - [Services Justification](#services-justification)
 - [Contributing](#contributing)
     - [Releases](#releases)
+- [Community](#community)
 
 
 
@@ -511,3 +512,30 @@ In addition, the release will be prefaced with a `v` (v1.0.0) to conform standar
 During a new release, the version number in VERSION.yml will be incremented and tagged with the same version number along with a [GitHub Release](https://help.github.com/articles/about-releases/).
 
 See http://semver.org/spec/v2.0.0.html for more information.
+
+
+
+# Community #
+
+
+
+## Conferences ##
+
+Catapult is making the conference tour! We plan to attend the following the conferences, with more to come. Get a chance to see Catapult in action, presented by it's core developers.
+
+* Spring 2016 [04-08-2016] [Drupaldelphia](http://drupaldelphia.com/)
+* Summer 2016 [Wharton Web Conference](http://www.sas.upenn.edu/wwc/)
+* Winter 2016 [WordCamp US](http://us.wordcamp.org/)
+
+
+
+## Local Events ##
+
+Catapult will also be seen throughout local meetups in the Philadelphia and Greater Philadelphia area! Get a chance to meet the team and engage at a personal level.
+
+* [Philly Tech Meetup](http://www.meetup.com/philly-tech/) 4k+ technologists
+* [Princeton Tech ](http://www.meetup.com/Princeton-Tech/) 3.5k+ technologists
+* [Technical.ly Philly](http://www.meetup.com/Technically-Philly/) 3k+
+* [Philadelphia WordPress Meetup Group](http://www.meetup.com/philadelphia-wordpress-meetup-group/) 1.5k+ technologists
+* [Philly DevOps](http://www.meetup.com/PhillyDevOps/) 700+ technologists
+* [Greater Philadelphia Drupal Meetup Group](http://www.meetup.com/drupaldelphia/) 500+ technologists
