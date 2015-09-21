@@ -56,7 +56,6 @@ echo -e "\n==> completed in ($(($end - $start)) seconds)"
 
 echo -e "\n\n\n==> Installing Apache"
 start=$(date +%s)
-# install httpd
 sudo yum install -y httpd
 sudo systemctl enable httpd.service
 sudo systemctl start httpd.service
@@ -83,13 +82,6 @@ echo -e "\n==> completed in ($(($end - $start)) seconds)"
 echo -e "\n\n\n==> Generating software database config files"
 start=$(date +%s)
 source /catapult/provisioners/redhat/modules/software_database_config.sh
-end=$(date +%s)
-echo -e "\n==> completed in ($(($end - $start)) seconds)"
-
-
-echo -e "\n\n\n==> Configuring CloudFlare"
-start=$(date +%s)
-source /catapult/provisioners/redhat/modules/cloudflare.sh
 end=$(date +%s)
 echo -e "\n==> completed in ($(($end - $start)) seconds)"
 
@@ -352,6 +344,13 @@ echo -e "\n\n\n==> Restarting Apache"
 start=$(date +%s)
 sudo systemctl reload httpd.service
 sudo systemctl status httpd.service
+end=$(date +%s)
+echo -e "\n==> completed in ($(($end - $start)) seconds)"
+
+
+echo -e "\n\n\n==> Configuring CloudFlare"
+start=$(date +%s)
+source /catapult/provisioners/redhat/modules/cloudflare.sh
 end=$(date +%s)
 echo -e "\n==> completed in ($(($end - $start)) seconds)"
 
