@@ -343,6 +343,12 @@ echo -e "\n==> completed in ($(($end - $start)) seconds)"
 echo -e "\n\n\n==> Restarting Apache"
 start=$(date +%s)
 sudo systemctl reload httpd.service
+if [ $? -eq 0 ]; then
+  echo "'sudo systemctl reload httpd.service' was successful"
+else
+  echo "'sudo systemctl reload httpd.service' was unsuccessful, trying 'sudo apachectl -k graceful'"
+  sudo apachectl -k graceful
+fi
 sudo systemctl status httpd.service
 end=$(date +%s)
 echo -e "\n==> completed in ($(($end - $start)) seconds)"
