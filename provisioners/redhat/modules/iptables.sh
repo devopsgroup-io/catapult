@@ -1,5 +1,13 @@
-redhat_ip="$(echo "${configuration}" | shyaml get-value environments.${1}.servers.redhat.ip)"
+if [ "${1}" == "dev" ]; then
+    redhat_ip="$(echo "${configuration}" | shyaml get-value environments.${1}.servers.redhat.ip)"
+else
+    redhat_ip="$(echo "${configuration}" | shyaml get-value environments.${1}.servers.redhat.ip_private)"
+fi
 
+# establish default policies
+sudo iptables --policy INPUT ACCEPT
+sudo iptables --policy FORWARD ACCEPT
+sudo iptables --policy OUTPUT ACCEPT
 # remove all rules
 sudo iptables --flush
 # we're not a router
@@ -73,4 +81,4 @@ fi
 # now that everything is configured, we drop everything else (drop does not send any return packets, reject does)
 sudo iptables --policy INPUT DROP
 # output the iptables
-sudo iptables --list
+sudo iptables --list-rules

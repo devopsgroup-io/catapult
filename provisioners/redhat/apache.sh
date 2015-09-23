@@ -19,7 +19,7 @@ echo -e "\n==> completed in ($(($end - $start)) seconds)"
 
 echo -e "\n\n\n==> Configuring IPTables"
 start=$(date +%s)
-#source /catapult/provisioners/redhat/modules/iptables.sh
+source /catapult/provisioners/redhat/modules/iptables.sh
 end=$(date +%s)
 echo -e "\n==> completed in ($(($end - $start)) seconds)"
 
@@ -56,7 +56,6 @@ echo -e "\n==> completed in ($(($end - $start)) seconds)"
 
 echo -e "\n\n\n==> Installing Apache"
 start=$(date +%s)
-# install httpd
 sudo yum install -y httpd
 sudo systemctl enable httpd.service
 sudo systemctl start httpd.service
@@ -83,13 +82,6 @@ echo -e "\n==> completed in ($(($end - $start)) seconds)"
 echo -e "\n\n\n==> Generating software database config files"
 start=$(date +%s)
 source /catapult/provisioners/redhat/modules/software_database_config.sh
-end=$(date +%s)
-echo -e "\n==> completed in ($(($end - $start)) seconds)"
-
-
-echo -e "\n\n\n==> Configuring CloudFlare"
-start=$(date +%s)
-source /catapult/provisioners/redhat/modules/cloudflare.sh
 end=$(date +%s)
 echo -e "\n==> completed in ($(($end - $start)) seconds)"
 
@@ -350,11 +342,21 @@ echo -e "\n==> completed in ($(($end - $start)) seconds)"
 
 echo -e "\n\n\n==> Restarting Apache"
 start=$(date +%s)
-sudo apachectl graceful
-# sometimes there are zombie processes left over, httpd graceful cleans this up properly? (service httpd only supports start|stop|restart)
-sudo service httpd graceful
-sudo service httpd configtest
-sudo systemctl is-active httpd.service
+sudo systemctl reload httpd.service
+if [ $? -eq 0 ]; then
+  echo "'sudo systemctl reload httpd.service' was successful"
+else
+  echo "'sudo systemctl reload httpd.service' was unsuccessful, trying 'sudo apachectl -k graceful'"
+  sudo apachectl -k graceful
+fi
+sudo systemctl status httpd.service
+end=$(date +%s)
+echo -e "\n==> completed in ($(($end - $start)) seconds)"
+
+
+echo -e "\n\n\n==> Configuring CloudFlare"
+start=$(date +%s)
+source /catapult/provisioners/redhat/modules/cloudflare.sh
 end=$(date +%s)
 echo -e "\n==> completed in ($(($end - $start)) seconds)"
 

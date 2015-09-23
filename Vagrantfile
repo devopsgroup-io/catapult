@@ -44,6 +44,7 @@ def catapult_exception(error)
     puts "\n"
     puts "Please correct the error then re-run your vagrant command."
     puts "See https://github.com/devopsgroup-io/catapult-release-management for more information."
+    File.delete('.lock')
     exit 1
   end
 end
@@ -86,6 +87,13 @@ class String
       return color + self + Colors::NOCOLOR
    end
 end
+
+
+# locking in order to prevent multiple executions occurring at once (e.g. competing command line and Bamboo executions)
+if File.exist?('.lock')
+  catapult_exception("The .lock file is present in this directory. This indicates that another process, such as provisioning, may be under way in another session or that a process ended unexpectedly. Once verifying that no conflict exists, remove the .lock file and try again.")
+end
+FileUtils.touch('.lock')
 
 
 # check for an internet connection
@@ -196,6 +204,10 @@ staged = `#{git} diff --name-only --staged --word-diff=porcelain`
 staged = staged.split($/)
 
 if "#{branch}" == "develop-catapult"
+  unless staged.include?("VERSION.yml")
+    puts "Please increment the version in VERSION.yml for every commit, see http://semver.org/ for more information."
+    exit 1
+  end
   if staged.include?("secrets/configuration.yml.gpg")
     puts "Please commit secrets/configuration.yml.gpg on the develop branch. You are on the develop-catapult branch, which is meant for contribution back to Catapult and should not contain your configuration files."
     exit 1
@@ -1217,6 +1229,10 @@ windowshostsfile = Array.new
 end
 
 
+# remove lock file
+File.delete('.lock')
+
+
 # vagrant status binding
 if ["status"].include?(ARGV[0])
   totalwebsites = 0
@@ -1228,7 +1244,7 @@ if ["status"].include?(ARGV[0])
   puts "\n[cert signature algorithm]"
   puts " * https://www.openssl.org/docs/apps/ciphers.html"
   puts "\nAvailable websites:".color(Colors::WHITE)
-  puts "".ljust(42) + "[software]".ljust(14) + "[alexa rank, 3m delta]".ljust(24) + "[dev.]".ljust(22) + "[test.]".ljust(22) + "[qc.]".ljust(22) + "[production / cert expiry, signature algorithm, common name]".ljust(80)
+  puts "".ljust(42) + "[software]".ljust(14) + "[alexa rank, 3m delta]".ljust(24) + "[dev.]".ljust(21) + "[test.]".ljust(21) + "[qc.]".ljust(21) + "[production / cert expiry, signature algorithm, common name]"
 
   configuration["websites"].each do |service,data|
     if configuration["websites"]["#{service}"] == nil
@@ -1406,7 +1422,7 @@ Vagrant.configure("2") do |config|
 
   # redhat localdev servers
   config.vm.define "#{configuration["company"]["name"].downcase}-dev-redhat" do |config|
-    config.vm.box = "chef/centos-7.0"
+    config.vm.box = "puppetlabs/centos-7.0-64-nocm"
     config.vm.network "private_network", ip: configuration["environments"]["dev"]["servers"]["redhat"]["ip"]
     config.vm.network "forwarded_port", guest: 80, host: configuration["environments"]["dev"]["servers"]["redhat"]["port_80"]
     config.vm.provider :virtualbox do |provider|
@@ -1422,7 +1438,7 @@ Vagrant.configure("2") do |config|
     config.vm.provision "shell", path: "provisioners/redhat/provision.sh", args: ["dev","#{repo}","#{configuration_user["settings"]["gpg_key"]}","apache","#{configuration_user["settings"]["software_validation"]}"]
   end
   config.vm.define "#{configuration["company"]["name"].downcase}-dev-redhat-mysql" do |config|
-    config.vm.box = "chef/centos-7.0"
+    config.vm.box = "puppetlabs/centos-7.0-64-nocm"
     config.vm.network "private_network", ip: configuration["environments"]["dev"]["servers"]["redhat_mysql"]["ip"]
     config.vm.provider :virtualbox do |provider|
       provider.memory = 512
