@@ -44,6 +44,7 @@ def catapult_exception(error)
     puts "\n"
     puts "Please correct the error then re-run your vagrant command."
     puts "See https://github.com/devopsgroup-io/catapult-release-management for more information."
+    File.delete('.lock')
     exit 1
   end
 end
@@ -90,9 +91,7 @@ end
 
 # locking in order to prevent multiple executions occurring at once (e.g. competing command line and Bamboo executions)
 if File.exist?('.lock')
-  catapult_exception("The .lock file is present in this directory. This indicates that another process, such as provisioning, may be"\
-    " under way in another session or that a process ended unexpectedly. Once verifying that no conflict exists,"\
-    " remove the .lock file and try again.")
+  catapult_exception("The .lock file is present in this directory. This indicates that another process, such as provisioning, may be under way in another session or that a process ended unexpectedly. Once verifying that no conflict exists, remove the .lock file and try again.")
 end
 FileUtils.touch('.lock')
 
