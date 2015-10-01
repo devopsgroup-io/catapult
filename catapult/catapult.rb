@@ -162,38 +162,34 @@ module Catapult
         `#{@git} remote rm upstream`
         `#{@git} remote add upstream #{repo_upstream_url}`
       end
-      # create and confirm branches, and sync from catapult core
+      # get a list of branches from origin
       @branches = `#{@git} ls-remote #{@repo}`.split(/\n/).reject(&:empty?)
-      def Command::branch_management(branch)
-        puts "\n * Configuring #{branch} branch:\n\n"
-        if @branches.find { |element| element.include?("refs/heads/#{branch}") }
-          if "#{branch}" == "develop-catapult"
-            `#{@git} checkout -- secrets/configuration.yml.gpg`
-            `#{@git} checkout -- secrets/id_rsa.gpg`
-            `#{@git} checkout -- secrets/id_rsa.pub.gpg`
-          end
-          `#{@git} checkout #{branch}`
-          `#{@git} pull origin #{branch}`
-          `#{@git} pull upstream master`
-          `#{@git} push origin #{branch}`
-        else
-          `#{@git} fetch upstream`
-          `#{@git} checkout -b #{branch} --track upstream/master`
-          `#{@git} pull upstream master`
-          `#{@git} push origin #{branch}`
-        end
+      # halt if there is no master branch
+      if not @branches.find { |element| element.include?("refs/heads/master") }
+        catapult_exception("Cannot find the master branch for your Catapult's fork, please fork again or manually correct.")
       end
-      branch_management("develop-catapult")
-      branch_management("develop")
-      # create the release branch if it does not exist
+      # create the release branch if it does not yet exist
       if not @branches.find { |element| element.include?("refs/heads/release") }
-        `#{@git} checkout release`
+        `#{@git} checkout master`
+        `#{@git} checkout -b release`
         `#{@git} push origin release`
       end
-      # checkout original branch
-      `#{@git} checkout #{branch}`
-      # if on the release or master branch, stop user
-      if "#{branch}" == "release" || "#{branch}" == "master"
+      # create the develop branch if it does not yet exist
+      if not @branches.find { |element| element.include?("refs/heads/develop") }
+        `#{@git} fetch upstream`
+        `#{@git} checkout -b develop --track upstream/master`
+        `#{@git} pull upstream master`
+        `#{@git} push origin develop`
+      end
+      # create the develop-catapult branch if it does not yet exist
+      if not @branches.find { |element| element.include?("refs/heads/develop-catapult") }
+        `#{@git} fetch upstream`
+        `#{@git} checkout -b develop-catapult --track upstream/master`
+        `#{@git} pull upstream master`
+        `#{@git} push origin develop-catapult`
+      end
+      # if on the master or release branch, stop user
+      if "#{branch}" == "master" || "#{branch}" == "release"
         catapult_exception(""\
           "You are on the #{branch} branch, all interaction should be done from either the develop or develop-catapult branch."\
           " * The develop branch is running in test"\
@@ -202,8 +198,44 @@ module Catapult
           "To move your configuration from environment to environment, create pull requests (develop => release, release => master)."\
         "")
       end
+      puts "\n * Configuring the #{branch} branch:\n\n"
+      # if on the develop branch, update from catapult core
+      if "#{branch}" == "develop"
+        `#{@git} pull origin develop`
+        # only self update from catapult core if the same MAJOR
+        `#{@git} fetch upstream`
+        @version_this = YAML.load_file("VERSION.yml")
+        @version_this_integer = @version_this["version"].to_i
+        @version_upstream = YAML.load(`#{@git} show upstream/master:VERSION.yml`)
+        @version_upstream_integer = @version_upstream["version"].to_i
+        if @version_upstream_integer > @version_this_integer
+          puts "\n"
+          puts "#{@version_upstream["major"]["notice"]}".color(Colors::RED)
+          puts "#{@version_upstream["major"]["description"]}".color(Colors::YELLOW)
+          puts "* This Catapult instance is version #{@version_this["version"]}"
+          puts "* Catapult version #{@version_upstream["version"]} is available"
+          puts "The upgrade path from MAJOR version #{@version_this["version"].to_i} to #{@version_upstream["version"].to_i} is:"
+          puts "* #{@version_upstream["major"][@version_upstream_integer][@version_this_integer]}"
+          puts "\n"
+        else
+          `#{@git} pull upstream master`
+          `#{@git} push origin develop`
+        end
+      end
+      # if on the develop-catapult branch, update from catapult core, and checkout secrets from develop
+      if "#{branch}" == "develop-catapult"
+        `#{@git} checkout develop -- secrets/configuration.yml.gpg`
+        `#{@git} checkout develop -- secrets/id_rsa.gpg`
+        `#{@git} checkout develop -- secrets/id_rsa.pub.gpg`
+        `#{@git} reset HEAD secrets/configuration.yml.gpg`
+        `#{@git} reset HEAD secrets/id_rsa.gpg`
+        `#{@git} reset HEAD secrets/id_rsa.pub.gpg`
+        `#{@git} pull origin develop-catapult`
+        `#{@git} pull upstream master`
+        `#{@git} push origin develop-catapult`
+      end
     end
-    # create a git pre-commit hook to ensure no configuration is committed to develop-catapult
+    # create a git pre-commit hook to ensure only configuration is committed to only the develop branch
     FileUtils.mkdir_p(".git/hooks")
     File.write('.git/hooks/pre-commit',
     '#!/usr/bin/env ruby

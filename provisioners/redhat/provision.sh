@@ -24,7 +24,7 @@ echo "  | | |____| | ++ |_________________| | ++ |    "
 echo "   \_\__/   \_\__/          \_\__/   \_\__/     "
 
 
-echo -e "\n\n\n==> System Information"
+echo -e "\n\n\n==> SYSTEM INFORMATION"
 echo -e "CPU"
 cat /proc/cpuinfo | grep 'model name' | cut -d: -f2 | awk 'NR==1' | tr -d " "
 echo -e "$(top -bn 1 | awk '{print $9}' | tail -n +8 | awk '{s+=$1} END {print s}')% utilization"
@@ -36,9 +36,20 @@ echo -e "\nRAM"
 free -h
 
 
-echo -e "\n\n\n==> Receiving your Catapult Instance"
+echo -e "\n\n\n==> RECEIVING CATAPULT"
+# update packages
+sudo yum update -y
+# install shyaml
+sudo easy_install pip
+sudo pip install --upgrade pip
+sudo pip install shyaml --upgrade
 # install git
 sudo yum install -y git
+# initialize known_hosts
+sudo mkdir -p ~/.ssh
+sudo touch ~/.ssh/known_hosts
+sudo ssh-keyscan -T 10 bitbucket.org > ~/.ssh/known_hosts
+sudo ssh-keyscan -T 10 github.com >> ~/.ssh/known_hosts
 # clone and pull catapult
 if ([ $1 = "dev" ] || [ $1 = "test" ]); then
     branch="develop"
@@ -63,12 +74,50 @@ else
     fi
 fi
 
-# kick off instance provisioner
+
+# provision server
+# @todo standardize apache/mysql to match server name?
 if [ "${4}" = "apache" ]; then
-    bash /catapult/provisioners/redhat/apache.sh $1 $2 $3 $4 | tee -a /catapult/provisioners/redhat/logs/apache.log
+
+    provisionstart=$(date +%s)
+    echo -e "\n\n\n==> PROVISION: apache"
+
+    cat "/catapult/provisioners/provisioners.yml" | shyaml get-values-0 redhat.servers.redhat.modules |
+    while read -r -d $'\0' key value; do
+        start=$(date +%s)
+        echo -e "\n\n\n==> MODULE: ${key}"
+        echo -e "==> DESCRIPTION: $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-value redhat.modules.$key.description)"
+        bash "/catapult/provisioners/redhat/modules/${key}.sh" $1 $2 $3 $4
+        end=$(date +%s)
+        echo -e "==> MODULE: ${key}"
+        echo -e "==> DURATION: $(($end - $start)) seconds"
+    done
+
+    provisionend=$(date +%s)
+    echo -e "\n\n\n==> PROVISION: apache"
+    echo -e "==> DURATION: $(($provisionend - $provisionstart)) total seconds"
+
 elif [ "${4}" = "mysql" ]; then
-    bash /catapult/provisioners/redhat/mysql.sh $1 $2 $3 $4 | tee -a /catapult/provisioners/redhat/logs/mysql.log
+
+    provisionstart=$(date +%s)
+    echo -e "\n\n\n==> PROVISION: mysql"
+
+    cat "/catapult/provisioners/provisioners.yml" | shyaml get-values-0 redhat.servers.redhat_mysql.modules |
+    while read -r -d $'\0' key value; do
+        start=$(date +%s)
+        echo -e "\n\n\n==> MODULE: ${key}"
+        echo -e "==> DESCRIPTION: $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-value redhat.modules.$key.description)"
+        bash "/catapult/provisioners/redhat/modules/${key}.sh" $1 $2 $3 $4
+        end=$(date +%s)
+        echo -e "==> MODULE: ${key}"
+        echo -e "==> DURATION: $(($end - $start)) seconds"
+    done
+
+    provisionend=$(date +%s)
+    echo -e "\n\n\n==> PROVISION: mysql"
+    echo -e "==> DURATION: $(($provisionend - $provisionstart)) total seconds"
+
 else
-    "Error: Cannot detect the instance type."
+    "Error: Cannot detect the server type."
     exit 1
 fi

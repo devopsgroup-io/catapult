@@ -1,0 +1,31 @@
+---
+redhat:
+    modules:
+        apache:
+          description: "Installs and configures Apache HTTP daemon, then configures virtual hosts for websites."
+        catapult:
+          description: "Decrypts Catapult secrets."
+        cloudflare:
+          description: "Configures DNS via the CloudFlare API for websites."
+        git:
+          description: "Clones Git repositories for websites."
+        iptables:
+          description: "Configures firewall via IPTables to only allow necessary traffic."
+        mysql:
+          description: "Installs and configures MariaDB server, then configures databases for websites with software."
+        rsync:
+          description: "Copies meta files contingent on the software_workflow for websites with software."
+        software_database_config:
+          description: "Creates database connection files for websites with software."
+        software_tools:
+          description: "Installs and configures software CLI tools."
+        system:
+          description: "Installs and configures initial system requirements."
+        time:
+          description: "Installs and configures NTP daemon based on the company timezone."
+    servers:
+        redhat:
+            modules: ["system","iptables","time","software_tools","git","rsync","software_database_config","apache","cloudflare"]
+        redhat_mysql:
+            modules: ["system","iptables","time","software_tools","git","rsync","software_database_config","mysql"]
+windows:

@@ -501,7 +501,7 @@ When you first setup Catapult a `develop-catapult` branch is created for you und
 
 ## Releases ##
 
-Releases are driven by the devopsgroup.io team and occur when accepting new pull requests from contributors like you. Releases follow Semantic Versioning 2.0.0., given a version number MAJOR.MINOR.PATCH, increment the:
+Releases are driven by the devopsgroup.io team and occur when accepting new pull requests from contributors like you. Releases follow Semantic Versioning 2.0.0, given a version number MAJOR.MINOR.PATCH, increment the:
 
 1. MAJOR version when you make incompatible API changes,
 2. MINOR version when you add functionality in a backwards-compatible manner, and

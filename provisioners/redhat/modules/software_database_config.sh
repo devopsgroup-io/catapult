@@ -1,3 +1,5 @@
+source "/catapult/provisioners/redhat/modules/catapult.sh"
+
 mysql_user="$(echo "${configuration}" | shyaml get-value environments.${1}.servers.redhat_mysql.mysql.user)"
 mysql_user_password="$(echo "${configuration}" | shyaml get-value environments.${1}.servers.redhat_mysql.mysql.user_password)"
 mysql_root_password="$(echo "${configuration}" | shyaml get-value environments.${1}.servers.redhat_mysql.mysql.root_password)"

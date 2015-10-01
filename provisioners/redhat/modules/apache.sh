@@ -1,3 +1,5 @@
+source "/catapult/provisioners/redhat/modules/catapult.sh"
+
 # install apache
 sudo yum install -y httpd
 sudo systemctl enable httpd.service

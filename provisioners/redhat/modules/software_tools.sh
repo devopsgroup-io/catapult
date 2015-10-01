@@ -1,3 +1,6 @@
+source "/catapult/provisioners/redhat/modules/catapult.sh"
+
+# install drush dependancies
 sudo yum install -y php-cli
 sudo yum install -y php-dom
 sudo yum install -y php-mysql

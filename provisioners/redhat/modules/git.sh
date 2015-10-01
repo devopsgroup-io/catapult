@@ -1,3 +1,5 @@
+source "/catapult/provisioners/redhat/modules/catapult.sh"
+
 # remove directories from /var/www/repositories/apache/ that no longer exist in configuration
 # create an array of domains
 while IFS='' read -r -d '' key; do
@@ -16,12 +18,6 @@ for directory in /var/www/repositories/apache/*/; do
         fi
     fi
 done
-
-# initialize known_hosts
-sudo mkdir -p ~/.ssh
-sudo touch ~/.ssh/known_hosts
-sudo ssh-keyscan bitbucket.org > ~/.ssh/known_hosts
-sudo ssh-keyscan github.com >> ~/.ssh/known_hosts
 
 # clone/pull repositories into /var/www/repositories/apache/
 while IFS='' read -r -d '' key; do
