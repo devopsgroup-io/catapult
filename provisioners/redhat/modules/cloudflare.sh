@@ -1,3 +1,5 @@
+source "/catapult/provisioners/redhat/modules/catapult.sh"
+
 if [ "$1" = "dev" ]; then
 
     echo -e "\t * skipping cloudflare as global dns is not required in dev..."

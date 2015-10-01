@@ -1,1 +1,19 @@
-version: 1.11.2
+---
+version: 2.0.0
+major:
+    description: "Catapult uses Semantic Versioning. During a MAJOR increment, incompatable API changes are made which require a manual upgrade path. Please follow these directions:"
+    notice: "NEW MAJOR VERSION OF CATAPULT AVAILABLE"
+    5:
+        4:
+        3:
+        2:
+        1:
+    4:
+        3:
+        2:
+        1:
+    3:
+        2:
+        1:
+    2:
+        1: "~/provisioners/redhat/apache.sh and ~/provisioners/redhat/mysql.sh were replaced by the provisioner system. The first time that an existing server receives Catapult v2, the build will fail, and will need to be started again."

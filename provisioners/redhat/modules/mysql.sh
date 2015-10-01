@@ -1,3 +1,5 @@
+source "/catapult/provisioners/redhat/modules/catapult.sh"
+
 # install mariadb
 sudo yum -y install mariadb mariadb-server
 sudo systemctl enable mariadb.service

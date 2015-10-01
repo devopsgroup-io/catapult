@@ -1,3 +1,5 @@
+source "/catapult/provisioners/redhat/modules/catapult.sh"
+
 # only allow authentication via ssh key pair
 # suppress this - There were 34877 failed login attempts since the last successful login.
 echo -e "$(lastb | head -n -2 | wc -l) failed login attempts"
@@ -11,21 +13,6 @@ if ! grep -q "PubkeyAuthentication yes" "/etc/ssh/sshd_config"; then
    sudo bash -c 'echo "PubkeyAuthentication yes" >> /etc/ssh/sshd_config'
 fi
 sudo systemctl reload sshd.service
-
-# update packages
-sudo yum update -y
-
-# parse yaml
-sudo easy_install pip
-sudo pip install --upgrade pip
-sudo pip install shyaml --upgrade
-configuration=$(gpg --batch --passphrase ${3} --decrypt /catapult/secrets/configuration.yml.gpg)
-gpg --verbose --batch --yes --passphrase ${3} --output /catapult/secrets/id_rsa --decrypt /catapult/secrets/id_rsa.gpg
-gpg --verbose --batch --yes --passphrase ${3} --output /catapult/secrets/id_rsa.pub --decrypt /catapult/secrets/id_rsa.pub.gpg
-
-# ssh keys are required to be 700
-chmod 700 /catapult/secrets/id_rsa
-chmod 700 /catapult/secrets/id_rsa.pub
 
 # send root's mail as company email
 sudo cat > "/root/.forward" << EOF

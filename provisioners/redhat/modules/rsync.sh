@@ -1,3 +1,5 @@
+source "/catapult/provisioners/redhat/modules/catapult.sh"
+
 if [ "${1}" == "dev" ]; then
     test_redhat_ip="$(echo "${configuration}" | shyaml get-value environments.test.servers.redhat.ip)"
     production_redhat_ip="$(echo "${configuration}" | shyaml get-value environments.production.servers.redhat.ip)"
