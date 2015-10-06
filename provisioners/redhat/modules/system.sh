@@ -20,7 +20,7 @@ sudo cat > "/root/.forward" << EOF
 EOF
 
 # send an email with catapult stack
-if [ "$1" != "dev" ]; then
+if [ "$1" = "production" ]; then
     sudo touch /tmp/email.txt
     sudo echo -e "Subject: Catapult ($(echo "${configuration}" | shyaml get-value company.name)) - Environment Update" >> /tmp/email.txt
     sudo echo -e "\n" >> /tmp/email.txt
