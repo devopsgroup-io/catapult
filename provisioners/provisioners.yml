@@ -3,29 +3,42 @@ redhat:
     modules:
         apache:
           description: "Installs and configures Apache HTTP daemon, then configures virtual hosts for websites."
+          configuration: true
         catapult:
           description: "Decrypts Catapult secrets."
         cloudflare:
           description: "Configures DNS via the CloudFlare API for websites."
+          configuration: true
+        cloudflare_cache:
+          description: "Clears CloudFlare cache for websites."
+          configuration: false
         git:
           description: "Clones Git repositories for websites."
+          configuration: false
         iptables:
           description: "Configures firewall via IPTables to only allow necessary traffic."
+          configuration: false
         mysql:
           description: "Installs and configures MariaDB server, then configures databases for websites with software."
+          configuration: false
         rsync:
           description: "Copies meta files contingent on the software_workflow for websites with software."
+          configuration: false
         software_config:
           description: "Creates database configuration files and sets upload directory permissions for websites with software."
+          configuration: false
         software_tools:
           description: "Installs and configures software CLI tools."
+          configuration: false
         system:
           description: "Installs and configures initial system requirements."
+          configuration: false
         time:
           description: "Installs and configures NTP daemon based on the company timezone."
+          configuration: false
     servers:
         redhat:
-            modules: ["system","iptables","time","software_tools","git","rsync","software_config","apache","cloudflare"]
+            modules: ["system","iptables","time","software_tools","git","rsync","software_config","apache","cloudflare","cloudflare_cache"]
         redhat_mysql:
             modules: ["system","iptables","time","software_tools","git","rsync","software_config","mysql"]
 windows:
