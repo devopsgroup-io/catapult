@@ -15,8 +15,8 @@ redhat:
           description: "Installs and configures MariaDB server, then configures databases for websites with software."
         rsync:
           description: "Copies meta files contingent on the software_workflow for websites with software."
-        software_database_config:
-          description: "Creates database connection files for websites with software."
+        software_config:
+          description: "Creates database configuration files and sets upload directory permissions for websites with software."
         software_tools:
           description: "Installs and configures software CLI tools."
         system:
@@ -25,7 +25,7 @@ redhat:
           description: "Installs and configures NTP daemon based on the company timezone."
     servers:
         redhat:
-            modules: ["system","iptables","time","software_tools","git","rsync","software_database_config","apache","cloudflare"]
+            modules: ["system","iptables","time","software_tools","git","rsync","software_config","apache","cloudflare"]
         redhat_mysql:
-            modules: ["system","iptables","time","software_tools","git","rsync","software_database_config","mysql"]
+            modules: ["system","iptables","time","software_tools","git","rsync","software_config","mysql"]
 windows:

@@ -18,6 +18,7 @@ while IFS='' read -r -d '' key; do
     software_dbprefix=$(echo "$key" | grep -w "software_dbprefix" | cut -d ":" -f 2 | tr -d " ")
     webroot=$(echo "$key" | grep -w "webroot" | cut -d ":" -f 2 | tr -d " ")
 
+    # generate database config files
     if [ -z "${software}" ]; then
         echo -e "\t * no database configuration file needed, skipping..."
     elif [ "${software}" = "codeigniter2" ]; then
@@ -71,6 +72,29 @@ while IFS='' read -r -d '' key; do
         fi
         sed -e "s/\$config\['db'\]\['host'\]\s=\s'localhost';/\$config\['db'\]\['host'\] = '${redhat_mysql_ip}';/g" -e "s/\$config\['db'\]\['username'\]\s=\s'';/\$config\['db'\]\['username'\] = '${mysql_user}';/g" -e "s/\$config\['db'\]\['password'\]\s=\s'';/\$config\['db'\]\['password'\] = '${mysql_user_password}';/g" -e "s/\$config\['db'\]\['dbname'\]\s=\s'';/\$config\['db'\]\['dbname'\] = '${1}_${domainvaliddbname}';/g" /catapult/provisioners/redhat/installers/xenforo_config.php > "${file}"
         sudo chmod 0444 "${file}"
+    fi
+
+    # set ownership of uploads directory in upstream servers
+    if [ "$1" != "dev" ]; then
+        if [ "$software" = "drupal6" ]; then
+            if [ -d "/var/www/repositories/apache/${domain}/${webroot}sites/default/files" ]; then
+                echo -e "\t * setting permissions for $software upload directory ~/sites/default/files"
+                sudo chown -R apache /var/www/repositories/apache/${domain}/${webroot}sites/default/files
+                sudo chmod -R 0700 /var/www/repositories/apache/${domain}/${webroot}sites/default/files
+            fi
+        elif [ "$software" = "drupal7" ]; then
+            if [ -d "/var/www/repositories/apache/${domain}/${webroot}sites/default/files" ]; then
+                echo -e "\t * setting permissions for $software upload directory ~/sites/default/files"
+                sudo chown -R apache /var/www/repositories/apache/${domain}/${webroot}sites/default/files
+                sudo chmod -R 0700 /var/www/repositories/apache/${domain}/${webroot}sites/default/files
+            fi
+        elif [ "$software" = "wordpress" ]; then
+            if [ -d "/var/www/repositories/apache/${domain}/${webroot}wp-content/uploads" ]; then
+                echo -e "\t * setting permissions for $software upload directory ~/wp-content/uploads"
+                sudo chown -R apache /var/www/repositories/apache/${domain}/${webroot}wp-content/uploads
+                sudo chmod -R 0700 /var/www/repositories/apache/${domain}/${webroot}wp-content/uploads
+            fi
+        fi
     fi
 
 done
