@@ -89,7 +89,7 @@ if [ "${4}" = "apache" ]; then
     cat "/catapult/provisioners/provisioners.yml" | shyaml get-values-0 redhat.servers.redhat.modules |
     while read -r -d $'\0' key value; do
         # first boot || dev || not config related || config related and incoming config changes
-        if ([ -s /catapult/provisioners/redhat/logs/apache.log ]) || ([ $1 == "dev" ]) || ([ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-value redhat.modules.$key.configuration) == "False" ]) || ([ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-value redhat.modules.$key.configuration) == "True" ] && [ $(cd /catapult && sudo git diff --exit-code ${branch} origin/${branch} "secrets/configuration.yml.gpg") ]); then
+        if ([ ! -s /catapult/provisioners/redhat/logs/apache.log ]) || ([ $1 == "dev" ]) || ([ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-value redhat.modules.$key.configuration) == "False" ]) || ([ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-value redhat.modules.$key.configuration) == "True" ] && [ $(cd /catapult && sudo git diff --exit-code ${branch} origin/${branch} "secrets/configuration.yml.gpg") ]); then
             start=$(date +%s)
             echo -e "\n\n\n==> MODULE: ${key}"
             echo -e "==> DESCRIPTION: $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-value redhat.modules.$key.description)"
@@ -112,7 +112,7 @@ elif [ "${4}" = "mysql" ]; then
     cat "/catapult/provisioners/provisioners.yml" | shyaml get-values-0 redhat.servers.redhat_mysql.modules |
     while read -r -d $'\0' key value; do
         # first boot || dev || not config related || config related and incoming config changes
-        if ([ -s /catapult/provisioners/redhat/logs/mysql.log ]) || ([ $1 == "dev" ]) || ([ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-value redhat.modules.$key.configuration) == "False" ]) || ([ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-value redhat.modules.$key.configuration) == "True" ] && [ $(cd /catapult && sudo git diff --exit-code ${branch} origin/${branch} "secrets/configuration.yml.gpg") ]); then
+        if ([ ! -s /catapult/provisioners/redhat/logs/mysql.log ]) || ([ $1 == "dev" ]) || ([ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-value redhat.modules.$key.configuration) == "False" ]) || ([ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-value redhat.modules.$key.configuration) == "True" ] && [ $(cd /catapult && sudo git diff --exit-code ${branch} origin/${branch} "secrets/configuration.yml.gpg") ]); then
             start=$(date +%s)
             echo -e "\n\n\n==> MODULE: ${key}"
             echo -e "==> DESCRIPTION: $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-value redhat.modules.$key.description)"
