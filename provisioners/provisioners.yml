@@ -4,53 +4,53 @@ redhat:
         apache:
           description: "Installs and configures Apache HTTP daemon, then configures virtual hosts for websites."
           configuration: true
-          multithread: false
+          multithreading: false
         catapult:
           description: "Decrypts Catapult secrets."
         cloudflare:
           description: "Configures DNS via the CloudFlare API for websites."
           configuration: true
-          multithread: false
+          multithreading: false
         cloudflare_cache:
           description: "Clears CloudFlare cache for websites."
           configuration: false
-          multithread: false
+          multithreading: false
         git:
           description: "Clones Git repositories for websites."
           configuration: false
-          multithread: true
+          multithreading: true
         git_clean:
           description: "Removes Git repositories for websites."
           configuration: true
-          multithread: false
+          multithreading: false
         iptables:
           description: "Configures firewall via IPTables to only allow necessary traffic."
           configuration: false
-          multithread: false
+          multithreading: false
         mysql:
           description: "Installs and configures MariaDB server, then configures databases for websites with software."
           configuration: false
-          multithread: false
+          multithreading: false
         rsync:
           description: "Copies meta files contingent on the software_workflow for websites with software."
           configuration: false
-          multithread: false
+          multithreading: true
         software_config:
           description: "Creates database configuration files and sets upload directory permissions for websites with software."
           configuration: false
-          multithread: false
+          multithreading: false
         software_tools:
           description: "Installs and configures software CLI tools."
           configuration: false
-          multithread: false
+          multithreading: false
         system:
           description: "Installs and configures initial system requirements."
           configuration: false
-          multithread: false
+          multithreading: false
         time:
           description: "Installs and configures NTP daemon based on the company timezone."
           configuration: false
-          multithread: false
+          multithreading: false
     servers:
         redhat:
           apache:

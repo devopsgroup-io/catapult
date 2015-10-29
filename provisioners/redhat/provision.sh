@@ -80,10 +80,12 @@ else
 fi
 
 
-
+# run server provision
 if [ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-values-0 redhat.servers.redhat.$4.modules) ]; then
     provisionstart=$(date +%s)
     echo -e "\n\n\n==> PROVISION: ${4}"
+    # decrypt configuration
+    source "/catapult/provisioners/redhat/modules/catapult_decrypt.sh"
 
     # loop through each required module
     cat "/catapult/provisioners/provisioners.yml" | shyaml get-values-0 redhat.servers.redhat.$4.modules |
@@ -93,8 +95,9 @@ if [ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-values-0 redha
             start=$(date +%s)
             echo -e "\n\n\n==> MODULE: ${key}"
             echo -e "==> DESCRIPTION: $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-value redhat.modules.$key.description)"
+            echo -e "==> MULTITHREADING: $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-value redhat.modules.$key.multithreading)"
             # if multithreading is supported
-            if ([ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-value redhat.modules.$key.multithread) == "True" ]); then
+            if ([ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-value redhat.modules.$key.multithreading) == "True" ]); then
                 # cleanup leftover utility files
                 for file in "/catapult/provisioners/redhat/logs/${key}.*.log"; do
                     if [ -e "$file" ]; then
@@ -110,26 +113,25 @@ if [ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-values-0 redha
                 set -m
                 # get configuration
                 source "/catapult/provisioners/redhat/modules/catapult.sh"
-                # get environment branch
-                branch=$(echo "${configuration}" | shyaml get-value environments.$1.branch)
                 # loop through websites and pass to subprocesses
+                websiteN=0
                 echo "${configuration}" | shyaml get-values-0 websites.apache |
-                    while read -r -d $'\0' website; do
-                        domain=$(echo "${website}" | shyaml get-value domain)
-                        repo=$(echo "${website}" | shyaml get-value repo)
-                        bash "/catapult/provisioners/redhat/modules/${key}.sh" $1 $2 $3 $4 $key $branch $domain $repo >> "/catapult/provisioners/redhat/logs/${key}.${domain}.log" 2>&1 &
-                    done
+                while read -r -d $'\0' website; do
+                    bash "/catapult/provisioners/redhat/modules/${key}.sh" $1 $2 $3 $4 $websiteN >> "/catapult/provisioners/redhat/logs/${key}.$(echo "${website}" | shyaml get-value domain).log" 2>&1 &
+                    (( websiteN += 1 ))
+                done
                 # determine when each subprocess is finished
                 echo "${configuration}" | shyaml get-values-0 websites.apache |
                     while read -r -d $'\0' website; do
                         domain=$(echo "${website}" | shyaml get-value domain)
                         while [ ! -e "/catapult/provisioners/redhat/logs/${key}.${domain}.complete" ]; do
-                            sleep 2
+                            sleep 1
                         done
+                        echo -e "=> ${domain}"
+                        cat "/catapult/provisioners/redhat/logs/${key}.${domain}.log" | sed 's/^/   /'
                     done
                 # cleanup utility files
                 for file in "/catapult/provisioners/redhat/logs/${key}.*.log"; do
-                    cat $file | sed "s/^/\t/"
                     rm $file
                 done
                 for file in "/catapult/provisioners/redhat/logs/${key}.*.complete"; do
@@ -145,6 +147,8 @@ if [ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-values-0 redha
     done
 
     provisionend=$(date +%s)
+    # remove configuration
+    source "/catapult/provisioners/redhat/modules/catapult_clean.sh"
     echo -e "\n\n\n==> PROVISION: ${4}"
     echo -e "==> DURATION: $(($provisionend - $provisionstart)) total seconds" | tee -a /catapult/provisioners/redhat/logs/$4.log
 else
@@ -152,4 +156,4 @@ else
     exit 1
 fi
 
-exit 1
+exit 0
