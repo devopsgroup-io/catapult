@@ -7,7 +7,7 @@ sudo yum install -y php-mysql
 sudo yum install -y php-posix
 sudo yum install -y mariadb
 # install drush
-if [ ! -f /usr/bin/drush  ]; then
+if [ ! -f /usr/bin/drush ]; then
     curl -sS https://getcomposer.org/installer | php
     mv composer.phar /usr/local/bin/composer
     ln -s /usr/local/bin/composer /usr/bin/composer

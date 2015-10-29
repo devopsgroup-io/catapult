@@ -4,41 +4,57 @@ redhat:
         apache:
           description: "Installs and configures Apache HTTP daemon, then configures virtual hosts for websites."
           configuration: true
+          multithread: false
         catapult:
           description: "Decrypts Catapult secrets."
         cloudflare:
           description: "Configures DNS via the CloudFlare API for websites."
           configuration: true
+          multithread: false
         cloudflare_cache:
           description: "Clears CloudFlare cache for websites."
           configuration: false
+          multithread: false
         git:
           description: "Clones Git repositories for websites."
           configuration: false
+          multithread: true
+        git_clean:
+          description: "Removes Git repositories for websites."
+          configuration: true
+          multithread: false
         iptables:
           description: "Configures firewall via IPTables to only allow necessary traffic."
           configuration: false
+          multithread: false
         mysql:
           description: "Installs and configures MariaDB server, then configures databases for websites with software."
           configuration: false
+          multithread: false
         rsync:
           description: "Copies meta files contingent on the software_workflow for websites with software."
           configuration: false
+          multithread: false
         software_config:
           description: "Creates database configuration files and sets upload directory permissions for websites with software."
           configuration: false
+          multithread: false
         software_tools:
           description: "Installs and configures software CLI tools."
           configuration: false
+          multithread: false
         system:
           description: "Installs and configures initial system requirements."
           configuration: false
+          multithread: false
         time:
           description: "Installs and configures NTP daemon based on the company timezone."
           configuration: false
+          multithread: false
     servers:
         redhat:
-            modules: ["system","iptables","time","software_tools","git","rsync","software_config","apache","cloudflare","cloudflare_cache"]
-        redhat_mysql:
-            modules: ["system","iptables","time","software_tools","git","rsync","software_config","mysql"]
+          apache:
+            modules: ["system","iptables","time","software_tools","git_clean","git","rsync","software_config","apache","cloudflare","cloudflare_cache"]
+          mysql:
+            modules: ["system","iptables","time","software_tools","git_clean","git","rsync","software_config","mysql"]
 windows:

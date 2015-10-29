@@ -80,25 +80,64 @@ else
 fi
 
 
-# determine if there are configuration changes
 
-
-
-# provision server
-# @todo standardize apache/mysql to match server name?
-if [ "${4}" = "apache" ]; then
-
+if [ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-values-0 redhat.servers.redhat.$4.modules) ]; then
     provisionstart=$(date +%s)
-    echo -e "\n\n\n==> PROVISION: apache"
+    echo -e "\n\n\n==> PROVISION: ${4}"
 
-    cat "/catapult/provisioners/provisioners.yml" | shyaml get-values-0 redhat.servers.redhat.modules |
+    # loop through each required module
+    cat "/catapult/provisioners/provisioners.yml" | shyaml get-values-0 redhat.servers.redhat.$4.modules |
     while read -r -d $'\0' key value; do
         # first boot || dev || not config related || config related and incoming config changes
-        if ([ ! -s /catapult/provisioners/redhat/logs/apache.log ]) || ([ $1 == "dev" ]) || ([ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-value redhat.modules.$key.configuration) == "False" ]) || ([ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-value redhat.modules.$key.configuration) == "True" ] && [ "${configuration_changes}" == "True" ]); then
+        if ([ ! -s /catapult/provisioners/redhat/logs/$4.log ]) || ([ $1 == "dev" ]) || ([ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-value redhat.modules.$key.configuration) == "False" ]) || ([ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-value redhat.modules.$key.configuration) == "True" ] && [ "${configuration_changes}" == "True" ]); then
             start=$(date +%s)
             echo -e "\n\n\n==> MODULE: ${key}"
             echo -e "==> DESCRIPTION: $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-value redhat.modules.$key.description)"
-            bash "/catapult/provisioners/redhat/modules/${key}.sh" $1 $2 $3 $4
+            # if multithreading is supported
+            if ([ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-value redhat.modules.$key.multithread) == "True" ]); then
+                # cleanup leftover utility files
+                for file in "/catapult/provisioners/redhat/logs/${key}.*.log"; do
+                    if [ -e "$file" ]; then
+                        rm $file
+                    fi
+                done
+                for file in "/catapult/provisioners/redhat/logs/${key}.*.complete"; do
+                    if [ -e "$file" ]; then
+                        rm $file
+                    fi
+                done
+                # enable job control
+                set -m
+                # get configuration
+                source "/catapult/provisioners/redhat/modules/catapult.sh"
+                # get environment branch
+                branch=$(echo "${configuration}" | shyaml get-value environments.$1.branch)
+                # loop through websites and pass to subprocesses
+                echo "${configuration}" | shyaml get-values-0 websites.apache |
+                    while read -r -d $'\0' website; do
+                        domain=$(echo "${website}" | shyaml get-value domain)
+                        repo=$(echo "${website}" | shyaml get-value repo)
+                        bash "/catapult/provisioners/redhat/modules/${key}.sh" $1 $2 $3 $4 $key $branch $domain $repo >> "/catapult/provisioners/redhat/logs/${key}.${domain}.log" 2>&1 &
+                    done
+                # determine when each subprocess is finished
+                echo "${configuration}" | shyaml get-values-0 websites.apache |
+                    while read -r -d $'\0' website; do
+                        domain=$(echo "${website}" | shyaml get-value domain)
+                        while [ ! -e "/catapult/provisioners/redhat/logs/${key}.${domain}.complete" ]; do
+                            sleep 2
+                        done
+                    done
+                # cleanup utility files
+                for file in "/catapult/provisioners/redhat/logs/${key}.*.log"; do
+                    cat $file | sed "s/^/\t/"
+                    rm $file
+                done
+                for file in "/catapult/provisioners/redhat/logs/${key}.*.complete"; do
+                    rm $file
+                done
+            else
+                bash "/catapult/provisioners/redhat/modules/${key}.sh" $1 $2 $3 $4
+            fi
             end=$(date +%s)
             echo -e "==> MODULE: ${key}"
             echo -e "==> DURATION: $(($end - $start)) seconds"
@@ -106,33 +145,11 @@ if [ "${4}" = "apache" ]; then
     done
 
     provisionend=$(date +%s)
-    echo -e "\n\n\n==> PROVISION: apache"
-    echo -e "==> DURATION: $(($provisionend - $provisionstart)) total seconds" | tee -a /catapult/provisioners/redhat/logs/apache.log
-
-elif [ "${4}" = "mysql" ]; then
-
-    provisionstart=$(date +%s)
-    echo -e "\n\n\n==> PROVISION: mysql"
-
-    cat "/catapult/provisioners/provisioners.yml" | shyaml get-values-0 redhat.servers.redhat_mysql.modules |
-    while read -r -d $'\0' key value; do
-        # first boot || dev || not config related || config related and incoming config changes
-        if ([ ! -s /catapult/provisioners/redhat/logs/mysql.log ]) || ([ $1 == "dev" ]) || ([ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-value redhat.modules.$key.configuration) == "False" ]) || ([ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-value redhat.modules.$key.configuration) == "True" ] && [ "${configuration_changes}" == "True" ]); then
-            start=$(date +%s)
-            echo -e "\n\n\n==> MODULE: ${key}"
-            echo -e "==> DESCRIPTION: $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-value redhat.modules.$key.description)"
-            bash "/catapult/provisioners/redhat/modules/${key}.sh" $1 $2 $3 $4
-            end=$(date +%s)
-            echo -e "==> MODULE: ${key}"
-            echo -e "==> DURATION: $(($end - $start)) seconds"
-        fi
-    done
-
-    provisionend=$(date +%s)
-    echo -e "\n\n\n==> PROVISION: mysql"
-    echo -e "==> DURATION: $(($provisionend - $provisionstart)) total seconds" | tee -a /catapult/provisioners/redhat/logs/mysql.log
-
+    echo -e "\n\n\n==> PROVISION: ${4}"
+    echo -e "==> DURATION: $(($provisionend - $provisionstart)) total seconds" | tee -a /catapult/provisioners/redhat/logs/$4.log
 else
     "Error: Cannot detect the server type."
     exit 1
 fi
+
+exit 1
