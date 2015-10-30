@@ -2,7 +2,7 @@ source "/catapult/provisioners/redhat/modules/catapult.sh"
 
 software=$(catapult "websites.apache.$5.software")
 
-if ([ -z "${software}" ] || [ "${software}" = "codeigniter2" ] || [ "${software}" = "silverstripe" ] || [ "${software}" = "xenforo" ]); then
+if ([ -z "${software}" ] || [ "${software}" = "codeigniter2" ] || [ "${software}" = "codeigniter3" ] || [ "${software}" = "silverstripe" ] || [ "${software}" = "xenforo" ]); then
 
     echo -e "no rsync needed, skipping..."
 

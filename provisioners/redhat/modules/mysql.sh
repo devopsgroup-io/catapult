@@ -203,7 +203,7 @@ while IFS='' read -r -d '' key; do
                         # ://devopsgroup.io.example.com
                         # ://www.devopsgroup.io.example.com
                         # for software without a cli tool, use sed via the sql file to replace urls
-                        if ([ "${software}" = "codeigniter2" ] || [ "${software}" = "drupal6" ] || [ "${software}" = "drupal7" ] || [ "${software}" = "silverstripe" ] || [ "${software}" = "xenforo" ]); then
+                        if ([ "${software}" = "codeigniter2" ] || [ "${software}" = "codeigniter3" ] || [ "${software}" = "drupal6" ] || [ "${software}" = "drupal7" ] || [ "${software}" = "silverstripe" ] || [ "${software}" = "xenforo" ]); then
                             echo -e "\t* replacing URLs in the database to align with the enivronment..."
                             sed -r --expression="s/:\/\/(www\.)?(dev\.|test\.)?(${domain}.${domain_tld_override}|${domain})/:\/\/\1${domain_url}/g" "/var/www/repositories/apache/${domain}/_sql/$(basename "$file")" > "/var/www/repositories/apache/${domain}/_sql/${1}.$(basename "$file")"
                         else
