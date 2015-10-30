@@ -89,22 +89,22 @@ if [ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-values-0 redha
 
     # loop through each required module
     cat "/catapult/provisioners/provisioners.yml" | shyaml get-values-0 redhat.servers.redhat.$4.modules |
-    while read -r -d $'\0' key value; do
+    while read -r -d $'\0' module; do
         # first boot || dev || not config related || config related and incoming config changes
-        if ([ ! -s /catapult/provisioners/redhat/logs/$4.log ]) || ([ $1 == "dev" ]) || ([ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-value redhat.modules.$key.configuration) == "False" ]) || ([ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-value redhat.modules.$key.configuration) == "True" ] && [ "${configuration_changes}" == "True" ]); then
+        if ([ ! -s /catapult/provisioners/redhat/logs/$4.log ]) || ([ "${1}" == "dev" ]) || ([ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-value redhat.modules.${module}.configuration) == "False" ]) || ([ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-value redhat.modules.${module}.configuration) == "True" ] && [ "${configuration_changes}" == "True" ]); then
             start=$(date +%s)
-            echo -e "\n\n\n==> MODULE: ${key}"
-            echo -e "==> DESCRIPTION: $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-value redhat.modules.$key.description)"
-            echo -e "==> MULTITHREADING: $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-value redhat.modules.$key.multithreading)"
+            echo -e "\n\n\n==> MODULE: ${module}"
+            echo -e "==> DESCRIPTION: $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-value redhat.modules.${module}.description)"
+            echo -e "==> MULTITHREADING: $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-value redhat.modules.${module}.multithreading)"
             # if multithreading is supported
-            if ([ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-value redhat.modules.$key.multithreading) == "True" ]); then
+            if ([ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-value redhat.modules.${module}.multithreading) == "True" ]); then
                 # cleanup leftover utility files
-                for file in "/catapult/provisioners/redhat/logs/${key}.*.log"; do
+                for file in "/catapult/provisioners/redhat/logs/${module}.*.log"; do
                     if [ -e "$file" ]; then
                         rm $file
                     fi
                 done
-                for file in "/catapult/provisioners/redhat/logs/${key}.*.complete"; do
+                for file in "/catapult/provisioners/redhat/logs/${module}.*.complete"; do
                     if [ -e "$file" ]; then
                         rm $file
                     fi
@@ -117,31 +117,31 @@ if [ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-values-0 redha
                 websiteN=0
                 echo "${configuration}" | shyaml get-values-0 websites.apache |
                 while read -r -d $'\0' website; do
-                    bash "/catapult/provisioners/redhat/modules/${key}.sh" $1 $2 $3 $4 $websiteN >> "/catapult/provisioners/redhat/logs/${key}.$(echo "${website}" | shyaml get-value domain).log" 2>&1 &
+                    bash "/catapult/provisioners/redhat/modules/${module}.sh" $1 $2 $3 $4 $websiteN >> "/catapult/provisioners/redhat/logs/${module}.$(echo "${website}" | shyaml get-value domain).log" 2>&1 &
                     (( websiteN += 1 ))
                 done
                 # determine when each subprocess is finished
                 echo "${configuration}" | shyaml get-values-0 websites.apache |
                     while read -r -d $'\0' website; do
                         domain=$(echo "${website}" | shyaml get-value domain)
-                        while [ ! -e "/catapult/provisioners/redhat/logs/${key}.${domain}.complete" ]; do
+                        while [ ! -e "/catapult/provisioners/redhat/logs/${module}.${domain}.complete" ]; do
                             sleep 1
                         done
                         echo -e "=> ${domain}"
-                        cat "/catapult/provisioners/redhat/logs/${key}.${domain}.log" | sed 's/^/   /'
+                        cat "/catapult/provisioners/redhat/logs/${module}.${domain}.log" | sed 's/^/   /'
                     done
                 # cleanup utility files
-                for file in "/catapult/provisioners/redhat/logs/${key}.*.log"; do
+                for file in "/catapult/provisioners/redhat/logs/${module}.*.log"; do
                     rm $file
                 done
-                for file in "/catapult/provisioners/redhat/logs/${key}.*.complete"; do
+                for file in "/catapult/provisioners/redhat/logs/${module}.*.complete"; do
                     rm $file
                 done
             else
-                bash "/catapult/provisioners/redhat/modules/${key}.sh" $1 $2 $3 $4
+                bash "/catapult/provisioners/redhat/modules/${module}.sh" $1 $2 $3 $4
             fi
             end=$(date +%s)
-            echo -e "==> MODULE: ${key}"
+            echo -e "==> MODULE: ${module}"
             echo -e "==> DURATION: $(($end - $start)) seconds"
         fi
     done
