@@ -11,7 +11,7 @@ redhat:
           multithreading: false
         cloudflare_cache:
           configuration: false
-          description: "Clears CloudFlare cache for websites."
+          description: "Clears CloudFlare zone cache for websites."
           multithreading: true
         git:
           configuration: false
