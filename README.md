@@ -60,6 +60,7 @@ Catapult supports the following software:
 
 * Any website without a database dependency built in PHP
 * CodeIgniter 2.x
+* CodeIgniter 3.x
 * Drupal 6.x, Drupal 7.x
     * as required by Drush 7.0.0
 * SilverStripe 2.x
@@ -398,6 +399,8 @@ The following options are available:
 * software:
     * `codeigniter2`
         * generates codeigniter2 database config file ~/application/config/database.php, restores database
+    * `codeigniter3`
+        * generates codeigniter3 database config file ~/application/config/database.php, restores database
     * `drupal6`
         * generates drupal6 database config file ~/sites/default/settings.php, resets Drupal admin password, rsyncs ~/sites/default/files, restores database
     * `drupal7`
