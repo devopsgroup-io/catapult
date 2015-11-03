@@ -71,7 +71,9 @@ while IFS='' read -r -d '' key; do
     software=$(echo "$key" | grep -w "software" | cut -d ":" -f 2 | tr -d " ")
     software_dbprefix=$(echo "$key" | grep -w "software_dbprefix" | cut -d ":" -f 2 | tr -d " ")
     software_workflow=$(echo "$key" | grep -w "software_workflow" | cut -d ":" -f 2 | tr -d " ")
-    software_dbexist=$(mysql --defaults-extra-file=$dbconf -e "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = '${1}_${domainvaliddbname}'")
+    software_db=$(mysql --defaults-extra-file=$dbconf --silent --skip-column-names --execute "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = '${1}_${domainvaliddbname}'")
+    software_db_tables=$(mysql --defaults-extra-file=$dbconf --silent --skip-column-names --execute "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = '${1}_${domainvaliddbname}'")    
+    webroot=$(echo "$key" | grep -w "webroot" | cut -d ":" -f 2 | tr -d " ")
 
     if [ "${1}" = "production" ]; then
         echo -e "\nNOTICE: ${domain}"
@@ -88,7 +90,7 @@ while IFS='' read -r -d '' key; do
         # flush privileges
         mysql --defaults-extra-file=$dbconf -e "FLUSH PRIVILEGES"
         # respect software_workflow option
-        if ([ "${1}" = "production" ] && [ "${software_workflow}" = "downstream" ] && [ "${software_dbexist}" != "" ]) || ([ "${1}" = "test" ] && [ "${software_workflow}" = "upstream" ] && [ "${software_dbexist}" != "" ]); then
+        if ([ "${1}" = "production" ] && [ "${software_workflow}" = "downstream" ] && [ "${software_db}" != "" ] && [ "${software_db_tables}" != "0" ]) || ([ "${1}" = "test" ] && [ "${software_workflow}" = "upstream" ] && [ "${software_db}" != "" ] && [ "${software_db_tables}" != "0" ]); then
             echo -e "\t* workflow is set to ${software_workflow} and this is the ${1} environment, performing a database backup"
             # database dumps are always committed to the develop branch to respect software_workflow
             cd "/var/www/repositories/apache/${domain}" && git checkout develop 2>&1 | sed "s/^/\t/"
@@ -142,10 +144,12 @@ while IFS='' read -r -d '' key; do
             # after verifying database dumps, checkout the correct branch again
             cd "/var/www/repositories/apache/${domain}" && git checkout $(echo "${configuration}" | shyaml get-value environments.${1}.branch) 2>&1 | sed "s/^/\t/"
         else
-            if [ -z "${software_dbexist}" ]; then
-                echo -e "\t* workflow is set to ${software_workflow} and this is the ${1} environment, however, the database does not exist. performing a database restore"
+            if [ -z "${software_db}" ]; then
+                echo -e "\t* workflow is set to ${software_workflow} and this is the ${1} environment, however, the database does not exist. performing a database restore..."
+            elif [ -z "${software_db_tables}" ]; then
+                echo -e "\t* workflow is set to ${software_workflow} and this is the ${1} environment, however, the database exists but contains no tables. performing a database restore..."
             else
-                echo -e "\t* workflow is set to ${software_workflow} and this is the ${1} environment, performing a database restore"
+                echo -e "\t* workflow is set to ${software_workflow} and this is the ${1} environment, performing a database restore..."
             fi
             # drop the database
             # the loop is necessary just in case the database doesn't yet exist
@@ -215,7 +219,7 @@ while IFS='' read -r -d '' key; do
                         # for software with a cli tool, use cli tool to replace urls
                         if [[ "${software}" = "wordpress" ]]; then
                             echo -e "\t* replacing URLs in the database to align with the enivronment..."
-                            php /catapult/provisioners/redhat/installers/wp-cli.phar --allow-root --path="/var/www/repositories/apache/${domain}/" search-replace ":\/\/(www\.)?(dev\.|test\.)?(${domain}.${domain_tld_override}|${domain})" "://${domain_url}" --regex | sed "s/^/\t\t/"
+                            php /catapult/provisioners/redhat/installers/wp-cli.phar --allow-root --path="/var/www/repositories/apache/${domain}/${webroot}" search-replace ":\/\/(www\.)?(dev\.|test\.)?(${domain}.${domain_tld_override}|${domain})" "://${domain_url}" --regex | sed "s/^/\t\t/"
                             mysql --defaults-extra-file=$dbconf ${1}_${domainvaliddbname} -e "UPDATE ${software_dbprefix}options SET option_value='$(echo "${configuration}" | shyaml get-value company.email)' WHERE option_name = 'admin_email';"
                             mysql --defaults-extra-file=$dbconf ${1}_${domainvaliddbname} -e "UPDATE ${software_dbprefix}options SET option_value='http://${domain_url}' WHERE option_name = 'home';"
                             mysql --defaults-extra-file=$dbconf ${1}_${domainvaliddbname} -e "UPDATE ${software_dbprefix}options SET option_value='http://${domain_url}' WHERE option_name = 'siteurl';"
