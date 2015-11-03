@@ -7,17 +7,6 @@ sudo systemctl start httpd.service
 sudo yum install -y mod_ssl
 sudo bash /etc/ssl/certs/make-dummy-cert "/etc/ssl/certs/httpd-dummy-cert.key.cert"
 
-# install php
-#@todo think about having directive per website that lists php module dependancies
-sudo yum install -y php
-sudo yum install -y php-apc
-sudo yum install -y php-curl
-sudo yum install -y php-dom
-sudo yum install -y php-gd
-sudo yum install -y php-mbstring
-sudo yum install -y php-mysql
-sed -i -e "s#\;date\.timezone.*#date.timezone = \"$(echo "${configuration}" | shyaml get-value company.timezone_redhat)\"#g" /etc/php.ini
-
 # set variables from secrets/configuration.yml
 mysql_user="$(echo "${configuration}" | shyaml get-value environments.$1.servers.redhat_mysql.mysql.user)"
 mysql_user_password="$(echo "${configuration}" | shyaml get-value environments.$1.servers.redhat_mysql.mysql.user_password)"
