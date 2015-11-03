@@ -17,4 +17,5 @@ if [ ! -f /usr/bin/drush ]; then
     ln -s /usr/local/src/drush/drush /usr/bin/drush
     composer install
 fi
-drush --version
+echo -e "\nDRUSH $(drush --version --format=string)"
+php /catapult/provisioners/redhat/installers/wp-cli.phar --allow-root --version
