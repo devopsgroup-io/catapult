@@ -28,7 +28,7 @@ company_email="$(echo "${configuration}" | shyaml get-value company.email)"
 # use sites-available, sites-enabled convention. this is a debianism - but the convention is common and easy understand
 sudo mkdir -p /etc/httpd/sites-available
 sudo mkdir -p /etc/httpd/sites-enabled
-if ! grep -q "IncludeOptional sites-enabled/*.conf" "/etc/httpd/conf/httpd.conf"; then
+if ! grep -q "IncludeOptional sites-enabled/\*.conf" "/etc/httpd/conf/httpd.conf"; then
    sudo bash -c 'echo "IncludeOptional sites-enabled/*.conf" >> "/etc/httpd/conf/httpd.conf"'
 fi
 
