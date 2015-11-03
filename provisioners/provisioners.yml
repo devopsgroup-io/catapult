@@ -54,5 +54,5 @@ redhat:
           apache:
             modules: ["system","iptables","time","software_tools","git_clean","git","rsync","software_config","apache","cloudflare","cloudflare_cache"]
           mysql:
-            modules: ["system","iptables","time","software_tools","git_clean","git","rsync","software_config","mysql"]
+            modules: ["system","iptables","time","software_tools","git_clean","git","software_config","mysql"]
 windows:
