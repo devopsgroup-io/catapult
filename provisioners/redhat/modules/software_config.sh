@@ -109,13 +109,13 @@ while IFS='' read -r -d '' key; do
         if [ "$software" = "drupal6" ]; then
             if [ -d "/var/www/repositories/apache/${domain}/${webroot}sites/default/files" ]; then
                 echo -e "\t * setting permissions for $software upload directory ~/sites/default/files"
-                sudo chown -R apache /var/www/repositories/apache/${domain}/${webroot}sites/default/files
+                sudo chown -R apache /var/www/repositories/apache/${domain}/${webroot}sites/default
                 sudo chmod -R 0700 /var/www/repositories/apache/${domain}/${webroot}sites/default/files
             fi
         elif [ "$software" = "drupal7" ]; then
             if [ -d "/var/www/repositories/apache/${domain}/${webroot}sites/default/files" ]; then
                 echo -e "\t * setting permissions for $software upload directory ~/sites/default/files"
-                sudo chown -R apache /var/www/repositories/apache/${domain}/${webroot}sites/default/files
+                sudo chown -R apache /var/www/repositories/apache/${domain}/${webroot}sites/default
                 sudo chmod -R 0700 /var/www/repositories/apache/${domain}/${webroot}sites/default/files
             fi
         elif [ "$software" = "wordpress" ]; then
