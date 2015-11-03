@@ -59,7 +59,7 @@ Vagrant.configure("2") do |config|
       provider.backups_enabled = true
     end
     config.vm.synced_folder ".", "/vagrant", disabled: true
-    config.vm.provision "shell", path: "provisioners/redhat/provision.sh", args: ["test","#{Catapult::Command.repo}","#{Catapult::Command.configuration_user["settings"]["gpg_key"]}","apache","false"]
+    config.vm.provision "shell", path: "provisioners/redhat/provision.sh", args: ["test","#{Catapult::Command.repo}","#{Catapult::Command.configuration_user["settings"]["gpg_key"]}","apache"]
   end
   config.vm.define "#{Catapult::Command.configuration["company"]["name"].downcase}-test-redhat-mysql" do |config|
     config.vm.provider :digital_ocean do |provider,override|
@@ -75,7 +75,7 @@ Vagrant.configure("2") do |config|
       provider.backups_enabled = true
     end
     config.vm.synced_folder ".", "/vagrant", disabled: true
-    config.vm.provision "shell", path: "provisioners/redhat/provision.sh", args: ["test","#{Catapult::Command.repo}","#{Catapult::Command.configuration_user["settings"]["gpg_key"]}","mysql","false"]
+    config.vm.provision "shell", path: "provisioners/redhat/provision.sh", args: ["test","#{Catapult::Command.repo}","#{Catapult::Command.configuration_user["settings"]["gpg_key"]}","mysql"]
   end
 
   # qc => redhat
@@ -93,7 +93,7 @@ Vagrant.configure("2") do |config|
       provider.backups_enabled = true
     end
     config.vm.synced_folder ".", "/vagrant", disabled: true
-    config.vm.provision "shell", path: "provisioners/redhat/provision.sh", args: ["qc","#{Catapult::Command.repo}","#{Catapult::Command.configuration_user["settings"]["gpg_key"]}","apache","false"]
+    config.vm.provision "shell", path: "provisioners/redhat/provision.sh", args: ["qc","#{Catapult::Command.repo}","#{Catapult::Command.configuration_user["settings"]["gpg_key"]}","apache"]
   end
   config.vm.define "#{Catapult::Command.configuration["company"]["name"].downcase}-qc-redhat-mysql" do |config|
     config.vm.provider :digital_ocean do |provider,override|
@@ -109,7 +109,7 @@ Vagrant.configure("2") do |config|
       provider.backups_enabled = true
     end
     config.vm.synced_folder ".", "/vagrant", disabled: true
-    config.vm.provision "shell", path: "provisioners/redhat/provision.sh", args: ["qc","#{Catapult::Command.repo}","#{Catapult::Command.configuration_user["settings"]["gpg_key"]}","mysql","false"]
+    config.vm.provision "shell", path: "provisioners/redhat/provision.sh", args: ["qc","#{Catapult::Command.repo}","#{Catapult::Command.configuration_user["settings"]["gpg_key"]}","mysql"]
   end
 
   # production => redhat
@@ -127,7 +127,7 @@ Vagrant.configure("2") do |config|
       provider.backups_enabled = true
     end
     config.vm.synced_folder ".", "/vagrant", disabled: true
-    config.vm.provision "shell", path: "provisioners/redhat/provision.sh", args: ["production","#{Catapult::Command.repo}","#{Catapult::Command.configuration_user["settings"]["gpg_key"]}","apache","false"]
+    config.vm.provision "shell", path: "provisioners/redhat/provision.sh", args: ["production","#{Catapult::Command.repo}","#{Catapult::Command.configuration_user["settings"]["gpg_key"]}","apache"]
   end
   config.vm.define "#{Catapult::Command.configuration["company"]["name"].downcase}-production-redhat-mysql" do |config|
     config.vm.provider :digital_ocean do |provider,override|
@@ -143,7 +143,7 @@ Vagrant.configure("2") do |config|
       provider.backups_enabled = true
     end
     config.vm.synced_folder ".", "/vagrant", disabled: true
-    config.vm.provision "shell", path: "provisioners/redhat/provision.sh", args: ["production","#{Catapult::Command.repo}","#{Catapult::Command.configuration_user["settings"]["gpg_key"]}","mysql","false"]
+    config.vm.provision "shell", path: "provisioners/redhat/provision.sh", args: ["production","#{Catapult::Command.repo}","#{Catapult::Command.configuration_user["settings"]["gpg_key"]}","mysql"]
   end
 
   # dev => windows
