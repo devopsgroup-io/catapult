@@ -11,7 +11,7 @@ for directory in /var/www/repositories/apache/*/; do
     # on a new provision, there will be no directories and an empty for loop returns itself
     if [ -e "$directory" ]; then
         domain=$(basename $directory)
-        if ! [[ ${domains[*]} =~ $domain ]]; then
+        if ! ([[ ${domains[*]} =~ $domain ]] || [ "_default_" == $domain ]); then
             echo "Cleaning up the ${domain} repo because it has been removed from your configuration..."
             sudo chmod 0777 -R $directory
             sudo rm -rf $directory

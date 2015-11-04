@@ -2,8 +2,16 @@
 redhat:
     modules:
         apache:
+          configuration: false
+          description: "Installs and configures Apache HTTP daemon."
+          multithreading: false
+        apache_vhosts_clean:
           configuration: true
-          description: "Installs and configures Apache HTTP daemon, then configures virtual hosts for websites."
+          description: "Removes virtual hosts for websites."
+          multithreading: false
+        apache_vhosts:
+          configuration: true
+          description: "Configures virtual hosts for websites."
           multithreading: false
         cloudflare:
           configuration: true
@@ -56,7 +64,7 @@ redhat:
     servers:
         redhat:
           apache:
-            modules: ["system","iptables","time","software_tools","git_clean","git","rsync","software_config","php","apache","cloudflare","cloudflare_cache"]
+            modules: ["system","iptables","time","software_tools","git_clean","git","rsync","software_config","php","apache","apache_vhosts_clean","apache_vhosts","cloudflare","cloudflare_cache"]
           mysql:
             modules: ["system","iptables","time","software_tools","git_clean","git","software_config","mysql"]
 windows:
