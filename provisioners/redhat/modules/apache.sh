@@ -24,11 +24,17 @@ fi
 sudo cat /dev/null > /var/log/httpd/access_log
 sudo cat /dev/null > /var/log/httpd/error_log
 
-# null the welcome conf and provide a _default_ catchall
+# null the welcome conf
 sudo cat /dev/null > /etc/httpd/conf.d/welcome.conf
+
+# create a _default_ catchall
+# if the vhost has not been linked, link the vhost
+if [ ! -f /var/www/repositories/apache/_default_ ]; then
+    sudo ln -s /catapult/repositories/apache/_default_ /var/www/repositories/apache/_default_
+fi
 sudo cat > /etc/httpd/sites-enabled/_default_.conf << EOF
 <VirtualHost *:80>
-  DocumentRoot /catapult/repositories/apache/_default_/
+  DocumentRoot /var/www/repositories/apache/_default_/
 </VirtualHost>
 EOF
 
