@@ -32,8 +32,13 @@ fi
 sudo cat /dev/null > /var/log/httpd/access_log
 sudo cat /dev/null > /var/log/httpd/error_log
 
-# @todo null the welcome conf, ideally we should make a catapult welcome file, remember that conf files are read alpa
+# null the welcome conf and provide a _default_ catchall
 sudo cat /dev/null > /etc/httpd/conf.d/welcome.conf
+sudo cat > /etc/httpd/sites-enabled/_default_.conf << EOF
+<VirtualHost *:80>
+  DocumentRoot /var/www/repositories/apache/_default_/
+</VirtualHost>
+EOF
 
 # remove directories from /var/www/repositories/apache/ that no longer exist in configuration
 # create an array of domains
