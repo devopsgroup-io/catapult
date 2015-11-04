@@ -3,11 +3,15 @@ source "/catapult/provisioners/redhat/modules/catapult.sh"
 # clone/pull repositories into /var/www/repositories/apache/
 if [ -d "/var/www/repositories/apache/$(catapult websites.apache.$5.domain)/.git" ]; then
     if [ "$(cd /var/www/repositories/apache/$(catapult websites.apache.$5.domain) && git config --get remote.origin.url)" != "$(catapult websites.apache.$5.repo)" ]; then
-        echo "the repo has changed in secrets/configuration.yml, removing and cloning the new repository."
+        echo "the repo has changed in secrets/configuration.yml, removing and cloning the new repository..."
+        sudo rm -rf /var/www/repositories/apache/$(catapult websites.apache.$5.domain)
+        sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git clone --recursive -b $(catapult environments.$1.branch) $(catapult websites.apache.$5.repo) /var/www/repositories/apache/$(catapult websites.apache.$5.domain)"
+    elif [ "$(cd /var/www/repositories/apache/$(catapult websites.apache.$5.domain) && ls -afq .git/refs/heads | wc -l )" == "2" ]; then
+        echo "the repo appears to be empty, removing and re-cloning the repository..."
         sudo rm -rf /var/www/repositories/apache/$(catapult websites.apache.$5.domain)
         sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git clone --recursive -b $(catapult environments.$1.branch) $(catapult websites.apache.$5.repo) /var/www/repositories/apache/$(catapult websites.apache.$5.domain)"
     elif [ "$(cd /var/www/repositories/apache/$(catapult websites.apache.$5.domain) && git rev-list HEAD | tail -n 1 )" != "$(cd /var/www/repositories/apache/$(catapult websites.apache.$5.domain) && git rev-list origin/master | tail -n 1 )" ]; then
-        echo "the repo has changed, removing and cloning the new repository."
+        echo "the repo has changed, removing and cloning the new repository..."
         sudo rm -rf /var/www/repositories/apache/$(catapult websites.apache.$5.domain)
         sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git clone --recursive -b $(catapult environments.$1.branch) $(catapult websites.apache.$5.repo) /var/www/repositories/apache/$(catapult websites.apache.$5.domain)"
     else
