@@ -28,7 +28,7 @@ sudo cat /dev/null > /var/log/httpd/error_log
 sudo cat /dev/null > /etc/httpd/conf.d/welcome.conf
 sudo cat > /etc/httpd/sites-enabled/_default_.conf << EOF
 <VirtualHost *:80>
-  DocumentRoot /var/www/repositories/apache/_default_/
+  DocumentRoot /catapult/repositories/apache/_default_/
 </VirtualHost>
 EOF
 
