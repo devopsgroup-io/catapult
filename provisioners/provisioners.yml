@@ -40,7 +40,7 @@ redhat:
         software_config:
           configuration: false
           description: "Creates database configuration files and sets upload directory permissions for websites with software."
-          multithreading: false
+          multithreading: true
         software_tools:
           configuration: false
           description: "Installs and configures software CLI tools."
