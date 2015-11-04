@@ -16,6 +16,7 @@ if [ ! -f /usr/bin/drush ]; then
     cd /usr/local/src/drush \
         && ln -s /usr/local/src/drush/drush /usr/bin/drush
 fi
+composer self-update
 cd /usr/local/src/drush \
     && git fetch \
     && git checkout 7.1.0 \
