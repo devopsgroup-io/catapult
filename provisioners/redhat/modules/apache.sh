@@ -29,8 +29,9 @@ sudo cat /dev/null > /etc/httpd/conf.d/welcome.conf
 
 # create a _default_ catchall
 # if the vhost has not been linked, link the vhost
+# to test this visit the ip address of the respective environment redhat public ip via http://
 if [ ! -f /var/www/repositories/apache/_default_ ]; then
-    sudo ln -s /catapult/repositories/apache/_default_ /var/www/repositories/apache/_default_
+    sudo ln -s /catapult/repositories/apache/_default_ /var/www/repositories/apache/
 fi
 sudo cat > /etc/httpd/sites-enabled/_default_.conf << EOF
 <VirtualHost *:80>
