@@ -13,13 +13,17 @@ redhat:
           configuration: true
           description: "Configures virtual hosts for websites."
           multithreading: false
-        cloudflare:
-          configuration: true
-          description: "Configures DNS via the CloudFlare API for websites."
-          multithreading: false
         cloudflare_cache:
           configuration: false
           description: "Clears CloudFlare zone cache for websites."
+          multithreading: true
+        cloudflare_dns:
+          configuration: true
+          description: "Configures CloudfFlare DNS A records for websites."
+          multithreading: true
+        cloudflare_zones:
+          configuration: true
+          description: "Configures CloudfFlare zone for websites."
           multithreading: true
         git:
           configuration: false
@@ -64,7 +68,7 @@ redhat:
     servers:
         redhat:
           apache:
-            modules: ["system","iptables","time","software_tools","git_clean","git","rsync","software_config","php","apache","apache_vhosts_clean","apache_vhosts","cloudflare","cloudflare_cache"]
+            modules: ["system","iptables","time","software_tools","git_clean","git","rsync","software_config","php","apache","apache_vhosts_clean","apache_vhosts","cloudflare_zones","cloudflare_dns","cloudflare_cache"]
           mysql:
             modules: ["system","iptables","time","software_tools","git_clean","git","software_config","mysql"]
 windows:
