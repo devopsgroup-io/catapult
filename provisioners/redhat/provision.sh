@@ -124,11 +124,19 @@ if [ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-values-0 redha
                 echo "${configuration}" | shyaml get-values-0 websites.apache |
                     while read -r -d $'\0' website; do
                         domain=$(echo "${website}" | shyaml get-value domain)
+                        domain_tld_override=$(echo "${website}" | shyaml get-value domain_tld_override 2>/dev/null )
+                        software=$(echo "${website}" | shyaml get-value software 2>/dev/null )
+                        software_dbprefix=$(echo "${website}" | shyaml get-value software_dbprefix 2>/dev/null )
+                        software_workflow=$(echo "${website}" | shyaml get-value software_workflow 2>/dev/null )
                         while [ ! -e "/catapult/provisioners/redhat/logs/${module}.${domain}.complete" ]; do
                             sleep 1
                         done
-                        echo -e "=> ${domain}"
-                        cat "/catapult/provisioners/redhat/logs/${module}.${domain}.log" | sed 's/^/   /'
+                        echo -e "=> DOMAIN: ${domain}"
+                        echo -e "   - domain_tld_override: ${domain_tld_override}"
+                        echo -e "   - software: ${software}"
+                        echo -e "   - software_dbprefix: ${software_dbprefix}"
+                        echo -e "   - software_workflow: ${software_workflow}"
+                        cat "/catapult/provisioners/redhat/logs/${module}.${domain}.log" | sed 's/^/     /'
                     done
                 # cleanup utility files
                 for file in "/catapult/provisioners/redhat/logs/${module}.*.log"; do
