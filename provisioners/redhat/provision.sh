@@ -120,24 +120,30 @@ if [ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-values-0 redha
                     bash "/catapult/provisioners/redhat/modules/${module}.sh" $1 $2 $3 $4 $websiteN >> "/catapult/provisioners/redhat/logs/${module}.$(echo "${website}" | shyaml get-value domain).log" 2>&1 &
                     (( websiteN += 1 ))
                 done
-                # determine when each subprocess is finished
-                echo "${configuration}" | shyaml get-values-0 websites.apache |
-                    while read -r -d $'\0' website; do
-                        domain=$(echo "${website}" | shyaml get-value domain)
-                        domain_tld_override=$(echo "${website}" | shyaml get-value domain_tld_override 2>/dev/null )
-                        software=$(echo "${website}" | shyaml get-value software 2>/dev/null )
-                        software_dbprefix=$(echo "${website}" | shyaml get-value software_dbprefix 2>/dev/null )
-                        software_workflow=$(echo "${website}" | shyaml get-value software_workflow 2>/dev/null )
-                        while [ ! -e "/catapult/provisioners/redhat/logs/${module}.${domain}.complete" ]; do
-                            sleep 1
-                        done
-                        echo -e "=> DOMAIN: ${domain}"
-                        echo -e "   - domain_tld_override: ${domain_tld_override}"
-                        echo -e "   - software: ${software}"
-                        echo -e "   - software_dbprefix: ${software_dbprefix}"
-                        echo -e "   - software_workflow: ${software_workflow}"
-                        cat "/catapult/provisioners/redhat/logs/${module}.${domain}.log" | sed 's/^/     /'
+                # determine when each subprocess finishes
+                cpuN=()
+                while read -r -d $'\0' website; do
+                    domain=$(echo "${website}" | shyaml get-value domain)
+                    domain_tld_override=$(echo "${website}" | shyaml get-value domain_tld_override 2>/dev/null )
+                    software=$(echo "${website}" | shyaml get-value software 2>/dev/null )
+                    software_dbprefix=$(echo "${website}" | shyaml get-value software_dbprefix 2>/dev/null )
+                    software_workflow=$(echo "${website}" | shyaml get-value software_workflow 2>/dev/null )
+                    while [ ! -e "/catapult/provisioners/redhat/logs/${module}.${domain}.complete" ]; do
+                        cpu_decimal=$(top -bn 1 | awk '{print $9}' | tail -n +8 | awk '{s+=$1} END {print s}')
+                        cpuN+=(${cpu_decimal%.*})
+                        sleep 1
                     done
+                    echo -e "=> domain: ${domain}"
+                    echo -e "=> domain_tld_override: ${domain_tld_override}"
+                    echo -e "=> software: ${software}"
+                    echo -e "=> software_dbprefix: ${software_dbprefix}"
+                    echo -e "=> software_workflow: ${software_workflow}"
+                    cat "/catapult/provisioners/redhat/logs/${module}.${domain}.log" | sed 's/^/     /'
+                done < <(echo "${configuration}" | shyaml get-values-0 websites.apache)
+                IFS=+ read <<< "${cpuN[*]}"
+                ((sum=REPLY))
+                total="${#cpuN[@]}"
+                echo -e "==> CPU USAGE: $((sum / total))% from $total samples"
                 # cleanup utility files
                 for file in "/catapult/provisioners/redhat/logs/${module}.*.log"; do
                     rm $file
