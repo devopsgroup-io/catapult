@@ -1,5 +1,9 @@
 import-module c:\vagrant\provisioners\windows\installers\poweryaml\poweryaml.psm1
-$config = get-yaml -fromfile (resolve-path c:\vagrant\secrets/configuration.yml)
+$config = get-yaml -fromfile (resolve-path c:\vagrant\secrets\configuration.yml)
+if (-not($config.websites.iis)) {
+    echo "There are no websites in iis, nothing to do."
+    exit 0
+}
 # @todo pass environment arg from vagrant
 
 echo "==> Configuring time"
@@ -143,6 +147,3 @@ if (-not(Test-Path -Path "c:\windows\Microsoft.NET\Framework64\v4.0.30319\")) {
     $provisionend = Get-Date
     echo ("`n`n`n==> Provision complete ({0}) seconds" -f [math]::floor((New-TimeSpan -Start $provisionstart -End $provisionend).TotalSeconds))
 }
-
-
-exit 0
