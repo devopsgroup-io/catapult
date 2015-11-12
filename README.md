@@ -60,6 +60,7 @@ Catapult supports the following software:
 
 * Any website without a database dependency built in PHP
 * CodeIgniter 2.x
+* CodeIgniter 3.x
 * Drupal 6.x, Drupal 7.x
     * as required by Drush 7.0.0
 * SilverStripe 2.x
@@ -398,6 +399,8 @@ The following options are available:
 * software:
     * `codeigniter2`
         * generates codeigniter2 database config file ~/application/config/database.php, restores database
+    * `codeigniter3`
+        * generates codeigniter3 database config file ~/application/config/database.php, restores database
     * `drupal6`
         * generates drupal6 database config file ~/sites/default/settings.php, resets Drupal admin password, rsyncs ~/sites/default/files, restores database
     * `drupal7`
@@ -501,7 +504,7 @@ When you first setup Catapult a `develop-catapult` branch is created for you und
 
 ## Releases ##
 
-Releases are driven by the devopsgroup.io team and occur when accepting new pull requests from contributors like you. Releases follow Semantic Versioning 2.0.0., given a version number MAJOR.MINOR.PATCH, increment the:
+Releases are driven by the devopsgroup.io team and occur when accepting new pull requests from contributors like you. Releases follow Semantic Versioning 2.0.0, given a version number MAJOR.MINOR.PATCH, increment the:
 
 1. MAJOR version when you make incompatible API changes,
 2. MINOR version when you add functionality in a backwards-compatible manner, and

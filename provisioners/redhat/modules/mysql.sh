@@ -1,78 +1,10 @@
-#!/usr/bin/env bash
+source "/catapult/provisioners/redhat/modules/catapult.sh"
 
-
-
-# variables inbound from provisioner args
-# $1 => environment
-# $2 => repository
-# $3 => gpg key
-# $4 => instance
-
-
-
-echo -e "\n\n\n==> Updating existing packages and installing utilities"
-start=$(date +%s)
-source /catapult/provisioners/redhat/modules/system.sh
-end=$(date +%s)
-echo -e "\n==> completed in ($(($end - $start)) seconds)"
-
-
-echo -e "\n\n\n==> Configuring IPTables"
-start=$(date +%s)
-source /catapult/provisioners/redhat/modules/iptables.sh
-end=$(date +%s)
-echo -e "\n==> completed in ($(($end - $start)) seconds)"
-
-
-echo -e "\n\n\n==> Configuring time"
-start=$(date +%s)
-source /catapult/provisioners/redhat/modules/time.sh
-provisionstart=$(date +%s)
-sudo touch /catapult/provisioners/redhat/logs/mysql.log
-end=$(date +%s)
-echo -e "\n==> completed in ($(($end - $start)) seconds)"
-
-
-echo -e "\n\n\n==> Installing software tools"
-start=$(date +%s)
-source /catapult/provisioners/redhat/modules/software_tools.sh
-end=$(date +%s)
-echo -e "\n==> completed in ($(($end - $start)) seconds)"
-
-
-echo -e "\n\n\n==> Installing MySQL"
-start=$(date +%s)
 # install mariadb
 sudo yum -y install mariadb mariadb-server
 sudo systemctl enable mariadb.service
 sudo systemctl start mariadb.service
-end=$(date +%s)
-echo -e "\n==> completed in ($(($end - $start)) seconds)"
 
-
-echo -e "\n\n\n==> Configuring git repositories (This may take a while...)"
-start=$(date +%s)
-source /catapult/provisioners/redhat/modules/git.sh
-end=$(date +%s)
-echo -e "\n==> completed in ($(($end - $start)) seconds)"
-
-
-echo -e "\n\n\n==> RSyncing files"
-start=$(date +%s)
-source /catapult/provisioners/redhat/modules/rsync.sh
-end=$(date +%s)
-echo -e "\n==> completed in ($(($end - $start)) seconds)"
-
-
-echo -e "\n\n\n==> Generating software database config files"
-start=$(date +%s)
-source /catapult/provisioners/redhat/modules/software_database_config.sh
-end=$(date +%s)
-echo -e "\n==> completed in ($(($end - $start)) seconds)"
-
-
-echo -e "\n\n\n==> Configuring MySQL"
-start=$(date +%s)
 # configure mysql conf so user/pass isn't logged in shell history or memory
 sudo cat > "/catapult/provisioners/redhat/installers/${1}.cnf" << EOF
 [client]
@@ -139,7 +71,9 @@ while IFS='' read -r -d '' key; do
     software=$(echo "$key" | grep -w "software" | cut -d ":" -f 2 | tr -d " ")
     software_dbprefix=$(echo "$key" | grep -w "software_dbprefix" | cut -d ":" -f 2 | tr -d " ")
     software_workflow=$(echo "$key" | grep -w "software_workflow" | cut -d ":" -f 2 | tr -d " ")
-    software_dbexist=$(mysql --defaults-extra-file=$dbconf -e "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = '${1}_${domainvaliddbname}'")
+    software_db=$(mysql --defaults-extra-file=$dbconf --silent --skip-column-names --execute "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = '${1}_${domainvaliddbname}'")
+    software_db_tables=$(mysql --defaults-extra-file=$dbconf --silent --skip-column-names --execute "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = '${1}_${domainvaliddbname}'")    
+    webroot=$(echo "$key" | grep -w "webroot" | cut -d ":" -f 2 | tr -d " ")
 
     if [ "${1}" = "production" ]; then
         echo -e "\nNOTICE: ${domain}"
@@ -156,7 +90,7 @@ while IFS='' read -r -d '' key; do
         # flush privileges
         mysql --defaults-extra-file=$dbconf -e "FLUSH PRIVILEGES"
         # respect software_workflow option
-        if ([ "${1}" = "production" ] && [ "${software_workflow}" = "downstream" ] && [ "${software_dbexist}" != "" ]) || ([ "${1}" = "test" ] && [ "${software_workflow}" = "upstream" ] && [ "${software_dbexist}" != "" ]); then
+        if ([ "${1}" = "production" ] && [ "${software_workflow}" = "downstream" ] && [ "${software_db}" != "" ] && [ "${software_db_tables}" != "0" ]) || ([ "${1}" = "test" ] && [ "${software_workflow}" = "upstream" ] && [ "${software_db}" != "" ] && [ "${software_db_tables}" != "0" ]); then
             echo -e "\t* workflow is set to ${software_workflow} and this is the ${1} environment, performing a database backup"
             # database dumps are always committed to the develop branch to respect software_workflow
             cd "/var/www/repositories/apache/${domain}" && git checkout develop 2>&1 | sed "s/^/\t/"
@@ -210,10 +144,12 @@ while IFS='' read -r -d '' key; do
             # after verifying database dumps, checkout the correct branch again
             cd "/var/www/repositories/apache/${domain}" && git checkout $(echo "${configuration}" | shyaml get-value environments.${1}.branch) 2>&1 | sed "s/^/\t/"
         else
-            if [ -z "${software_dbexist}" ]; then
-                echo -e "\t* workflow is set to ${software_workflow} and this is the ${1} environment, however, the database does not exist. performing a database restore"
+            if [ -z "${software_db}" ]; then
+                echo -e "\t* workflow is set to ${software_workflow} and this is the ${1} environment, however, the database does not exist. performing a database restore..."
+            elif [ -z "${software_db_tables}" ]; then
+                echo -e "\t* workflow is set to ${software_workflow} and this is the ${1} environment, however, the database exists but contains no tables. performing a database restore..."
             else
-                echo -e "\t* workflow is set to ${software_workflow} and this is the ${1} environment, performing a database restore"
+                echo -e "\t* workflow is set to ${software_workflow} and this is the ${1} environment, performing a database restore..."
             fi
             # drop the database
             # the loop is necessary just in case the database doesn't yet exist
@@ -271,7 +207,7 @@ while IFS='' read -r -d '' key; do
                         # ://devopsgroup.io.example.com
                         # ://www.devopsgroup.io.example.com
                         # for software without a cli tool, use sed via the sql file to replace urls
-                        if ([ "${software}" = "codeigniter2" ] || [ "${software}" = "drupal6" ] || [ "${software}" = "drupal7" ] || [ "${software}" = "silverstripe" ] || [ "${software}" = "xenforo" ]); then
+                        if ([ "${software}" = "codeigniter2" ] || [ "${software}" = "codeigniter3" ] || [ "${software}" = "drupal6" ] || [ "${software}" = "drupal7" ] || [ "${software}" = "silverstripe" ] || [ "${software}" = "xenforo" ]); then
                             echo -e "\t* replacing URLs in the database to align with the enivronment..."
                             sed -r --expression="s/:\/\/(www\.)?(dev\.|test\.)?(${domain}.${domain_tld_override}|${domain})/:\/\/\1${domain_url}/g" "/var/www/repositories/apache/${domain}/_sql/$(basename "$file")" > "/var/www/repositories/apache/${domain}/_sql/${1}.$(basename "$file")"
                         else
@@ -283,7 +219,7 @@ while IFS='' read -r -d '' key; do
                         # for software with a cli tool, use cli tool to replace urls
                         if [[ "${software}" = "wordpress" ]]; then
                             echo -e "\t* replacing URLs in the database to align with the enivronment..."
-                            php /catapult/provisioners/redhat/installers/wp-cli.phar --allow-root --path="/var/www/repositories/apache/${domain}/" search-replace ":\/\/(www\.)?(dev\.|test\.)?(${domain}.${domain_tld_override}|${domain})" "://${domain_url}" --regex | sed "s/^/\t\t/"
+                            php /catapult/provisioners/redhat/installers/wp-cli.phar --allow-root --path="/var/www/repositories/apache/${domain}/${webroot}" search-replace ":\/\/(www\.)?(dev\.|test\.)?(${domain}.${domain_tld_override}|${domain})" "://${domain_url}" --regex | sed "s/^/\t\t/"
                             mysql --defaults-extra-file=$dbconf ${1}_${domainvaliddbname} -e "UPDATE ${software_dbprefix}options SET option_value='$(echo "${configuration}" | shyaml get-value company.email)' WHERE option_name = 'admin_email';"
                             mysql --defaults-extra-file=$dbconf ${1}_${domainvaliddbname} -e "UPDATE ${software_dbprefix}options SET option_value='http://${domain_url}' WHERE option_name = 'home';"
                             mysql --defaults-extra-file=$dbconf ${1}_${domainvaliddbname} -e "UPDATE ${software_dbprefix}options SET option_value='http://${domain_url}' WHERE option_name = 'siteurl';"
@@ -312,14 +248,6 @@ while IFS='' read -r -d '' key; do
     fi
 
 done
+
 # remove .cnf file after usage
 rm -f /catapult/provisioners/redhat/installers/${1}.cnf
-end=$(date +%s)
-echo -e "\n==> completed in ($(($end - $start)) seconds)"
-
-
-provisionend=$(date +%s)
-echo -e "\n\n\n==> Provision complete ($(($provisionend - $provisionstart)) total seconds)"
-
-
-exit 0
