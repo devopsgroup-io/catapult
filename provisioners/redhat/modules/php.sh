@@ -24,6 +24,7 @@ sudo yum install -y php-devel
 sudo pear config-set php_ini /etc/php.ini
 # These extensions are available from » PECL. They may require external libraries. More PECL extensions exist but they are not documented in the PHP manual yet.
 sudo yum install -y libyaml-devel
+echo autodetect | sudo pecl install yaml
 echo autodetect | sudo pecl upgrade yaml
 
 # restart httpd for changes to reflect
