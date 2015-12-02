@@ -33,9 +33,17 @@ sudo cat /dev/null > /etc/httpd/conf.d/welcome.conf
 if [ ! -f /var/www/repositories/apache/_default_ ]; then
     sudo ln -s /catapult/repositories/apache/_default_ /var/www/repositories/apache/
 fi
+# enable cors for localdev http response codes from dashboard
+if [ "$1" = "dev" ]; then
+    cors="SetEnvIf Origin \"^(.*\.?devopsgroup\.io)$\" ORIGIN_SUB_DOMAIN=\$1
+    Header set Access-Control-Allow-Origin \"%{ORIGIN_SUB_DOMAIN}e\" env=ORIGIN_SUB_DOMAIN"
+else
+    cors=""
+fi
 sudo cat > /etc/httpd/sites-enabled/_default_.conf << EOF
 <VirtualHost *:80>
   DocumentRoot /var/www/repositories/apache/_default_/
+  $cors
 </VirtualHost>
 EOF
 

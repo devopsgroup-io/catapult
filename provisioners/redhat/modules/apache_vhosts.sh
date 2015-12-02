@@ -84,6 +84,13 @@ while IFS='' read -r -d '' key; do
     else
         force_https_value=""
     fi
+    # enable cors for localdev http response codes from dashboard
+    if [ "$1" = "dev" ]; then
+        cors="SetEnvIf Origin \"^(.*\.?devopsgroup\.io)$\" ORIGIN_SUB_DOMAIN=\$1
+        Header set Access-Control-Allow-Origin \"%{ORIGIN_SUB_DOMAIN}e\" env=ORIGIN_SUB_DOMAIN"
+    else
+        cors=""
+    fi
     # write vhost apache conf file
     sudo cat > /etc/httpd/sites-available/$domain_environment.conf << EOF
 
@@ -120,6 +127,7 @@ while IFS='' read -r -d '' key; do
     <Directory "/var/www/repositories/apache/$domain/${webroot}">
         AllowOverride All
         Options -Indexes +FollowSymlinks
+        $cors
     </Directory>
 
     # deny access to _sql folders
