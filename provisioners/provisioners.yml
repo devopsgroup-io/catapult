@@ -2,67 +2,51 @@
 redhat:
     modules:
         apache:
-          configuration: false
           description: "Installs and configures Apache HTTP daemon."
           multithreading: false
         apache_vhosts_clean:
-          configuration: true
           description: "Removes virtual hosts for websites."
           multithreading: false
         apache_vhosts:
-          configuration: true
           description: "Configures virtual hosts for websites."
           multithreading: false
         cloudflare_cache:
-          configuration: false
           description: "Clears CloudFlare zone cache for websites."
           multithreading: true
         cloudflare_dns:
-          configuration: true
           description: "Configures CloudfFlare DNS A records for websites."
           multithreading: true
         cloudflare_zones:
-          configuration: true
           description: "Configures CloudfFlare zone for websites."
           multithreading: true
         git:
-          configuration: false
           description: "Clones Git repositories for websites."
           multithreading: true
         git_clean:
-          configuration: true
           description: "Removes Git repositories for websites."
           multithreading: false
         iptables:
-          configuration: false
           description: "Configures firewall via IPTables to only allow necessary traffic."
           multithreading: false
         mysql:
-          configuration: false
           description: "Installs and configures MariaDB server, then configures databases for websites with software."
           multithreading: false
         php:
-          configuration: false
           description: "Installs and updates PHP and PHP modules."
           multithreading: false
         rsync:
-          configuration: false
           description: "Copies meta files contingent on the software_workflow for websites with software."
           multithreading: true
         software_config:
-          configuration: false
           description: "Creates database configuration files and sets upload directory permissions for websites with software."
           multithreading: true
         software_tools:
-          configuration: false
           description: "Installs and configures software CLI tools."
           multithreading: false
         system:
-          configuration: false
           description: "Installs and configures initial system requirements."
           multithreading: false
         time:
-          configuration: false
           description: "Installs and configures NTP daemon based on the company timezone."
           multithreading: false
     servers:
