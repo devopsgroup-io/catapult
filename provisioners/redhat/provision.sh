@@ -63,9 +63,6 @@ if [ $1 != "dev" ]; then
         cd /catapult && sudo git checkout ${branch}
         cd /catapult && sudo git fetch
         cd /catapult && sudo git diff --exit-code ${branch} origin/${branch} "secrets/configuration.yml.gpg"
-        if [ $? -eq 1 ]; then 
-            configuration_changes="True"
-        fi
         cd /catapult && sudo git pull
     else
         sudo git clone --recursive -b ${branch} $2 /catapult | sed "s/^/\t/"
@@ -90,74 +87,71 @@ if [ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-values-0 redha
     # loop through each required module
     cat "/catapult/provisioners/provisioners.yml" | shyaml get-values-0 redhat.servers.redhat.$4.modules |
     while read -r -d $'\0' module; do
-        # first boot || dev || not config related || config related and incoming config changes
-        if ([ ! -s /catapult/provisioners/redhat/logs/$4.log ]) || ([ "${1}" == "dev" ]) || ([ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-value redhat.modules.${module}.configuration) == "False" ]) || ([ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-value redhat.modules.${module}.configuration) == "True" ] && [ "${configuration_changes}" == "True" ]); then
-            start=$(date +%s)
-            echo -e "\n\n\n==> MODULE: ${module}"
-            echo -e "==> DESCRIPTION: $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-value redhat.modules.${module}.description)"
-            echo -e "==> MULTITHREADING: $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-value redhat.modules.${module}.multithreading)"
-            # if multithreading is supported
-            if ([ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-value redhat.modules.${module}.multithreading) == "True" ]); then
-                # cleanup leftover utility files
-                for file in "/catapult/provisioners/redhat/logs/${module}.*.log"; do
-                    if [ -e "$file" ]; then
-                        rm $file
-                    fi
-                done
-                for file in "/catapult/provisioners/redhat/logs/${module}.*.complete"; do
-                    if [ -e "$file" ]; then
-                        rm $file
-                    fi
-                done
-                # enable job control
-                set -m
-                # get configuration
-                source "/catapult/provisioners/redhat/modules/catapult.sh"
-                # loop through websites and pass to subprocesses
-                websiteN=0
-                echo "${configuration}" | shyaml get-values-0 websites.apache |
-                while read -r -d $'\0' website; do
-                    bash "/catapult/provisioners/redhat/modules/${module}.sh" $1 $2 $3 $4 $websiteN >> "/catapult/provisioners/redhat/logs/${module}.$(echo "${website}" | shyaml get-value domain).log" 2>&1 &
-                    (( websiteN += 1 ))
-                done
-                # determine when each subprocess finishes
-                cpuN=()
-                while read -r -d $'\0' website; do
-                    domain=$(echo "${website}" | shyaml get-value domain)
-                    domain_tld_override=$(echo "${website}" | shyaml get-value domain_tld_override 2>/dev/null )
-                    software=$(echo "${website}" | shyaml get-value software 2>/dev/null )
-                    software_dbprefix=$(echo "${website}" | shyaml get-value software_dbprefix 2>/dev/null )
-                    software_workflow=$(echo "${website}" | shyaml get-value software_workflow 2>/dev/null )
-                    while [ ! -e "/catapult/provisioners/redhat/logs/${module}.${domain}.complete" ]; do
-                        cpu_decimal=$(top -bn 1 | awk '{print $9}' | tail -n +8 | awk '{s+=$1} END {print s}')
-                        cpuN+=(${cpu_decimal%.*})
-                        sleep 1
-                    done
-                    echo -e "=> domain: ${domain}"
-                    echo -e "=> domain_tld_override: ${domain_tld_override}"
-                    echo -e "=> software: ${software}"
-                    echo -e "=> software_dbprefix: ${software_dbprefix}"
-                    echo -e "=> software_workflow: ${software_workflow}"
-                    cat "/catapult/provisioners/redhat/logs/${module}.${domain}.log" | sed 's/^/     /'
-                done < <(echo "${configuration}" | shyaml get-values-0 websites.apache)
-                IFS=+ read <<< "${cpuN[*]}"
-                ((sum=REPLY))
-                total="${#cpuN[@]}"
-                echo -e "==> CPU USAGE: $((sum / total))% from $total samples"
-                # cleanup utility files
-                for file in "/catapult/provisioners/redhat/logs/${module}.*.log"; do
+        start=$(date +%s)
+        echo -e "\n\n\n==> MODULE: ${module}"
+        echo -e "==> DESCRIPTION: $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-value redhat.modules.${module}.description)"
+        echo -e "==> MULTITHREADING: $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-value redhat.modules.${module}.multithreading)"
+        # if multithreading is supported
+        if ([ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-value redhat.modules.${module}.multithreading) == "True" ]); then
+            # cleanup leftover utility files
+            for file in "/catapult/provisioners/redhat/logs/${module}.*.log"; do
+                if [ -e "$file" ]; then
                     rm $file
-                done
-                for file in "/catapult/provisioners/redhat/logs/${module}.*.complete"; do
+                fi
+            done
+            for file in "/catapult/provisioners/redhat/logs/${module}.*.complete"; do
+                if [ -e "$file" ]; then
                     rm $file
+                fi
+            done
+            # enable job control
+            set -m
+            # get configuration
+            source "/catapult/provisioners/redhat/modules/catapult.sh"
+            # loop through websites and pass to subprocesses
+            websiteN=0
+            echo "${configuration}" | shyaml get-values-0 websites.apache |
+            while read -r -d $'\0' website; do
+                bash "/catapult/provisioners/redhat/modules/${module}.sh" $1 $2 $3 $4 $websiteN >> "/catapult/provisioners/redhat/logs/${module}.$(echo "${website}" | shyaml get-value domain).log" 2>&1 &
+                (( websiteN += 1 ))
+            done
+            # determine when each subprocess finishes
+            cpuN=()
+            while read -r -d $'\0' website; do
+                domain=$(echo "${website}" | shyaml get-value domain)
+                domain_tld_override=$(echo "${website}" | shyaml get-value domain_tld_override 2>/dev/null )
+                software=$(echo "${website}" | shyaml get-value software 2>/dev/null )
+                software_dbprefix=$(echo "${website}" | shyaml get-value software_dbprefix 2>/dev/null )
+                software_workflow=$(echo "${website}" | shyaml get-value software_workflow 2>/dev/null )
+                while [ ! -e "/catapult/provisioners/redhat/logs/${module}.${domain}.complete" ]; do
+                    cpu_decimal=$(top -bn 1 | awk '{print $9}' | tail -n +8 | awk '{s+=$1} END {print s}')
+                    cpuN+=(${cpu_decimal%.*})
+                    sleep 1
                 done
-            else
-                bash "/catapult/provisioners/redhat/modules/${module}.sh" $1 $2 $3 $4
-            fi
-            end=$(date +%s)
-            echo -e "==> MODULE: ${module}"
-            echo -e "==> DURATION: $(($end - $start)) seconds"
+                echo -e "=> domain: ${domain}"
+                echo -e "=> domain_tld_override: ${domain_tld_override}"
+                echo -e "=> software: ${software}"
+                echo -e "=> software_dbprefix: ${software_dbprefix}"
+                echo -e "=> software_workflow: ${software_workflow}"
+                cat "/catapult/provisioners/redhat/logs/${module}.${domain}.log" | sed 's/^/     /'
+            done < <(echo "${configuration}" | shyaml get-values-0 websites.apache)
+            IFS=+ read <<< "${cpuN[*]}"
+            ((sum=REPLY))
+            total="${#cpuN[@]}"
+            echo -e "==> CPU USAGE: $((sum / total))% from $total samples"
+            # cleanup utility files
+            for file in "/catapult/provisioners/redhat/logs/${module}.*.log"; do
+                rm $file
+            done
+            for file in "/catapult/provisioners/redhat/logs/${module}.*.complete"; do
+                rm $file
+            done
+        else
+            bash "/catapult/provisioners/redhat/modules/${module}.sh" $1 $2 $3 $4
         fi
+        end=$(date +%s)
+        echo -e "==> MODULE: ${module}"
+        echo -e "==> DURATION: $(($end - $start)) seconds"
     done
 
     provisionend=$(date +%s)

@@ -36,7 +36,7 @@ fi
 # 80/443: create a _default_ catchall
 # if the vhost has not been linked, link the vhost
 # to test this visit the ip address of the respective environment redhat public ip via http:// or https://
-if [ ! -f /var/www/repositories/apache/_default_ ]; then
+if [ ! -e /var/www/repositories/apache/_default_ ]; then
     sudo ln -s /catapult/repositories/apache/_default_ /var/www/repositories/apache/
 fi
 
