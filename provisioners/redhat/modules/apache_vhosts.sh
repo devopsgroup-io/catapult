@@ -104,6 +104,7 @@ while IFS='' read -r -d '' key; do
         DocumentRoot /var/www/repositories/apache/$domain/$webroot
         ErrorLog /var/log/httpd/$domain_environment/error.log
         CustomLog /var/log/httpd/$domain_environment/access.log combined
+        LogLevel warn
         $force_auth_value
         $force_https_value
     </VirtualHost> 
@@ -116,9 +117,47 @@ while IFS='' read -r -d '' key; do
             DocumentRoot /var/www/repositories/apache/$domain/$webroot
             ErrorLog /var/log/httpd/$domain_environment/error.log
             CustomLog /var/log/httpd/$domain_environment/access.log combined
+            LogLevel warn
+            # Enable/Disable SSL for this virtual host.
             SSLEngine on
+            # List the enable protocol levels with which clients will be able to
+            # connect. Disable SSLv2 access by default.
+            SSLProtocol all -SSLv2
+            # List the ciphers that the client is permitted to negotiate.
+            # See the mod_ssl documentation for a complete list.
+            SSLCipherSuite HIGH:MEDIUM:!aNULL:!MD5
+            # This exports the standard SSL/TLS related 'SSL_*' environment variables.
+            # Per default this exportation is switched off for performance reasons,
+            # because the extraction step is an expensive operation and is usually
+            # useless for serving static content. So one usually enables the
+            # exportation for CGI and SSI requests only.
+            SSLOptions -StdEnvVars
             SSLCertificateFile /etc/ssl/certs/httpd-dummy-cert.key.cert
             SSLCertificateKeyFile /etc/ssl/certs/httpd-dummy-cert.key.cert
+            # The safe and default but still SSL/TLS standard compliant shutdown
+            # approach is that mod_ssl sends the close notify alert but doesn't wait for
+            # the close notify alert from client. When you need a different shutdown
+            # approach you can use one of the following variables:
+            # o ssl-unclean-shutdown:
+            #   This forces an unclean shutdown when the connection is closed, i.e. no
+            #   SSL close notify alert is send or allowed to received.  This violates
+            #   the SSL/TLS standard but is needed for some brain-dead browsers. Use
+            #   this when you receive I/O errors because of the standard approach where
+            #   mod_ssl sends the close notify alert.
+            # o ssl-accurate-shutdown:
+            #   This forces an accurate shutdown when the connection is closed, i.e. a
+            #   SSL close notify alert is send and mod_ssl waits for the close notify
+            #   alert of the client. This is 100% SSL/TLS standard compliant, but in
+            #   practice often causes hanging connections with brain-dead browsers. Use
+            #   this only for browsers where you know that their SSL implementation
+            #   works correctly.
+            # Notice: Most problems of broken clients are also related to the HTTP
+            # keep-alive facility, so you usually additionally want to disable
+            # keep-alive for those clients, too. Use variable "nokeepalive" for this.
+            # Similarly, one has to force some clients to use HTTP/1.0 to workaround
+            # their broken HTTP/1.1 implementation. Use variables "downgrade-1.0" and
+            # "force-response-1.0" for this.
+            BrowserMatch "MSIE [2-5]" nokeepalive ssl-unclean-shutdown downgrade-1.0 force-response-1.0
             $force_auth_value
         </VirtualHost>
     </IfModule>
