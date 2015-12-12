@@ -80,8 +80,10 @@ while IFS='' read -r -d '' key; do
     fi
     # handle the force_https option
     if [ "${force_https}" = true ]; then
+        force_http_value=""
         force_https_value="Redirect Permanent / https://${domain_environment}"
     else
+        force_http_value="Redirect Permanent / http://${domain_environment}"
         force_https_value=""
     fi
     # enable cors for localdev http response codes from dashboard
@@ -118,47 +120,31 @@ while IFS='' read -r -d '' key; do
             ErrorLog /var/log/httpd/$domain_environment/error.log
             CustomLog /var/log/httpd/$domain_environment/access.log combined
             LogLevel warn
-            # Enable/Disable SSL for this virtual host.
             SSLEngine on
-            # List the enable protocol levels with which clients will be able to
-            # connect. Disable SSLv2 access by default.
-            SSLProtocol all -SSLv2
-            # List the ciphers that the client is permitted to negotiate.
-            # See the mod_ssl documentation for a complete list.
-            SSLCipherSuite HIGH:MEDIUM:!aNULL:!MD5
-            # This exports the standard SSL/TLS related 'SSL_*' environment variables.
-            # Per default this exportation is switched off for performance reasons,
-            # because the extraction step is an expensive operation and is usually
-            # useless for serving static content. So one usually enables the
-            # exportation for CGI and SSI requests only.
+            # allow only secure protocols for client to connect
+            # SSLv2: FUBAR
+            # SSLv3: POODLE
+            SSLProtocol all -SSLv2 -SSLv3
+            # SSLCompression: CRIME
+            SSLCompression off
+            # add support for HSTS
+            # HSTS: SSLstrip, MITM
+            # Firefox 4, Chrome 4, IE 11, Opera 12, Safari (OS X 10.9)
+            Header always set Strict-Transport-Security "max-age=15768000"
+            # allow only secure ciphers that client can negotiate
+            # https://wiki.mozilla.org/Security/Server_Side_TLS
+            # Firefox 1, Chrome 1, IE 7, Opera 5, Safari 1
+            SSLHonorCipherOrder On
+            SSLCipherSuite ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-DSS-AES128-GCM-SHA256:kEDH+AESGCM:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA:ECDHE-ECDSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-DSS-AES128-SHA256:DHE-RSA-AES256-SHA256:DHE-DSS-AES256-SHA:DHE-RSA-AES256-SHA:ECDHE-RSA-DES-CBC3-SHA:ECDHE-ECDSA-DES-CBC3-SHA:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SHA256:AES256-SHA256:AES128-SHA:AES256-SHA:AES:DES-CBC3-SHA:HIGH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!PSK:!aECDH:!EDH-DSS-DES-CBC3-SHA:!EDH-RSA-DES-CBC3-SHA:!KRB5-DES-CBC3-SHA
+            # disable the SSL_ environment variable (usually CGI and SSI requests only)
             SSLOptions -StdEnvVars
+            # help old browsers
+            BrowserMatch "MSIE [2-5]" nokeepalive ssl-unclean-shutdown downgrade-1.0 force-response-1.0
+            # set the server certificate
             SSLCertificateFile /etc/ssl/certs/httpd-dummy-cert.key.cert
             SSLCertificateKeyFile /etc/ssl/certs/httpd-dummy-cert.key.cert
-            # The safe and default but still SSL/TLS standard compliant shutdown
-            # approach is that mod_ssl sends the close notify alert but doesn't wait for
-            # the close notify alert from client. When you need a different shutdown
-            # approach you can use one of the following variables:
-            # o ssl-unclean-shutdown:
-            #   This forces an unclean shutdown when the connection is closed, i.e. no
-            #   SSL close notify alert is send or allowed to received.  This violates
-            #   the SSL/TLS standard but is needed for some brain-dead browsers. Use
-            #   this when you receive I/O errors because of the standard approach where
-            #   mod_ssl sends the close notify alert.
-            # o ssl-accurate-shutdown:
-            #   This forces an accurate shutdown when the connection is closed, i.e. a
-            #   SSL close notify alert is send and mod_ssl waits for the close notify
-            #   alert of the client. This is 100% SSL/TLS standard compliant, but in
-            #   practice often causes hanging connections with brain-dead browsers. Use
-            #   this only for browsers where you know that their SSL implementation
-            #   works correctly.
-            # Notice: Most problems of broken clients are also related to the HTTP
-            # keep-alive facility, so you usually additionally want to disable
-            # keep-alive for those clients, too. Use variable "nokeepalive" for this.
-            # Similarly, one has to force some clients to use HTTP/1.0 to workaround
-            # their broken HTTP/1.1 implementation. Use variables "downgrade-1.0" and
-            # "force-response-1.0" for this.
-            BrowserMatch "MSIE [2-5]" nokeepalive ssl-unclean-shutdown downgrade-1.0 force-response-1.0
             $force_auth_value
+            $force_http_value
         </VirtualHost>
     </IfModule>
 
