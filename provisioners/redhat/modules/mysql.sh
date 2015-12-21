@@ -43,16 +43,32 @@ for database in $(mysql --defaults-extra-file=$dbconf -e "show databases" | egre
     fi
 done
 
-# create mysql user
+# clear and create mysql user
 # @todo user per db? 16 char limit
 mysql --defaults-extra-file=$dbconf -e "GRANT USAGE ON *.* TO '$(echo "${configuration}" | shyaml get-value environments.${1}.servers.redhat_mysql.mysql.user)'@'%'"
 mysql --defaults-extra-file=$dbconf -e "DROP USER '$(echo "${configuration}" | shyaml get-value environments.${1}.servers.redhat_mysql.mysql.user)'@'%'"
 mysql --defaults-extra-file=$dbconf -e "CREATE USER '$(echo "${configuration}" | shyaml get-value environments.${1}.servers.redhat_mysql.mysql.user)'@'%' IDENTIFIED BY '$(echo "${configuration}" | shyaml get-value environments.${1}.servers.redhat_mysql.mysql.user_password)'"
 
-# create maintenance user
+# clear and create maintenance user
 mysql --defaults-extra-file=$dbconf -e "GRANT USAGE ON *.* TO 'maintenance'@'%'"
 mysql --defaults-extra-file=$dbconf -e "DROP USER 'maintenance'@'%'"
 mysql --defaults-extra-file=$dbconf -e "CREATE USER 'maintenance'@'%'"
+
+# apply mysql and maintenance user grant to website => software databases
+echo "${configuration}" | shyaml get-values-0 websites.apache |
+while IFS='' read -r -d '' key; do
+
+    domainvaliddbname=$(echo "$key" | grep -w "domain" | cut -d ":" -f 2 | tr -d " " | tr "." "_")
+    software=$(echo "$key" | grep -w "software" | cut -d ":" -f 2 | tr -d " ")
+
+    if test -n "${software}"; then
+        # grant mysql user to database
+        mysql --defaults-extra-file=$dbconf -e "GRANT ALL ON ${1}_${domainvaliddbname}.* TO '$(echo "${configuration}" | shyaml get-value environments.${1}.servers.redhat_mysql.mysql.user)'@'%'";
+        # grant maintenance user to database
+        mysql --defaults-extra-file=$dbconf -e "GRANT ALL ON ${1}_${domainvaliddbname}.* TO 'maintenance'@'%'";
+    fi
+
+done
 
 # flush privileges
 mysql --defaults-extra-file=$dbconf -e "FLUSH PRIVILEGES"
@@ -83,12 +99,6 @@ while IFS='' read -r -d '' key; do
     if ! test -n "${software}"; then
         echo -e "\t* this website has no software setting, skipping database workflow"
     else
-        # grant mysql user to database
-        mysql --defaults-extra-file=$dbconf -e "GRANT ALL ON ${1}_${domainvaliddbname}.* TO '$(echo "${configuration}" | shyaml get-value environments.${1}.servers.redhat_mysql.mysql.user)'@'%'";
-        # grant maintenance user to database
-        mysql --defaults-extra-file=$dbconf -e "GRANT ALL ON ${1}_${domainvaliddbname}.* TO 'maintenance'@'%'";
-        # flush privileges
-        mysql --defaults-extra-file=$dbconf -e "FLUSH PRIVILEGES"
         # respect software_workflow option
         if ([ "${1}" = "production" ] && [ "${software_workflow}" = "downstream" ] && [ "${software_db}" != "" ] && [ "${software_db_tables}" != "0" ]) || ([ "${1}" = "test" ] && [ "${software_workflow}" = "upstream" ] && [ "${software_db}" != "" ] && [ "${software_db_tables}" != "0" ]); then
             echo -e "\t* workflow is set to ${software_workflow} and this is the ${1} environment, performing a database backup"
