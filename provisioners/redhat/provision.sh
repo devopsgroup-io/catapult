@@ -109,14 +109,14 @@ if [ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-values-0 redha
             # get configuration
             source "/catapult/provisioners/redhat/modules/catapult.sh"
             # loop through websites and pass to subprocesses
-            websiteN=0
+            website_index=0
             echo "${configuration}" | shyaml get-values-0 websites.apache |
             while read -r -d $'\0' website; do
-                bash "/catapult/provisioners/redhat/modules/${module}.sh" $1 $2 $3 $4 $websiteN >> "/catapult/provisioners/redhat/logs/${module}.$(echo "${website}" | shyaml get-value domain).log" 2>&1 &
-                (( websiteN += 1 ))
+                bash "/catapult/provisioners/redhat/modules/${module}.sh" $1 $2 $3 $4 $website_index >> "/catapult/provisioners/redhat/logs/${module}.$(echo "${website}" | shyaml get-value domain).log" 2>&1 &
+                (( website_index += 1 ))
             done
             # determine when each subprocess finishes
-            cpuN=()
+            cpu_load_samples=()
             while read -r -d $'\0' website; do
                 domain=$(echo "${website}" | shyaml get-value domain)
                 domain_tld_override=$(echo "${website}" | shyaml get-value domain_tld_override 2>/dev/null )
@@ -124,8 +124,8 @@ if [ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-values-0 redha
                 software_dbprefix=$(echo "${website}" | shyaml get-value software_dbprefix 2>/dev/null )
                 software_workflow=$(echo "${website}" | shyaml get-value software_workflow 2>/dev/null )
                 while [ ! -e "/catapult/provisioners/redhat/logs/${module}.${domain}.complete" ]; do
-                    cpu_decimal=$(top -bn 1 | awk '{print $9}' | tail -n +8 | awk '{s+=$1} END {print s}')
-                    cpuN+=(${cpu_decimal%.*})
+                    cpu_load_sample_decimal=$(top -bn 1 | awk '{print $9}' | tail -n +8 | awk '{s+=$1} END {print s}')
+                    cpu_load_samples+=(${cpu_load_sample_decimal%.*})
                     sleep 1
                 done
                 echo -e "=> domain: ${domain}"
@@ -135,10 +135,12 @@ if [ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-values-0 redha
                 echo -e "=> software_workflow: ${software_workflow}"
                 cat "/catapult/provisioners/redhat/logs/${module}.${domain}.log" | sed 's/^/     /'
             done < <(echo "${configuration}" | shyaml get-values-0 websites.apache)
-            IFS=+ read <<< "${cpuN[*]}"
-            ((sum=REPLY))
-            total="${#cpuN[@]}"
-            echo -e "==> CPU USAGE: $((sum / total))% from $total samples"
+            cpu_load_samples_sum=0
+            for i in ${cpu_load_samples[@]}; do
+              let cpu_load_samples_sum+=$i
+            done
+            cpu_load_samples_total="${#cpu_load_samples[@]}"
+            echo -e "==> CPU USAGE: $((cpu_load_samples_sum / cpu_load_samples_total))% from $cpu_load_samples_total samples"
             # cleanup utility files
             for file in "/catapult/provisioners/redhat/logs/${module}.*.log"; do
                 rm $file
