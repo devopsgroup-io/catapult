@@ -666,7 +666,7 @@ module Catapult
           if response.code.to_f.between?(399,499)
             catapult_exception("The monitor.us API could not authenticate, please verify [\"company\"][\"monitorus_api_key\"] and [\"company\"][\"monitorus_secret_key\"].")
           elsif response.code.to_f.between?(500,600)
-            puts "   - The Bitbucket API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
+            puts "   - The monitor.us API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
           else
             @api_monitorus = JSON.parse(response.body)
             if @api_monitorus["error"]
@@ -678,6 +678,25 @@ module Catapult
             end
           end
         end
+    end
+    # https://docs.newrelic.com/docs/apis/rest-api-v2
+    if @configuration["company"]["newrelic_api_key"] == nil || @configuration["company"]["newrelic_license_key"] == nil
+      catapult_exception("Please set [\"company\"][\"newrelic_api_key\"] and [\"company\"][\"newrelic_license_key\"] in secrets/configuration.yml")
+    else
+      uri = URI("https://api.newrelic.com/v2/users.json")
+      Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => OpenSSL::SSL::VERIFY_NONE) do |http|
+        request = Net::HTTP::Get.new uri.request_uri
+        request.add_field "X-Api-Key", "#{@configuration["company"]["newrelic_api_key"]}"
+        response = http.request request
+        if response.code.to_f.between?(399,499)
+          catapult_exception("The New Relic API could not authenticate, please verify [\"company\"][\"newrelic_api_key\"] and [\"company\"][\"newrelic_license_key\"].")
+        elsif response.code.to_f.between?(500,600)
+          puts "   - The New Relic API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
+        else
+          puts " * New Relic API authenticated successfully."
+          @api_cloudflare = JSON.parse(response.body)
+        end
+      end
     end
     puts "\nVerification of configuration[\"environments\"]:\n".color(Colors::WHITE)
     # get full list of available digitalocean slugs to validate against

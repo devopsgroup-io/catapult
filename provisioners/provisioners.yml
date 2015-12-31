@@ -31,6 +31,9 @@ redhat:
         mysql:
           description: "Installs and configures MariaDB server, then configures databases for websites with software."
           multithreading: false
+        newrelic:
+          description: "Installs and configures New Relic Server Monitor daemon."
+          multithreading: false
         php:
           description: "Installs and updates PHP and PHP modules."
           multithreading: false
@@ -52,7 +55,7 @@ redhat:
     servers:
         redhat:
           apache:
-            modules: ["system","iptables","time","software_tools","git_clean","git","rsync","software_config","php","apache","apache_vhosts_clean","apache_vhosts","cloudflare_zones","cloudflare_dns","cloudflare_cache"]
+            modules: ["system","iptables","time","newrelic","software_tools","git_clean","git","rsync","software_config","php","apache","apache_vhosts_clean","apache_vhosts","cloudflare_zones","cloudflare_dns","cloudflare_cache"]
           mysql:
-            modules: ["system","iptables","time","software_tools","git_clean","git","software_config","mysql"]
+            modules: ["system","iptables","time","newrelic","software_tools","git_clean","git","software_config","mysql"]
 windows:
