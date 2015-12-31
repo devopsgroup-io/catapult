@@ -234,6 +234,13 @@ Catapult uses several third-party services to pull everything off - below is a l
         3. Go to Tools > API > API Key.
         4. Place your API key at `~/secrets/configuration.yml["company"]["monitorus_api_key"]`
         5. Place your Secret key at `~/secrets/configuration.yml["company"]["monitorus_secret_key"]`
+    1. **New Relic** sign-up and configuration
+        1. Create a New Relic account at http://newrelic.com/
+        2. Sign in to your New Relic account
+        3. Go to your Account Settings > Integrations > API keys.
+        4. Generate and place your REST API key at `~/secrets/configuration.yml["company"]["newrelic_api_key"]`
+        3. Go to your Account Settings > Account > Summary.
+        5. Place your License key at `~/secrets/configuration.yml["company"]["newrelic_license_key"]`
 6. **Verify Configuration:**    
     1. To verify all of the configuration that you just set, open your command line and cd into your fork of Catapult, then run `vagrant status`. Catapult will confirm connection to all of the Services and inform you of any problems.
 
