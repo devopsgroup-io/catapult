@@ -32,7 +32,7 @@ module Catapult
 
     # puts intro
     puts "\n"
-    title = "Catapult Release Management - https://github.com/devopsgroup-io/catapult-release-management"
+    title = "Catapult - https://github.com/devopsgroup-io/catapult"
     length = title.size
     padding = 5
     puts "+".ljust(padding,"-") + "".ljust(length,"-") + "+".rjust(padding,"-")
