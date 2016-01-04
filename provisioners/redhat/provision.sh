@@ -25,14 +25,16 @@ echo "   \_\__/   \_\__/          \_\__/   \_\__/     "
 
 
 echo -e "\n\n\n==> SYSTEM INFORMATION"
-echo -e "CPU"
+echo -e "SYSTEM"
+hostnamectl status
+echo -e "\nCPU"
 cat /proc/cpuinfo | grep 'model name' | cut -d: -f2 | awk 'NR==1' | tr -d " "
 echo -e "$(top -bn 1 | awk '{print $9}' | tail -n +8 | awk '{s+=$1} END {print s}')% utilization"
-echo -e "\nHDD"
+echo -e "\nDISKS"
 df -h
-echo -e "\nNET"
+echo -e "\nNETWORK"
 ifconfig
-echo -e "\nRAM"
+echo -e "\nMEMORY"
 free -h
 
 

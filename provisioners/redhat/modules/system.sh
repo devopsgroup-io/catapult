@@ -20,38 +20,8 @@ sudo cat > "/root/.forward" << EOF
 "$(echo "${configuration}" | shyaml get-value company.email)"
 EOF
 
-# send an email with catapult stack
-if [ "$1" = "production" ]; then
-    sudo touch /tmp/email.txt
-    sudo echo -e "Subject: Catapult ($(echo "${configuration}" | shyaml get-value company.name)) - Environment Update" >> /tmp/email.txt
-    sudo echo -e "\n" >> /tmp/email.txt
-    echo "${configuration}" | shyaml get-values-0 websites.apache |
-    while IFS='' read -r -d '' key; do
-        domain=$(echo "$key" | grep -w "domain" | cut -d ":" -f 2 | tr -d " ")
-        domain_tld_override=$(echo "$key" | grep -w "domain_tld_override" | cut -d ":" -f 2 | tr -d " ")
-        if [ ! -z "${domain_tld_override}" ]; then
-            domain_root="${domain}.${domain_tld_override}"
-        else
-            domain_root="${domain}"
-        fi
-        force_auth=$(echo "$key" | grep -w "force_auth" | cut -d ":" -f 2 | tr -d " ")
-        force_auth_exclude=$(echo "$key" | grep -w "force_auth_exclude" | tr -d " ")
-        if ([ ! -z "${force_auth_exclude}" ]); then
-            force_auth_excludes=( $(echo "${key}" | shyaml get-values force_auth_exclude) )
-        else
-            force_auth_excludes=""
-        fi
-        sudo echo -e "domain: ${domain}" >> /tmp/email.txt
-        sudo echo -e "http://dev.${domain_root}" >> /tmp/email.txt
-        sudo echo -e "http://test.${domain_root}" >> /tmp/email.txt
-        sudo echo -e "http://qc.${domain_root}" >> /tmp/email.txt
-        sudo echo -e "http://${domain_root}" >> /tmp/email.txt
-        sudo echo -e "force_auth: ${force_auth}" >> /tmp/email.txt
-        sudo echo -e "force_auth_exclude: ${force_auth_excludes}" >> /tmp/email.txt
-        sudo echo -e "\n" >> /tmp/email.txt
-    done
-    sudo echo -e "\n" >> /tmp/email.txt
-    sudo echo -e "https://devopsgroup.io/" >> /tmp/email.txt
-    sendmail -F"Catapult" "$(echo "${configuration}" | shyaml get-value company.email)" < /tmp/email.txt
-    sudo cat /dev/null > /tmp/email.txt
+# set dev hostnames
+# @todo set hostnames in upstream servers, will need to align vagrant names, etc
+if ([ $1 = "dev" ]); then
+    hostnamectl set-hostname "$(echo "${configuration}" | shyaml get-value company.name)-${1}-redhat-${4}"
 fi
