@@ -209,7 +209,7 @@ while IFS='' read -r -d '' key; do
                         # replace variances of the following urls during a restore to match the environment
                         # pay attention to the order of the (${domain}.${domain_tld_override|${domain}}) rule
                         # https://regex101.com/r/vF7hY9/2
-                        # :\/\/(www\.)?(dev\.|test\.)?(devopsgroup\.io\.example.com|devopsgroup\.io)
+                        # :\/\/(www\.)?(dev\.|test\.|qc\.)?(devopsgroup\.io\.example.com|devopsgroup\.io)
                         # ://dev.devopsgroup.io
                         # ://www.dev.devopsgroup.io
                         # ://test.devopsgroup.io
@@ -225,7 +225,7 @@ while IFS='' read -r -d '' key; do
                         # for software without a cli tool, use sed via the sql file to replace urls
                         if ([ "${software}" = "codeigniter2" ] || [ "${software}" = "codeigniter3" ] || [ "${software}" = "drupal6" ] || [ "${software}" = "drupal7" ] || [ "${software}" = "silverstripe" ] || [ "${software}" = "xenforo" ]); then
                             echo -e "\t* replacing URLs in the database to align with the enivronment..."
-                            sed -r --expression="s/:\/\/(www\.)?(dev\.|test\.)?(${domain_url_replace})/:\/\/\1${domain_url}/g" "/var/www/repositories/apache/${domain}/_sql/$(basename "$file")" > "/var/www/repositories/apache/${domain}/_sql/${1}.$(basename "$file")"
+                            sed -r --expression="s/:\/\/(www\.)?(dev\.|test\.|qc\.)?(${domain_url_replace})/:\/\/\1${domain_url}/g" "/var/www/repositories/apache/${domain}/_sql/$(basename "$file")" > "/var/www/repositories/apache/${domain}/_sql/${1}.$(basename "$file")"
                         else
                             cp "/var/www/repositories/apache/${domain}/_sql/$(basename "$file")" "/var/www/repositories/apache/${domain}/_sql/${1}.$(basename "$file")"
                         fi
@@ -235,7 +235,7 @@ while IFS='' read -r -d '' key; do
                         # for software with a cli tool, use cli tool to replace urls
                         if [[ "${software}" = "wordpress" ]]; then
                             echo -e "\t* replacing URLs in the database to align with the enivronment..."
-                            php /catapult/provisioners/redhat/installers/wp-cli.phar --allow-root --path="/var/www/repositories/apache/${domain}/${webroot}" search-replace ":\/\/(www\.)?(dev\.|test\.)?(${domain_url_replace})" "://\$1${domain_url}" --regex | sed "s/^/\t\t/"
+                            php /catapult/provisioners/redhat/installers/wp-cli.phar --allow-root --path="/var/www/repositories/apache/${domain}/${webroot}" search-replace ":\/\/(www\.)?(dev\.|test\.|qc\.)?(${domain_url_replace})" "://\$1${domain_url}" --regex | sed "s/^/\t\t/"
                             mysql --defaults-extra-file=$dbconf ${1}_${domainvaliddbname} -e "UPDATE ${software_dbprefix}options SET option_value='$(echo "${configuration}" | shyaml get-value company.email)' WHERE option_name = 'admin_email';"
                         fi
                     fi
