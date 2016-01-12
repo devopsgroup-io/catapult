@@ -1,8 +1,8 @@
-# Catapult Release Management #
+# Catapult #
 
 
 
-**Welcome to devopsgroup.io Catapult Release Management**, a complete DevOps Release Management solution featuring automated website deployment and continuous integration, while following Gitflow and SCRUM workflows. Built for Developers, but simple enough to use by non-Developers. Catapult's core technologies and features include:
+**Welcome to Catapult**, a complete DevOps Release Management solution featuring automated website deployment and continuous integration, while following Gitflow and SCRUM workflows. Built for Developers, but simple enough to use by non-Developers. Catapult's core technologies and features include:
 
 * Configuration Management via CloudFlare, DigitalOcean, Git, GPG, Shell, and Vagrant
 * Continuous Integration via Bamboo and AWS
@@ -34,7 +34,7 @@ Catapult manages all of this for you through an open-source and well-documented 
 
 ## Table of Contents ##
 
-- [Catapult Release Management](#catapult-release-management)
+- [Catapult](#catapult)
     - [Table of Contents](#table-of-contents)
     - [Supported Software](#supported-software)
 - [Setup](#setup)
@@ -497,7 +497,7 @@ Catapult uses many factors to make the best decision when it comes to choosing *
 
 # Contributing #
 
-So you want to contribute... Great! Open source projects like Catapult Release Management succeed or fail upon the involvement of a thriving community of developers, who often offer various levels of code skills and time commitment. Here are some ways you can begin contributing right away, at whatever level is most comfortable for you.
+So you want to contribute... Great! Open source projects like Catapult succeed or fail upon the involvement of a thriving community of developers, who often offer various levels of code skills and time commitment. Here are some ways you can begin contributing right away, at whatever level is most comfortable for you.
 
   * Submit a feature
   * Report a bug

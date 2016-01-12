@@ -1,8 +1,12 @@
 source "/catapult/provisioners/redhat/modules/catapult.sh"
 
 # reset httpd log files
-sudo cat /dev/null > /var/log/httpd/access_log
-sudo cat /dev/null > /var/log/httpd/error_log
+if [ -e /var/log/httpd/access_log ]; then
+  sudo cat /dev/null > /var/log/httpd/access_log
+fi
+if [ -e /var/log/httpd/error_log ]; then
+  sudo cat /dev/null > /var/log/httpd/error_log
+fi
 
 # install apache
 sudo yum install -y httpd
