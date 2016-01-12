@@ -720,7 +720,7 @@ module Catapult
     # validate @configuration["environments"]
     @configuration["environments"].each do |environment,data|
       #validate digitalocean droplets
-      unless "#{environment}" == "dev"
+      unless "#{environment}" == "dev" || @api_digitalocean == nil
 
         # redhat droplet
         droplet = @api_digitalocean["droplets"].find { |element| element['name'] == "#{@configuration["company"]["name"].downcase}-#{environment}-redhat" }
