@@ -96,12 +96,12 @@ if [ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-values-0 redha
         # if multithreading is supported
         if ([ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-value redhat.modules.${module}.multithreading) == "True" ]); then
             # cleanup leftover utility files
-            for file in "/catapult/provisioners/redhat/logs/${module}.*.log"; do
+            for file in /catapult/provisioners/redhat/logs/${module}.*.log; do
                 if [ -e "$file" ]; then
                     rm $file
                 fi
             done
-            for file in "/catapult/provisioners/redhat/logs/${module}.*.complete"; do
+            for file in /catapult/provisioners/redhat/logs/${module}.*.complete; do
                 if [ -e "$file" ]; then
                     rm $file
                 fi
@@ -143,12 +143,16 @@ if [ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-values-0 redha
             done
             cpu_load_samples_total="${#cpu_load_samples[@]}"
             echo -e "==> CPU USAGE: $((cpu_load_samples_sum / cpu_load_samples_total))% from $cpu_load_samples_total samples"
-            # cleanup utility files
-            for file in "/catapult/provisioners/redhat/logs/${module}.*.log"; do
-                rm $file
+            # cleanup leftover utility files
+            for file in /catapult/provisioners/redhat/logs/${module}.*.log; do
+                if [ -e "$file" ]; then
+                    rm $file
+                fi
             done
-            for file in "/catapult/provisioners/redhat/logs/${module}.*.complete"; do
-                rm $file
+            for file in /catapult/provisioners/redhat/logs/${module}.*.complete; do
+                if [ -e "$file" ]; then
+                    rm $file
+                fi
             done
         else
             bash "/catapult/provisioners/redhat/modules/${module}.sh" $1 $2 $3 $4
