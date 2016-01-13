@@ -153,7 +153,7 @@ while IFS='' read -r -d '' key; do
         Options -Indexes +FollowSymlinks
         # define new relic appname
         <IfModule php5_module>
-            php_value newrelic.appname "$(catapult company.name)-${1}-redhat;${domain_environment}"
+            php_value newrelic.appname "$(catapult company.name | tr '[:upper:]' '[:lower:]')-${1}-redhat;${domain_environment}"
         </IfModule>
     </Directory>
 
@@ -171,10 +171,6 @@ EOF
     fi
 
 done
-if [ $1 != "dev" ]; then
-    # reload newrelic daemon
-    /etc/init.d/newrelic-daemon restart
-fi
 # reload apache
 sudo systemctl reload httpd.service
 sudo systemctl status httpd.service
