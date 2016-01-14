@@ -23,6 +23,8 @@ elif [ "${software}" = "codeigniter2" ]; then
     echo -e "generating ${software} ${file}..."
     if [ -f "${file}" ]; then
         sudo chmod 0777 "${file}"
+    else
+        mkdir -p $(dirname "${file}")
     fi
     sed -e "s/\$db\['default'\]\['hostname'\]\s=\s'localhost';/\$db\['default'\]\['hostname'\] = '${redhat_mysql_ip}';/g" \
         -e "s/\$db\['default'\]\['username'\]\s=\s'';/\$db\['default'\]\['username'\] = '${mysql_user}';/g" \
@@ -36,6 +38,8 @@ elif [ "${software}" = "codeigniter3" ]; then
     echo -e "generating ${software} ${file}..."
     if [ -f "${file}" ]; then
         sudo chmod 0777 "${file}"
+    else
+        mkdir -p $(dirname "${file}")
     fi
     sed -e "s/'hostname'\s=>\s'localhost'/'hostname' => '${redhat_mysql_ip}'/g" \
         -e "s/'username'\s=>\s''/'username' => '${mysql_user}'/g" \
@@ -49,6 +53,8 @@ elif [ "${software}" = "drupal6" ]; then
     echo -e "generating ${software} ${file}..."
     if [ -f "${file}" ]; then
         sudo chmod 0777 "${file}"
+    else
+        mkdir -p $(dirname "${file}")
     fi
     connectionstring="mysql:\/\/${mysql_user}:${mysql_user_password}@${redhat_mysql_ip}\/${1}_${domainvaliddbname}"
     sed -e "s/mysql:\/\/username:password@localhost\/databasename/${connectionstring}/g" \
@@ -59,6 +65,8 @@ elif [ "${software}" = "drupal7" ]; then
     echo -e "generating ${software} ${file}..."
     if [ -f "${file}" ]; then
         sudo chmod 0777 "${file}"
+    else
+        mkdir -p $(dirname "${file}")
     fi
     connectionstring="\$databases['default']['default'] = array('driver' => 'mysql','database' => '${1}_${domainvaliddbname}','username' => '${mysql_user}','password' => '${mysql_user_password}','host' => '${redhat_mysql_ip}','prefix' => '${software_dbprefix}');"
     sed -e "s/\$databases\s=\sarray();/${connectionstring}/g" \
@@ -69,6 +77,8 @@ elif [ "${software}" = "silverstripe" ]; then
     echo -e "generating ${software} ${file}..."
     if [ -f "${file}" ]; then
         sudo chmod 0777 "${file}"
+    else
+        mkdir -p $(dirname "${file}")
     fi
     connectionstring="\$databaseConfig = array(\"type\" => \"MySQLDatabase\",\"server\" => \"${redhat_mysql_ip}\",\"username\" => \"${mysql_user}\",\"password\" => \"${mysql_user_password}\",\"database\" => \"${1}_${domainvaliddbname}\");"
     sed -e "s/\$databaseConfig\s=\sarray();/${connectionstring}/g" \
@@ -79,6 +89,8 @@ elif [ "${software}" = "wordpress" ]; then
     echo -e "generating ${software} ${file}..."
     if [ -f "${file}" ]; then
         sudo chmod 0777 "${file}"
+    else
+        mkdir -p $(dirname "${file}")
     fi
     sed -e "s/database_name_here/${1}_${domainvaliddbname}/g" \
         -e "s/username_here/${mysql_user}/g" \
@@ -92,6 +104,8 @@ elif [ "${software}" = "xenforo" ]; then
     echo -e "generating ${software} ${file}..."
     if [ -f "${file}" ]; then
         sudo chmod 0777 "${file}"
+    else
+        mkdir -p $(dirname "${file}")
     fi
     sed -e "s/\$config\['db'\]\['host'\]\s=\s'localhost';/\$config\['db'\]\['host'\] = '${redhat_mysql_ip}';/g" \
         -e "s/\$config\['db'\]\['username'\]\s=\s'';/\$config\['db'\]\['username'\] = '${mysql_user}';/g" \
