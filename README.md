@@ -58,7 +58,8 @@ Catapult manages all of this for you through an open-source and well-documented 
 
 Catapult supports the following software:
 
-* Any website without a database dependency built in PHP
+* Any PHP project compatible with PHP 5.4
+    * as limited by CentOS 7.2
 * CodeIgniter 2.x
 * CodeIgniter 3.x
 * Drupal 6.x, Drupal 7.x
