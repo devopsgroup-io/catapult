@@ -1,6 +1,5 @@
 # Catapult #
-
-
+<img src="https://cdn.rawgit.com/devopsgroup-io/catapult/master/repositories/apache/_default_/svg/catapult.svg" width="200">
 
 **Welcome to Catapult**, a complete DevOps Release Management solution featuring automated website deployment and continuous integration, while following Gitflow and SCRUM workflows. Built for Developers, but simple enough to use by non-Developers. Catapult's core technologies and features include:
 
