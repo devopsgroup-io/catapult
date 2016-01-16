@@ -142,11 +142,17 @@ elif [ "$software" = "wordpress" ]; then
     fi
 fi
 
-# run updatedb
-if [ "$software" = "drupal6" ]; then
+# run software database update operations
+if [ "$software" = "codeigniter2" ]; then
+    #cd "/var/www/repositories/apache/${domain}/${webroot}" && php index.php migrate
+elif [ "$software" = "codeigniter3" ]; then
+    #cd "/var/www/repositories/apache/${domain}/${webroot}" && php index.php migrate
+elif [ "$software" = "drupal6" ]; then
     cd "/var/www/repositories/apache/${domain}/${webroot}" && drush updatedb -y
 elif [ "$software" = "drupal7" ]; then
     cd "/var/www/repositories/apache/${domain}/${webroot}" && drush updatedb -y
+elif [ "$software" = "wordpress" ]; then
+    cd "/var/www/repositories/apache/${domain}/${webroot}" && php /catapult/provisioners/redhat/installers/wp-cli.phar --allow-root core update-db
 fi
 
 touch "/catapult/provisioners/redhat/logs/software_config.$(catapult websites.apache.$5.domain).complete"
