@@ -26,6 +26,7 @@ echo "   \_\__/   \_\__/          \_\__/   \_\__/     "
 
 echo -e "\n\n\n==> SYSTEM INFORMATION"
 echo -e "SYSTEM"
+cat /etc/centos-release
 hostnamectl status
 echo -e "\nCPU"
 cat /proc/cpuinfo | grep 'model name' | cut -d: -f2 | awk 'NR==1' | tr -d " "
