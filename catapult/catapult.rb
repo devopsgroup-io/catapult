@@ -655,30 +655,6 @@ module Catapult
         end
       end
     end
-    # http://www.monitor.us/api/api.html
-    if @configuration["company"]["monitorus_api_key"] == nil || @configuration["company"]["monitorus_secret_key"] == nil
-      catapult_exception("Please set [\"company\"][\"monitorus_api_key\"] and [\"company\"][\"monitorus_secret_key\"] in secrets/configuration.yml")
-    else
-        uri = URI("http://monitor.us/api?action=authToken&apikey=#{@configuration["company"]["monitorus_api_key"]}&secretkey=#{@configuration["company"]["monitorus_secret_key"]}")
-        Net::HTTP.start(uri.host, uri.port) do |http|
-          request = Net::HTTP::Get.new uri.request_uri
-          response = http.request request # Net::HTTPResponse object
-          if response.code.to_f.between?(399,499)
-            catapult_exception("The monitor.us API could not authenticate, please verify [\"company\"][\"monitorus_api_key\"] and [\"company\"][\"monitorus_secret_key\"].")
-          elsif response.code.to_f.between?(500,600)
-            puts "   - The monitor.us API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
-          else
-            @api_monitorus = JSON.parse(response.body)
-            if @api_monitorus["error"]
-              catapult_exception("The monitor.us API could not authenticate, please verify [\"company\"][\"monitorus_api_key\"] and [\"company\"][\"monitorus_secret_key\"].")
-            else
-              puts " * monitor.us API authenticated successfully."
-              @api_monitorus_authtoken = @api_monitorus["authToken"]
-              puts "   - Successfully generated an authToken"
-            end
-          end
-        end
-    end
     # https://docs.newrelic.com/docs/apis/rest-api-v2
     if @configuration["company"]["newrelic_api_key"] == nil || @configuration["company"]["newrelic_license_key"] == nil
       catapult_exception("Please set [\"company\"][\"newrelic_api_key\"] and [\"company\"][\"newrelic_license_key\"] in secrets/configuration.yml")
@@ -859,75 +835,6 @@ module Catapult
               domain_tld_override_depth = instance["domain_tld_override"].split(".")
               if domain_tld_override_depth.count != 2
                 catapult_exception("There is an error in your secrets/configuration.yml file.\nThe domain_tld_override for websites => #{service} => domain => #{instance["domain"]} is invalid, it must only be one domain level (company.com)")
-              end
-            end
-            # monitor each production domain over http and https
-            uri = URI("http://monitor.us/api")
-            Net::HTTP.start(uri.host, uri.port) do |http|
-              request = Net::HTTP::Post.new uri.request_uri
-              request.body = URI::encode\
-                (""\
-                  "action=addExternalMonitor"\
-                  "&authToken=#{@api_monitorus_authtoken}"\
-                  "&apikey=#{@configuration["company"]["monitorus_api_key"]}"\
-                  "&interval=30"\
-                  "&locationIds=1,3"\
-                  "&name=http_#{instance["domain"]}"\
-                  "&tag=http_#{instance["domain"]}"\
-                  "&timestamp=#{Time.now.getutc}"\
-                  "&type=http"\
-                  "&url=#{instance["domain"]}"\
-                "")
-              response = http.request request # Net::HTTPResponse object
-              if response.code.to_f.between?(399,600)
-                puts "   - The monitor.us API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
-              else
-                api_monitorus_monitor_http = JSON.parse(response.body)
-                # errorCode 11 => monitorUrlExists
-                if api_monitorus_monitor_http["status"] == "ok" || api_monitorus_monitor_http["errorCode"].to_f == 11
-                  puts "   - Configured monitor.us http monitor."
-                # errorCode 14 => The URL is not resolved.
-                elsif api_monitorus_monitor_http["errorCode"].to_f == 14
-                  puts "   - Could not add the monitor.us http monitor. The domain name is not registered."
-                elsif api_monitorus_monitor_http["error"].include?("out of limit")
-                  puts "   - monitor.us api limit of 1000 requests per hour has been hit, skipping for now."
-                else
-                  catapult_exception("Unable to configure monitor.us http monitor for websites => #{service} => domain => #{instance["domain"]}.")
-                end
-              end
-            end
-            uri = URI("http://monitor.us/api")
-            Net::HTTP.start(uri.host, uri.port) do |http|
-              request = Net::HTTP::Post.new uri.request_uri
-              request.body = URI::encode\
-                (""\
-                  "action=addExternalMonitor"\
-                  "&authToken=#{@api_monitorus_authtoken}"\
-                  "&apikey=#{@configuration["company"]["monitorus_api_key"]}"\
-                  "&interval=30"\
-                  "&locationIds=1,3"\
-                  "&name=https_#{instance["domain"]}"\
-                  "&tag=https_#{instance["domain"]}"\
-                  "&timestamp=#{Time.now.getutc}"\
-                  "&type=https"\
-                  "&url=#{instance["domain"]}"\
-                "")
-              response = http.request request # Net::HTTPResponse object
-              if response.code.to_f.between?(399,600)
-                puts "   - The monitor.us API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
-              else
-                api_monitorus_monitor_https = JSON.parse(response.body)
-                # errorCode 11 => monitorUrlExists
-                if api_monitorus_monitor_https["status"] == "ok" || api_monitorus_monitor_https["errorCode"].to_f == 11
-                  puts "   - Configured monitor.us https monitor."
-                # errorCode 14 => The URL is not resolved.
-                elsif api_monitorus_monitor_https["errorCode"].to_f == 14
-                  puts "   - Could not add the monitor.us https monitor. The domain name is not registered."
-                elsif api_monitorus_monitor_https["error"].include?("out of limit")
-                  puts "   - monitor.us api limit of 1000 requests per hour has been hit, skipping for now."
-                else
-                  catapult_exception("Unable to configure monitor.us https monitor for websites => #{service} => domain => #{instance["domain"]}.")
-                end
               end
             end
           end
