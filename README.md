@@ -233,12 +233,6 @@ Catapult uses several third-party services to pull everything off - below is a l
         3. Visit your My Account section at https://www.cloudflare.com/a/account/my-account and scroll down to your API Key and place the token value at `~/secrets/configuration.yml["company"]["cloudflare_api_key"]`
         4. Place the email address of the email address that you used to sign up for CloudFlare at `~/secrets/configuration.yml["company"]["cloudflare_email"]`
 5. **Monitoring:**
-    1. **monitor.us** sign-up and configuration
-        1. Create a monitor.us account at http://www.monitor.us
-        2. Sign in to your new monitor.us account
-        3. Go to Tools > API > API Key.
-        4. Place your API key at `~/secrets/configuration.yml["company"]["monitorus_api_key"]`
-        5. Place your Secret key at `~/secrets/configuration.yml["company"]["monitorus_secret_key"]`
     1. **New Relic** sign-up and configuration
         1. Create a New Relic account at http://newrelic.com/
         2. Sign in to your New Relic account
@@ -267,7 +261,7 @@ Catapult uses several third-party services to pull everything off - below is a l
 | **DNS:**                      |                                                                  |              |
 | CloudFlare                    | test., qc., and production global DNS                            | Free         |
 | **Monitoring:**               |                                                                  |              |
-| monitor.us                    | Production website updtime monitoring                            | Free         |
+| New Relic                     | Full-stack performance monitoring                                | Free         |
 | **Total**                     |                                                                  | $41 - $55    |
 
 
@@ -471,7 +465,6 @@ Once you Provision Websites and it's time to work on a website, there are a few 
 
 
 
-
 # Troubleshooting #
 
 Below is a list of known limitations with Catapult, if you're still having issues with Catapult, [submit a GitHub Issue](https://github.com/devopsgroup-io/catapult-release-management/issues/new).
@@ -482,21 +475,8 @@ Below is a list of known limitations with Catapult, if you're still having issue
     * [09-01-2015] vagrant rebuild was failing with a `The configured shell (config.ssh.shell) is invalid and unable to properly execute commands.` it is due to DigitalOcean's API not re-inserting the SSH key that was originally used during the first vagrant up (creation of the droplet). To rebuild, you must use the DigitalOcean console, run through the first root password reset workflow that was emailed to you, then vi /etc/sudoers and remove the Defaults requiretty line and save and exit. You can then run vagrant provision successfully.
 * **Git**
     * [09-08-2015] Some database dumps exceed 100MB, so it's recommened to use Bitbucket in those instances as Catapult auto-commits database dumps to your website's repository, up to 500MB worth of database dumps or the one, newest database dump. [Bitbucket](https://help.github.com/articles/what-is-my-disk-quota/) has a 2GB hard repo push limit with no documented file limit and [GitHub](https://help.github.com/articles/what-is-my-disk-quota/) has a 1GB soft repo limit with a 100MB file size limit.
-* **monitor.us**
-    * [08-10-2015] If your `~/secrets/configuration.yml["websites"]["apache/iis"]["domain"]` includes the `force_https` option, you will need to login to monitor.us and enable SNI from Monitors > Monitor List > Actions > Basic Settings > Enable SNI support. 
 * **Vagrant**
     * [07-27-2015] If your `~/secrets/configuration.yml["websites"]["apache/iis"]["domain"]` includes the `force_https` option, during `vagrant status` you will receive an err for the http response code for `.dev` as this is a self-signed cert and not routing through CloudFlare.
-
-
-
-# Services Justification #
-
-Catapult uses many factors to make the best decision when it comes to choosing **Services**, the following are taken into account - popularity, cost, API support, and user experience. The following is an outline of what we think the common questions may be when you see Catapult using a particular **Service**. Have your own perspective? [Let us know](https://github.com/devopsgroup-io/catapult-release-management/issues/new).
-
-* **monitor.us**
-    * [08-10-2015] monitor.us does not have the greatest user interface, branding, or technology. However, it does something that no other application monitoring services do - it offers free http/https monitoring and an API that allows Catapult to add these monitors for you.
-        * A service to watch would be New Relic, however, the blocker is that there is no API support for their synthetic monitoring.
-        * Other services researched were AppDynamics, DataDog, and StatusCake which all fell short in pricing or API functionality.
 
 
 
