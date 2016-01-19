@@ -17,7 +17,7 @@
 * Continuous Integration - Bamboo and AWS
 * Performance Monitoring - New Relic
 
-Do you need Catapult? Here a few triggers:
+Do you need Catapult? Here are a few triggers:
 
 * Production is down.
 * We need a test site.
