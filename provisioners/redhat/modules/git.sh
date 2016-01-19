@@ -15,6 +15,11 @@ if [ -d "/var/www/repositories/apache/$(catapult websites.apache.$5.domain)/.git
         sudo rm -rf /var/www/repositories/apache/$(catapult websites.apache.$5.domain)
         sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git clone --recursive -b $(catapult environments.$1.branch) $(catapult websites.apache.$5.repo) /var/www/repositories/apache/$(catapult websites.apache.$5.domain)"
     else
+        # stash any pending work in localdev as a courtesy
+        if [ $1 = "dev" ]; then
+            cd /var/www/repositories/apache/$(catapult websites.apache.$5.domain) \
+                && git stash save
+        fi
         cd /var/www/repositories/apache/$(catapult websites.apache.$5.domain) \
             && git reset -q --hard HEAD -- \
             && git checkout . \
