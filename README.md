@@ -7,7 +7,7 @@
 
 :rocket: **Our vision** is to afford developers an accelerated path to best practice and performance at minimal cost.
 
-<br><br>
+<br>
 
 **Do you need a website and workflow management platform?** Here are a few triggers.
 
