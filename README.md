@@ -1,11 +1,12 @@
 # Catapult #
 <img src="https://cdn.rawgit.com/devopsgroup-io/catapult/master/repositories/apache/_default_/svg/catapult.svg" width="200">
 
-**Catapult** is a lean website and workflow management platform built from leading and affordable technology.
+:boom: **Catapult** is a lean website and workflow management platform built from leading and affordable technology.
 
-**Our mission** is to create a pre-defined platform that orchestrates every common problem of a website's life-cycle.
+:earth_americas: **Our mission** is to create a pre-defined platform that orchestrates every common problem of a website's life-cycle.
 
-**Our vision** is to afford developers an accelerated path to best practice and performance at minimal cost.
+:rocket: **Our vision** is to afford developers an accelerated path to best practice and performance at minimal cost.
+
 
 **Do you need a website and workflow management platform?** Here are a few triggers.
 
