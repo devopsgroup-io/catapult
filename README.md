@@ -3,7 +3,7 @@
 
 **Catapult** is a lean website and workflow management platform built from leading and affordable technology.
 
-**Our mission** is to create a pre-defined platform that solves every common problem of a website's life-cycle.
+**Our mission** is to create a pre-defined platform that orchestrates every common problem of a website's life-cycle.
 
 **Our vision** is to afford developers an accelerated path to best practice and performance at minimal cost.
 
