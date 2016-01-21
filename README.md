@@ -3,7 +3,7 @@
 
 :boom: **Catapult** is a lean website and workflow management platform built from leading and affordable technology.
 
-:earth_americas: **Our mission** is to create a pre-defined platform that orchestrates every common problem of a website's life-cycle.
+:earth_americas: **Our mission** is to create a pre-defined platform that orchestrates every DevOps task of a common website's life-cycle.
 
 :rocket: **Our vision** is to afford developers an accelerated path to best practice and performance at minimal cost.
 
