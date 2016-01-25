@@ -86,7 +86,7 @@ The free market and competition is great - it pushes the envelope of innovation.
 Technology | Catapult | Pantheon
 -----------|----------|---------
 Source | Open | Closed
-Monthly Cost | $40 | $400
+Base Monthly Cost | $40 | $400
 Approach | Virtual Machine | Container
 Methodology | SCRUM | :x:
 Workflow | Git Flow | Git Flow
@@ -97,7 +97,7 @@ Dashboard | CLI & **Web-based | Web-based
 Git | GitHub & Bitbucket | Proprietary
 DNS | CloudFlare | :x:
 Monitoring | New Relic | :x:
-Software | Numerous | 2
+Supported Software | Numerous | 2
 
 ** Catapult rolls out new features on a regular basis - this feature is highlighted for improvement or a future release.
 
