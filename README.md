@@ -274,12 +274,12 @@ Catapult uses several third-party services to pull everything off - below is a l
 | Service                       | Description                                                      | Monthly Cost |
 |-------------------------------|------------------------------------------------------------------|-------------:|
 | **Hosting:**                  |                                                                  |              |
-| DigitalOcean                  | `~/secrets/configuration.yml["company"]["name"]-test-redhat`             | $5           |
-| DigitalOcean                  | `~/secrets/configuration.yml["company"]["name"]-qc-redhat`               | $5           |
-| DigitalOcean                  | `~/secrets/configuration.yml["company"]["name"]-production-redhat`       | $5           |
-| DigitalOcean                  | `~/secrets/configuration.yml["company"]["name"]-test-redhat-mysql`       | $5           |
-| DigitalOcean                  | `~/secrets/configuration.yml["company"]["name"]-qc-redhat-mysql`         | $5           |
-| DigitalOcean                  | `~/secrets/configuration.yml["company"]["name"]-production-redhat-mysql` | $5           |
+| DigitalOcean                  | Test Web Server                                                  | $5           |
+| DigitalOcean                  | Test Database Server                                             | $5           |
+| DigitalOcean                  | QC Web Server                                                    | $5           |
+| DigitalOcean                  | QC Database Server                                               | $5           |
+| DigitalOcean                  | Production Web Server                                            | $5           |
+| DigitalOcean                  | Production Database Server                                       | $5           |
 | **Repositories:**             |                                                                  |              |
 | Bitbucket                     | Private Repositories                                             | Free         |
 | GitHub                        | Public Repositories                                              | Free         |
