@@ -83,8 +83,8 @@ Catapult supports the following software:
 
 The free market and competition is great - it pushes the envelope of innovation. Here, we compare similar platforms to shed light on where we are and we're headed.
 
-Technology | Catapult | Pantheon
------------|----------|---------
+Feature | Catapult | Pantheon
+--------|----------|---------
 Source | Open | Closed
 Base Monthly Cost | $40 | $400
 Approach | Virtual Machine | Container
