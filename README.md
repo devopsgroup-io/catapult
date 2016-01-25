@@ -79,12 +79,32 @@ Catapult supports the following software:
 
 
 
+## Competition ##
+
+The free market and competition is great - it pushes the envelope of innovation. Here, we compare similar platforms to shed light on where we are and we're headed.
+
+Technology | Catapult | Pantheon
+-----------|----------|---------
+Source | Open | Closed
+Approach | Virtual Machine | Container
+Environments | dev, test, qc, prod | dev, test, prod
+Scaling | **Resize | Smooth
+Dashboard | CLI & **Web-based | Web-based
+Git | GitHub & Bitbucket | Proprietary
+DNS | CloudFlare | :x:
+Monitoring | New Relic | :x:
+
+** Catapult rolls out new features on a regular basis - this feature is highlighted for improvement or a future release.
+
+
+
 ## Table of Contents ##
 
 - [Catapult](#catapult)
     - [Technology Overview](#technology-overview)
     - [Security Disclosure](#security-disclosure)
     - [Supported Software](#supported-software)
+    - [Competition](#competition)
     - [Table of Contents](#table-of-contents)
 - [Setup](#setup)
     - [Developer Setup](#developer-setup)
@@ -473,15 +493,15 @@ Once you're satisfied with new website in localdev, it's time to commit configur
 
 Once a website exists in the upstream environments (test, qc, production), automated deployments will kick off if changes are detected on their respected branches (see chart below). The same workflow of moving a website upstream, exists when you make changes to a specific website's repository.
 
-| Environment                    | dev                                                         | test                                                              | qc                                                             | production                                                        |
-|--------------------------------|-------------------------------------------------------------|-------------------------------------------------------------------|----------------------------------------------------------------|-------------------------------------------------------------------|
-| **Running Branch**             | *develop*                                                   | *develop*                                                         | *release*                                                      | *master*                                                          |
-| **New Website Provisioning**   | Manually via Vagrant                                        | Automatically via Bamboo (new commits to **develop**)             | Automatically via Bamboo (new commits to **release**)          | Manually via Bamboo                                               |
-| **Downstream Database**        | Restore from **develop** ~/_sql folder of website repo      | Restore from **develop** ~/_sql folder of website repo            | Restore from **release** ~/_sql folder of website repo         | Backup to **develop** ~/_sql folder of website repo during deploy |
-| **Upstream Database**          | Restore from **develop** ~/_sql folder of website repo      | Backup to **develop** ~/_sql folder of website repo during deploy | Restore from **release** ~/_sql folder of website repo         | Restore from **master** ~/_sql folder of website repo             |
-| **Downstream Untracked Files** | rsync files from **production**                             | rsync files from **production**                                   | rsync files from **production**                                | --                                                                |
-| **Upstream Untracked Files**   | rsync files from **test**                                   | --                                                                | rsync files from **test**                                      | rsync files from **test**                                         |
-| **Deployments**                | Manually via `vagrant provision`                            | Automatically via Bamboo (new commits to **develop**)             | Automatically via Bamboo (new commits to **release**)          | Manually via Bamboo                                               |
+Environment | dev | test | qc | production
+------------|-----|------|----|-----------
+**Running Branch**             | *develop*                                                   | *develop*                                                         | *release*                                                      | *master*
+**New Website Provisioning**   | Manually via Vagrant                                        | Automatically via Bamboo (new commits to **develop**)             | Automatically via Bamboo (new commits to **release**)          | Manually via Bamboo
+**Downstream Database**        | Restore from **develop** ~/_sql folder of website repo      | Restore from **develop** ~/_sql folder of website repo            | Restore from **release** ~/_sql folder of website repo         | Backup to **develop** ~/_sql folder of website repo during deploy
+**Upstream Database**          | Restore from **develop** ~/_sql folder of website repo      | Backup to **develop** ~/_sql folder of website repo during deploy | Restore from **release** ~/_sql folder of website repo         | Restore from **master** ~/_sql folder of website repo
+**Downstream Untracked Files** | rsync files from **production**                             | rsync files from **production**                                   | rsync files from **production**                                | --
+**Upstream Untracked Files**   | rsync files from **test**                                   | --                                                                | rsync files from **test**                                      | rsync files from **test**
+**Deployments**                | Manually via `vagrant provision`                            | Automatically via Bamboo (new commits to **develop**)             | Automatically via Bamboo (new commits to **release**)          | Manually via Bamboo
 
 
 
