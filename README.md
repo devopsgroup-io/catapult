@@ -434,21 +434,21 @@ The following options are available:
 
 * domain:
     * `example.com`
-        * the domain name of what the website is/will be in production
+        * the domain name of what the website is/will be in Production
         * a maximum of one subdomain is supported (subdomain.example.com)
-        * this drives the domains of localdev (via hosts file) and test, qc, production (via cloudflare)
+        * this drives the domains of LocalDev (via hosts file) and Test, QC, Production (via CloudFlare)
         * dev.example.com, test.example.com, qc.example.com, example.com
 * domain_tld_override:
     * `mycompany.com`
-        * a domain name that will override the tld of the domain for when you do not have control of the domain (example.com), but still need a localdev and externally accessible test and qc instance
-        * this drives the domains of localdev (via hosts file) and test, qc, production (via cloudflare)
+        * a domain name that will override the tld of the domain for when you do not have control of the domain (example.com), but still need a LocalDev and externally accessible Test and QC instance
+        * this drives the domains of LocalDev (via hosts file) and Test, QC, Production (via CloudFlare)
             * PLEASE NOTE: When removing this option from a website with `software`, you need to manually replace URLs in the database respective to the `software_workflow` option.
                 * ie `vagrant ssh mycompany.com-test-redhat-mysql`
                 * `php /catapult/provisioners/redhat/installers/wp-cli.phar --allow-root --path="/var/www/repositories/apache/example.com/(webroot if applicable)" search-replace ":\/\/(www\.)?(dev\.|test\.)?(example\.com\.mycompany\.com)" "://example.com" --regex`
         * dev.example.com, test.example.com, qc.example.com, example.com are replaced by dev.example.com.mycompany.com, test.example.com.mycompany.com, qc.example.com.mycompany.com, example.com.mycompany.com
 * force_auth:
     * `example`
-        * forces http basic authentication in test, qc, and production
+        * forces http basic authentication in Test, QC, and Production
         * `example` is both the username and password
 * force_auth_exclude:
     * `["test","qc","production"]`
@@ -479,11 +479,11 @@ The following options are available:
         * usually used in Drupal for multisite installations (`wp_` is required for base Wordpress installs, Drupal has no prefix by default)
 * software_workflow:
     * `downstream`
-        * production is the source for the database and upload directories of drupal and wordpress
+        * Production is the source for the database and upload directories of drupal and wordpress
         * this option is used when maintaining a website
         * see the below chart for more details
     * `upstream`
-        * test is the source for the database and upload directories of drupal and wordpress
+        * Test is the source for the database and upload directories of drupal and wordpress
         * this option is used when launching a new website
         * see the below chart for more details
 * webroot:
@@ -491,23 +491,23 @@ The following options are available:
         * if the webroot differs from the repo root, specify it here
         * must include the trailing slash
 
-Once you add a new website to configuration.yml, it's time to test in localdev:
+Once you add a new website to configuration.yml, it's time to test in LocalDev:
 
   * `vagrant provision ~/secrets/configuration.yml["company"]["name"]-dev-redhat`
   * `vagrant provision ~/secrets/configuration.yml["company"]["name"]-dev-redhat-mysql`
 
-Once you're satisfied with new website in localdev, it's time to commit configuration.yml.gpg to your Catapult fork's develop branch, this will kick off a automated deployment of test. Once you're satisfied with the website in test, it's time to create a pull request from your Catapult fork's develop branch into release - once the pull request is merged, this will kick off an automated deployment to qc. Once you're satisfied with the website in qc, it's time to create a pull request from your Catapult fork's release branch into master. Production does not have any automated deployments, to deploy your website to production it's time to login to Bamboo and press the deployment button for production.
+Once you're satisfied with new website in LocalDev, it's time to commit configuration.yml.gpg to your Catapult fork's develop branch, this will kick off a automated deployment of Test. Once you're satisfied with the website in Test, it's time to create a pull request from your Catapult fork's develop branch into release - once the pull request is merged, this will kick off an automated deployment to QC. Once you're satisfied with the website in QC, it's time to create a pull request from your Catapult fork's release branch into master. Production does not have any automated deployments, to deploy your website to Production it's time to login to Bamboo and press the deployment button for Production.
 
-Once a website exists in the upstream environments (test, qc, production), automated deployments will kick off if changes are detected on their respected branches (see chart below). The same workflow of moving a website upstream, exists when you make changes to a specific website's repository.
+Once a website exists in the upstream environments (Test, QC, Production), automated deployments will kick off if changes are detected on their respected branches (see chart below). The same workflow of moving a website upstream, exists when you make changes to a specific website's repository.
 
-Environment | dev | test | qc | production
-------------|-----|------|----|-----------
+Environment | LocalDev | Test | QC | Production
+------------|----------|------|----|-----------
 **Running Branch**             | *develop*                                                   | *develop*                                                         | *release*                                                      | *master*
 **New Website Provisioning**   | Manually via Vagrant                                        | Automatically via Bamboo (new commits to **develop**)             | Automatically via Bamboo (new commits to **release**)          | Manually via Bamboo
 **Downstream Database**        | Restore from **develop** ~/_sql folder of website repo      | Restore from **develop** ~/_sql folder of website repo            | Restore from **release** ~/_sql folder of website repo         | Backup to **develop** ~/_sql folder of website repo during deploy
 **Upstream Database**          | Restore from **develop** ~/_sql folder of website repo      | Backup to **develop** ~/_sql folder of website repo during deploy | Restore from **release** ~/_sql folder of website repo         | Restore from **master** ~/_sql folder of website repo
-**Downstream Untracked Files** | rsync files from **production**                             | rsync files from **production**                                   | rsync files from **production**                                | --
-**Upstream Untracked Files**   | rsync files from **test**                                   | --                                                                | rsync files from **test**                                      | rsync files from **test**
+**Downstream Untracked Files** | rsync files from **Production**                             | rsync files from **Production**                                   | rsync files from **Production**                                | --
+**Upstream Untracked Files**   | rsync files from **Test**                                   | --                                                                | rsync files from **Test**                                      | rsync files from **Test**
 **Deployments**                | Manually via `vagrant provision`                            | Automatically via Bamboo (new commits to **develop**)             | Automatically via Bamboo (new commits to **release**)          | Manually via Bamboo
 
 
@@ -516,7 +516,7 @@ Environment | dev | test | qc | production
 
 Once you Provision Websites and it's time to work on a website, there are a few things to consider:
 
-* Using the `software_workflow` flag for `upstream` websites is great, you can develop your code in localDev then have anyone in your company enter content into Drupal, Wordpress, etc. However, in the cercumstance that you absolutely need to move your localDev database `upstream`, it's as easy as saving a .sql dump to your website's repository develop branch under the _sql folder with today's date (following the YYYYMMDD.sql format). You can then `vagrant rebuild` the `~/secrets/configuration.yml["company"]["name"]-test-redhat-mysql` server and it will restore from your new sql dump.
+* Using the `software_workflow` flag for `upstream` websites is great, you can develop your code in LocalDev then have anyone in your company enter content into Drupal, Wordpress, etc. However, in the cercumstance that you absolutely need to move your LocalDev database `upstream`, it's as easy as saving a .sql dump to your website's repository develop branch under the _sql folder with today's date (following the YYYYMMDD.sql format). You can then `vagrant rebuild` the `~/secrets/configuration.yml["company"]["name"]-test-redhat-mysql` server and it will restore from your new sql dump.
 
 
 
@@ -525,7 +525,7 @@ Once you Provision Websites and it's time to work on a website, there are a few 
 Below is a list of known limitations with Catapult, if you're still having issues with Catapult, [submit a GitHub Issue](https://github.com/devopsgroup-io/catapult-release-management/issues/new).
 
 * **CloudFlare**
-    * [07-27-2015] If your `~/secrets/configuration.yml["websites"]["apache/iis"]["domain"]` is a subdomain (drupal7.devopsgroup.io) the `force_https` option will only work in localdev and production as CloudFlare only supports a first-level subdomain. https://www.cloudflare.com/ssl
+    * [07-27-2015] If your `~/secrets/configuration.yml["websites"]["apache/iis"]["domain"]` is a subdomain (drupal7.devopsgroup.io) the `force_https` option will only work in LocalDev and Production as CloudFlare only supports a first-level subdomain. https://www.cloudflare.com/ssl
 * **DigitalOcean**
     * [09-01-2015] vagrant rebuild was failing with a `The configured shell (config.ssh.shell) is invalid and unable to properly execute commands.` it is due to DigitalOcean's API not re-inserting the SSH key that was originally used during the first vagrant up (creation of the droplet). To rebuild, you must use the DigitalOcean console, run through the first root password reset workflow that was emailed to you, then vi /etc/sudoers and remove the Defaults requiretty line and save and exit. You can then run vagrant provision successfully.
 * **Git**
