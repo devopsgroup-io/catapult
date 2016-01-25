@@ -100,6 +100,7 @@ Monitoring | New Relic | Proprietary
 Supported Software | Numerous | 2
 
 ** Catapult rolls out new features on a regular basis - this feature is highlighted for improvement or a future release.
+See an error or have a suggestion? Email competition@devopsgroup.io
 
 
 
