@@ -96,7 +96,7 @@ Development | Unlimited Local | 5 Cloud
 Dashboard | CLI & **Web-based | Web-based
 Git | GitHub & Bitbucket | Proprietary
 DNS | CloudFlare | :x:
-Monitoring | New Relic | :x:
+Monitoring | New Relic | Proprietary
 Supported Software | Numerous | 2
 
 ** Catapult rolls out new features on a regular basis - this feature is highlighted for improvement or a future release.
