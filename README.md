@@ -88,9 +88,9 @@ Technology | Catapult | Pantheon
 Source | Open | Closed
 Monthly Cost | $40 | $400
 Approach | Virtual Machine | Container
-Environments | dev, test, qc, prod | dev, test, prod
+Environments | dev, test, qc, prod | multidev, dev, test, prod
 Scaling | **Resize | Smooth
-Development | Local | Cloud
+Development | Unlimited Local | 5 Cloud
 Dashboard | CLI & **Web-based | Web-based
 Git | GitHub & Bitbucket | Proprietary
 DNS | CloudFlare | :x:
