@@ -88,6 +88,8 @@ Technology | Catapult | Pantheon
 Source | Open | Closed
 Monthly Cost | $40 | $400
 Approach | Virtual Machine | Container
+Workflow | Git Flow | Git Flow
+Methodology | SCRUM | :x:
 Environments | dev, test, qc, prod | multidev, dev, test, prod
 Scaling | **Resize | Smooth
 Development | Unlimited Local | 5 Cloud
