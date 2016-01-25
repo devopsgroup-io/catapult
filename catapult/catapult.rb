@@ -46,12 +46,10 @@ module Catapult
     require "json"
     require "net/ssh"
     require "net/http"
-    require "nokogiri"
     require "open-uri"
     require "openssl"
     require "resolv"
     require "securerandom"
-    require "socket"
     require "yaml"
 
 
@@ -1226,8 +1224,7 @@ module Catapult
       puts "\n[http response codes]"
       puts " * 200 ok, 301 moved permanently, 302 found, 400 bad request, 401 unauthorized, 403 forbidden, 404 not found, 500 internal server error, 502 bad gateway, 503 service unavailable, 504 gateway timeout"
       puts " * http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html"
-      puts "\n[cert signature algorithm]"
-      puts " * https://www.openssl.org/docs/apps/ciphers.html"
+      puts " * Keep in mind these response codes and nslookups are from within your network - they may differ externally if you're running your own DNS server internally."
       puts "\nAvailable websites:".color(Colors::WHITE)
       puts "".ljust(42) + "[software]".ljust(14) + "[workflow]".ljust(14) + "[dev.:80]".ljust(21) + "[test.:80]".ljust(21) + "[qc.:80]".ljust(21) + "[production:80]"
 
