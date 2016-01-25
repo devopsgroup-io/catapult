@@ -86,13 +86,16 @@ The free market and competition is great - it pushes the envelope of innovation.
 Technology | Catapult | Pantheon
 -----------|----------|---------
 Source | Open | Closed
+Monthly Cost | $40 | $400
 Approach | Virtual Machine | Container
 Environments | dev, test, qc, prod | dev, test, prod
 Scaling | **Resize | Smooth
+Development | Local | Cloud
 Dashboard | CLI & **Web-based | Web-based
 Git | GitHub & Bitbucket | Proprietary
 DNS | CloudFlare | :x:
 Monitoring | New Relic | :x:
+Software | Numerous | 2
 
 ** Catapult rolls out new features on a regular basis - this feature is highlighted for improvement or a future release.
 
@@ -304,13 +307,13 @@ Catapult uses several third-party services to pull everything off - below is a l
 | Bitbucket                     | Private Repositories                                             | Free         |
 | GitHub                        | Public Repositories                                              | Free         |
 | **Automated Deployments:**    |                                                                  |              |
-| Amazon Web Services           | Build Server                                                     | $1 - $15     |
+| Amazon Web Services           | Build Server                                                     | $0 - $15     |
 | Bamboo                        | Continuous Integration                                           | $10          |
 | **DNS:**                      |                                                                  |              |
 | CloudFlare                    | Cloud DNS                                                        | Free         |
 | **Monitoring:**               |                                                                  |              |
 | New Relic                     | Application, Browser, and Server Monitoring                      | Free         |
-| **Total**                     |                                                                  | $41 - $55    |
+| **Total**                     |                                                                  | $40 - $55    |
 
 
 
