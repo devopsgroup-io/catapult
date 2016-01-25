@@ -329,10 +329,10 @@ To use Catapult you will need to [Provision Environments](#provision-environment
 
 ## Provision Environments ##
 
-| Environment                   | dev                                                         | test                                                          | qc                                                            | production                                                    |
-|-------------------------------|-------------------------------------------------------------|---------------------------------------------------------------|---------------------------------------------------------------|---------------------------------------------------------------|
-| **Server Provider**           | Locally via VirtualBox                                      | Hosted via DigitalOcean                                       | Hosted via DigitalOcean                                       | Hosted via DigitalOcean                                       |
-| **Server Provisioning**       | Manually via Vagrant                                        | Manually via Vagrant                                          | Manually via Vagrant                                          | Manually via Vagrant                                          |
+Environment | LocalDev | Test | QC | Production
+------------|----------|------|----|-----------
+**Server Provider** | Locally via VirtualBox | Hosted via DigitalOcean | Hosted via DigitalOcean | Hosted via DigitalOcean
+**Server Provisioning** | Manually via Vagrant | Manually via Vagrant | Manually via Vagrant | Manually via Vagrant
 
 For each **Environment** you will need to:
 
