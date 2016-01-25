@@ -5,7 +5,7 @@
 
 :earth_americas: **Our mission** is to create a pre-defined platform that orchestrates every DevOps task of a common website's life-cycle.
 
-:rocket: **Our vision** is to afford developers an accelerated path to best practice and performance at minimal cost.
+:rocket: **Our vision** is to afford developers an accelerated path to reducing risk and increasing performance at minimal cost.
 
 <br>
 
