@@ -273,7 +273,7 @@ Catapult uses several third-party services to pull everything off - below is a l
 
 | Service                       | Description                                                      | Monthly Cost |
 |-------------------------------|------------------------------------------------------------------|-------------:|
-| **Hosting:**                  |                                                                  |              |
+| **Cloud Hosting:**            |                                                                  |              |
 | DigitalOcean                  | Test Web Server                                                  | $5           |
 | DigitalOcean                  | Test Database Server                                             | $5           |
 | DigitalOcean                  | QC Web Server                                                    | $5           |
@@ -287,9 +287,9 @@ Catapult uses several third-party services to pull everything off - below is a l
 | Amazon Web Services           | Build Server                                                     | $1 - $15     |
 | Bamboo                        | Continuous Integration                                           | $10          |
 | **DNS:**                      |                                                                  |              |
-| CloudFlare                    | test., qc., and production global DNS                            | Free         |
+| CloudFlare                    | Cloud DNS                                                        | Free         |
 | **Monitoring:**               |                                                                  |              |
-| New Relic                     | Full-stack performance monitoring                                | Free         |
+| New Relic                     | Application, Browser, and Server Monitoring                      | Free         |
 | **Total**                     |                                                                  | $41 - $55    |
 
 
