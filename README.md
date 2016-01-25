@@ -96,6 +96,7 @@ Development | Unlimited Local | 5 Cloud
 Dashboard | CLI & **Web-based | Web-based
 Git | GitHub & Bitbucket | Proprietary
 DNS | CloudFlare | :x:
+HTTPS | Free | $30/mo
 Monitoring | New Relic | Proprietary
 Supported Software | Numerous | 2
 
