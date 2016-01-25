@@ -31,7 +31,7 @@ security@devopsgroup.io and not by creating a GitHub issue.
 
 
 
-## Technology Overview ##
+## Platform Overview ##
 
 Catapult leverages the following technologies and technology services to implement key components of DevOps.
 
@@ -107,7 +107,7 @@ See an error or have a suggestion? Email competition@devopsgroup.io
 ## Table of Contents ##
 
 - [Catapult](#catapult)
-    - [Technology Overview](#technology-overview)
+    - [Platform Overview](#platform-overview)
     - [Security Disclosure](#security-disclosure)
     - [Supported Software](#supported-software)
     - [Competition](#competition)
