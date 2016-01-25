@@ -123,7 +123,6 @@ See an error or have a suggestion? Email competition@devopsgroup.io
     - [Provision Websites](#provision-websites)
     - [Develop Websites](#develop-websites)
 - [Troubleshooting](#troubleshooting)
-- [Services Justification](#services-justification)
 - [Contributing](#contributing)
     - [Releases](#releases)
 - [Community](#community)
