@@ -160,7 +160,7 @@ Catapult is controlled via Vagrant and the command line of a Developer's compute
 Catapult is quick to setup. Fork the Github repository and start adding your configuration.
 
 1. **Fork Catapult**
-    1. Fork https://github.com/devopsgroup-io/catapult-release-management and clone via SourceTree or the git utility of your choice.
+    1. Fork https://github.com/devopsgroup-io/catapult and clone via SourceTree or the git utility of your choice.
 2. **Vagrant Plugins**
     1. Open your command line and cd into the newly cloned repository and install the following Vagrant plugins.
         1. `vagrant plugin install vagrant-digitalocean` [![Gem](https://img.shields.io/gem/dt/vagrant-digitalocean.svg)](https://rubygems.org/gems/vagrant-digitalocean)
@@ -367,7 +367,7 @@ Once the Web and Database Servers are up and running, it's then time to configur
             3. Username: `root`
             4. Authentication Type: `Key without passphrase`
             5. SSH Key: `~/secrets/id_rsa`
-            6. SSH command: `bash /catapult/provisioners/redhat/provision.sh "test" "https://github.com/[your-name-here]/catapult-release-management" "~/secrets/configuration-user.yml["settings"]["gpg_key"]" "apache"`
+            6. SSH command: `bash /catapult/provisioners/redhat/provision.sh "test" "https://github.com/[your-name-here]/catapult" "~/secrets/configuration-user.yml["settings"]["gpg_key"]" "apache"`
             7. Click Save
         5. Click Add task
             1. Search for SSH Task and select it
@@ -375,7 +375,7 @@ Once the Web and Database Servers are up and running, it's then time to configur
             3. Username: `root`
             4. Authentication Type: `Key without passphrase`
             5. SSH Key: `~/secrets/id_rsa`
-            6. SSH command: `bash /catapult/provisioners/redhat/provision.sh "test" "https://github.com/[your-name-here]/catapult-release-management" "~/secrets/configuration-user.yml["settings"]["gpg_key"]" "mysql"`
+            6. SSH command: `bash /catapult/provisioners/redhat/provision.sh "test" "https://github.com/[your-name-here]/catapult" "~/secrets/configuration-user.yml["settings"]["gpg_key"]" "mysql"`
             7. Click Save
     * **Configure Catapult Project QC Plan**
         1. Click the edit icon for the QC plan
@@ -387,7 +387,7 @@ Once the Web and Database Servers are up and running, it's then time to configur
             3. Username: `root`
             4. Authentication Type: `Key without passphrase`
             5. SSH Key: `~/secrets/id_rsa`
-            6. SSH command: `bash /catapult/provisioners/redhat/provision.sh "qc" "https://github.com/[your-name-here]/catapult-release-management" "~/secrets/configuration-user.yml["settings"]["gpg_key"]" "apache"`
+            6. SSH command: `bash /catapult/provisioners/redhat/provision.sh "qc" "https://github.com/[your-name-here]/catapult" "~/secrets/configuration-user.yml["settings"]["gpg_key"]" "apache"`
             7. Click Save
         5. Click Add task
             1. Search for SSH Task and select it
@@ -395,7 +395,7 @@ Once the Web and Database Servers are up and running, it's then time to configur
             3. Username: `root`
             4. Authentication Type: `Key without passphrase`
             5. SSH Key: `~/secrets/id_rsa`
-            6. SSH command: `bash /catapult/provisioners/redhat/provision.sh "qc" "https://github.com/[your-name-here]/catapult-release-management" "~/secrets/configuration-user.yml["settings"]["gpg_key"]" "mysql"`
+            6. SSH command: `bash /catapult/provisioners/redhat/provision.sh "qc" "https://github.com/[your-name-here]/catapult" "~/secrets/configuration-user.yml["settings"]["gpg_key"]" "mysql"`
             7. Click Save
     * **Configure Catapult Project PRODUCTION Plan**
         1. Click the edit icon for the PRODUCTION plan
@@ -407,7 +407,7 @@ Once the Web and Database Servers are up and running, it's then time to configur
             3. Username: `root`
             4. Authentication Type: `Key without passphrase`
             5. SSH Key: `~/secrets/id_rsa`
-            6. SSH command: `bash /catapult/provisioners/redhat/provision.sh "production" "https://github.com/[your-name-here]/catapult-release-management" "~/secrets/configuration-user.yml["settings"]["gpg_key"]" "apache"`
+            6. SSH command: `bash /catapult/provisioners/redhat/provision.sh "production" "https://github.com/[your-name-here]/catapult" "~/secrets/configuration-user.yml["settings"]["gpg_key"]" "apache"`
             7. Click Save
         5. Click Add task
             1. Search for SSH Task and select it
@@ -415,7 +415,7 @@ Once the Web and Database Servers are up and running, it's then time to configur
             3. Username: `root`
             4. Authentication Type: `Key without passphrase`
             5. SSH Key: `~/secrets/id_rsa`
-            6. SSH command: `bash /catapult/provisioners/redhat/provision.sh "production" "https://github.com/your-name-here/catapult-release-management" "~/secrets/configuration-user.yml["settings"]["gpg_key"]" "mysql"`
+            6. SSH command: `bash /catapult/provisioners/redhat/provision.sh "production" "https://github.com/your-name-here/catapult" "~/secrets/configuration-user.yml["settings"]["gpg_key"]" "mysql"`
             7. Click Save
 
 
@@ -523,7 +523,7 @@ Once you Provision Websites and it's time to work on a website, there are a few 
 
 # Troubleshooting #
 
-Below is a list of known limitations with Catapult, if you're still having issues with Catapult, [submit a GitHub Issue](https://github.com/devopsgroup-io/catapult-release-management/issues/new).
+Below is a list of known limitations with Catapult, if you're still having issues with Catapult, [submit a GitHub Issue](https://github.com/devopsgroup-io/catapult/issues/new).
 
 * **CloudFlare**
     * [07-27-2015] If your `~/secrets/configuration.yml["websites"]["apache/iis"]["domain"]` is a subdomain (drupal7.devopsgroup.io) the `force_https` option will only work in LocalDev and Production as CloudFlare only supports a first-level subdomain. https://www.cloudflare.com/ssl
@@ -548,7 +548,7 @@ So you want to contribute... Great! Open source projects like Catapult succeed o
   * Contribute to the Catapult wiki
   * Blog about your experiences with Catapult
 
-When you first setup Catapult a `develop-catapult` branch is created for you under your forked repository, with an upstream set to `https://github.com/devopsgroup-io/catapult-release-management.git` so that you can easily create a pull request. Also keep in mind when closing issues to submit a pull request that includes [GitHub's: Closing issues via commit messages](https://help.github.com/articles/closing-issues-via-commit-messages/).
+When you first setup Catapult a `develop-catapult` branch is created for you under your forked repository, with an upstream set to `https://github.com/devopsgroup-io/catapult.git` so that you can easily create a pull request. Also keep in mind when closing issues to submit a pull request that includes [GitHub's: Closing issues via commit messages](https://help.github.com/articles/closing-issues-via-commit-messages/).
 
 
 
