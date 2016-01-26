@@ -153,7 +153,7 @@ while IFS='' read -r -d '' key; do
         Options -Indexes +FollowSymlinks
         # define new relic appname
         <IfModule php5_module>
-            php_value newrelic.appname "$(catapult company.name | tr '[:upper:]' '[:lower:]')-${1}-redhat;${domain_environment}"
+            php_value newrelic.appname "${domain_environment};$(catapult company.name | tr '[:upper:]' '[:lower:]')-${1}-redhat;"
         </IfModule>
     </Directory>
 
