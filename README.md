@@ -193,7 +193,29 @@ Catapult is quick to setup. Fork the Github repository and start adding your con
 
 Catapult uses several third-party services to pull everything off - below is a list of the required services and sign-up and configuration steps.
 
-1. **Hosting:**    
+Service | Description | Monthly Cost
+--------|-------------|-------------
+**Cloud Hosting:** | |
+DigitalOcean | Test Web Server | \*$5+
+DigitalOcean | Test Database Server | \*$5+
+DigitalOcean | QC Web Server | \*$5+
+DigitalOcean | QC Database Server | \*$5+
+DigitalOcean | Production Web Server | \*$5+
+DigitalOcean | Production Database Server | \*$5+
+**Repositories:** | |
+Bitbucket | Private Repositories | Free
+GitHub | Public Repositories | Free
+**Automated Deployments:** | |
+Amazon Web Services | Build Server | \*$0+
+Bamboo | Continuous Integration | $10
+**DNS:** | |
+CloudFlare | Cloud DNS | Free 
+**Monitoring:** | |
+New Relic | Application, Browser, and Server Monitoring | Free
+**Total** | | $40+
+\* Depending on load, resources may need to be increased.
+
+1. **Cloud Hosting:**    
     1. **DigitalOcean** sign-up and configuration
         1. Create an account at http://digitalocean.com
            * Get a $10 credit and give us $25 once you spend $25 https://www.digitalocean.com/?refcode=6127912f3462
@@ -298,27 +320,6 @@ Catapult uses several third-party services to pull everything off - below is a l
         5. Place your License key at `~/secrets/configuration.yml["company"]["newrelic_license_key"]`
 6. **Verify Configuration:**    
     1. To verify all of the configuration that you just set, open your command line and cd into your fork of Catapult, then run `vagrant status`. Catapult will confirm connection to all of the Services and inform you of any problems.
-
-| Service                       | Description                                                      | Monthly Cost |
-|-------------------------------|------------------------------------------------------------------|-------------:|
-| **Cloud Hosting:**            |                                                                  |              |
-| DigitalOcean                  | Test Web Server                                                  | $5           |
-| DigitalOcean                  | Test Database Server                                             | $5           |
-| DigitalOcean                  | QC Web Server                                                    | $5           |
-| DigitalOcean                  | QC Database Server                                               | $5           |
-| DigitalOcean                  | Production Web Server                                            | $5           |
-| DigitalOcean                  | Production Database Server                                       | $5           |
-| **Repositories:**             |                                                                  |              |
-| Bitbucket                     | Private Repositories                                             | Free         |
-| GitHub                        | Public Repositories                                              | Free         |
-| **Automated Deployments:**    |                                                                  |              |
-| Amazon Web Services           | Build Server                                                     | $0 - $15     |
-| Bamboo                        | Continuous Integration                                           | $10          |
-| **DNS:**                      |                                                                  |              |
-| CloudFlare                    | Cloud DNS                                                        | Free         |
-| **Monitoring:**               |                                                                  |              |
-| New Relic                     | Application, Browser, and Server Monitoring                      | Free         |
-| **Total**                     |                                                                  | $40 - $55    |
 
 
 
