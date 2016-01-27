@@ -50,7 +50,7 @@ Catapult leverages the following technologies and technology services to impleme
 * **DNS Management**
     * CloudFlare
 * **Continuous Integration**
-    * Bamboo
+    * Automated Deployments - Bamboo
     * Build Server - Amazon Web Services (AWS)
 * **Monitoring**
     * Server Resources and Uptime - New Relic Servers
@@ -205,7 +205,7 @@ DigitalOcean | Production Database Server | \*$5+
 **Repositories:** | |
 Bitbucket | Private Repositories | Free
 GitHub | Public Repositories | Free
-**Automated Deployments:** | |
+**Continuous Integration:** | |
 Amazon Web Services | Build Server | \*$0+
 Bamboo | Continuous Integration | $10
 **DNS:** | |
