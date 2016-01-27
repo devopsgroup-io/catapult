@@ -633,6 +633,91 @@ module Catapult
         end
       end
     end
+    # http://docs.aws.amazon.com/general/latest/gr/sigv4_signing.html
+    # http://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_Operations.html
+    if @configuration["company"]["aws_access_key"] == nil || @configuration["company"]["aws_secret_key"] == nil
+      catapult_exception("Please set [\"company\"][\"aws_access_key\"] and [\"company\"][\"aws_secret_key\"] in secrets/configuration.yml")
+    else
+      # ************* REQUEST VALUES *************
+      method = 'GET'
+      service = 'ec2'
+      host = 'ec2.amazonaws.com'
+      region = 'us-east-1'
+      endpoint = 'https://ec2.amazonaws.com'
+      request_parameters = 'Action=DescribeRegions&Version=2013-10-15'
+      # Key derivation functions. See:
+      # http://docs.aws.amazon.com/general/latest/gr/signature-v4-examples.html#signature-v4-examples-python
+      def Command::getSignatureKey(key, dateStamp, regionName, serviceName)
+          kDate    = OpenSSL::HMAC.digest('sha256', "AWS4" + key, dateStamp)
+          kRegion  = OpenSSL::HMAC.digest('sha256', kDate, regionName)
+          kService = OpenSSL::HMAC.digest('sha256', kRegion, serviceName)
+          kSigning = OpenSSL::HMAC.digest('sha256', kService, "aws4_request")
+          return kSigning
+      end
+      # Create a date for headers and the credential string
+      t = Time.now.utc
+      amzdate = t.strftime('%Y%m%dT%H%M%SZ')
+      datestamp = t.strftime('%Y%m%d') # Date w/o time, used in credential scope
+      # ************* TASK 1: CREATE A CANONICAL REQUEST *************
+      # http://docs.aws.amazon.com/general/latest/gr/sigv4-create-canonical-request.html
+      # Step 1 is to define the verb (GET, POST, etc.)--already done.
+      # Step 2: Create canonical URI--the part of the URI from domain to query 
+      # string (use '/' if no path)
+      canonical_uri = '/' 
+      # Step 3: Create the canonical query string. In this example (a GET request),
+      # request parameters are in the query string. Query string values must
+      # be URL-encoded (space=%20). The parameters must be sorted by name.
+      # For this example, the query string is pre-formatted in the request_parameters variable.
+      canonical_querystring = request_parameters
+      # Step 4: Create the canonical headers and signed headers. Header names
+      # and value must be trimmed and lowercase, and sorted in ASCII order.
+      # Note that there is a trailing \n.
+      canonical_headers = 'host:' + host + "\n" + 'x-amz-date:' + amzdate + "\n"
+      # Step 5: Create the list of signed headers. This lists the headers
+      # in the canonical_headers list, delimited with ";" and in alpha order.
+      # Note: The request can include any headers; canonical_headers and
+      # signed_headers lists those that you want to be included in the 
+      # hash of the request. "Host" and "x-amz-date" are always required.
+      signed_headers = 'host;x-amz-date'
+      # Step 6: Create payload hash (hash of the request body content). For GET
+      # requests, the payload is an empty string ("").
+      payload_hash = Digest::SHA256.hexdigest('')
+      # Step 7: Combine elements to create create canonical request
+      canonical_request = method + "\n" + canonical_uri + "\n" + canonical_querystring + "\n" + canonical_headers + "\n" + signed_headers + "\n" + payload_hash
+      # ************* TASK 2: CREATE THE STRING TO SIGN*************
+      # Match the algorithm to the hashing algorithm you use, either SHA-1 or
+      # SHA-256 (recommended)
+      algorithm = 'AWS4-HMAC-SHA256'
+      credential_scope = datestamp + '/' + region + '/' + service + '/' + 'aws4_request'
+      string_to_sign = algorithm + "\n" +  amzdate + "\n" +  credential_scope + "\n" + Digest::SHA256.hexdigest(canonical_request)
+      # ************* TASK 3: CALCULATE THE SIGNATURE *************
+      # Create the signing key using the function defined above.
+      signing_key = getSignatureKey(@configuration["company"]["aws_secret_key"], datestamp, region, service)
+      # Sign the string_to_sign using the signing_key
+      signature = OpenSSL::HMAC.hexdigest('sha256', signing_key, string_to_sign)
+      # ************* TASK 4: ADD SIGNING INFORMATION TO THE REQUEST *************
+      # The signing information can be either in a query string value or in 
+      # a header named Authorization. This code shows how to use a header.
+      # Create authorization header and add to request headers
+      authorization_header = algorithm + ' ' + 'Credential=' + @configuration["company"]["aws_access_key"] + '/' + credential_scope + ', ' +  'SignedHeaders=' + signed_headers + ', ' + 'Signature=' + signature
+      # ************* SEND THE REQUEST *************
+      uri = URI(endpoint + '?' + canonical_querystring)
+      Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => OpenSSL::SSL::VERIFY_NONE) do |http|
+        request = Net::HTTP::Get.new uri.request_uri
+        request.add_field "Authorization", "#{authorization_header}"
+        request.add_field "x-amz-date", "#{amzdate}"
+        request.add_field "content-type", "application/json" #@todo this doesn't seem to work
+        response = http.request request
+        if response.code.to_f.between?(399,499)
+          catapult_exception("The AWS API could not authenticate, please verify [\"company\"][\"aws_access_key\"] and [\"company\"][\"aws_secret_key\"].")
+        elsif response.code.to_f.between?(500,600)
+          puts "   - The AWS API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
+        else
+          puts " * AWS API authenticated successfully."
+        end
+      end
+
+    end
     # https://api.cloudflare.com/
     if @configuration["company"]["cloudflare_api_key"] == nil || @configuration["company"]["cloudflare_email"] == nil
       catapult_exception("Please set [\"company\"][\"cloudflare_api_key\"] and [\"company\"][\"cloudflare_email\"] in secrets/configuration.yml")
@@ -1222,6 +1307,7 @@ module Catapult
       # start a new row
       puts "\n\n\nAvailable websites legend:".color(Colors::WHITE)
       puts "\n[http response codes]"
+      puts " * The below http response codes are started from http:// and up to 10 redirects allowed - so if you're forcing https://, you will end up with that code below."
       puts " * 200 ok, 301 moved permanently, 302 found, 400 bad request, 401 unauthorized, 403 forbidden, 404 not found, 500 internal server error, 502 bad gateway, 503 service unavailable, 504 gateway timeout"
       puts " * http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html"
       puts " * Keep in mind these response codes and nslookups are from within your network - they may differ externally if you're running your own DNS server internally."
