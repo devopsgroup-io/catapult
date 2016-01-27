@@ -91,7 +91,7 @@ Approach | Virtual Machine | Container
 Methodology | SCRUM | :x:
 Workflow | Git Flow | Git Flow
 Environments | LocalDev, Test, QC, Production | Multidev, Dev, Test, Live
-Scaling | **Resize | Smooth
+Scaling | \*Resize | Smooth
 Development | Unlimited Local | 5 Cloud
 Dashboard | CLI & **Web-based | Web-based
 Git | GitHub & Bitbucket | Proprietary
@@ -100,7 +100,7 @@ HTTPS | Free | $30/mo
 Monitoring | New Relic | Proprietary
 Supported Software | Numerous | 2
 
-** Catapult rolls out new features on a regular basis - this feature is highlighted for improvement or a future release.
+\* Catapult rolls out new features on a regular basis - this feature is highlighted for improvement or a future release.
 See an error or have a suggestion? Email competition@devopsgroup.io
 
 
