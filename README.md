@@ -213,7 +213,7 @@ CloudFlare | Cloud DNS | Free
 **Monitoring:** | |
 New Relic | Application, Browser, and Server Monitoring | Free
 **Total** | | $40+
-\* Depending on load, resources may need to be increased.
+\* Depending on load, resources may need to be increased. However, a few websites with builds running irregularly will not incur over a couple dollars more per month.
 
 1. **Cloud Hosting:**    
     1. **DigitalOcean** sign-up and configuration
