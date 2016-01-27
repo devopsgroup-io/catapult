@@ -239,7 +239,8 @@ New Relic | Application, Browser, and Server Monitoring | Free
         2. Sign in to your new AWS console https://console.aws.amazon.com
         3. Go to your AWS Identity and Access Management (IAM) Users Dashboard https://console.aws.amazon.com/iam/home#users
             1. Create a "Bamboo" user.
-            2. **Please note both the Access Key ID and Secret Access Key.**
+            2. Place the Access Key ID at `~/secrets/configuration.yml["company"]["aws_access_key"]`
+            3. Place the Secret Access Key at `~/secrets/configuration.yml["company"]["aws_secret_key"]`
         4. Go to your AWS Identity and Access Management (IAM) Groups Dashboard https://console.aws.amazon.com/iam/home#groups
             1. Create a "Bamboo" group.
             2. Attach the "AmazonEC2FullAccess" policy to the "Bamboo" group.
@@ -256,7 +257,7 @@ New Relic | Application, Browser, and Server Monitoring | Free
             1. Click Configuration from the left
             2. Click Edit configuration
                 1. **Amazon Web Services configuration**
-                    1. Set your AWS EC2 "Bamboo" Access Key ID and Secret Access Key
+                    1. Set your AWS EC2 "Bamboo" Access Key ID and Secret Access Key from `~/secrets/configuration.yml["company"]["aws_access_key"]` and `~/secrets/configuration.yml["company"]["aws_secret_key"]`
                     2. Region: `US East (Northern Virginia)`
                 2. **Automatic elastic instance management**
                     1. Elastic instance management: `Custom`
