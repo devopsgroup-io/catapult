@@ -18,6 +18,8 @@ if [ -d "/var/www/repositories/apache/$(catapult websites.apache.$5.domain)/.git
         # stash any pending work in localdev as a courtesy
         if [ $1 = "dev" ]; then
             cd /var/www/repositories/apache/$(catapult websites.apache.$5.domain) \
+                && git config --global user.name "Catapult" \
+                && git config --global user.email "$(catapult company.email)" \
                 && git stash save
         fi
         cd /var/www/repositories/apache/$(catapult websites.apache.$5.domain) \
