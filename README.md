@@ -92,7 +92,7 @@ Methodology | SCRUM | :x:
 Workflow | Git Flow | Git Flow
 Environments | LocalDev, Test, QC, Production | Multidev, Dev, Test, Live
 Scaling | \*Resize | Smooth
-Development | Unlimited Local | 5 Cloud
+Development Environment | Unlimited Local | 5 Cloud
 Dashboard | CLI & **Web-based | Web-based
 Git | GitHub & Bitbucket | Proprietary
 DNS | CloudFlare | :x:
@@ -209,7 +209,7 @@ GitHub | Public Repositories | Free
 Amazon Web Services | Build Server | \*$0+
 Bamboo | Continuous Integration | $10
 **DNS:** | |
-CloudFlare | Cloud DNS | Free 
+CloudFlare | Cloud DNS | Free
 **Monitoring:** | |
 New Relic | Application, Browser, and Server Monitoring | Free
 **Total** | | $40+
