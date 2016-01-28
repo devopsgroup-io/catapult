@@ -525,7 +525,7 @@ Once you Provision Websites and it's time to work on a website, there are a few 
 
 # Troubleshooting #
 
-Below is a list of known limitations with Catapult, if you're still having issues with Catapult, [submit a GitHub Issue](https://github.com/devopsgroup-io/catapult/issues/new).
+Below is a log of service related troubleshooting, if you're still having issues with Catapult, [submit a GitHub Issue](https://github.com/devopsgroup-io/catapult/issues/new).
 
 * **CloudFlare**
     * [07-27-2015] If your `~/secrets/configuration.yml["websites"]["apache/iis"]["domain"]` is a subdomain (drupal7.devopsgroup.io) the `force_https` option will only work in LocalDev and Production as CloudFlare only supports a first-level subdomain. https://www.cloudflare.com/ssl
