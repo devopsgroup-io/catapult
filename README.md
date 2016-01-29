@@ -86,7 +86,8 @@ The free market and competition is great - it pushes the envelope of innovation.
 Feature | Catapult | Pantheon
 --------|----------|---------
 Source | Open | Closed
-Base Monthly Cost | $40 | $400
+Pricing Model | Bundled | Separated
+Bundled Monthly Cost | $40 | $400
 Approach | Virtual Machine | Container
 Methodology | SCRUM | :x:
 Workflow | Git Flow | Git Flow
