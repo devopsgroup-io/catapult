@@ -464,6 +464,8 @@ The following options are available:
 * force_https:
     * `true`
         * rewrite all http traffic to https
+        * subdomains are not supported as limited by CloudFlare
+        * you will receive an unsigned cert error in LocalDev
 * repo:
     * `git@github.com:devopsgroup-io/devopsgroup-io.git`
         * GitHub and Bitbucket over SSH are supported, HTTPS is not supported
@@ -532,14 +534,10 @@ Once you Provision Websites and it's time to work on a website, there are a few 
 
 Below is a log of service related troubleshooting, if you're still having issues with Catapult, [submit a GitHub Issue](https://github.com/devopsgroup-io/catapult/issues/new).
 
-* **CloudFlare**
-    * [07-27-2015] If your `~/secrets/configuration.yml["websites"]["apache/iis"]["domain"]` is a subdomain (drupal7.devopsgroup.io) the `force_https` option will only work in LocalDev and Production as CloudFlare only supports a first-level subdomain. https://www.cloudflare.com/ssl
 * **DigitalOcean**
     * [09-01-2015] vagrant rebuild was failing with a `The configured shell (config.ssh.shell) is invalid and unable to properly execute commands.` it is due to DigitalOcean's API not re-inserting the SSH key that was originally used during the first vagrant up (creation of the droplet). To rebuild, you must use the DigitalOcean console, run through the first root password reset workflow that was emailed to you, then vi /etc/sudoers and remove the Defaults requiretty line and save and exit. You can then run vagrant provision successfully.
 * **Git**
     * [09-08-2015] Some database dumps exceed 100MB, so it's recommened to use Bitbucket in those instances as Catapult auto-commits database dumps to your website's repository, up to 500MB worth of database dumps or the one, newest database dump. [Bitbucket](https://help.github.com/articles/what-is-my-disk-quota/) has a 2GB hard repo push limit with no documented file limit and [GitHub](https://help.github.com/articles/what-is-my-disk-quota/) has a 1GB soft repo limit with a 100MB file size limit.
-* **Vagrant**
-    * [07-27-2015] If your `~/secrets/configuration.yml["websites"]["apache/iis"]["domain"]` includes the `force_https` option, during `vagrant status` you will receive an err for the http response code for `.dev` as this is a self-signed cert and not routing through CloudFlare.
 
 
 
@@ -576,6 +574,14 @@ See http://semver.org/spec/v2.0.0.html for more information.
 
 
 # Community #
+
+
+## Partnerships ##
+
+The Catapult team values partnerships and the great services and teams that have built them.
+
+* [01-28-2016] Pantheon provides feedback
+* [01-22-2016] New Relic provides private beta access to their Synthetics API along side Breather, Carfax, Ring Central, Rackspace, and IBM.
 
 
 
