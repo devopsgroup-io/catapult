@@ -94,7 +94,7 @@ if [ $1 != "dev" ]; then
         cd /catapult && sudo git diff --exit-code ${branch} origin/${branch} "secrets/configuration.yml.gpg"
         cd /catapult && sudo git pull
     else
-        sudo git clone --recursive -b ${branch} $2 /catapult | sed "s/^/\t/"
+        sudo git clone --recursive -b ${branch} $2 /catapult
     fi
 else
     if ! [ -e "/catapult/secrets/configuration.yml.gpg" ]; then
