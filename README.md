@@ -86,7 +86,7 @@ The free market and competition is great - it pushes the envelope of innovation.
 Platform Feature | Catapult | Pantheon | Acquia
 -----------------|----------|----------|--------
 Source                              | Open                           | Closed                    | Closed
-Feature Set                         | Bundled                        | Separated                 | Bundled
+Feature Set                         | Bundled                        | Separated                 | Separated
 Minimum Bundled<br>Monthly Cost     | $40                            | $400                      | $134
 Methodology                         | SCRUM                          | :x:                       | :x:
 Workflow                            | Git Flow                       | Git Flow                  | Git Flow
