@@ -86,7 +86,7 @@ The free market and competition is great - it pushes the envelope of innovation.
 Feature | Catapult | Pantheon
 --------|----------|---------
 Source | Open | Closed
-Pricing Model | Bundled | Separated
+Feature Set | Bundled | Separated
 Bundled Monthly Cost | $40 | $400
 Approach | Virtual Machine | Container
 Methodology | SCRUM | :x:
@@ -94,7 +94,7 @@ Workflow | Git Flow | Git Flow
 Environments | LocalDev, Test, QC, Production | Multidev, Dev, Test, Live
 Scaling | \*Resize | Smooth
 Development Environment | Unlimited Local | 5 Cloud
-Dashboard | CLI & **Web-based | Web-based
+Dashboard | CLI & \*Web-based | Web-based
 Git | GitHub & Bitbucket | Proprietary
 DNS | CloudFlare | :x:
 HTTPS | Free | $30/mo
