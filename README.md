@@ -88,11 +88,11 @@ Platform Feature | Catapult | Pantheon | Acquia
 Source                              | Open                           | Closed                    | Closed
 Feature Set                         | Bundled                        | Separated                 | Bundled
 Minimum Bundled<br>Monthly Cost     | $40                            | $400                      | $134
-Approach                            | Virtual Machine                | Container                 | Virtual Machine
 Methodology                         | SCRUM                          | :x:                       | :x:
 Workflow                            | Git Flow                       | Git Flow                  | Git Flow
 Workflow Model                      | Upstream or Downstream         | :x:                       | :x:
 Environments                        | LocalDev, Test, QC, Production | Multidev, Dev, Test, Live | Dev Desktop, Dev, Stage, Prod
+Approach                            | Virtual Machine                | Container                 | Virtual Machine
 Data Center                         | DigitalOcean                   | Rackspace                 | AWS
 Scaling                             | \*Resize                       | Smooth                    | Resize
 Development Environment             | Unlimited Local                | 5 Cloud                   | Unlimited Local
