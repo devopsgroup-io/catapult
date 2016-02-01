@@ -81,25 +81,29 @@ Catapult supports the following software:
 
 ## Competition ##
 
-The free market and competition is great - it pushes the envelope of innovation. Here, we compare similar platforms to shed light on where we are and we're headed.
+The free market and competition is great - it pushes the envelope of innovation. Here, we compare similar platforms to shed light on where we are and we're headed. Catapult's approach is holistic, meaning, there are no optional features - the platform includes everything in its default state and its default state is the only state of the platform. Some platforms offer and support optional third-party features that need configured - these are excluded.
 
-Feature | Catapult | Pantheon
---------|----------|---------
-Source | Open | Closed
-Feature Set | Bundled | Separated
-Bundled Monthly Cost | $40 | $400
-Approach | Virtual Machine | Container
-Methodology | SCRUM | :x:
-Workflow | Git Flow | Git Flow
-Environments | LocalDev, Test, QC, Production | Multidev, Dev, Test, Live
-Scaling | \*Resize | Smooth
-Development Environment | Unlimited Local | 5 Cloud
-Dashboard | CLI & \*Web-based | Web-based
-Git | GitHub & Bitbucket | Proprietary
-DNS | CloudFlare | :x:
-HTTPS | Free | $30/mo
-Monitoring | New Relic | Proprietary
-Supported Software | Numerous | 2
+Platform Feature | Catapult | Pantheon | Acquia
+-----------------|----------|----------|--------
+Source                              | Open                           | Closed                    | Closed
+Feature Set                         | Bundled                        | Separated                 | Bundled
+Minimum Bundled<br>Monthly Cost     | $40                            | $400                      | $134
+Approach                            | Virtual Machine                | Container                 | Virtual Machine
+Methodology                         | SCRUM                          | :x:                       | :x:
+Workflow                            | Git Flow                       | Git Flow                  | Git Flow
+Workflow Model                      | Upstream or Downstream         | :x:                       | :x:
+Environments                        | LocalDev, Test, QC, Production | Multidev, Dev, Test, Live | Dev Desktop, Dev, Stage, Prod
+Data Center                         | DigitalOcean                   | Rackspace                 | AWS
+Scaling                             | \*Resize                       | Smooth                    | Resize
+Development Environment             | Unlimited Local                | 5 Cloud                   | Unlimited Local
+Development Environment<br>Approach | Exact                          | Exact                     | Similar
+Dashboard - Control                 | CLI                            | CLI & Web                 | CLI & Web
+Dashboard - Monitor                 | CLI & \*Web                    | CLI & Web                 | CLI & Web
+Git                                 | GitHub & Bitbucket             | Proprietary               | Proprietary 
+DNS Management                      | CloudFlare                     | :x:                       | :x: 
+HTTPS                               | Free                           | $30/mo + $cert            | $cert
+Monitoring                          | New Relic                      | Proprietary               | Proprietary
+Supported Software                  | Numerous                       | 2                         | 1
 
 \* Catapult rolls out new features on a regular basis - this feature is highlighted for improvement or a future release.
 See an error or have a suggestion? Email competition@devopsgroup.io
