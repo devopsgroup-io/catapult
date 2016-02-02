@@ -155,10 +155,14 @@ Vagrant.configure("2") do |config|
       provider.memory = 512
       provider.cpus = 1
     end
+    # disable the default vagrant share
+    config.vm.synced_folder ".", "/vagrant", disabled: true
+    config.vm.synced_folder ".", "/catapult"
+    # sync the repositories folder for local access
     config.vm.synced_folder "repositories", "/inetpub/repositories"
     config.vm.provision :hostmanager
     config.hostmanager.aliases = Catapult::Command.dev_windows_hosts
-    config.vm.provision "shell", path: "provisioners/windows/provision.ps1", run: "always"
+    config.vm.provision "shell", path: "provisioners/windows/provision.ps1", args: ["dev","#{Catapult::Command.repo}","#{Catapult::Command.configuration_user["settings"]["gpg_key"]}","iis"], run: "always"
     # windows specific configuration
     config.vm.guest = :windows
     config.vm.boot_timeout = 60 * 7
