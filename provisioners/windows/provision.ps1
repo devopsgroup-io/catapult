@@ -1,10 +1,30 @@
+# required libraries
 import-module c:\vagrant\provisioners\windows\installers\poweryaml\poweryaml.psm1
-$config = get-yaml -fromfile (resolve-path c:\vagrant\secrets\configuration.yml)
-if (-not($config.websites.iis)) {
-    echo "There are no websites in iis, nothing to do."
-    exit 0
+
+
+# required global variables
+$provisionstart = get-date
+$provisionError = "c:\vagrant\provisioners\windows\logs\provisionError.log"
+$provision = "c:\vagrant\provisioners\windows\logs\provision.log"
+
+
+echo "==> Powershell Version"
+$PSVersionTable
+
+
+echo "`n==> Installing GPG"
+if (-not(Test-Path -Path "c:\Program Files (x86)\GNU\GnuPG\gpg2.exe")) {
+    start-process -filepath "c:\vagrant\provisioners\windows\installers\gpg4win-2.3.0.exe" -argumentlist "/S" -Wait -RedirectStandardOutput $provision -RedirectStandardError $provisionError
+    get-content $provision
+    get-content $provisionError
 }
+start-process -filepath "c:\Program Files (x86)\GNU\GnuPG\gpg2.exe" -argumentlist "--version" -Wait -RedirectStandardOutput $provision -RedirectStandardError $provisionError
+get-content $provision
+get-content $provisionError
+# decrypt configuration
+$config = get-yaml -fromfile (resolve-path c:\vagrant\secrets\configuration.yml)
 # @todo pass environment arg from vagrant
+
 
 echo "==> Configuring time"
 # set timezone
@@ -23,31 +43,56 @@ get-date
 $([System.TimeZone]::CurrentTimeZone.StandardName)
 
 
-$provisionstart = get-date
-$provisionError = "c:\vagrant\provisioners\windows\logs\provisionError.log"
-$provision = "c:\vagrant\provisioners\windows\logs\provision.log"
-
-
+echo "`n==> Installing .NET 4.0 (This may take a while...)"
 if (-not(Test-Path -Path "c:\windows\Microsoft.NET\Framework64\v4.0.30319\")) {
-
-    echo "`n==> Installing .NET 4.0 (This will take a while...)"
     # ((new-object net.webclient).DownloadFile("http://download.microsoft.com/download/9/5/A/95A9616B-7A37-4AF6-BC36-D6EA96C8DAAE/dotNetFx40_Full_x86_x64.exe","c:\tmp\dotNetFx40_Full_x86_x64.exe")) 
     start-process -filepath "c:\vagrant\provisioners\windows\installers\dotNetFx40_Full_x86_x64.exe" -argumentlist "/q /norestart /log c:\vagrant\provisioners\windows\logs\dotNetFx40_Full_x86_x64.exe.log" -Wait -RedirectStandardOutput $provision -RedirectStandardError $provisionError
     echo "Restarting Windows..."
     echo "Please run 'vagrant provision windows' when it's back up"
     restart-computer -force
+    exit 0
+}
+Get-ChildItem 'HKLM:\SOFTWARE\Microsoft\NET Framework Setup\NDP' -recurse |
+Get-ItemProperty -name Version,Release -EA 0 |
+Where { $_.PSChildName -match '^(?!S)\p{L}'} |
+Select PSChildName, Version, Release
 
-} else {
 
-    echo "`n==> Installing Git"
+echo "`n==> Installing Git"
+if (-not(Test-Path -Path "c:\Program Files (x86)\Git\bin\git.exe")) {
     start-process -filepath "c:\vagrant\provisioners\windows\installers\Git-1.9.5-preview20141217.exe" -argumentlist "/SP- /NORESTART /VERYSILENT /SUPPRESSMSGBOXES /SAVEINF=c:\vagrant\provisioners\windows\logs\git-settings.txt /LOG=c:\vagrant\provisioners\windows\logs\Git-1.9.5-preview20141217.exe.log" -Wait -RedirectStandardOutput $provision -RedirectStandardError $provisionError
     get-content $provision
     get-content $provisionError
-    start-process -filepath "c:\Program Files (x86)\Git\bin\git.exe" -argumentlist "--version" -Wait -RedirectStandardOutput $provision -RedirectStandardError $provisionError
-    get-content $provision
-    get-content $provisionError
+}
+start-process -filepath "c:\Program Files (x86)\Git\bin\git.exe" -argumentlist "--version" -Wait -RedirectStandardOutput $provision -RedirectStandardError $provisionError
+get-content $provision
+get-content $provisionError
 
-    echo "`n==> Configuring git repositories (This may take a while...)"
+
+echo "`n==> Importing servermanager"
+import-module servermanager
+
+
+echo "`n==> Installing web-webserver (This may take a while...)"
+add-windowsfeature web-webserver -includeallsubfeature -logpath c:\vagrant\provisioners\windows\logs\add-windowsfeature_web-webserver.log
+
+
+echo "`n==> Installing web-mgmt-tools"
+add-windowsfeature web-mgmt-tools -includeallsubfeature -logpath c:\vagrant\provisioners\windows\logs\add-windowsfeature_web-mgmt-tools.log
+
+
+echo "`n==> Importing webadministration"
+import-module webadministration
+
+
+echo "`n==> Configuring git repositories (This may take a while...)"
+if (-not($config.websites.iis)) {
+
+    echo "There are no websites in iis, nothing to do."
+    exit 0
+
+} else {
+
     # keep linux lf line endings instead of windows converting to crlf
     start-process -filepath "c:\Program Files (x86)\Git\bin\git.exe" -argumentlist ("config --global core.autocrlf false") -Wait -RedirectStandardOutput $provision -RedirectStandardError $provisionError
     # clone/pull necessary repos
@@ -71,22 +116,10 @@ if (-not(Test-Path -Path "c:\windows\Microsoft.NET\Framework64\v4.0.30319\")) {
     get-childitem "c:\vagrant\repositories\iis\*" | ?{ $_.PSIsContainer } | foreach-object {
         $domain = split-path $_.FullName -leaf
         if (-not($domains -contains $domain)) {
-            echo "`nWebsite does not exist in secrets/configuration.yaml, removing $domain ..."
+            echo "`nWebsite does not exist in secrets/configuration.yml, removing $domain ..."
             remove-item -recurse -force $_.FullName
         }
     }
-
-    echo "`n==> Importing servermanager"
-    import-module servermanager
-
-    echo "`n==> Installing web-webserver"
-    add-windowsfeature web-webserver -includeallsubfeature -logpath c:\vagrant\provisioners\windows\logs\add-windowsfeature_web-webserver.log
-
-    echo "`n==> Installing web-mgmt-tools"
-    add-windowsfeature web-mgmt-tools -includeallsubfeature -logpath c:\vagrant\provisioners\windows\logs\add-windowsfeature_web-mgmt-tools.log
-
-    echo "`n==> Importing webadministration"
-    import-module webadministration
 
     echo "`n==> Removing websites"
     if (get-childitem -Path IIS:\Sites | where-object {$_.Name -ne "Default Web Site"}) {
@@ -146,4 +179,5 @@ if (-not(Test-Path -Path "c:\windows\Microsoft.NET\Framework64\v4.0.30319\")) {
     
     $provisionend = Get-Date
     echo ("`n`n`n==> Provision complete ({0}) seconds" -f [math]::floor((New-TimeSpan -Start $provisionstart -End $provisionend).TotalSeconds))
+
 }
