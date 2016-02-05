@@ -21,12 +21,15 @@ Vagrant.configure("2") do |config|
       provider.memory = 512
       provider.cpus = 1
     end
+    # configure hosts file on both the host and guest
     config.vm.provision :hostmanager
     config.hostmanager.aliases = Catapult::Command.dev_redhat_hosts
+    # disable the default vagrant share
     config.vm.synced_folder ".", "/vagrant", disabled: true
     config.vm.synced_folder ".", "/catapult", type: "nfs"
-    # sym link the git clones for local access
+    # sync the repositories folder for local access from the host
     config.vm.synced_folder "repositories", "/var/www/repositories", type: "nfs"
+    # configure the provisioner
     config.vm.provision "shell", path: "provisioners/redhat/provision.sh", args: ["dev","#{Catapult::Command.repo}","#{Catapult::Command.configuration_user["settings"]["gpg_key"]}","apache","#{Catapult::Command.configuration_user["settings"]["software_validation"]}"]
   end
   config.vm.define "#{Catapult::Command.configuration["company"]["name"].downcase}-dev-redhat-mysql" do |config|
@@ -36,11 +39,15 @@ Vagrant.configure("2") do |config|
       provider.memory = 512
       provider.cpus = 1
     end
+    # configure hosts file on both the host and guest
+    config.vm.provision :hostmanager
+    config.hostmanager.aliases = Catapult::Command.dev_redhat_hosts
+    # disable the default vagrant share
     config.vm.synced_folder ".", "/vagrant", disabled: true
     config.vm.synced_folder ".", "/catapult", type: "nfs"
-    # sym link the git clones for local access
+    # sync the repositories folder for local access from the host
     config.vm.synced_folder "repositories", "/var/www/repositories", type: "nfs"
-    config.vm.provision :hostmanager
+    # configure the provisioner
     config.vm.provision "shell", path: "provisioners/redhat/provision.sh", args: ["dev","#{Catapult::Command.repo}","#{Catapult::Command.configuration_user["settings"]["gpg_key"]}","mysql","#{Catapult::Command.configuration_user["settings"]["software_validation"]}"]
   end
 
@@ -58,7 +65,9 @@ Vagrant.configure("2") do |config|
       provider.private_networking = true
       provider.backups_enabled = true
     end
+    # disable the default vagrant share
     config.vm.synced_folder ".", "/vagrant", disabled: true
+    # configure the provisioner
     config.vm.provision "shell", path: "provisioners/redhat/provision.sh", args: ["test","#{Catapult::Command.repo}","#{Catapult::Command.configuration_user["settings"]["gpg_key"]}","apache"]
   end
   config.vm.define "#{Catapult::Command.configuration["company"]["name"].downcase}-test-redhat-mysql" do |config|
@@ -74,7 +83,9 @@ Vagrant.configure("2") do |config|
       provider.private_networking = true
       provider.backups_enabled = true
     end
+    # disable the default vagrant share
     config.vm.synced_folder ".", "/vagrant", disabled: true
+    # configure the provisioner
     config.vm.provision "shell", path: "provisioners/redhat/provision.sh", args: ["test","#{Catapult::Command.repo}","#{Catapult::Command.configuration_user["settings"]["gpg_key"]}","mysql"]
   end
 
@@ -92,7 +103,9 @@ Vagrant.configure("2") do |config|
       provider.private_networking = true
       provider.backups_enabled = true
     end
+    # disable the default vagrant share
     config.vm.synced_folder ".", "/vagrant", disabled: true
+    # configure the provisioner
     config.vm.provision "shell", path: "provisioners/redhat/provision.sh", args: ["qc","#{Catapult::Command.repo}","#{Catapult::Command.configuration_user["settings"]["gpg_key"]}","apache"]
   end
   config.vm.define "#{Catapult::Command.configuration["company"]["name"].downcase}-qc-redhat-mysql" do |config|
@@ -108,7 +121,9 @@ Vagrant.configure("2") do |config|
       provider.private_networking = true
       provider.backups_enabled = true
     end
+    # disable the default vagrant share
     config.vm.synced_folder ".", "/vagrant", disabled: true
+    # configure the provisioner
     config.vm.provision "shell", path: "provisioners/redhat/provision.sh", args: ["qc","#{Catapult::Command.repo}","#{Catapult::Command.configuration_user["settings"]["gpg_key"]}","mysql"]
   end
 
@@ -126,7 +141,9 @@ Vagrant.configure("2") do |config|
       provider.private_networking = true
       provider.backups_enabled = true
     end
+    # disable the default vagrant share
     config.vm.synced_folder ".", "/vagrant", disabled: true
+    # configure the provisioner
     config.vm.provision "shell", path: "provisioners/redhat/provision.sh", args: ["production","#{Catapult::Command.repo}","#{Catapult::Command.configuration_user["settings"]["gpg_key"]}","apache"]
   end
   config.vm.define "#{Catapult::Command.configuration["company"]["name"].downcase}-production-redhat-mysql" do |config|
@@ -142,7 +159,9 @@ Vagrant.configure("2") do |config|
       provider.private_networking = true
       provider.backups_enabled = true
     end
+    # disable the default vagrant share
     config.vm.synced_folder ".", "/vagrant", disabled: true
+    # configure the provisioner
     config.vm.provision "shell", path: "provisioners/redhat/provision.sh", args: ["production","#{Catapult::Command.repo}","#{Catapult::Command.configuration_user["settings"]["gpg_key"]}","mysql"]
   end
 
@@ -155,20 +174,22 @@ Vagrant.configure("2") do |config|
       provider.memory = 512
       provider.cpus = 1
     end
-    # disable the default vagrant share
-    config.vm.synced_folder ".", "/vagrant", disabled: true
-    config.vm.synced_folder ".", "/catapult"
-    # sync the repositories folder for local access
-    config.vm.synced_folder "repositories", "/inetpub/repositories"
-    config.vm.provision :hostmanager
-    config.hostmanager.aliases = Catapult::Command.dev_windows_hosts
-    config.vm.provision "shell", path: "provisioners/windows/provision.ps1", args: ["dev","#{Catapult::Command.repo}","#{Catapult::Command.configuration_user["settings"]["gpg_key"]}","iis"], run: "always"
     # windows specific configuration
     config.vm.guest = :windows
     config.vm.boot_timeout = 60 * 7
-    config.ssh.insert_key = false
+    #config.ssh.insert_key = false
     config.vm.communicator = "winrm"
     config.vm.network "forwarded_port", guest: 3389, host: Catapult::Command.configuration["environments"]["dev"]["servers"]["windows"]["port_3389"]
+    # configure hosts file on both the host and guest
+    config.vm.provision :hostmanager
+    config.hostmanager.aliases = Catapult::Command.dev_windows_hosts
+    # disable the default vagrant share
+    config.vm.synced_folder ".", "/vagrant", disabled: true
+    config.vm.synced_folder ".", "/catapult"
+    # sync the repositories folder for local access from the host
+    #config.vm.synced_folder "repositories", "/inetpub/repositories", type: "rsync"
+    # configure the provisioner
+    config.vm.provision "shell", path: "provisioners/windows/provision.ps1", args: ["dev","#{Catapult::Command.repo}","#{Catapult::Command.configuration_user["settings"]["gpg_key"]}","iis"], run: "always"
   end
 
 end

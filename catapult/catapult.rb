@@ -69,7 +69,7 @@ module Catapult
         puts exception.message
         puts "\n"
         puts "Please correct the error then re-run your vagrant command."
-        puts "See https://github.com/devopsgroup-io/catapult-release-management for more information."
+        puts "See https://github.com/devopsgroup-io/catapult for more information."
         File.delete('.lock')
         exit 1
       end
@@ -97,7 +97,7 @@ module Catapult
     elsif (RbConfig::CONFIG['host_os'] =~ /darwin|mac os|linux|solaris|bsd/)
       @git = "git"
     else
-      catapult_exception("Cannot detect your operating system, please submit an issue at https://github.com/devopsgroup-io/catapult-release-management")
+      catapult_exception("Cannot detect your operating system, please submit an issue at https://github.com/devopsgroup-io/catapult")
     end
 
 
@@ -141,7 +141,7 @@ module Catapult
     # configure catapult and git
     remote = `#{@git} config --get remote.origin.url`
     if remote.include?("devopsgroup-io/")
-      catapult_exception("In order to use Catapult Release Management, you must fork the repository so that the committed and encrypted configuration is unique to you! See https://github.com/devopsgroup-io/catapult-release-management for more information.")
+      catapult_exception("In order to use Catapult Release Management, you must fork the repository so that the committed and encrypted configuration is unique to you! See https://github.com/devopsgroup-io/catapult for more information.")
     else
       puts "\n\nSelf updating Catapult:\n".color(Colors::WHITE)
       `#{@git} fetch`
@@ -152,7 +152,7 @@ module Catapult
       puts " * Your repository: #{@repo}"
       # set the correct upstream
       repo_upstream = `#{@git} config --get remote.upstream.url`.strip
-      repo_upstream_url = "https://github.com/devopsgroup-io/catapult-release-management.git"
+      repo_upstream_url = "https://github.com/devopsgroup-io/catapult.git"
       puts " * Will sync from: #{repo_upstream}"
       if repo_upstream.empty?
         `#{@git} remote add upstream #{repo_upstream_url}`
@@ -454,12 +454,12 @@ module Catapult
               end
             end
             unless @api_digitalocean_account_key_name
-              catapult_exception("Could not find the SSH Key named \"Vagrant\" in DigitalOcean, please follow the Services Setup for DigitalOcean at https://github.com/devopsgroup-io/catapult-release-management#services-setup")
+              catapult_exception("Could not find the SSH Key named \"Vagrant\" in DigitalOcean, please follow the Services Setup for DigitalOcean at https://github.com/devopsgroup-io/catapult#services-setup")
             else
               puts "   - Found the ssh public key \"Vagrant\""
             end
             unless @api_digitalocean_account_key_public_key
-              catapult_exception("The SSH Key named \"Vagrant\" in DigitalOcean does not match your Catapult instance's SSH Key at \"secrets/id_rsa.pub\", please follow the Services Setup for DigitalOcean at https://github.com/devopsgroup-io/catapult-release-management#services-setup")
+              catapult_exception("The SSH Key named \"Vagrant\" in DigitalOcean does not match your Catapult instance's SSH Key at \"secrets/id_rsa.pub\", please follow the Services Setup for DigitalOcean at https://github.com/devopsgroup-io/catapult#services-setup")
             else
               puts "   - The ssh public key \"Vagrant\" matches your secrets/id_rsa.pub ssh public key"
             end
@@ -503,12 +503,12 @@ module Catapult
               end
             end
             unless @api_bitbucket_ssh_keys_title
-              catapult_exception("Could not find the SSH Key named \"Catapult\" for your Bitbucket user #{@configuration["company"]["bitbucket_username"]}, please follow Provision Websites at https://github.com/devopsgroup-io/catapult-release-management#provision-websites")
+              catapult_exception("Could not find the SSH Key named \"Catapult\" for your Bitbucket user #{@configuration["company"]["bitbucket_username"]}, please follow Provision Websites at https://github.com/devopsgroup-io/catapult#provision-websites")
             else
               puts "   - Found the ssh public key \"Catapult\" for your Bitbucket user #{@configuration["company"]["bitbucket_username"]}"
             end
             unless @api_bitbucket_ssh_keys_key
-              catapult_exception("The SSH Key named \"Catapult\" in Bitbucket does not match your Catapult instance's SSH Key at \"secrets/id_rsa.pub\", please follow Provision Websites at https://github.com/devopsgroup-io/catapult-release-management#provision-websites")
+              catapult_exception("The SSH Key named \"Catapult\" in Bitbucket does not match your Catapult instance's SSH Key at \"secrets/id_rsa.pub\", please follow Provision Websites at https://github.com/devopsgroup-io/catapult#provision-websites")
             else
               puts "   - The ssh public key \"Catapult\" matches your secrets/id_rsa.pub ssh public key"
             end
@@ -552,12 +552,12 @@ module Catapult
               end
             end
             unless @api_github_ssh_keys_title
-              catapult_exception("Could not find the SSH Key named \"Catapult\" for your GitHub user #{@configuration["company"]["github_username"]}, please follow Provision Websites at https://github.com/devopsgroup-io/catapult-release-management#provision-websites")
+              catapult_exception("Could not find the SSH Key named \"Catapult\" for your GitHub user #{@configuration["company"]["github_username"]}, please follow Provision Websites at https://github.com/devopsgroup-io/catapult#provision-websites")
             else
               puts "   - Found the ssh public key \"Catapult\" for your GitHub user #{@configuration["company"]["github_username"]}"
             end
             unless @api_github_ssh_keys_key
-              catapult_exception("The SSH Key named \"Catapult\" in GitHub does not match your Catapult instance's SSH Key at \"secrets/id_rsa.pub\", please follow Provision Websites at https://github.com/devopsgroup-io/catapult-release-management#provision-websites")
+              catapult_exception("The SSH Key named \"Catapult\" in GitHub does not match your Catapult instance's SSH Key at \"secrets/id_rsa.pub\", please follow Provision Websites at https://github.com/devopsgroup-io/catapult#provision-websites")
             else
               puts "   - The ssh public key \"Catapult\" matches your secrets/id_rsa.pub ssh public key"
             end
@@ -583,11 +583,11 @@ module Catapult
           @api_bamboo = JSON.parse(response.body)
           api_bamboo_project_key = @api_bamboo["projects"]["project"].find { |element| element["key"] == "CAT" }
           unless api_bamboo_project_key
-            catapult_exception("Could not find the project key \"CAT\" in Bamboo, please follow the Services Setup for Bamboo at https://github.com/devopsgroup-io/catapult-release-management#services-setup")
+            catapult_exception("Could not find the project key \"CAT\" in Bamboo, please follow the Services Setup for Bamboo at https://github.com/devopsgroup-io/catapult#services-setup")
           end
           api_bamboo_project_name = @api_bamboo["projects"]["project"].find { |element| element["name"] == "Catapult" }
           unless api_bamboo_project_name
-            catapult_exception("Could not find the project name \"Catapult\" in Bamboo, please follow the Services Setup for Bamboo at https://github.com/devopsgroup-io/catapult-release-management#services-setup")
+            catapult_exception("Could not find the project name \"Catapult\" in Bamboo, please follow the Services Setup for Bamboo at https://github.com/devopsgroup-io/catapult#services-setup")
           else
             puts "   - Found the project key \"CAT\""
           end
@@ -598,7 +598,7 @@ module Catapult
           request.basic_auth "#{@configuration["company"]["bamboo_username"]}", "#{@configuration["company"]["bamboo_password"]}"
           response = http.request request
           if response.code.to_f.between?(399,499)
-            catapult_exception("Could not find the plan key \"TEST\" in Bamboo, please follow the Services Setup for Bamboo at https://github.com/devopsgroup-io/catapult-release-management#services-setup")
+            catapult_exception("Could not find the plan key \"TEST\" in Bamboo, please follow the Services Setup for Bamboo at https://github.com/devopsgroup-io/catapult#services-setup")
           elsif response.code.to_f.between?(500,600)
             puts "   - The Bamboo API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
           else
@@ -611,7 +611,7 @@ module Catapult
           request.basic_auth "#{@configuration["company"]["bamboo_username"]}", "#{@configuration["company"]["bamboo_password"]}"
           response = http.request request
           if response.code.to_f.between?(399,499)
-            catapult_exception("Could not find the plan key \"QC\" in Bamboo, please follow the Services Setup for Bamboo at https://github.com/devopsgroup-io/catapult-release-management#services-setup")
+            catapult_exception("Could not find the plan key \"QC\" in Bamboo, please follow the Services Setup for Bamboo at https://github.com/devopsgroup-io/catapult#services-setup")
           elsif response.code.to_f.between?(500,600)
             puts "   - The Bamboo API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
           else
@@ -624,7 +624,7 @@ module Catapult
           request.basic_auth "#{@configuration["company"]["bamboo_username"]}", "#{@configuration["company"]["bamboo_password"]}"
           response = http.request request
           if response.code.to_f.between?(399,499)
-            catapult_exception("Could not find the plan key \"PROD\" in Bamboo, please follow the Services Setup for Bamboo at https://github.com/devopsgroup-io/catapult-release-management#services-setup")
+            catapult_exception("Could not find the plan key \"PROD\" in Bamboo, please follow the Services Setup for Bamboo at https://github.com/devopsgroup-io/catapult#services-setup")
           elsif response.code.to_f.between?(500,600)
             puts "   - The Bamboo API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
           else
@@ -961,13 +961,13 @@ module Catapult
               repo_split_2[1] = repo_split_3[0]
             end
           else
-            # instance["repo"] => https://github.com/seth-reeser/catapult-release-management(.git)
+            # instance["repo"] => https://github.com/seth-reeser/catapult(.git)
             repo_split_1 = instance["repo"].split("://")
             # repo_split_1[0] => https
-            # repo_split_1[1] => github.com/seth-reeser/catapult-release-management(.git)
+            # repo_split_1[1] => github.com/seth-reeser/catapult(.git)
             repo_split_2 = repo_split_1[1].split("/", 2)
             # repo_split_2[0] => github.com
-            # repo_split_2[1] => seth-reeser/catapult-release-management(.git)
+            # repo_split_2[1] => seth-reeser/catapult(.git)
             repo_split_3 = repo_split_2[1].split(".git")
             # repo_split_3[0] => devopsgroup-io/devopsgroup-io
             # if there is a .git on the end, repo_split_3[0] will have a value, otherwise set equal to repo_split_2[1]
