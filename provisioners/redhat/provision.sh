@@ -52,32 +52,28 @@ sudo yum install -y git
 sudo mkdir -p ~/.ssh
 sudo touch ~/.ssh/known_hosts
 # ssh-keyscan bitbucket.org for a maximum of 10 tries
-n=0
-until [ $n -ge 10 ]
-do
+i=0
+until [ $i -ge 10 ]; do
     sudo ssh-keyscan bitbucket.org > ~/.ssh/known_hosts
-    if ! grep -q "bitbucket\.org" ~/.ssh/known_hosts; then
-        echo "ssh-keyscan for bitbucket.org failed, retrying!"
-    else
+    if grep -q "bitbucket\.org" ~/.ssh/known_hosts; then
         echo "ssh-keyscan for bitbucket.org successful"
         break
+    else
+        echo "ssh-keyscan for bitbucket.org failed, retrying!"
     fi
-    n=$[$n+1]
-    sleep 1
+    i=$[$i+1]
 done
 # ssh-keyscan github.com for a maximum of 10 tries
-n=0
-until [ $n -ge 10 ]
-do
+i=0
+until [ $i -ge 10 ]; do
     sudo ssh-keyscan github.com >> ~/.ssh/known_hosts
-    if ! grep -q "github\.com" ~/.ssh/known_hosts; then
-        echo "ssh-keyscan for github.com failed, retrying!"
-    else
+    if grep -q "github\.com" ~/.ssh/known_hosts; then
         echo "ssh-keyscan for github.com successful"
         break
+    else
+        echo "ssh-keyscan for github.com failed, retrying!"
     fi
-    n=$[$n+1]
-    sleep 1
+    i=$[$i+1]
 done
 # clone and pull catapult
 if ([ $1 = "dev" ] || [ $1 = "test" ]); then
