@@ -62,12 +62,32 @@ get-date
 $([System.TimeZone]::CurrentTimeZone.StandardName)
 
 
+echo "`n==> Importing PSWindowsUpdate"
+Remove-Item "C:\Windows\System32\WindowsPowerShell\v1.0\Modules\PSWindowsUpdate" -Force -Recurse
+Add-Type -AssemblyName System.IO.Compression.FileSystem
+[System.IO.Compression.ZipFile]::ExtractToDirectory("c:\catapult\provisioners\windows\installers\PSWindowsUpdate.zip", "C:\Windows\System32\WindowsPowerShell\v1.0\Modules")
+Import-Module PSWindowsUpdate
+if (Get-Module -ListAvailable -Name PSWindowsUpdate) {
+    echo "PSWindowsUpdate loaded"
+} else {
+    echo "PSWindowsUpdate failed to load"
+}
+#Set-ExecutionPolicy RemoteSigned
+
+
+echo "`n==> Installing Windows Updates (This may take a while...)"
+# install latest updates
+Get-WUInstall -WindowsUpdate -AcceptAll
+echo "A reboot (LocalDev: vagrant reload) may be required after windows updates"
+# @todo check for reboot status
+
+
 echo "`n==> Installing .NET 4.0 (This may take a while...)"
 if (-not(Test-Path -Path "c:\windows\Microsoft.NET\Framework64\v4.0.30319\")) {
     # ((new-object net.webclient).DownloadFile("http://download.microsoft.com/download/9/5/A/95A9616B-7A37-4AF6-BC36-D6EA96C8DAAE/dotNetFx40_Full_x86_x64.exe","c:\tmp\dotNetFx40_Full_x86_x64.exe")) 
     start-process -filepath "c:\catapult\provisioners\windows\installers\dotNetFx40_Full_x86_x64.exe" -argumentlist "/q /norestart /log c:\catapult\provisioners\windows\logs\dotNetFx40_Full_x86_x64.exe.log" -Wait -RedirectStandardOutput $provision -RedirectStandardError $provisionError
     echo "Restarting Windows..."
-    echo "Please run 'vagrant provision windows' when it's back up"
+    echo "Please invoke 'vagrant provision' when it's back up"
     restart-computer -force
     exit 0
 }
