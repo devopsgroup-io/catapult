@@ -116,7 +116,23 @@ elif [ "${software}" = "xenforo" ]; then
 fi
 
 # set ownership of user generated directories
-if [ "$software" = "drupal6" ]; then
+if [ "$software" = "codeigniter2" ]; then
+    if [ -d "/var/www/repositories/apache/${domain}/${webroot}uploads" ]; then
+        echo -e "setting permissions for $software upload directory ~/uploads"
+        if [ "$1" != "dev" ]; then
+            sudo chown -R apache /var/www/repositories/apache/${domain}/${webroot}uploads
+        fi
+        sudo chmod -R 0700 /var/www/repositories/apache/${domain}/${webroot}uploads
+    fi
+elif [ "$software" = "codeigniter3" ]; then
+    if [ -d "/var/www/repositories/apache/${domain}/${webroot}uploads" ]; then
+        echo -e "setting permissions for $software upload directory ~/uploads"
+        if [ "$1" != "dev" ]; then
+            sudo chown -R apache /var/www/repositories/apache/${domain}/${webroot}uploads
+        fi
+        sudo chmod -R 0700 /var/www/repositories/apache/${domain}/${webroot}uploads
+    fi
+elif [ "$software" = "drupal6" ]; then
     if [ -d "/var/www/repositories/apache/${domain}/${webroot}sites/default/files" ]; then
         echo -e "setting permissions for $software upload directory ~/sites/default/files"
         if [ "$1" != "dev" ]; then
