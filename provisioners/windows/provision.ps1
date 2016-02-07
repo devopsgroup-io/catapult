@@ -223,6 +223,9 @@ if (-not($config.websites.iis)) {
 
     echo "`n==> Creating websites"
     foreach ($instance in $config.websites.iis) {
+        if ($instance.webroot) {
+            $instance.webroot = $instance.webroot.Replace("/","\")
+        }
         new-website -name ("$($args[0]).{0}" -f $instance.domain) -hostheader ("$($args[0]).{0}" -f $instance.domain) -port 80 -physicalpath ("c:\inetpub\repositories\iis\{0}\{1}" -f $instance.domain,$instance.webroot) -ApplicationPool ("$($args[0]).{0}" -f $instance.domain) -force
    }
 
