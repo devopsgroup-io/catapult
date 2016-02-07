@@ -13,13 +13,37 @@ software=$(catapult "websites.apache.$5.software")
 software_workflow=$(catapult "websites.apache.$5.software_workflow")
 webroot=$(catapult "websites.apache.$5.webroot")
 
-if [ -z "${software}" ]; then
+if [ "${software}" = "codeigniter2" ]; then
 
-    echo -e "no software - no rsync needed, skipping..."
+    folder="uploads/"
+    cd "/var/www/repositories/apache/${domain}/${webroot}" && git check-ignore --quiet "${folder}"
+    if [ $? -ne 0 ]; then
+        echo -e "/var/www/repositories/apache/${domain}/${webroot}${folder} seems to be tracked - no rsync needed, skipping..."
+    elif ([ "${software_workflow}" = "downstream" ] && [ "$1" != "production" ]); then
+        echo -e "rysncing /var/www/repositories/apache/${domain}/${webroot}${folder} from production..."
+        sudo rsync --compress --delete --recursive -e "ssh -oStrictHostKeyChecking=no -i /catapult/secrets/id_rsa" "root@${production_redhat_ip}:/var/www/repositories/apache/${domain}/${webroot}${folder}" "/var/www/repositories/apache/${domain}/${webroot}${folder}"
+    elif ([ "${software_workflow}" = "upstream" ] && [ "$1" != "test" ]); then
+        echo -e "rysncing /var/www/repositories/apache/${domain}/${webroot}${folder} from test..."
+        sudo rsync --compress --delete --recursive -e "ssh -oStrictHostKeyChecking=no -i /catapult/secrets/id_rsa" "root@${test_redhat_ip}:/var/www/repositories/apache/${domain}/${webroot}${folder}" "/var/www/repositories/apache/${domain}/${webroot}${folder}"
+    else
+        echo -e "software_workflow is set to ${software_workflow} and this is ${1} - no rsync needed, skipping..."
+    fi
 
-elif ([ "${software}" = "codeigniter2" ] || [ "${software}" = "codeigniter3" ] || [ "${software}" = "silverstripe" ] || [ "${software}" = "xenforo" ]); then
+elif [ "${software}" = "codeigniter3" ]; then
 
-    echo -e "this software does not have a standard for meta files - no rsync needed, skipping..."
+    folder="uploads/"
+    cd "/var/www/repositories/apache/${domain}/${webroot}" && git check-ignore --quiet "${folder}"
+    if [ $? -ne 0 ]; then
+        echo -e "/var/www/repositories/apache/${domain}/${webroot}${folder} seems to be tracked - no rsync needed, skipping..."
+    elif ([ "${software_workflow}" = "downstream" ] && [ "$1" != "production" ]); then
+        echo -e "rysncing /var/www/repositories/apache/${domain}/${webroot}${folder} from production..."
+        sudo rsync --compress --delete --recursive -e "ssh -oStrictHostKeyChecking=no -i /catapult/secrets/id_rsa" "root@${production_redhat_ip}:/var/www/repositories/apache/${domain}/${webroot}${folder}" "/var/www/repositories/apache/${domain}/${webroot}${folder}"
+    elif ([ "${software_workflow}" = "upstream" ] && [ "$1" != "test" ]); then
+        echo -e "rysncing /var/www/repositories/apache/${domain}/${webroot}${folder} from test..."
+        sudo rsync --compress --delete --recursive -e "ssh -oStrictHostKeyChecking=no -i /catapult/secrets/id_rsa" "root@${test_redhat_ip}:/var/www/repositories/apache/${domain}/${webroot}${folder}" "/var/www/repositories/apache/${domain}/${webroot}${folder}"
+    else
+        echo -e "software_workflow is set to ${software_workflow} and this is ${1} - no rsync needed, skipping..."
+    fi
 
 elif [ "${software}" = "drupal6" ]; then
 
@@ -56,6 +80,36 @@ elif [ "${software}" = "drupal7" ]; then
 elif [ "${software}" = "wordpress" ]; then
 
     folder="wp-content/uploads/"
+    cd "/var/www/repositories/apache/${domain}/${webroot}" && git check-ignore --quiet "${folder}"
+    if [ $? -ne 0 ]; then
+        echo -e "/var/www/repositories/apache/${domain}/${webroot}${folder} seems to be tracked - no rsync needed, skipping..."
+    elif ([ "${software_workflow}" = "downstream" ] && [ "$1" != "production" ]); then
+        echo -e "rysncing /var/www/repositories/apache/${domain}/${webroot}${folder} from production..."
+        sudo rsync --compress --delete --recursive -e "ssh -oStrictHostKeyChecking=no -i /catapult/secrets/id_rsa" "root@${production_redhat_ip}:/var/www/repositories/apache/${domain}/${webroot}${folder}" "/var/www/repositories/apache/${domain}/${webroot}${folder}"
+    elif ([ "${software_workflow}" = "upstream" ] && [ "$1" != "test" ]); then
+        echo -e "rysncing /var/www/repositories/apache/${domain}/${webroot}${folder} from test..."
+        sudo rsync --compress --delete --recursive -e "ssh -oStrictHostKeyChecking=no -i /catapult/secrets/id_rsa" "root@${test_redhat_ip}:/var/www/repositories/apache/${domain}/${webroot}${folder}" "/var/www/repositories/apache/${domain}/${webroot}${folder}"
+    else
+        echo -e "software_workflow is set to ${software_workflow} and this is ${1} - no rsync needed, skipping..."
+    fi
+
+elif [ "${software}" = "xenforo" ]; then
+
+    folder="data/"
+    cd "/var/www/repositories/apache/${domain}/${webroot}" && git check-ignore --quiet "${folder}"
+    if [ $? -ne 0 ]; then
+        echo -e "/var/www/repositories/apache/${domain}/${webroot}${folder} seems to be tracked - no rsync needed, skipping..."
+    elif ([ "${software_workflow}" = "downstream" ] && [ "$1" != "production" ]); then
+        echo -e "rysncing /var/www/repositories/apache/${domain}/${webroot}${folder} from production..."
+        sudo rsync --compress --delete --recursive -e "ssh -oStrictHostKeyChecking=no -i /catapult/secrets/id_rsa" "root@${production_redhat_ip}:/var/www/repositories/apache/${domain}/${webroot}${folder}" "/var/www/repositories/apache/${domain}/${webroot}${folder}"
+    elif ([ "${software_workflow}" = "upstream" ] && [ "$1" != "test" ]); then
+        echo -e "rysncing /var/www/repositories/apache/${domain}/${webroot}${folder} from test..."
+        sudo rsync --compress --delete --recursive -e "ssh -oStrictHostKeyChecking=no -i /catapult/secrets/id_rsa" "root@${test_redhat_ip}:/var/www/repositories/apache/${domain}/${webroot}${folder}" "/var/www/repositories/apache/${domain}/${webroot}${folder}"
+    else
+        echo -e "software_workflow is set to ${software_workflow} and this is ${1} - no rsync needed, skipping..."
+    fi
+
+    folder="internal_data/"
     cd "/var/www/repositories/apache/${domain}/${webroot}" && git check-ignore --quiet "${folder}"
     if [ $? -ne 0 ]; then
         echo -e "/var/www/repositories/apache/${domain}/${webroot}${folder} seems to be tracked - no rsync needed, skipping..."

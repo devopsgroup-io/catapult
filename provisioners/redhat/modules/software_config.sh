@@ -16,9 +16,7 @@ software_dbprefix=$(catapult websites.apache.$5.software_dbprefix)
 webroot=$(catapult websites.apache.$5.webroot)
 
 # generate database config files
-if [ -z "${software}" ]; then
-    echo -e "no database configuration file needed, skipping..."
-elif [ "${software}" = "codeigniter2" ]; then
+if [ "${software}" = "codeigniter2" ]; then
     file="/var/www/repositories/apache/${domain}/${webroot}application/config/database.php"
     echo -e "generating ${software} ${file}..."
     if [ -f "${file}" ]; then
@@ -155,6 +153,21 @@ elif [ "$software" = "wordpress" ]; then
             sudo chown -R apache /var/www/repositories/apache/${domain}/${webroot}wp-content/uploads
         fi
         sudo chmod -R 0700 /var/www/repositories/apache/${domain}/${webroot}wp-content/uploads
+    fi
+elif [ "$software" = "xenforo" ]; then
+    if [ -d "/var/www/repositories/apache/${domain}/${webroot}data" ]; then
+        echo -e "setting permissions for $software upload directory ~/data"
+        if [ "$1" != "dev" ]; then
+            sudo chown -R apache /var/www/repositories/apache/${domain}/${webroot}data
+        fi
+        sudo chmod -R 0700 /var/www/repositories/apache/${domain}/${webroot}data
+    fi
+    if [ -d "/var/www/repositories/apache/${domain}/${webroot}internal_data" ]; then
+        echo -e "setting permissions for $software upload directory ~/internal_data"
+        if [ "$1" != "dev" ]; then
+            sudo chown -R apache /var/www/repositories/apache/${domain}/${webroot}internal_data
+        fi
+        sudo chmod -R 0700 /var/www/repositories/apache/${domain}/${webroot}internal_data
     fi
 fi
 
