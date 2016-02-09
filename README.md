@@ -511,7 +511,7 @@ The following options are available:
         * dumps and restores database at ~/sql
 * software_dbprefix:
     * `wp_`
-        * usually used in Drupal for multisite installations (`wp_` is required for base Wordpress installs, Drupal has no prefix by default)
+        * `wp_` is required for base Wordpress installs, Drupal has no prefix by default
 * software_workflow:
     * `downstream`
         * Production is the source for the database and upload directories of software
