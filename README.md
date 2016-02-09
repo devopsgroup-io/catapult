@@ -471,31 +471,54 @@ The following options are available:
         * GitHub and Bitbucket over SSH are supported, HTTPS is not supported
 * software:
     * `codeigniter2`
-        * generates codeigniter2 database config file ~/application/config/database.php, restores database
+        * generates codeigniter2 database config file ~/application/config/database.php
+        * rsyncs untracked ~/uploads
+        * sets permissions for ~/uploads
+        * dumps and restores database at ~/sql
     * `codeigniter3`
-        * generates codeigniter3 database config file ~/application/config/database.php, restores database
+        * generates codeigniter3 database config file ~/application/config/database.php
+        * rsyncs untracked ~/uploads
+        * sets permissions for ~/uploads
+        * dumps and restores database at ~/sql
     * `drupal6`
-        * generates drupal6 database config file ~/sites/default/settings.php, resets Drupal admin password, rsyncs ~/sites/default/files, restores database
+        * generates drupal6 database config file ~/sites/default/settings.php
+        * rsyncs untracked ~/sites/default/files
+        * sets permissions for ~/sites/default/files
+        * dumps and restores database at ~/sql
+        * invokes drush updatedb
+        * resets Drupal admin password
     * `drupal7`
-        * generates drupal7 database config file ~/sites/default/settings.php, resets Drupal admin password, rsyncs ~/sites/default/files, restores database
+        * generates drupal7 database config file ~/sites/default/settings.php
+        * rsyncs untracked ~/sites/default/files
+        * sets permissions for ~/sites/default/files
+        * dumps and restores database at ~/sql
+        * invokes drush updatedb
+        * resets Drupal admin password
     * `silverstripe`
-        * generates silverstripe database config file ~/mysite/_config.php, restores database
+        * generates silverstripe database config file ~/mysite/_config.php
+        * restores newest database from ~/sql
     * `wordpress`
-        * generates WordPress database config file ~/installers/wp-config.php, resets WordPress admin password, rsyncs ~/wp-content/uploads, restores database
+        * generates WordPress database config file ~/installers/wp-config.php
+        * rsyncs untracked ~/wp-content/uploads
+        * sets permissions for ~/wp-content/uploads
+        * dumps and restores database at ~/sql
+        * invokes wp-cli core update-db
+        * resets WordPress admin password
     * `xenforo`
-        * generates xenforo database config file ~/library/config.php, restores database
+        * generates xenforo database config file ~/library/config.php
+        * rsyncs ~/data and ~/internal_data
+        * sets for ~/data and ~/internal_data
+        * dumps and restores database at ~/sql
 * software_dbprefix:
     * `wp_`
         * usually used in Drupal for multisite installations (`wp_` is required for base Wordpress installs, Drupal has no prefix by default)
 * software_workflow:
     * `downstream`
-        * Production is the source for the database and upload directories of drupal and wordpress
+        * Production is the source for the database and upload directories of software
         * this option is used when maintaining a website
-        * see the below chart for more details
     * `upstream`
-        * Test is the source for the database and upload directories of drupal and wordpress
+        * Test is the source for the database and upload directories of software
         * this option is used when launching a new website
-        * see the below chart for more details
 * webroot:
     * `www/`
         * if the webroot differs from the repo root, specify it here
