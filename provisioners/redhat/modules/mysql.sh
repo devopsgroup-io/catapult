@@ -259,8 +259,7 @@ while IFS='' read -r -d '' key; do
         elif [[ "${software}" = "wordpress" ]]; then
             echo -e "\t* resetting ${software} admin password..."
             mysql --defaults-extra-file=$dbconf ${1}_${domainvaliddbname} -e "INSERT INTO ${software_dbprefix}users (id, user_login, user_pass, user_nicename, user_email, user_status, display_name) VALUES ('1', 'admin', MD5('$(echo "${configuration}" | shyaml get-value environments.${1}.software.wordpress.admin_password)'), 'admin', '$(echo "${configuration}" | shyaml get-value company.email)', '0', 'admin') ON DUPLICATE KEY UPDATE user_login='admin', user_pass=MD5('$(echo "${configuration}" | shyaml get-value environments.${1}.software.wordpress.admin_password)'), user_nicename='admin', user_email='$(echo "${configuration}" | shyaml get-value company.email)', user_status='0', display_name='admin';"
-            mysql --defaults-extra-file=$dbconf ${1}_${domainvaliddbname} -e "INSERT INTO ${software_dbprefix}usermeta (user_id, meta_key, meta_value) VALUES ('1', '${software_dbprefix}capabilities','a:1:{s:13:\"administrator\";b:1;}');"
-            mysql --defaults-extra-file=$dbconf ${1}_${domainvaliddbname} -e "INSERT INTO ${software_dbprefix}usermeta (user_id, meta_key, meta_value) VALUES ('1', '${software_dbprefix}user_level','10');"
+            php /catapult/provisioners/redhat/installers/wp-cli.phar --allow-root --path="/var/www/repositories/apache/${domain}/${webroot}" user add-role 1 administrator
         fi  
     fi
 
