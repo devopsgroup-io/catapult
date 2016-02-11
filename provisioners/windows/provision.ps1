@@ -254,7 +254,7 @@ if (-not($config.websites.iis)) {
         new-webbinding -name ("$($args[0]).{0}" -f $instance.domain) -hostheader ("$($args[0]).{0}" -f $instance.domain) -port 443 -protocol https
         $certificate = New-SelfSignedCertificate -DnsName "localhost.localdomain" -CertStoreLocation cert:\LocalMachine\My
         $certificate | new-item 0.0.0.0!443
-   }
+    }
 
     echo "`n`n==> Starting websites"
     if (get-childitem -Path IIS:\Sites) {
