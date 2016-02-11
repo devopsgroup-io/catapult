@@ -11,16 +11,16 @@ $provisionError = "c:\catapult\provisioners\windows\logs\provisionError.log"
 $provision = "c:\catapult\provisioners\windows\logs\provision.log"
 
 
-echo "`n==> Importing PowerYaml"
+echo "`n`n==> Importing PowerYaml"
 import-module c:\catapult\provisioners\windows\installers\poweryaml\poweryaml.psm1
 
 
-echo "`n==> Powershell Version"
+echo "`n`n==> Powershell Version"
 $PSVersionTable
 
 
-echo "`n==> Installing GPG"
-if (-not(Test-Path -Path "c:\Program Files (x86)\GNU\GnuPG\gpg2.exe")) {
+echo "`n`n==> Installing GPG"
+if (-not(test-path -Path "c:\Program Files (x86)\GNU\GnuPG\gpg2.exe")) {
     start-process -filepath "c:\catapult\provisioners\windows\installers\gpg4win-2.3.0.exe" -argumentlist "/S" -Wait -RedirectStandardOutput $provision -RedirectStandardError $provisionError
     get-content $provision
     get-content $provisionError
@@ -28,7 +28,7 @@ if (-not(Test-Path -Path "c:\Program Files (x86)\GNU\GnuPG\gpg2.exe")) {
 start-process -filepath "c:\Program Files (x86)\GNU\GnuPG\gpg2.exe" -argumentlist "--version" -Wait -RedirectStandardOutput $provision -RedirectStandardError $provisionError
 get-content $provision
 get-content $provisionError
-if (-not(Test-Path -Path "c:\catapult\secrets\configuration.yml.gpg")) {
+if (-not(test-path -Path "c:\catapult\secrets\configuration.yml.gpg")) {
     echo -e "Cannot read from c:\catapult\secrets\configuration.yml.gpg, please vagrant reload the virtual machine."
     exit 1
 }
@@ -45,7 +45,7 @@ get-content $provisionError
 $config = get-yaml -fromfile (resolve-path c:\catapult\secrets\configuration.yml)
 
 
-echo "`n==> Configuring time"
+echo "`n`n==> Configuring time"
 # set timezone
 tzutil /s $config.company.timezone_windows
 # configure ntp
@@ -62,7 +62,7 @@ get-date
 $([System.TimeZone]::CurrentTimeZone.StandardName)
 
 
-echo "`n==> Importing PSWindowsUpdate"
+echo "`n`n==> Importing PSWindowsUpdate"
 Remove-Item "C:\Windows\System32\WindowsPowerShell\v1.0\Modules\PSWindowsUpdate" -Force -Recurse
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 [System.IO.Compression.ZipFile]::ExtractToDirectory("c:\catapult\provisioners\windows\installers\PSWindowsUpdate.zip", "C:\Windows\System32\WindowsPowerShell\v1.0\Modules")
@@ -75,15 +75,15 @@ if (Get-Module -ListAvailable -Name PSWindowsUpdate) {
 #Set-ExecutionPolicy RemoteSigned
 
 
-echo "`n==> Installing Windows Updates (This may take a while...)"
+echo "`n`n==> Installing Windows Updates (This may take a while...)"
 # install latest updates
-Get-WUInstall -WindowsUpdate -AcceptAll
+Get-WUInstall -WindowsUpdate -AcceptAll -IgnoreReboot
 echo "A reboot (LocalDev: vagrant reload) may be required after windows updates"
 # @todo check for reboot status
 
 
-echo "`n==> Installing .NET 4.0 (This may take a while...)"
-if (-not(Test-Path -Path "c:\windows\Microsoft.NET\Framework64\v4.0.30319\")) {
+echo "`n`n==> Installing .NET 4.0 (This may take a while...)"
+if (-not(test-path -Path "c:\windows\Microsoft.NET\Framework64\v4.0.30319\")) {
     # ((new-object net.webclient).DownloadFile("http://download.microsoft.com/download/9/5/A/95A9616B-7A37-4AF6-BC36-D6EA96C8DAAE/dotNetFx40_Full_x86_x64.exe","c:\tmp\dotNetFx40_Full_x86_x64.exe")) 
     start-process -filepath "c:\catapult\provisioners\windows\installers\dotNetFx40_Full_x86_x64.exe" -argumentlist "/q /norestart /log c:\catapult\provisioners\windows\logs\dotNetFx40_Full_x86_x64.exe.log" -Wait -RedirectStandardOutput $provision -RedirectStandardError $provisionError
     echo "Restarting Windows..."
@@ -97,9 +97,9 @@ Where { $_.PSChildName -match '^(?!S)\p{L}'} |
 Select PSChildName, Version, Release
 
 
-echo "`n==> Installing Web Platform Installer (This may take a while...)"
+echo "`n`n==> Installing Web Platform Installer (This may take a while...)"
 # http://www.iis.net/learn/install/web-platform-installer/web-platform-installer-v4-command-line-webpicmdexe-rtw-release
-if (-not(Test-Path -Path "c:\Program Files\Microsoft\Web Platform Installer\WebpiCmd-x64.exe")) {
+if (-not(test-path -Path "c:\Program Files\Microsoft\Web Platform Installer\WebpiCmd-x64.exe")) {
     # https://github.com/fdcastel/psunattended/blob/master/PSUnattended.ps1
     start-process -filepath msiexec -argumentlist "/i ""c:\catapult\provisioners\windows\installers\WebPlatformInstaller_amd64_en-US.msi"" /q ALLUSERS=1 REBOOT=ReallySuppress" -Wait -RedirectStandardOutput $provision -RedirectStandardError $provisionError
     get-content $provision
@@ -107,14 +107,14 @@ if (-not(Test-Path -Path "c:\Program Files\Microsoft\Web Platform Installer\Webp
 }
 
 
-echo "`n==> Installing URL Rewrite 2.0"
+echo "`n`n==> Installing URL Rewrite 2.0"
 start-process -filepath "c:\Program Files\Microsoft\Web Platform Installer\WebpiCmd-x64.exe" -argumentlist "/install /products:""UrlRewrite2"" /accepteula" -Wait -RedirectStandardOutput $provision -RedirectStandardError $provisionError
 get-content $provision
 get-content $provisionError
 
 
-echo "`n==> Installing Git"
-if (-not(Test-Path -Path "c:\Program Files (x86)\Git\bin\git.exe")) {
+echo "`n`n==> Installing Git"
+if (-not(test-path -Path "c:\Program Files (x86)\Git\bin\git.exe")) {
     start-process -filepath "c:\catapult\provisioners\windows\installers\Git-1.9.5-preview20141217.exe" -argumentlist "/SP- /NORESTART /VERYSILENT /SUPPRESSMSGBOXES /SAVEINF=c:\catapult\provisioners\windows\logs\git-settings.txt /LOG=c:\catapult\provisioners\windows\logs\Git-1.9.5-preview20141217.exe.log" -Wait -RedirectStandardOutput $provision -RedirectStandardError $provisionError
     get-content $provision
     get-content $provisionError
@@ -124,7 +124,7 @@ get-content $provision
 get-content $provisionError
 
 
-echo "`n==> Importing servermanager"
+echo "`n`n==> Importing servermanager"
 import-module servermanager
 if (Get-Module -ListAvailable -Name servermanager) {
     echo "servermanager loaded"
@@ -132,15 +132,15 @@ if (Get-Module -ListAvailable -Name servermanager) {
     echo "servermanager failed to load"
 }
 
-echo "`n==> Installing web-webserver (This may take a while...)"
+echo "`n`n==> Installing web-webserver (This may take a while...)"
 add-windowsfeature web-webserver -includeallsubfeature -logpath c:\catapult\provisioners\windows\logs\add-windowsfeature_web-webserver.log
 
 
-echo "`n==> Installing web-mgmt-tools"
+echo "`n`n==> Installing web-mgmt-tools"
 add-windowsfeature web-mgmt-tools -includeallsubfeature -logpath c:\catapult\provisioners\windows\logs\add-windowsfeature_web-mgmt-tools.log
 
 
-echo "`n==> Importing webadministration"
+echo "`n`n==> Importing webadministration"
 import-module webadministration
 if (Get-Module -ListAvailable -Name webadministration) {
     echo "webadministration loaded"
@@ -149,7 +149,7 @@ if (Get-Module -ListAvailable -Name webadministration) {
 }
 
 
-echo "`n==> Configuring git repositories (This may take a while...)"
+echo "`n`n==> Configuring git repositories (This may take a while...)"
 if (-not($config.websites.iis)) {
 
     echo "There are no websites in iis, nothing to do."
@@ -189,9 +189,16 @@ if (-not($config.websites.iis)) {
     start-process -filepath "c:\Program Files (x86)\Git\bin\git.exe" -argumentlist ("config --global core.autocrlf false") -Wait -RedirectStandardOutput $provision -RedirectStandardError $provisionError
 
     # clone/pull repositories into c:\inetpub\repositories\iis\
-    new-item -itemtype directory -force -path "c:\inetpub\repositories\iis\"
+    if (-not(test-path -path "c:\inetpub\repositories\iis")) {
+        new-item -itemtype directory -force -path "c:\inetpub\repositories\iis"
+    }
     foreach ($instance in $config.websites.iis) {
-        if (test-path ("c:\inetpub\repositories\{0}\.git" -f $instance.domain) ) {
+        if (test-path ("c:\inetpub\repositories\iis\{0}\.git" -f $instance.domain) ) {
+            start-process -filepath "c:\Program Files (x86)\Git\bin\git.exe" -argumentlist ("-C c:\inetpub\repositories\iis\{0} reset -q --hard HEAD --" -f $instance.domain,$config.environments.$($args[0]).branch) -Wait -RedirectStandardOutput $provision -RedirectStandardError $provisionError
+            start-process -filepath "c:\Program Files (x86)\Git\bin\git.exe" -argumentlist ("-C c:\inetpub\repositories\iis\{0} checkout ." -f $instance.domain,$config.environments.$($args[0]).branch) -Wait -RedirectStandardOutput $provision -RedirectStandardError $provisionError
+            start-process -filepath "c:\Program Files (x86)\Git\bin\git.exe" -argumentlist ("-C c:\inetpub\repositories\iis\{0} clean -fd" -f $instance.domain,$config.environments.$($args[0]).branch) -Wait -RedirectStandardOutput $provision -RedirectStandardError $provisionError
+            start-process -filepath "c:\Program Files (x86)\Git\bin\git.exe" -argumentlist ("-C c:\inetpub\repositories\iis\{0} checkout origin {1}" -f $instance.domain,$config.environments.$($args[0]).branch) -Wait -RedirectStandardOutput $provision -RedirectStandardError $provisionError
+            start-process -filepath "c:\Program Files (x86)\Git\bin\git.exe" -argumentlist ("-C c:\inetpub\repositories\iis\{0} fetch" -f $instance.domain,$config.environments.$($args[0]).branch) -Wait -RedirectStandardOutput $provision -RedirectStandardError $provisionError
             start-process -filepath "c:\Program Files (x86)\Git\bin\git.exe" -argumentlist ("-C c:\inetpub\repositories\iis\{0} pull origin {1}" -f $instance.domain,$config.environments.$($args[0]).branch) -Wait -RedirectStandardOutput $provision -RedirectStandardError $provisionError
             get-content $provision
             get-content $provisionError
@@ -210,12 +217,12 @@ if (-not($config.websites.iis)) {
     get-childitem "c:\catapult\repositories\iis\*" | ?{ $_.PSIsContainer } | foreach-object {
         $domain = split-path $_.FullName -leaf
         if (-not($domains -contains $domain)) {
-            echo "`nWebsite does not exist in secrets/configuration.yml, removing $domain ..."
+            echo "`n`nWebsite does not exist in secrets/configuration.yml, removing $domain ..."
             remove-item -recurse -force $_.FullName
         }
     }
 
-    echo "`n==> Removing websites"
+    echo "`n`n==> Removing websites"
     if (get-childitem -Path IIS:\Sites | where-object {$_.Name -ne "Default Web Site"}) {
         $websites = get-childitem -Path IIS:\Sites | where-object {$_.Name -ne "Default Web Site"}
         foreach ($website in $websites) {
@@ -223,7 +230,7 @@ if (-not($config.websites.iis)) {
         }
     }
 
-    echo "`n==> Removing application pools"
+    echo "`n`n==> Removing application pools"
     if (get-childitem -Path IIS:\AppPools | where-object {$_.Name -ne "DefaultAppPool"}) {
         $apppools = get-childitem -Path IIS:\AppPools | where-object {$_.Name -ne "DefaultAppPool"}
         foreach ($apppool in $apppools) {
@@ -231,21 +238,25 @@ if (-not($config.websites.iis)) {
         }
     }
 
-    echo "`n==> Creating application pools"
+    echo "`n`n==> Creating application pools"
     foreach ($instance in $config.websites.iis) {
         new-item ("IIS:\AppPools\$($args[0]).{0}" -f $instance.domain)
         set-itemproperty ("IIS:\AppPools\$($args[0]).{0}" -f $instance.domain) managedRuntimeVersion v4.0
     }
 
-    echo "`n==> Creating websites"
+    echo "`n`n==> Creating websites"
     foreach ($instance in $config.websites.iis) {
         if ($instance.webroot) {
             $instance.webroot = $instance.webroot.Replace("/","\")
         }
-        new-website -name ("$($args[0]).{0}" -f $instance.domain) -hostheader ("$($args[0]).{0}" -f $instance.domain) -port 80 -physicalpath ("c:\inetpub\repositories\iis\{0}\{1}" -f $instance.domain,$instance.webroot) -ApplicationPool ("$($args[0]).{0}" -f $instance.domain) -force
+        new-website -name ("$($args[0]).{0}" -f $instance.domain) -hostheader ("$($args[0]).{0}" -f $instance.domain) -port 80 -physicalpath ("c:\inetpub\repositories\iis\{0}\{1}" -f $instance.domain,$instance.webroot) -applicationpool ("$($args[0]).{0}" -f $instance.domain) -force
+        set-location IIS:\SslBindings
+        new-webbinding -name ("$($args[0]).{0}" -f $instance.domain) -hostheader ("$($args[0]).{0}" -f $instance.domain) -port 443 -protocol https
+        $certificate = New-SelfSignedCertificate -DnsName "localhost.localdomain" -CertStoreLocation cert:\LocalMachine\My
+        $certificate | new-item 0.0.0.0!443
    }
 
-    echo "`n==> Starting websites"
+    echo "`n`n==> Starting websites"
     if (get-childitem -Path IIS:\Sites) {
         get-childitem -Path IIS:\Sites | foreach { start-website $_.Name; }
     }
@@ -263,4 +274,4 @@ remove-item "c:\catapult\secrets\id_rsa.pub"
 
 
 $provisionend = Get-Date
-echo ("`n`n`n==> Provision complete ({0}) seconds" -f [math]::floor((New-TimeSpan -Start $provisionstart -End $provisionend).TotalSeconds))
+echo ("`n`n`n`n==> Provision complete ({0}) seconds" -f [math]::floor((New-TimeSpan -Start $provisionstart -End $provisionend).TotalSeconds))
