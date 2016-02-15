@@ -486,24 +486,24 @@ The following options are available:
         * sets permissions for ~/sites/default/files
         * dumps and restores database at ~/sql
         * invokes drush updatedb
-        * resets Drupal admin password
+        * resets drupal6 admin password
     * `drupal7`
         * generates drupal7 database config file ~/sites/default/settings.php
         * rsyncs untracked ~/sites/default/files
         * sets permissions for ~/sites/default/files
         * dumps and restores database at ~/sql
         * invokes drush updatedb
-        * resets Drupal admin password
+        * resets drupal7 admin password
     * `silverstripe`
         * generates silverstripe database config file ~/mysite/_config.php
         * restores newest database from ~/sql
     * `wordpress`
-        * generates WordPress database config file ~/installers/wp-config.php
+        * generates wordpress database config file ~/installers/wp-config.php
         * rsyncs untracked ~/wp-content/uploads
         * sets permissions for ~/wp-content/uploads
         * dumps and restores database at ~/sql
         * invokes wp-cli core update-db
-        * resets WordPress admin password
+        * resets wordpress admin password
     * `xenforo`
         * generates xenForo database config file ~/library/config.php
         * rsyncs untracked ~/data and ~/internal_data
@@ -529,9 +529,9 @@ Once you add a new website to configuration.yml, it's time to test in LocalDev:
   * `vagrant provision ~/secrets/configuration.yml["company"]["name"]-dev-redhat`
   * `vagrant provision ~/secrets/configuration.yml["company"]["name"]-dev-redhat-mysql`
 
-Once you're satisfied with new website in LocalDev, it's time to commit configuration.yml.gpg to your Catapult fork's develop branch, this will kick off a automated deployment of Test. Once you're satisfied with the website in Test, it's time to create a pull request from your Catapult fork's develop branch into release - once the pull request is merged, this will kick off an automated deployment to QC. Once you're satisfied with the website in QC, it's time to create a pull request from your Catapult fork's release branch into master. Production does not have any automated deployments, to deploy your website to Production it's time to login to Bamboo and press the deployment button for Production.
+Once you're satisfied with the new website in LocalDev, it's time to commit configuration.yml.gpg to your Catapult fork's develop branch, this will kick off an automated deployment of Test. Once you're satisfied with the website in Test, then create a pull request from your Catapult fork's develop branch into release - once the pull request is merged, this will kick off an automated deployment to QC. Once you're satisfied with the website in QC, then create a pull request from your Catapult fork's release branch into master. Production does not have any automated deployments, to deploy your website to Production, login to Bamboo and press the play button for Production.
 
-Once a website exists in the upstream environments (Test, QC, Production), automated deployments will kick off if changes are detected on their respected branches (see chart below). The same workflow of moving a website upstream, exists when you make changes to a specific website's repository.
+Once a website exists in the upstream environments (Test, QC, Production), automated deployments will deploy changes that are detected on their respected branches (see chart below). The same workflow of moving a website upstream, exists when you make changes to a specific website's repository.
 
 Environment | LocalDev | Test | QC | Production
 ------------|----------|------|----|-----------
