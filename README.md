@@ -438,13 +438,13 @@ Catapult follows Gitflow for its configuration and development model - each envi
 
 Environment | LocalDev | Test | QC | Production
 ------------|----------|------|----|-----------
-**Running Branch**             | *develop*                                                   | *develop*                                                         | *release*                                                      | *master*
-**New Website Provisioning**   | Manually via Vagrant                                        | Automatically via Bamboo (new commits to **develop**)             | Automatically via Bamboo (new commits to **release**)          | Manually via Bamboo
-**Downstream Database**        | Restore from **develop** ~/_sql folder of website repo      | Restore from **develop** ~/_sql folder of website repo            | Restore from **release** ~/_sql folder of website repo         | Backup to **develop** ~/_sql folder of website repo during deploy
-**Upstream Database**          | Restore from **develop** ~/_sql folder of website repo      | Backup to **develop** ~/_sql folder of website repo during deploy | Restore from **release** ~/_sql folder of website repo         | Restore from **master** ~/_sql folder of website repo
-**Downstream Untracked Files** | rsync files from **Production** if untracked                | rsync files from **Production**                                   | rsync files from **Production**                                | --
-**Upstream Untracked Files**   | rsync files from **Test**                                   | --                                                                | rsync files from **Test**                                      | rsync files from **Test**
-**Deployments**                | Manually via `vagrant provision`                            | Automatically via Bamboo (new commits to **develop**)             | Automatically via Bamboo (new commits to **release**)          | Manually via Bamboo
+**Running Branch**                     | *develop*                                                   | *develop*                                                         | *release*                                                      | *master*
+**Website Provisioning**               | Manually via Vagrant                                        | Automatically via Bamboo (new commits to **develop**)             | Automatically via Bamboo (new commits to **release**)          | Manually via Bamboo
+**Downstream Workflow Database**       | Restore from **develop** ~/_sql folder of website repo      | Restore from **develop** ~/_sql folder of website repo            | Restore from **release** ~/_sql folder of website repo         | Backup to **develop** ~/_sql folder of website repo during deploy
+**Upstream Workflow Database**         | Restore from **develop** ~/_sql folder of website repo      | Backup to **develop** ~/_sql folder of website repo during deploy | Restore from **release** ~/_sql folder of website repo         | Restore from **master** ~/_sql folder of website repo
+**Downstream Workflow Software Files** | rsync files from **Production** if untracked                | rsync files from **Production** if untracked                      | rsync files from **Production** if untracked                   | --
+**Upstream Workflow Software Files**   | rsync files from **Test** if untracked                      | --                                                                | rsync files from **Test** if untracked                         | rsync files from **Test** if untracked
+**Deployments**                        | Manually via `vagrant provision`                            | Automatically via Bamboo (new commits to **develop**)             | Automatically via Bamboo (new commits to **release**)          | Manually via Bamboo
 
 
 
@@ -546,7 +546,7 @@ The following options are available:
         * if the webroot differs from the repo root, specify it here
         * must include the trailing slash
 
-Once you add a new website to configuration.yml, it's time to test in LocalDev:
+Once you add or remove a website to configuration.yml, it's time to test in LocalDev:
 
   * `vagrant provision ~/secrets/configuration.yml["company"]["name"]-dev-redhat`
   * `vagrant provision ~/secrets/configuration.yml["company"]["name"]-dev-redhat-mysql`
