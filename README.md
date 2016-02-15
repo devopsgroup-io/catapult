@@ -429,7 +429,7 @@ Once the Web and Database Servers are up and running, it's then time to configur
 
 ## Provision Websites ##
 
-Adding websites to Catapult is easy. The only requirement is that the website needs to be contained in its own repo on GitHub or Bitbucket. Websites are then added to configuration.yml, a minimal addition looks like this:
+Adding websites to Catapult is easy. The only requirement is that the website needs to be contained in its own repo at GitHub or Bitbucket. Websites are then added to configuration.yml, a minimal addition looks like this:
 
 ```
 websites:
@@ -505,9 +505,9 @@ The following options are available:
         * invokes wp-cli core update-db
         * resets WordPress admin password
     * `xenforo`
-        * generates xenforo database config file ~/library/config.php
-        * rsyncs ~/data and ~/internal_data
-        * sets for ~/data and ~/internal_data
+        * generates xenForo database config file ~/library/config.php
+        * rsyncs untracked ~/data and ~/internal_data
+        * sets permissions for ~/data and ~/internal_data
         * dumps and restores database at ~/sql
 * software_dbprefix:
     * `wp_`
@@ -539,7 +539,7 @@ Environment | LocalDev | Test | QC | Production
 **New Website Provisioning**   | Manually via Vagrant                                        | Automatically via Bamboo (new commits to **develop**)             | Automatically via Bamboo (new commits to **release**)          | Manually via Bamboo
 **Downstream Database**        | Restore from **develop** ~/_sql folder of website repo      | Restore from **develop** ~/_sql folder of website repo            | Restore from **release** ~/_sql folder of website repo         | Backup to **develop** ~/_sql folder of website repo during deploy
 **Upstream Database**          | Restore from **develop** ~/_sql folder of website repo      | Backup to **develop** ~/_sql folder of website repo during deploy | Restore from **release** ~/_sql folder of website repo         | Restore from **master** ~/_sql folder of website repo
-**Downstream Untracked Files** | rsync files from **Production**                             | rsync files from **Production**                                   | rsync files from **Production**                                | --
+**Downstream Untracked Files** | rsync files from **Production** if untracked                | rsync files from **Production**                                   | rsync files from **Production**                                | --
 **Upstream Untracked Files**   | rsync files from **Test**                                   | --                                                                | rsync files from **Test**                                      | rsync files from **Test**
 **Deployments**                | Manually via `vagrant provision`                            | Automatically via Bamboo (new commits to **develop**)             | Automatically via Bamboo (new commits to **release**)          | Manually via Bamboo
 
