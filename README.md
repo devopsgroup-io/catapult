@@ -1,5 +1,5 @@
 # Catapult #
-<img src="https://cdn.rawgit.com/devopsgroup-io/catapult/master/repositories/apache/_default_/svg/catapult.svg" align="center" alt="Catapult" width="200">
+<img src="https://cdn.rawgit.com/devopsgroup-io/catapult/master/repositories/apache/_default_/svg/catapult.svg" alt="Catapult" width="200">
 
 :boom: **Catapult** is a pre-defined website and workflow management platform built from leading and affordable technology.
 
@@ -430,6 +430,23 @@ Once the Web and Database Servers are up and running, it's then time to configur
 
 # Release Management #
 
+Catapult follows Gitflow for its configuration and development model - each environment runs a specific branch and changes are made by pull requests from one branch to the next.
+
+<img src="https://www.atlassian.com/git/images/tutorials/collaborating/comparing-workflows/gitflow-workflow/05.svg" alt="Gitflow" width="400">
+[1](#references)
+
+
+Environment | LocalDev | Test | QC | Production
+------------|----------|------|----|-----------
+**Running Branch**             | *develop*                                                   | *develop*                                                         | *release*                                                      | *master*
+**New Website Provisioning**   | Manually via Vagrant                                        | Automatically via Bamboo (new commits to **develop**)             | Automatically via Bamboo (new commits to **release**)          | Manually via Bamboo
+**Downstream Database**        | Restore from **develop** ~/_sql folder of website repo      | Restore from **develop** ~/_sql folder of website repo            | Restore from **release** ~/_sql folder of website repo         | Backup to **develop** ~/_sql folder of website repo during deploy
+**Upstream Database**          | Restore from **develop** ~/_sql folder of website repo      | Backup to **develop** ~/_sql folder of website repo during deploy | Restore from **release** ~/_sql folder of website repo         | Restore from **master** ~/_sql folder of website repo
+**Downstream Untracked Files** | rsync files from **Production** if untracked                | rsync files from **Production**                                   | rsync files from **Production**                                | --
+**Upstream Untracked Files**   | rsync files from **Test**                                   | --                                                                | rsync files from **Test**                                      | rsync files from **Test**
+**Deployments**                | Manually via `vagrant provision`                            | Automatically via Bamboo (new commits to **develop**)             | Automatically via Bamboo (new commits to **release**)          | Manually via Bamboo
+
+
 
 
 ## Website Configuration ##
@@ -534,19 +551,9 @@ Once you add a new website to configuration.yml, it's time to test in LocalDev:
   * `vagrant provision ~/secrets/configuration.yml["company"]["name"]-dev-redhat`
   * `vagrant provision ~/secrets/configuration.yml["company"]["name"]-dev-redhat-mysql`
 
-Once you're satisfied with the new website in LocalDev, it's time to commit configuration.yml.gpg to your Catapult fork's develop branch, this will kick off an automated deployment of Test. Once you're satisfied with the website in Test, then create a pull request from your Catapult fork's develop branch into release - once the pull request is merged, this will kick off an automated deployment to QC. Once you're satisfied with the website in QC, then create a pull request from your Catapult fork's release branch into master. Production does not have any automated deployments, to deploy your website to Production, login to Bamboo and press the play button for Production.
+Once you're satisfied with the website in LocalDev, it's time to commit configuration.yml.gpg to your Catapult fork's develop branch, this will kick off an automated deployment of Test. Once you're satisfied with the website in Test, then create a pull request from your Catapult fork's develop branch into release - once the pull request is merged, this will kick off an automated deployment to QC. Once you're satisfied with the website in QC, then create a pull request from your Catapult fork's release branch into master. Production does not have any automated deployments, to deploy your website to Production, login to Bamboo and press the play button for Production.
 
-Once a website exists in the upstream environments (Test, QC, Production), automated deployments will deploy changes that are detected on their respected branches (see chart below). The same workflow of moving a website upstream, exists when you make changes to a specific website's repository.
-
-Environment | LocalDev | Test | QC | Production
-------------|----------|------|----|-----------
-**Running Branch**             | *develop*                                                   | *develop*                                                         | *release*                                                      | *master*
-**New Website Provisioning**   | Manually via Vagrant                                        | Automatically via Bamboo (new commits to **develop**)             | Automatically via Bamboo (new commits to **release**)          | Manually via Bamboo
-**Downstream Database**        | Restore from **develop** ~/_sql folder of website repo      | Restore from **develop** ~/_sql folder of website repo            | Restore from **release** ~/_sql folder of website repo         | Backup to **develop** ~/_sql folder of website repo during deploy
-**Upstream Database**          | Restore from **develop** ~/_sql folder of website repo      | Backup to **develop** ~/_sql folder of website repo during deploy | Restore from **release** ~/_sql folder of website repo         | Restore from **master** ~/_sql folder of website repo
-**Downstream Untracked Files** | rsync files from **Production** if untracked                | rsync files from **Production**                                   | rsync files from **Production**                                | --
-**Upstream Untracked Files**   | rsync files from **Test**                                   | --                                                                | rsync files from **Test**                                      | rsync files from **Test**
-**Deployments**                | Manually via `vagrant provision`                            | Automatically via Bamboo (new commits to **develop**)             | Automatically via Bamboo (new commits to **release**)          | Manually via Bamboo
+Once a website exists in the upstream environments (Test, QC, Production), automated deployments will deploy changes that are detected on their respected branches.
 
 
 
@@ -635,3 +642,9 @@ Catapult will also be seen throughout local meetups in the Philadelphia and Grea
 * [Philadelphia WordPress Meetup Group](http://www.meetup.com/philadelphia-wordpress-meetup-group/) 1.5k+ technologists
 * [Philly DevOps](http://www.meetup.com/PhillyDevOps/) 700+ technologists
 * [Greater Philadelphia Drupal Meetup Group](http://www.meetup.com/drupaldelphia/) 500+ technologists
+* 
+
+
+
+# References #
+1. Atlassian. Comparing Workflows. https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow. Accessed February 15, 2016.
