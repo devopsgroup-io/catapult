@@ -105,7 +105,7 @@ HTTPS                               | Free                           | $30/mo + 
 Monitoring                          | New Relic                      | Proprietary               | Proprietary
 Supported Software                  | Numerous                       | 2                         | 1
 
-\* Catapult rolls out new features on a regular basis - this feature is highlighted for improvement or a future release.
+\* Catapult introduces new features on a regular basis - this feature is highlighted as a milestone for future release.
 See an error or have a suggestion? Email competition@devopsgroup.io
 
 
@@ -125,8 +125,9 @@ See an error or have a suggestion? Email competition@devopsgroup.io
 - [Usage](#usage)
     - [Provision Environments](#provision-environments)
     - [Configure Automated Deployments](#configure-automated-deployments)
-    - [Provision Websites](#provision-websites)
-    - [Develop Websites](#develop-websites)
+- [Release Management](#release-management)
+    - [Website Configuration](#website-configuration)
+    - [Website Development](#website-development)
 - [Troubleshooting](#troubleshooting)
 - [Contributing](#contributing)
     - [Releases](#releases)
@@ -331,7 +332,7 @@ New Relic | Application, Browser, and Server Monitoring | Free
 
 # Usage #
 
-To use Catapult you will need to [Provision Environments](#provision-environments), [Configure Automated Deployments](#configure-automated-deployments), then [Provision Websites](#provision-websites).
+To start using Catapult you will need to [Provision Environments](#provision-environments) and [Configure Automated Deployments](#configure-automated-deployments).
 
 
 
@@ -427,7 +428,11 @@ Once the Web and Database Servers are up and running, it's then time to configur
 
 
 
-## Provision Websites ##
+# Release Management #
+
+
+
+## Website Configuration ##
 
 Adding websites to Catapult is easy. The only requirement is that the website needs to be contained in its own repo at GitHub or Bitbucket. Websites are then added to configuration.yml, a minimal addition looks like this:
 
@@ -545,7 +550,7 @@ Environment | LocalDev | Test | QC | Production
 
 
 
-## Develop Websites ##
+## Website Development ##
 
 Once you Provision Websites and it's time to work on a website, there are a few things to consider:
 
