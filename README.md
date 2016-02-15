@@ -432,7 +432,7 @@ Once the Web and Database Servers are up and running, it's then time to configur
 
 Catapult follows Gitflow for its configuration and development model - each environment runs a specific branch and changes are made by pull requests from one branch to the next.
 
-<img src="https://www.atlassian.com/git/images/tutorials/collaborating/comparing-workflows/gitflow-workflow/05.svg" alt="Gitflow" width="400">
+<img src="https://www.atlassian.com/git/images/tutorials/collaborating/comparing-workflows/gitflow-workflow/05.svg" alt="Gitflow" width="600">
 [1](#references)
 
 
