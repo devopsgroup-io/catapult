@@ -169,11 +169,12 @@ Catapult is quick to setup. Fork the Github repository and start adding your con
     1. Fork https://github.com/devopsgroup-io/catapult and clone via SourceTree or the git utility of your choice.
 2. **Vagrant Plugins**
     1. Open your command line and cd into the newly cloned repository and install the following Vagrant plugins.
-        1. `vagrant plugin install vagrant-digitalocean` [![Gem](https://img.shields.io/gem/dt/vagrant-digitalocean.svg)](https://rubygems.org/gems/vagrant-digitalocean)
+        1. `vagrant plugin install vagrant-aws` [![Gem](https://img.shields.io/gem/dt/vagrant-aws.svg)](https://rubygems.org/gems/vagrant-aws)
+        2. `vagrant plugin install vagrant-digitalocean` [![Gem](https://img.shields.io/gem/dt/vagrant-digitalocean.svg)](https://rubygems.org/gems/vagrant-digitalocean)
             * We maintain this project! [GitHub](https://github.com/smdahlen/vagrant-digitalocean)
-        2. `vagrant plugin install vagrant-hostmanager` [![Gem](https://img.shields.io/gem/dt/vagrant-hostmanager.svg)](https://rubygems.org/gems/vagrant-hostmanager)
+        3. `vagrant plugin install vagrant-hostmanager` [![Gem](https://img.shields.io/gem/dt/vagrant-hostmanager.svg)](https://rubygems.org/gems/vagrant-hostmanager)
             * We maintain this project! [GitHub](https://github.com/smdahlen/vagrant-hostmanager)
-        3. `vagrant plugin install vagrant-vbguest` [![Gem](https://img.shields.io/gem/dt/vagrant-vbguest.svg)](https://rubygems.org/gems/vagrant-vbguest)
+        4. `vagrant plugin install vagrant-vbguest` [![Gem](https://img.shields.io/gem/dt/vagrant-vbguest.svg)](https://rubygems.org/gems/vagrant-vbguest)
 3. **SSH Key Pair**
     1. You will need to create a *passwordless* SSH key pair that will drive authentication for Catapult.
         1. For instructions please see https://help.github.com/articles/generating-ssh-keys/
@@ -225,8 +226,32 @@ New Relic | Application, Browser, and Server Monitoring | Free
     1. **DigitalOcean** sign-up and configuration
         1. Create an account at http://digitalocean.com
            * Get a $10 credit and give us $25 once you spend $25 https://www.digitalocean.com/?refcode=6127912f3462
-        2. Create a Personal Access Token at https://cloud.digitalocean.com/settings/applications named "Vagrant" and place the token value at `~/secrets/configuration.yml["company"]["digitalocean_personal_access_token"]`
-        3. Add your newly created id_rsa.pub from ~/secrets/id_rsa.pub key in https://cloud.digitalocean.com/settings/security named "Vagrant"
+        2. Go to your DigitalOcean Applications & API Dashboard https://cloud.digitalocean.com/settings/api
+            1. Create a Personal Access Token named "Vagrant" and place the token value at `~/secrets/configuration.yml["company"]["digitalocean_personal_access_token"]`
+        3. Go to your DigitalOcean Security Dashboard https://cloud.digitalocean.com/settings/security
+            1. Add a new SSH Key named "Vagrant" with your newly created id_rsa.pub from ~/secrets/id_rsa.pub key 
+    2. **Amazon Web Services** (AWS) sign-up and configuration
+        1. Create an account https://portal.aws.amazon.com/gp/aws/developer/registration
+        2. Sign in to your new AWS console https://console.aws.amazon.com
+        3. Go to your AWS Identity and Access Management (IAM) Users Dashboard https://console.aws.amazon.com/iam/home#users
+            1. Create a "Catapult" user.
+            2. Place the Access Key ID at `~/secrets/configuration.yml["company"]["aws_access_key"]`
+            3. Place the Secret Access Key at `~/secrets/configuration.yml["company"]["aws_secret_key"]`
+        4. Go to your AWS Identity and Access Management (IAM) Groups Dashboard https://console.aws.amazon.com/iam/home#groups
+            1. Create a "Catapult" group.
+            2. Attach the "AmazonEC2FullAccess" policy to the "Catapult" group.
+        5. Go back to your AWS Identity and Access Management (IAM) Groups Dashboard https://console.aws.amazon.com/iam/home#groups
+            1. Select your newly created "Catapult" group.
+            2. Select Add Users to Group and add your newly created "Catapult" user.
+        6. Go to your AWS EC2 Key Pairs Dashboard https://console.aws.amazon.com/ec2/home#KeyPairs
+            1. Click Import Key Pair
+            2. Add your newly created id_rsa.pub from ~/secrets/id_rsa.pub key
+            3. Set the Key pair name to "Catapult"
+        7. Go to your AWS EC2 Security Groups Dashboard https://console.aws.amazon.com/ec2/home#SecurityGroups
+            1. Select the "default" Group Name
+            2. Select the Inbound tab and click Edit
+            3. Change Source to "Anywhere"
+            4. Click Save
 2. **Repositories:**    
     Bitbucket provides free private repositories and GitHub provides free public repositories, you will need to sign up for both. If you already have Bitbucket and GitHub accounts you may use them, however, it's best to setup a [machine user](https://developer.github.com/guides/managing-deploy-keys/#machine-users) if you're using Catapult with your team.
     1. **Bitbucket** sign-up and configuration
@@ -239,20 +264,7 @@ New Relic | Application, Browser, and Server Monitoring | Free
             1. Place the username (not the email address) that you used to sign up for GitHub at `~/secrets/configuration.yml["company"]["github_username"]`
             2. Place the password of the account for GitHub at `~/secrets/configuration.yml["company"]["github_password"]`
         2. Add your newly created id_rsa.pub from ~/secrets/id_rsa.pub key in https://github.com/settings/ssh named "Catapult"
-3. **Automated Deployments:**    
-    1. **Amazon Web Services** (AWS) EC2 sign-up and configuration (Required for Bamboo)
-        1. Create an AWS account https://portal.aws.amazon.com/gp/aws/developer/registration
-        2. Sign in to your new AWS console https://console.aws.amazon.com
-        3. Go to your AWS Identity and Access Management (IAM) Users Dashboard https://console.aws.amazon.com/iam/home#users
-            1. Create a "Bamboo" user.
-            2. Place the Access Key ID at `~/secrets/configuration.yml["company"]["aws_access_key"]`
-            3. Place the Secret Access Key at `~/secrets/configuration.yml["company"]["aws_secret_key"]`
-        4. Go to your AWS Identity and Access Management (IAM) Groups Dashboard https://console.aws.amazon.com/iam/home#groups
-            1. Create a "Bamboo" group.
-            2. Attach the "AmazonEC2FullAccess" policy to the "Bamboo" group.
-        5. Go back to your AWS Identity and Access Management (IAM) Groups Dashboard https://console.aws.amazon.com/iam/home#groups
-            1. Select your newly created "Bamboo" group.
-            2. Select Add Users to Group and add your newly created "Bamboo" user.
+3. **Automated Deployments:**
     2. **Bamboo** sign-up and configuration
         1. Create a Bamboo Cloud account at https://www.atlassian.com/software/bamboo
         2. Sign in to your new custom Bamboo instance https://[your-name-here].atlassian.net

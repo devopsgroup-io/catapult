@@ -119,6 +119,9 @@ module Catapult
 
 
     # check for vagrant plugins
+    unless Vagrant.has_plugin?("vagrant-aws")
+      catapult_exception('vagrant-aws is not installed, please run "vagrant plugin install vagrant-aws"')
+    end
     unless Vagrant.has_plugin?("vagrant-digitalocean")
       catapult_exception('vagrant-digitalocean is not installed, please run "vagrant plugin install vagrant-digitalocean"')
     end
