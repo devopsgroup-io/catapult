@@ -536,10 +536,10 @@ The following options are available:
         * `wp_` is required for base Wordpress installs, Drupal has no prefix by default
 * software_workflow:
     * `downstream`
-        * Production is the source for the database and upload directories of software
+        * Production is the source for the database and software upload directories
         * this option is used when maintaining a website
     * `upstream`
-        * Test is the source for the database and upload directories of software
+        * Test is the source for the database and software upload directories
         * this option is used when launching a new website
 * webroot:
     * `www/`
@@ -587,7 +587,6 @@ So you want to contribute... Great! Open source projects like Catapult succeed o
   * Verify and track down a reported bug
   * Add documentation to the README
   * Answer project specific questions
-  * Contribute to the Catapult wiki
   * Blog about your experiences with Catapult
 
 When you first setup Catapult a `develop-catapult` branch is created for you under your forked repository, with an upstream set to `https://github.com/devopsgroup-io/catapult.git` so that you can easily create a pull request. Also keep in mind when closing issues to submit a pull request that includes [GitHub's: Closing issues via commit messages](https://help.github.com/articles/closing-issues-via-commit-messages/).
