@@ -9,7 +9,7 @@ sudo yum install -y mariadb
 
 # install drush
 if [ ! -f /usr/bin/drush ]; then
-    curl -sS https://getcomposer.org/installer | php
+    curl --silent --show-error --connect-timeout 5 --max-time 5 https://getcomposer.org/installer | php
     mv composer.phar /usr/local/bin/composer
     ln -s /usr/local/bin/composer /usr/bin/composer
     git clone https://github.com/drush-ops/drush.git /usr/local/src/drush
