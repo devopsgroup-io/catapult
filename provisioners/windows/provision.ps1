@@ -20,7 +20,7 @@ $PSVersionTable
 
 
 echo "`n`n==> Installing GPG"
-if (-not(test-path -Path "c:\Program Files (x86)\GNU\GnuPG\gpg2.exe")) {
+if (-not(test-path -path "c:\Program Files (x86)\GNU\GnuPG\gpg2.exe")) {
     start-process -filepath "c:\catapult\provisioners\windows\installers\gpg4win-2.3.0.exe" -argumentlist "/S" -Wait -RedirectStandardOutput $provision -RedirectStandardError $provisionError
     get-content $provision
     get-content $provisionError
@@ -28,7 +28,7 @@ if (-not(test-path -Path "c:\Program Files (x86)\GNU\GnuPG\gpg2.exe")) {
 start-process -filepath "c:\Program Files (x86)\GNU\GnuPG\gpg2.exe" -argumentlist "--version" -Wait -RedirectStandardOutput $provision -RedirectStandardError $provisionError
 get-content $provision
 get-content $provisionError
-if (-not(test-path -Path "c:\catapult\secrets\configuration.yml.gpg")) {
+if (-not(test-path -path "c:\catapult\secrets\configuration.yml.gpg")) {
     echo -e "Cannot read from c:\catapult\secrets\configuration.yml.gpg, please vagrant reload the virtual machine."
     exit 1
 }
@@ -83,7 +83,7 @@ echo "A reboot (LocalDev: vagrant reload) may be required after windows updates"
 
 
 echo "`n`n==> Installing .NET 4.0 (This may take a while...)"
-if (-not(test-path -Path "c:\windows\Microsoft.NET\Framework64\v4.0.30319\")) {
+if (-not(test-path -path "c:\windows\Microsoft.NET\Framework64\v4.0.30319\")) {
     # ((new-object net.webclient).DownloadFile("http://download.microsoft.com/download/9/5/A/95A9616B-7A37-4AF6-BC36-D6EA96C8DAAE/dotNetFx40_Full_x86_x64.exe","c:\tmp\dotNetFx40_Full_x86_x64.exe")) 
     start-process -filepath "c:\catapult\provisioners\windows\installers\dotNetFx40_Full_x86_x64.exe" -argumentlist "/q /norestart /log c:\catapult\provisioners\windows\logs\dotNetFx40_Full_x86_x64.exe.log" -Wait -RedirectStandardOutput $provision -RedirectStandardError $provisionError
     echo "Restarting Windows..."
@@ -99,7 +99,7 @@ Select PSChildName, Version, Release
 
 echo "`n`n==> Installing Web Platform Installer (This may take a while...)"
 # http://www.iis.net/learn/install/web-platform-installer/web-platform-installer-v4-command-line-webpicmdexe-rtw-release
-if (-not(test-path -Path "c:\Program Files\Microsoft\Web Platform Installer\WebpiCmd-x64.exe")) {
+if (-not(test-path -path "c:\Program Files\Microsoft\Web Platform Installer\WebpiCmd-x64.exe")) {
     # https://github.com/fdcastel/psunattended/blob/master/PSUnattended.ps1
     start-process -filepath msiexec -argumentlist "/i ""c:\catapult\provisioners\windows\installers\WebPlatformInstaller_amd64_en-US.msi"" /q ALLUSERS=1 REBOOT=ReallySuppress" -Wait -RedirectStandardOutput $provision -RedirectStandardError $provisionError
     get-content $provision
@@ -114,7 +114,7 @@ get-content $provisionError
 
 
 echo "`n`n==> Installing Git"
-if (-not(test-path -Path "c:\Program Files (x86)\Git\bin\git.exe")) {
+if (-not(test-path -path "c:\Program Files (x86)\Git\bin\git.exe")) {
     start-process -filepath "c:\catapult\provisioners\windows\installers\Git-1.9.5-preview20141217.exe" -argumentlist "/SP- /NORESTART /VERYSILENT /SUPPRESSMSGBOXES /SAVEINF=c:\catapult\provisioners\windows\logs\git-settings.txt /LOG=c:\catapult\provisioners\windows\logs\Git-1.9.5-preview20141217.exe.log" -Wait -RedirectStandardOutput $provision -RedirectStandardError $provisionError
     get-content $provision
     get-content $provisionError
@@ -222,17 +222,34 @@ if (-not($config.websites.iis)) {
         }
     }
 
+    echo "`n`n==> Removing SSL Bindings"
+    if (get-childitem -path IIS:\SslBindings) {
+        $sslbindings = get-childitem -path IIS:\SslBindings
+        foreach ($sslbinding in $sslbindings) {
+            if ($sslbinding.IPAddress -and $sslbinding.Port -and $sslbinding.Host) {
+                remove-item ("IIS:\SslBindings\{0}!{1}!{2}" -f $sslbinding.IPAddress,$sslbinding.Port,$sslbinding.Host) -recurse
+            } elseif ($sslbinding.IPAddress -and $sslbinding.Port) {
+                remove-item ("IIS:\SslBindings\{0}!{1}!" -f $sslbinding.IPAddress,$sslbinding.Port) -recurse
+            } elseif ($sslbinding.Port -and $sslbinding.Host) {
+                remove-item ("IIS:\SslBindings\!{0}!{1}" -f $sslbinding.Port,$sslbinding.Host) -recurse
+            } else {
+                echo "could not remove the ssl binding"
+                write-host ($sslbinding | format-list | out-string)
+            }
+        }
+    }
+
     echo "`n`n==> Removing websites"
-    if (get-childitem -Path IIS:\Sites | where-object {$_.Name -ne "Default Web Site"}) {
-        $websites = get-childitem -Path IIS:\Sites | where-object {$_.Name -ne "Default Web Site"}
+    if (get-childitem -path IIS:\Sites | where-object {$_.Name -ne "Default Web Site"}) {
+        $websites = get-childitem -path IIS:\Sites | where-object {$_.Name -ne "Default Web Site"}
         foreach ($website in $websites) {
             remove-item ("IIS:\Sites\{0}" -f $website.Name) -recurse
         }
     }
 
     echo "`n`n==> Removing application pools"
-    if (get-childitem -Path IIS:\AppPools | where-object {$_.Name -ne "DefaultAppPool"}) {
-        $apppools = get-childitem -Path IIS:\AppPools | where-object {$_.Name -ne "DefaultAppPool"}
+    if (get-childitem -path IIS:\AppPools | where-object {$_.Name -ne "DefaultAppPool"}) {
+        $apppools = get-childitem -path IIS:\AppPools | where-object {$_.Name -ne "DefaultAppPool"}
         foreach ($apppool in $apppools) {
             remove-item ("IIS:\AppPools\{0}" -f $apppool.Name) -recurse
         }
@@ -246,19 +263,28 @@ if (-not($config.websites.iis)) {
 
     echo "`n`n==> Creating websites"
     foreach ($instance in $config.websites.iis) {
+        $domain = ("$($args[0]).{0}" -f $instance.domain)
         if ($instance.webroot) {
             $instance.webroot = $instance.webroot.Replace("/","\")
         }
+        # 80
         new-website -name ("$($args[0]).{0}" -f $instance.domain) -hostheader ("$($args[0]).{0}" -f $instance.domain) -port 80 -physicalpath ("c:\inetpub\repositories\iis\{0}\{1}" -f $instance.domain,$instance.webroot) -applicationpool ("$($args[0]).{0}" -f $instance.domain) -force
-        set-location IIS:\SslBindings
-        new-webbinding -name ("$($args[0]).{0}" -f $instance.domain) -hostheader ("$($args[0]).{0}" -f $instance.domain) -port 443 -protocol https
-        $certificate = New-SelfSignedCertificate -DnsName "localhost.localdomain" -CertStoreLocation cert:\LocalMachine\My
-        $certificate | new-item 0.0.0.0!443
+        # 443
+        new-webbinding -name ("$($args[0]).{0}" -f $instance.domain) -hostheader ("$($args[0]).{0}" -f $instance.domain) -port 443 -protocol https -sslflags 1
+    }
+
+    echo "`n`n==> Creating SSL Bindings"
+    foreach ($instance in $config.websites.iis) {
+        $domain = ("$($args[0]).{0}" -f $instance.domain)
+        # create self-signed cert
+        $certificate = New-SelfSignedCertificate -DnsName ("$($args[0]).{0}" -f $instance.domain) -CertStoreLocation "cert:\LocalMachine\My"
+        # bind self-signed cert to 443
+        new-item -path "IIS:\SslBindings\!443!$domain" -value $certificate -sslflags 1 -force
     }
 
     echo "`n`n==> Starting websites"
-    if (get-childitem -Path IIS:\Sites) {
-        get-childitem -Path IIS:\Sites | foreach { start-website $_.Name; }
+    if (get-childitem -path IIS:\Sites) {
+        get-childitem -path IIS:\Sites | foreach { start-website $_.Name; }
     }
     foreach ($instance in $config.websites.iis) {
         echo ("http://$($args[0]).{0}" -f $instance.domain)
