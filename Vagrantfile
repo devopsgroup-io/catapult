@@ -193,4 +193,23 @@ Vagrant.configure("2") do |config|
     config.vm.provision "shell", path: "provisioners/windows/provision.ps1", args: ["dev","#{Catapult::Command.repo}","#{Catapult::Command.configuration_user["settings"]["gpg_key"]}","iis"], run: "always"
   end
 
+  # test => windows
+  config.vm.define "#{Catapult::Command.configuration["company"]["name"].downcase}-test-windows" do |config|
+    config.vm.provider :aws do |provider,override|
+      provider.keypair_name = "Catapult"
+      override.ssh.private_key_path = "secrets/id_rsa"
+      override.vm.box = "aws"
+      override.vm.box_url = "https://github.com/mitchellh/vagrant-aws/raw/master/dummy.box"
+      provider.access_key_id = Catapult::Command.configuration["company"]["aws_access_key"]
+      provider.secret_access_key = Catapult::Command.configuration["company"]["aws_secret_key"]
+      provider.ami = "ami-40f0d32a"
+      provider.region = "us-east-1"
+      provider.instance_type = "t2.micro"
+    end
+    # disable the default vagrant share
+    config.vm.synced_folder ".", "/vagrant", disabled: true
+    # configure the provisioner
+    config.vm.provision "shell", path: "provisioners/windows/provision.ps1", args: ["test","#{Catapult::Command.repo}","#{Catapult::Command.configuration_user["settings"]["gpg_key"]}","iis"], run: "always"
+  end
+
 end
