@@ -118,11 +118,11 @@ See an error or have a suggestion? Email competition@devopsgroup.io
     - [Supported Software](#supported-software)
     - [Competition](#competition)
     - [Table of Contents](#table-of-contents)
-- [Setup](#setup)
+- [Setup Catapult](#setup-catapults)
     - [Developer Setup](#developer-setup)
     - [Instance Setup](#instance-setup)
     - [Services Setup](#services-setup)
-- [Usage](#usage)
+- [Setup Environments](#setup-environments)
     - [Provision Environments](#provision-environments)
     - [Configure Automated Deployments](#configure-automated-deployments)
 - [Release Management](#release-management)
@@ -135,7 +135,7 @@ See an error or have a suggestion? Email competition@devopsgroup.io
 
 
 
-# Setup #
+# Setup Catapult #
 
 Catapult requires a [Developer Setup](#developer-setup), [Instance Setup](#instance-setup), and [Services Setup](#services-setup) as described in the following sections.
 
@@ -330,7 +330,7 @@ New Relic | Application, Browser, and Server Monitoring | Free
 
 
 
-# Usage #
+# Setup Environments #
 
 To start using Catapult you will need to [Provision Environments](#provision-environments) and [Configure Automated Deployments](#configure-automated-deployments).
 
