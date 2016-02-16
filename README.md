@@ -118,7 +118,7 @@ See an error or have a suggestion? Email competition@devopsgroup.io
     - [Supported Software](#supported-software)
     - [Competition](#competition)
     - [Table of Contents](#table-of-contents)
-- [Setup Catapult](#setup-catapults)
+- [Setup Catapult](#setup-catapult)
     - [Developer Setup](#developer-setup)
     - [Instance Setup](#instance-setup)
     - [Services Setup](#services-setup)
@@ -126,7 +126,8 @@ See an error or have a suggestion? Email competition@devopsgroup.io
     - [Provision Environments](#provision-environments)
     - [Configure Automated Deployments](#configure-automated-deployments)
 - [Release Management](#release-management)
-    - [Website Configuration](#website-configuration)
+    - [Catapult Configuration](#catapult-configuration)
+        - [Websites](#websites)
     - [Website Development](#website-development)
 - [Troubleshooting](#troubleshooting)
 - [Contributing](#contributing)
@@ -462,7 +463,11 @@ Environment | LocalDev | Test | QC | Production
 
 
 
-## Website Configuration ##
+## Catapult Configuration ##
+
+
+
+### Websites ###
 
 Adding websites to Catapult is easy. The only requirement is that the website needs to be contained in its own repo at GitHub or Bitbucket. Websites are then added to configuration.yml, a minimal addition looks like this:
 
