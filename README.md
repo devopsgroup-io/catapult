@@ -430,7 +430,7 @@ Once the Web and Database Servers are up and running, it's then time to configur
 
 # Release Management #
 
-Catapult follows Gitflow for its configuration and development model - each environment runs a specific branch and changes are made by pull requests from one branch to the next.
+Catapult follows Gitflow for its configuration and development model - each environment runs a specific branch and changesets are introduced into each environment by pull requests from one branch to the next.
 
 <img src="https://www.atlassian.com/git/images/tutorials/collaborating/comparing-workflows/gitflow-workflow/05.svg" alt="Gitflow" width="600">
 [1](#references)
@@ -438,14 +438,12 @@ Catapult follows Gitflow for its configuration and development model - each envi
 
 Environment | LocalDev | Test | QC | Production
 ------------|----------|------|----|-----------
-**Running Branch**                     | *develop*                                                   | *develop*                                                         | *release*                                                      | *master*
-**Website Provisioning**               | Manually via Vagrant                                        | Automatically via Bamboo (new commits to **develop**)             | Automatically via Bamboo (new commits to **release**)          | Manually via Bamboo
-**Downstream Workflow Database**       | Restore from **develop** ~/_sql folder of website repo      | Restore from **develop** ~/_sql folder of website repo            | Restore from **release** ~/_sql folder of website repo         | Backup to **develop** ~/_sql folder of website repo during deploy
-**Upstream Workflow Database**         | Restore from **develop** ~/_sql folder of website repo      | Backup to **develop** ~/_sql folder of website repo during deploy | Restore from **release** ~/_sql folder of website repo         | Restore from **master** ~/_sql folder of website repo
-**Downstream Workflow Software Files** | rsync files from **Production** if untracked                | rsync files from **Production** if untracked                      | rsync files from **Production** if untracked                   | --
-**Upstream Workflow Software Files**   | rsync files from **Test** if untracked                      | --                                                                | rsync files from **Test** if untracked                         | rsync files from **Test** if untracked
-**Deployments**                        | Manually via `vagrant provision`                            | Automatically via Bamboo (new commits to **develop**)             | Automatically via Bamboo (new commits to **release**)          | Manually via Bamboo
-
+**Running Branch**                       | *develop*                                                   | *develop*                                                         | *release*                                                      | *master*
+**Deployments**                          | Manually via `vagrant provision`                            | Automatically via Bamboo (new commits to **develop**)             | Automatically via Bamboo (new commits to **release**)          | Manually via Bamboo
+**Downstream Workflow - Database**       | Restore from **develop** ~/_sql folder of website repo      | Restore from **develop** ~/_sql folder of website repo            | Restore from **release** ~/_sql folder of website repo         | Backup to **develop** ~/_sql folder of website repo during deploy
+**Upstream Workflow - Database**         | Restore from **develop** ~/_sql folder of website repo      | Backup to **develop** ~/_sql folder of website repo during deploy | Restore from **release** ~/_sql folder of website repo         | Restore from **master** ~/_sql folder of website repo
+**Downstream Workflow - Software Files** | rsync files from **Production** if untracked                | rsync files from **Production** if untracked                      | rsync files from **Production** if untracked                   | --
+**Upstream Workflow - Software Files**   | rsync files from **Test** if untracked                      | --                                                                | rsync files from **Test** if untracked                         | rsync files from **Test** if untracked
 
 
 
@@ -545,15 +543,6 @@ The following options are available:
     * `www/`
         * if the webroot differs from the repo root, specify it here
         * must include the trailing slash
-
-Once you add or remove a website to configuration.yml, it's time to test in LocalDev:
-
-  * `vagrant provision ~/secrets/configuration.yml["company"]["name"]-dev-redhat`
-  * `vagrant provision ~/secrets/configuration.yml["company"]["name"]-dev-redhat-mysql`
-
-Once you're satisfied with the website in LocalDev, it's time to commit configuration.yml.gpg to your Catapult fork's develop branch, this will kick off an automated deployment of Test. Once you're satisfied with the website in Test, then create a pull request from your Catapult fork's develop branch into release - once the pull request is merged, this will kick off an automated deployment to QC. Once you're satisfied with the website in QC, then create a pull request from your Catapult fork's release branch into master. Production does not have any automated deployments, to deploy your website to Production, login to Bamboo and press the play button for Production.
-
-Once a website exists in the upstream environments (Test, QC, Production), automated deployments will deploy changes that are detected on their respected branches.
 
 
 
