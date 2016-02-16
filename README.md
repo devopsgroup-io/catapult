@@ -88,7 +88,7 @@ Platform Feature | Catapult | Pantheon | Acquia
 Source                              | Open                           | Closed                    | Closed
 Feature Set                         | Bundled                        | Separated                 | Separated
 Minimum Bundled<br>Monthly Cost     | $40                            | $400                      | $134
-Methodology                         | SCRUM                          | :x:                       | :x:
+Methodology                         | Scrum                          | :x:                       | :x:
 Workflow                            | Git Flow                       | Git Flow                  | Git Flow
 Workflow Model                      | Upstream or Downstream         | :x:                       | :x:
 Environments                        | LocalDev, Test, QC, Production | Multidev, Dev, Test, Live | Dev Desktop, Dev, Stage, Prod
@@ -452,6 +452,8 @@ Environment | LocalDev | Test | QC | Production
 ------------|----------|------|----|-----------
 **Running Branch**                       | *develop*                                                   | *develop*                                                         | *release*                                                      | *master*
 **Deployments**                          | Manually via `vagrant provision`                            | Automatically via Bamboo (new commits to **develop**)             | Automatically via Bamboo (new commits to **release**)          | Manually via Bamboo
+**Testing Activities**                   | Component Test                                              | Integration Test, System Test                                     | Acceptance Test, Release Test                                  | Operational Qualification
+**Scrum Activities**                     | Sprint Start: Development of User Stories                   | Daily Scrum                                                       | Sprint Review                                                  | Sprint End: Accepted Product Release
 **Downstream Workflow - Database**       | Restore from **develop** ~/_sql folder of website repo      | Restore from **develop** ~/_sql folder of website repo            | Restore from **release** ~/_sql folder of website repo         | Backup to **develop** ~/_sql folder of website repo during deploy
 **Upstream Workflow - Database**         | Restore from **develop** ~/_sql folder of website repo      | Backup to **develop** ~/_sql folder of website repo during deploy | Restore from **release** ~/_sql folder of website repo         | Restore from **master** ~/_sql folder of website repo
 **Downstream Workflow - Software Files** | rsync files from **Production** if untracked                | rsync files from **Production** if untracked                      | rsync files from **Production** if untracked                   | --
