@@ -229,7 +229,7 @@ if (-not($config.websites.iis)) {
             if ($sslbinding.IPAddress -and $sslbinding.Port -and $sslbinding.Host) {
                 remove-item ("IIS:\SslBindings\{0}!{1}!{2}" -f $sslbinding.IPAddress,$sslbinding.Port,$sslbinding.Host) -recurse
             } elseif ($sslbinding.IPAddress -and $sslbinding.Port) {
-                remove-item ("IIS:\SslBindings\{0}!{1}!" -f $sslbinding.IPAddress,$sslbinding.Port) -recurse
+                remove-item ("IIS:\SslBindings\{0}!{1}" -f $sslbinding.IPAddress,$sslbinding.Port) -recurse
             } elseif ($sslbinding.Port -and $sslbinding.Host) {
                 remove-item ("IIS:\SslBindings\!{0}!{1}" -f $sslbinding.Port,$sslbinding.Host) -recurse
             } else {
