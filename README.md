@@ -226,7 +226,7 @@ New Relic | Application, Browser, and Server Monitoring | Free
 1. **Cloud Hosting:**    
     1. **DigitalOcean** sign-up and configuration
         1. Create an account at http://digitalocean.com
-           * Get a $10 credit and give us $25 once you spend $25 https://www.digitalocean.com/?refcode=6127912f3462
+           * [Free Stuff] Get a $10 credit and give us $25 once you spend $25 https://www.digitalocean.com/?refcode=6127912f3462
         2. Go to your DigitalOcean Applications & API Dashboard https://cloud.digitalocean.com/settings/api
             1. Create a Personal Access Token named "Vagrant" and place the token value at `~/secrets/configuration.yml["company"]["digitalocean_personal_access_token"]`
         3. Go to your DigitalOcean Security Dashboard https://cloud.digitalocean.com/settings/security
@@ -333,6 +333,8 @@ New Relic | Application, Browser, and Server Monitoring | Free
 5. **Monitoring:**
     1. **New Relic** sign-up and configuration
         1. Create a New Relic account at http://newrelic.com/
+            * [Free Stuff] Sign-up up for New Relic and get a Data Nerd shirt! http://newrelic.com/lp/datanerd
+            * [Free Stuff] Refer Catapult and get a New Relic hoodie! http://newrelic.com/referral
         2. Sign in to your New Relic account
         3. Go to your Account Settings > Integrations > API keys.
         4. Generate and place your REST API key at `~/secrets/configuration.yml["company"]["newrelic_api_key"]`
