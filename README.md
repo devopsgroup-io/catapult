@@ -127,6 +127,8 @@ See an error or have a suggestion? Email competition@devopsgroup.io
     - [Configure Automated Deployments](#configure-automated-deployments)
 - [Release Management](#release-management)
     - [Catapult Configuration](#catapult-configuration)
+        - [Company](#company)
+        - [Environments](#environments)
         - [Websites](#websites)
     - [Website Development](#website-development)
 - [Troubleshooting](#troubleshooting)
