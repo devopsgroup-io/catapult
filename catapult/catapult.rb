@@ -429,7 +429,7 @@ module Catapult
       catapult_exception("Please set [\"company\"][\"digitalocean_personal_access_token\"] in secrets/configuration.yml")
     else
       uri = URI("https://api.digitalocean.com/v2/droplets")
-      Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => OpenSSL::SSL::VERIFY_NONE) do |http|
+      Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
         request = Net::HTTP::Get.new uri.request_uri
         request.add_field "Authorization", "Bearer #{@configuration["company"]["digitalocean_personal_access_token"]}"
         response = http.request request
@@ -441,7 +441,7 @@ module Catapult
           puts " * DigitalOcean API authenticated successfully."
           @api_digitalocean = JSON.parse(response.body)
           uri = URI("https://api.digitalocean.com/v2/account/keys")
-          Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => OpenSSL::SSL::VERIFY_NONE) do |http|
+          Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
             request = Net::HTTP::Get.new uri.request_uri
             request.add_field "Authorization", "Bearer #{@configuration["company"]["digitalocean_personal_access_token"]}"
             response = http.request request
@@ -475,7 +475,7 @@ module Catapult
       catapult_exception("Please set [\"company\"][\"bitbucket_username\"] and [\"company\"][\"bitbucket_password\"] in secrets/configuration.yml")
     else
       uri = URI("https://api.bitbucket.org/1.0/user/repositories")
-      Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => OpenSSL::SSL::VERIFY_NONE) do |http|
+      Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
         request = Net::HTTP::Get.new uri.request_uri
         request.basic_auth "#{@configuration["company"]["bitbucket_username"]}", "#{@configuration["company"]["bitbucket_password"]}"
         response = http.request request
@@ -488,7 +488,7 @@ module Catapult
           @api_bitbucket = JSON.parse(response.body)
           # verify bitbucket user's catapult ssh key
           uri = URI("https://api.bitbucket.org/1.0/users/#{@configuration["company"]["bitbucket_username"]}/ssh-keys")
-          Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => OpenSSL::SSL::VERIFY_NONE) do |http|
+          Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
             request = Net::HTTP::Get.new uri.request_uri
             request.basic_auth "#{@configuration["company"]["bitbucket_username"]}", "#{@configuration["company"]["bitbucket_password"]}"
             response = http.request request # Net::HTTPResponse object
@@ -524,7 +524,7 @@ module Catapult
       catapult_exception("Please set [\"company\"][\"github_username\"] and [\"company\"][\"github_password\"] in secrets/configuration.yml")
     else
       uri = URI("https://api.github.com/user")
-      Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => OpenSSL::SSL::VERIFY_NONE) do |http|
+      Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
         request = Net::HTTP::Get.new uri.request_uri
         request.basic_auth "#{@configuration["company"]["github_username"]}", "#{@configuration["company"]["github_password"]}"
         response = http.request request
@@ -537,7 +537,7 @@ module Catapult
           @api_github = JSON.parse(response.body)
           # verify github user's catapult ssh key
           uri = URI("https://api.github.com/user/keys")
-          Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => OpenSSL::SSL::VERIFY_NONE) do |http|
+          Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
             request = Net::HTTP::Get.new uri.request_uri
             request.basic_auth "#{@configuration["company"]["github_username"]}", "#{@configuration["company"]["github_password"]}"
             response = http.request request # Net::HTTPResponse object
@@ -573,7 +573,7 @@ module Catapult
       catapult_exception("Please set [\"company\"][\"bamboo_base_url\"] and [\"company\"][\"bamboo_username\"] and [\"company\"][\"bamboo_password\"] in secrets/configuration.yml")
     else
       uri = URI("#{@configuration["company"]["bamboo_base_url"]}rest/api/latest/project.json?os_authType=basic")
-      Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => OpenSSL::SSL::VERIFY_NONE) do |http|
+      Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
         request = Net::HTTP::Get.new uri.request_uri
         request.basic_auth "#{@configuration["company"]["bamboo_username"]}", "#{@configuration["company"]["bamboo_password"]}"
         response = http.request request
@@ -596,7 +596,7 @@ module Catapult
           end
         end
         uri = URI("#{@configuration["company"]["bamboo_base_url"]}rest/api/latest/result/CAT-TEST.json?os_authType=basic")
-        Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => OpenSSL::SSL::VERIFY_NONE) do |http|
+        Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
           request = Net::HTTP::Get.new uri.request_uri
           request.basic_auth "#{@configuration["company"]["bamboo_username"]}", "#{@configuration["company"]["bamboo_password"]}"
           response = http.request request
@@ -609,7 +609,7 @@ module Catapult
           end
         end
         uri = URI("#{@configuration["company"]["bamboo_base_url"]}rest/api/latest/result/CAT-QC.json?os_authType=basic")
-        Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => OpenSSL::SSL::VERIFY_NONE) do |http|
+        Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
           request = Net::HTTP::Get.new uri.request_uri
           request.basic_auth "#{@configuration["company"]["bamboo_username"]}", "#{@configuration["company"]["bamboo_password"]}"
           response = http.request request
@@ -622,7 +622,7 @@ module Catapult
           end
         end
         uri = URI("#{@configuration["company"]["bamboo_base_url"]}rest/api/latest/result/CAT-PROD.json?os_authType=basic")
-        Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => OpenSSL::SSL::VERIFY_NONE) do |http|
+        Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
           request = Net::HTTP::Get.new uri.request_uri
           request.basic_auth "#{@configuration["company"]["bamboo_username"]}", "#{@configuration["company"]["bamboo_password"]}"
           response = http.request request
@@ -705,7 +705,7 @@ module Catapult
       authorization_header = algorithm + ' ' + 'Credential=' + @configuration["company"]["aws_access_key"] + '/' + credential_scope + ', ' +  'SignedHeaders=' + signed_headers + ', ' + 'Signature=' + signature
       # ************* SEND THE REQUEST *************
       uri = URI(endpoint + '?' + canonical_querystring)
-      Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => OpenSSL::SSL::VERIFY_NONE) do |http|
+      Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
         request = Net::HTTP::Get.new uri.request_uri
         request.add_field "Authorization", "#{authorization_header}"
         request.add_field "x-amz-date", "#{amzdate}"
@@ -726,7 +726,7 @@ module Catapult
       catapult_exception("Please set [\"company\"][\"cloudflare_api_key\"] and [\"company\"][\"cloudflare_email\"] in secrets/configuration.yml")
     else
       uri = URI("https://api.cloudflare.com/client/v4/zones")
-      Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => OpenSSL::SSL::VERIFY_NONE) do |http|
+      Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
         request = Net::HTTP::Get.new uri.request_uri
         request.add_field "X-Auth-Key", "#{@configuration["company"]["cloudflare_api_key"]}"
         request.add_field "X-Auth-Email", "#{@configuration["company"]["cloudflare_email"]}"
@@ -746,7 +746,7 @@ module Catapult
       catapult_exception("Please set [\"company\"][\"newrelic_api_key\"] and [\"company\"][\"newrelic_license_key\"] in secrets/configuration.yml")
     else
       uri = URI("https://api.newrelic.com/v2/users.json")
-      Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => OpenSSL::SSL::VERIFY_NONE) do |http|
+      Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
         request = Net::HTTP::Get.new uri.request_uri
         request.add_field "X-Api-Key", "#{@configuration["company"]["newrelic_api_key"]}"
         response = http.request request
@@ -760,10 +760,29 @@ module Catapult
         end
       end
     end
+    # https://docs.newrelic.com/docs/apis
+    if @configuration["company"]["newrelic_admin_api_key"] == nil
+      catapult_exception("Please set [\"company\"][\"newrelic_admin_api_key\"] in secrets/configuration.yml")
+    else
+      uri = URI("https://synthetics.newrelic.com/synthetics/api/v1/monitors")
+      Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
+        request = Net::HTTP::Get.new uri.request_uri
+        request.add_field "X-Api-Key", "#{@configuration["company"]["newrelic_admin_api_key"]}"
+        response = http.request request
+        if response.code.to_f.between?(399,499)
+          catapult_exception("The New Relic Admin API could not authenticate, please verify [\"company\"][\"newrelic_admin_api_key\"].")
+        elsif response.code.to_f.between?(500,600)
+          puts "   - The New Relic Admin API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
+        else
+          puts " * New Relic Admin API authenticated successfully."
+          @api_cloudflare = JSON.parse(response.body)
+        end
+      end
+    end
     puts "\nVerification of configuration[\"environments\"]:\n".color(Colors::WHITE)
     # get full list of available digitalocean slugs to validate against
     uri = URI("https://api.digitalocean.com/v2/sizes")
-    Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => OpenSSL::SSL::VERIFY_NONE) do |http|
+    Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
       request = Net::HTTP::Get.new uri.request_uri
       request.add_field "Authorization", "Bearer #{@configuration["company"]["digitalocean_personal_access_token"]}"
       response = http.request request
@@ -992,7 +1011,7 @@ module Catapult
           if "#{repo_split_2[0]}" == "bitbucket.org"
             @api_bitbucket_repo_access = false
             uri = URI("https://api.bitbucket.org/2.0/repositories/#{repo_split_3[0]}")
-            Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => OpenSSL::SSL::VERIFY_NONE) do |http|
+            Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
               request = Net::HTTP::Get.new uri.request_uri
               request.basic_auth "#{@configuration["company"]["bitbucket_username"]}", "#{@configuration["company"]["bitbucket_password"]}"
               response = http.request request # Net::HTTPResponse object
@@ -1008,7 +1027,7 @@ module Catapult
               end
             end
             uri = URI("https://api.bitbucket.org/1.0/privileges/#{repo_split_3[0]}")
-            Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => OpenSSL::SSL::VERIFY_NONE) do |http|
+            Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
               request = Net::HTTP::Get.new uri.request_uri
               request.basic_auth "#{@configuration["company"]["bitbucket_username"]}", "#{@configuration["company"]["bitbucket_password"]}"
               response = http.request request # Net::HTTPResponse object
@@ -1026,7 +1045,7 @@ module Catapult
               end
             end
             uri = URI("https://api.bitbucket.org/1.0/group-privileges/#{repo_split_3[0]}")
-            Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => OpenSSL::SSL::VERIFY_NONE) do |http|
+            Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
               request = Net::HTTP::Get.new uri.request_uri
               request.basic_auth "#{@configuration["company"]["bitbucket_username"]}", "#{@configuration["company"]["bitbucket_password"]}"
               response = http.request request # Net::HTTPResponse object
@@ -1055,7 +1074,7 @@ module Catapult
           end
           if "#{repo_split_2[0]}" == "github.com"
             uri = URI("https://api.github.com/repos/#{repo_split_3[0]}/collaborators/#{@configuration["company"]["github_username"]}")
-            Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => OpenSSL::SSL::VERIFY_NONE) do |http|
+            Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
               request = Net::HTTP::Get.new uri.request_uri
               request.basic_auth "#{@configuration["company"]["github_username"]}", "#{@configuration["company"]["github_password"]}"
               response = http.request request # Net::HTTPResponse object
@@ -1073,7 +1092,7 @@ module Catapult
           # validate repo branches
           if "#{repo_split_2[0]}" == "bitbucket.org"
             uri = URI("https://api.bitbucket.org/1.0/repositories/#{repo_split_3[0]}/branches")
-            Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => OpenSSL::SSL::VERIFY_NONE) do |http|
+            Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
               request = Net::HTTP::Get.new uri.request_uri
               request.basic_auth "#{@configuration["company"]["bitbucket_username"]}", "#{@configuration["company"]["bitbucket_password"]}"
               response = http.request request # Net::HTTPResponse object
@@ -1115,7 +1134,7 @@ module Catapult
           end
           if "#{repo_split_2[0]}" == "github.com"
             uri = URI("https://api.github.com/repos/#{repo_split_3[0]}/branches")
-            Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => OpenSSL::SSL::VERIFY_NONE) do |http|
+            Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
               request = Net::HTTP::Get.new uri.request_uri
               request.basic_auth "#{@configuration["company"]["github_username"]}", "#{@configuration["company"]["github_password"]}"
               response = http.request request # Net::HTTPResponse object
@@ -1159,7 +1178,7 @@ module Catapult
           if "#{repo_split_2[0]}" == "bitbucket.org"
             # the bitbucket api offers no patch for service hooks, so we first need to check if the bitbucket bamboo service hooks exist
             uri = URI("https://api.bitbucket.org/1.0/repositories/#{repo_split_3[0]}/services")
-            Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => OpenSSL::SSL::VERIFY_NONE) do |http|
+            Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
               request = Net::HTTP::Get.new uri.request_uri
               request.basic_auth "#{@configuration["company"]["bitbucket_username"]}", "#{@configuration["company"]["bitbucket_password"]}"
               response = http.request request # Net::HTTPResponse object
@@ -1185,7 +1204,7 @@ module Catapult
                 end
                 unless @api_bitbucket_services_bamboo_cat_test
                   uri = URI("https://api.bitbucket.org/1.0/repositories/#{repo_split_3[0]}/services")
-                  Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => OpenSSL::SSL::VERIFY_NONE) do |http|
+                  Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
                     request = Net::HTTP::Post.new uri.request_uri
                     request.basic_auth "#{@configuration["company"]["bitbucket_username"]}", "#{@configuration["company"]["bitbucket_password"]}"
                     request.body = URI::encode\
@@ -1204,7 +1223,7 @@ module Catapult
                 end
                 unless @api_bitbucket_services_bamboo_cat_qc
                   uri = URI("https://api.bitbucket.org/1.0/repositories/#{repo_split_3[0]}/services")
-                  Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => OpenSSL::SSL::VERIFY_NONE) do |http|
+                  Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
                     request = Net::HTTP::Post.new uri.request_uri
                     request.basic_auth "#{@configuration["company"]["bitbucket_username"]}", "#{@configuration["company"]["bitbucket_password"]}"
                     request.body = URI::encode\
@@ -1227,7 +1246,7 @@ module Catapult
           # create bamboo service per github repo
           if "#{repo_split_2[0]}" == "github.com"
             uri = URI("https://api.github.com/repos/#{repo_split_3[0]}/hooks")
-            Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', :verify_mode => OpenSSL::SSL::VERIFY_NONE) do |http|
+            Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
               request = Net::HTTP::Post.new uri.request_uri
               request.basic_auth "#{@configuration["company"]["github_username"]}", "#{@configuration["company"]["github_password"]}"
               request.body = ""\

@@ -56,9 +56,7 @@ Catapult leverages the following technologies and technology services to impleme
     * Server Resources and Uptime - New Relic Servers
     * Application - New Relic APM
     * Browser - New Relic Browsers
-    * Website Uptime - \*New Relic Synthetics
-
-\* This technology is currently not integrated into Catapult due to limitations of the service - manual configuration is required.
+    * Website Uptime - New Relic Synthetics
 
 
 
@@ -340,6 +338,7 @@ New Relic | Application, Browser, and Server Monitoring | Free
         2. Sign in to your New Relic account
         3. Go to your Account Settings > Integrations > API keys.
         4. Generate and place your REST API key at `~/secrets/configuration.yml["company"]["newrelic_api_key"]`
+        5. Generate and place your Admin API key at `~/secrets/configuration.yml["company"]["newrelic_admin_api_key"]`
         3. Go to your Account Settings > Account > Summary.
         5. Place your License key at `~/secrets/configuration.yml["company"]["newrelic_license_key"]`
 6. **Verify Configuration:**    
