@@ -469,6 +469,43 @@ Environment | LocalDev | Test | QC | Production
 
 
 
+All instance specific configuration is stored in ~/secrets/configuration.yml and encrypted as ~/secrets/configuration.yml.gpg. There are three main sections - [Company](#company), [Environments](#environments), and [Websites](#websites).
+
+
+
+### Company ###
+
+
+
+The Company section contains globally used credentials and company information - all of which will be completed during [Setup Catapult](#setup-catapult).
+
+
+
+* name:
+    * `required: true`
+        * Your company's name or your name
+* email:
+    * `required: true`
+        * Your company's email or your email that is used for software admin accounts and virtual host admin
+* timezone_redhat:
+    * `required: true`
+        * Your timezone in tz database format that is used to for setting within operating systems and applications
+        * https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Virtualization/3.1/html/Developer_Guide/appe-REST_API_Guide-Timezones.html
+* timezone_windows:
+    * `required: true`
+        * Your timezone in windows standard format that is used to for setting within operating systems and applications
+        * https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Virtualization/3.1/html/Developer_Guide/appe-REST_API_Guide-Timezones.html
+
+
+
+### Environments ###
+
+
+
+The Company section contains environment configuration such as IP addresses and system credentials - most of which are automatically set during [Setup Catapult](#setup-catapult) and [Setup Environments](#setup-environments).
+
+
+
 ### Websites ###
 
 Adding websites to Catapult is easy. The only requirement is that the website needs to be contained in its own repo at GitHub or Bitbucket. Websites are then added to configuration.yml, a minimal addition looks like this:
