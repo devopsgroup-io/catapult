@@ -129,6 +129,8 @@ See an error or have a suggestion? Email competition@devopsgroup.io
         - [Environments](#environments)
         - [Websites](#websites)
     - [Website Development](#website-development)
+    - [Disaster Recovery](#disaster-recovery)
+        - [Website Rollbacks](#website-rollbacks) 
 - [Troubleshooting](#troubleshooting)
 - [Contributing](#contributing)
     - [Releases](#releases)
@@ -629,9 +631,22 @@ The following options are available:
 
 ## Website Development ##
 
-Once you Provision Websites and it's time to work on a website, there are a few things to consider:
+The importance of a LocalDev environment is critical to reducing risk by exacting the environment that exists upstream by leveraging Vagrant and VirtualBox.
 
-* Using the `software_workflow` flag for `upstream` websites is great, you can develop your code in LocalDev then have anyone in your company enter content into Drupal, Wordpress, etc. However, in the cercumstance that you absolutely need to move your LocalDev database `upstream`, it's as easy as saving a .sql dump to your website's repository develop branch under the _sql folder with today's date (following the YYYYMMDD.sql format). You can then `vagrant rebuild` the `~/secrets/configuration.yml["company"]["name"]-test-redhat-mysql` server and it will restore from your new sql dump.
+* Repositories for websites are cloned into the Catapult instance at ~/repositories and in the respective apache or iis folder, listed by domain name.
+* Repositories are linked between the host and guest for realtime developing.
+* Need a fresh database backup? Just delete and commit today's backup from the ~/sql folder.
+
+
+
+## Disaster Recovery ##
+
+No one likes when bad things happen - but being able to react immediately is crucial.
+
+### Website Rollbacks ###
+
+* `software_workflow: upstream` The production database is dropped and restored from the latest sql file in the ~/sql folder. To rollback, reverse the merge commit and run the production deployment.
+* `software_workflow: downstream` The production database is dumped once per day when the production build is run. To rollback, reverse the merge commit and manually restore the production database.
 
 
 
@@ -680,6 +695,7 @@ See http://semver.org/spec/v2.0.0.html for more information.
 
 
 # Community #
+
 
 
 ## Partnerships ##
