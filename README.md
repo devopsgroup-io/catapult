@@ -130,6 +130,7 @@ See an error or have a suggestion? Email competition@devopsgroup.io
         - [Websites](#websites)
     - [Website Development](#website-development)
     - [Disaster Recovery](#disaster-recovery)
+        - [Server Rebuilding](#server-rebuilding) 
         - [Website Rollbacks](#website-rollbacks) 
 - [Troubleshooting](#troubleshooting)
 - [Contributing](#contributing)
