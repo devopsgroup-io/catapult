@@ -470,19 +470,13 @@ Environment | LocalDev | Test | QC | Production
 
 ## Catapult Configuration ##
 
-
-
 All instance specific configuration is stored in ~/secrets/configuration.yml and encrypted as ~/secrets/configuration.yml.gpg. There are three main sections - [Company](#company), [Environments](#environments), and [Websites](#websites).
 
 
 
 ### Company ###
 
-
-
 The Company section contains globally used credentials and company information - all of which will be completed during [Setup Catapult](#setup-catapult).
-
-
 
 * name:
     * `required: true`
@@ -502,8 +496,6 @@ The Company section contains globally used credentials and company information -
 
 
 ### Environments ###
-
-
 
 The Company section contains environment configuration such as IP addresses and system credentials - most of which are automatically set during [Setup Catapult](#setup-catapult) and [Setup Environments](#setup-environments).
 
@@ -641,7 +633,16 @@ The importance of a LocalDev environment is critical to reducing risk by exactin
 
 ## Disaster Recovery ##
 
-No one likes when bad things happen - but being able to react immediately is crucial.
+No one likes when bad things happen - but being able to react immediately is crucial. Catapult affords you fast rebuilding and rollbacks.
+
+
+
+### Server Rebuilding ###
+
+* LocalDev is rebuildable by running `vagrant destroy` then `vagrant up` for the respective virtual machine.
+* Test, QC, and Production are rebuildable by running `vagrant rebuild` for the respective virtual machine - this is necessary (rather than a destroy and up) to retain the IP addresses of the machine.
+
+
 
 ### Website Rollbacks ###
 
