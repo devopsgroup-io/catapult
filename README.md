@@ -153,6 +153,7 @@ Catapult is controlled via Vagrant and the command line of a Developer's compute
 
 1. **Vagrant**
     1. Please download and install from https://www.vagrantup.com/downloads.html
+    2. Using OSX ? Please ensure Xcode Command Line Tools are installed by running `xcode-select --install` from Terminal
 2. **VirtualBox**
     1. Please download and install from https://www.virtualbox.org/wiki/Downloads
 3. **SourceTree**
