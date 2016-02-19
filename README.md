@@ -643,6 +643,7 @@ ApacheBench enables us to profile requests `-n` (number of requests to perform) 
 ````
 ab -n 1000 -c 100 http://test.devopsgroup.io/
 ````
+Keep bumping up `-n` and `-c` and notate failed requests and requests per second.
 
 
 
