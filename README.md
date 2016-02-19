@@ -91,16 +91,16 @@ Workflow                            | Git Flow                       | Git Flow 
 Workflow Model                      | Upstream or Downstream         | :x:                       | :x:
 Environments                        | LocalDev, Test, QC, Production | Multidev, Dev, Test, Live | Dev Desktop, Dev, Stage, Prod
 Approach                            | Virtual Machine                | Container                 | Virtual Machine
-Data Center                         | DigitalOcean                   | Rackspace                 | AWS
+Data Center                         | DigitalOcean and AWS           | Rackspace                 | AWS
 Scaling                             | *Vertical                      | Horizontal                | Vertical
 Development Environment             | Unlimited Local                | 5 Cloud                   | Unlimited Local
 Development Environment<br>Approach | Exact                          | Exact                     | Similar
 Dashboard - Control                 | CLI                            | CLI & Web                 | CLI & Web
 Dashboard - Monitor                 | CLI & \*Web                    | CLI & Web                 | CLI & Web
 Git                                 | GitHub & Bitbucket             | Proprietary               | Proprietary 
-DNS Management                      | CloudFlare                     | :x:                       | :x: 
-HTTPS                               | Free                           | $30/mo + $cert            | $cert
-Monitoring                          | New Relic                      | Proprietary               | Proprietary
+Managed DNS                         | CloudFlare                     | :x:                       | :x: 
+Managed HTTPS                       | Free                           | $30/mo + $cert            | $cert
+Managed Monitoring                  | New Relic                      | Proprietary               | Proprietary
 Supported Software                  | Numerous                       | 2                         | 1
 
 \* Catapult introduces new features on a regular basis - this feature is highlighted as a milestone for future release.
