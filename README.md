@@ -130,6 +130,7 @@ See an error or have a suggestion? Email competition@devopsgroup.io
         - [Environments](#environments)
         - [Websites](#websites)
     - [Website Development](#website-development)
+    - [Performance Testing](#performance-testing)
     - [Disaster Recovery](#disaster-recovery)
         - [Server Rebuilding](#server-rebuilding) 
         - [Website Rollbacks](#website-rollbacks) 
@@ -631,6 +632,17 @@ The importance of a LocalDev environment is critical to reducing risk by exactin
 * Repositories for websites are cloned into the Catapult instance at ~/repositories and in the respective apache or iis folder, listed by domain name.
 * Repositories are linked between the host and guest for realtime developing.
 * Need a fresh database backup? Just delete and commit today's backup from the ~/sql folder.
+
+
+
+## Performance Testing ##
+
+Often disregarded, performance testing is a key step in ensuring 100% uptime and an excellent user experience. ApacheBench is a great tool to test request performance and concurrency - OSX includes ApacheBench out of the box, see [this StackOverflow](http://stackoverflow.com/a/7407602/4838803) post to get up and running on Windows.
+
+ApacheBench enables us to profile requests `-n` (number of requests to perform) and concurrency `-c` (number of multiple requests to make at a time) to test for [C10k and C10M](http://highscalability.com/blog/2013/5/13/the-secret-to-10-million-concurrent-connections-the-kernel-i.html). An example command looks like this:
+````
+ab -n 1000 -c 100 http://test.devopsgroup.io/
+````
 
 
 
