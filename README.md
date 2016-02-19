@@ -92,7 +92,8 @@ Workflow Model                      | Upstream or Downstream         | :x:      
 Environments                        | LocalDev, Test, QC, Production | Multidev, Dev, Test, Live | Dev Desktop, Dev, Stage, Prod
 Approach                            | Virtual Machine                | Container                 | Virtual Machine
 Data Center                         | DigitalOcean and AWS           | Rackspace                 | AWS
-Scaling                             | *Vertical                      | Horizontal                | Vertical
+Scaling                             | Vertical                       | Horizontal                | Vertical
+Scaling Management                  | *Manual                        | Automatic                 | Manual
 Development Environment             | Unlimited Local                | 5 Cloud                   | Unlimited Local
 Development Environment<br>Approach | Exact                          | Exact                     | Similar
 Dashboard - Control                 | CLI                            | CLI & Web                 | CLI & Web
