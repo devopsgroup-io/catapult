@@ -17,7 +17,7 @@ redhat:
           description: "Configures CloudfFlare DNS A records for websites."
           multithreading: true
         cloudflare_zones:
-          description: "Configures CloudfFlare zone for websites."
+          description: "Configures CloudfFlare zones for websites."
           multithreading: true
         git:
           description: "Clones Git repositories for websites."
@@ -34,6 +34,9 @@ redhat:
         newrelic_apm_php:
           description: "Installs and configures New Relic APM PHP daemon."
           multithreading: false
+        newrelic_synthetics:
+          description: "Configures New Relic Synthetics monitors for websites."
+          multithreading: true
         newrelic_sysmon:
           description: "Installs and configures New Relic System Monitor daemon."
           multithreading: false
@@ -58,7 +61,7 @@ redhat:
     servers:
         redhat:
           apache:
-            modules: ["system","iptables","time","newrelic_sysmon","software_tools","git_clean","git","rsync","software_config","apache","apache_vhosts_clean","apache_vhosts","php","newrelic_apm_php","cloudflare_zones","cloudflare_dns","cloudflare_cache"]
+            modules: ["system","iptables","time","newrelic_sysmon","software_tools","git_clean","git","rsync","software_config","apache","apache_vhosts_clean","apache_vhosts","php","newrelic_apm_php","cloudflare_zones","cloudflare_dns","cloudflare_cache","newrelic_synthetics"]
           mysql:
             modules: ["system","iptables","time","newrelic_sysmon","software_tools","git_clean","git","software_config","mysql"]
 windows:
