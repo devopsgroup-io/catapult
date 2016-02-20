@@ -502,7 +502,7 @@ The exclusive Company entry contains top-level global credentials and company in
 
 ### Environments ###
 
-The Environments section contains environment configuration such as IP addresses and system credentials - all of which are automatically set during [Setup Catapult](#setup-catapult) and [Setup Environments](#setup-environments).
+The setup- and maintenance-free Environments entries contain environment configurations such as IP addresses and system credentials - all of which are automatically set during [Setup Catapult](#setup-catapult) and [Setup Environments](#setup-environments).
 
 
 
