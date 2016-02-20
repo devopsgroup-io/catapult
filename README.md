@@ -508,13 +508,14 @@ The setup- and maintenance-free Environments entries contain environment configu
 
 ### Websites ###
 
-Adding websites to Catapult is easy. The only requirement is that the website needs to be contained in its own repo at GitHub or Bitbucket. Websites are then added to configuration.yml, a minimal addition looks like this:
-
+Adding websites to Catapult is driven by simple configuration. After establishing a repository at GitHub or Bitbucket, simply add entries to configuration.yml. The entries must be ordered alphabetically by domain name and all entries exist under the single `websites` key as reflected in this example:
 ```
 websites:
   apache:
   - domain: devopsgroup.io
     repo: git@github.com:devopsgroup-io/devopsgroup-io.git
+  - domain: example.com
+    repo: git@github.com:example-company/example.com.git
 ```
 
 The following options are available:
