@@ -568,41 +568,41 @@ The following options are available:
         * generates codeigniter2 database config file ~/application/config/database.php
         * rsyncs untracked ~/uploads
         * sets permissions for ~/uploads
-        * dumps and restores database at ~/sql
+        * dumps and restores database at ~/_sql
     * `value: codeigniter3`
         * generates codeigniter3 database config file ~/application/config/database.php
         * rsyncs untracked ~/uploads
         * sets permissions for ~/uploads
-        * dumps and restores database at ~/sql
+        * dumps and restores database at ~/_sql
     * `value: drupal6`
         * generates drupal6 database config file ~/sites/default/settings.php
         * rsyncs untracked ~/sites/default/files
         * sets permissions for ~/sites/default/files
-        * dumps and restores database at ~/sql
+        * dumps and restores database at ~/_sql
         * invokes drush updatedb
         * resets drupal6 admin password
     * `value: drupal7`
         * generates drupal7 database config file ~/sites/default/settings.php
         * rsyncs untracked ~/sites/default/files
         * sets permissions for ~/sites/default/files
-        * dumps and restores database at ~/sql
+        * dumps and restores database at ~/_sql
         * invokes drush updatedb
         * resets drupal7 admin password
     * `value: silverstripe`
         * generates silverstripe database config file ~/mysite/_config.php
-        * restores newest database from ~/sql
+        * restores newest database from ~/_sql
     * `value: wordpress`
         * generates wordpress database config file ~/installers/wp-config.php
         * rsyncs untracked ~/wp-content/uploads
         * sets permissions for ~/wp-content/uploads
-        * dumps and restores database at ~/sql
+        * dumps and restores database at ~/_sql
         * invokes wp-cli core update-db
         * resets wordpress admin password
     * `value: xenforo`
         * generates xenForo database config file ~/library/config.php
         * rsyncs untracked ~/data and ~/internal_data
         * sets permissions for ~/data and ~/internal_data
-        * dumps and restores database at ~/sql
+        * dumps and restores database at ~/_sql
 * software_dbprefix:
     * `dependancy: software`
     * `required: false`
