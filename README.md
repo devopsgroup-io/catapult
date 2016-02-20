@@ -697,16 +697,15 @@ Below is a log of service related troubleshooting. If you're having issues relat
 
 # Contributing #
 
-So you want to contribute... Great! Open source projects like Catapult succeed or fail upon the involvement of a thriving community of developers, who often offer various levels of code skills and time commitment. Here are some ways you can begin contributing right away, at whatever level is most comfortable for you.
+Here are some ways which we welcome you to contribute to Catapult:
 
-  * Submit a feature
-  * Report a bug
-  * Verify and track down a reported bug
-  * Add documentation to the README
-  * Answer project specific questions
-  * Blog about your experiences with Catapult
+  * Submit a pull request
+  * Report an issue
+  * Provide feedback on open issues
+  * Improve documentation in the README
+  * Share your experiences with Catapult
 
-When you first setup Catapult a `develop-catapult` branch is created for you under your forked repository, with an upstream set to `https://github.com/devopsgroup-io/catapult.git` so that you can easily create a pull request. Also keep in mind when closing issues to submit a pull request that includes [GitHub's: Closing issues via commit messages](https://help.github.com/articles/closing-issues-via-commit-messages/).
+When you first setup Catapult, a `develop-catapult` branch is created for you under your forked repository with the git remote upstream set to `https://github.com/devopsgroup-io/catapult.git` so that you can easily create a pull request. Also keep in mind when closing issues to submit a pull request that includes [GitHub's: Closing issues via commit messages](https://help.github.com/articles/closing-issues-via-commit-messages/).
 
 
 
