@@ -565,44 +565,51 @@ The following options are available:
     * `required: false`
     * `default: null`
     * `value: codeigniter2`
-        * generates codeigniter2 database config file ~/application/config/database.php
+        * maintains codeigniter2 database config file ~/application/config/database.php
         * rsyncs untracked ~/uploads
         * sets permissions for ~/uploads
         * dumps and restores database at ~/_sql
+        * updates url references in database
     * `value: codeigniter3`
-        * generates codeigniter3 database config file ~/application/config/database.php
+        * maintains codeigniter3 database config file ~/application/config/database.php
         * rsyncs untracked ~/uploads
         * sets permissions for ~/uploads
         * dumps and restores database at ~/_sql
+        * updates url references in database
     * `value: drupal6`
-        * generates drupal6 database config file ~/sites/default/settings.php
+        * maintains drupal6 database config file ~/sites/default/settings.php
         * rsyncs untracked ~/sites/default/files
         * sets permissions for ~/sites/default/files
+        * invokes `drush updatedb`
         * dumps and restores database at ~/_sql
-        * invokes drush updatedb
+        * updates url references in database
         * resets drupal6 admin password
     * `value: drupal7`
-        * generates drupal7 database config file ~/sites/default/settings.php
+        * maintains drupal7 database config file ~/sites/default/settings.php
         * rsyncs untracked ~/sites/default/files
         * sets permissions for ~/sites/default/files
+        * invokes `drush updatedb`
         * dumps and restores database at ~/_sql
-        * invokes drush updatedb
+        * updates url references in database
         * resets drupal7 admin password
     * `value: silverstripe`
-        * generates silverstripe database config file ~/mysite/_config.php
-        * restores newest database from ~/_sql
+        * maintains silverstripe database config file ~/mysite/_config.php
+        * dumps and restores database at ~/_sql
+        * updates url references in database
     * `value: wordpress`
-        * generates wordpress database config file ~/installers/wp-config.php
+        * maintains wordpress database config file ~/wp-config.php
         * rsyncs untracked ~/wp-content/uploads
         * sets permissions for ~/wp-content/uploads
+        * invokes `wp-cli core update-db`
         * dumps and restores database at ~/_sql
-        * invokes wp-cli core update-db
+        * updates url references in database
         * resets wordpress admin password
     * `value: xenforo`
-        * generates xenForo database config file ~/library/config.php
+        * maintains xenForo database config file ~/library/config.php
         * rsyncs untracked ~/data and ~/internal_data
         * sets permissions for ~/data and ~/internal_data
         * dumps and restores database at ~/_sql
+        * updates url references in database
 * software_dbprefix:
     * `dependancy: software`
     * `required: false`
