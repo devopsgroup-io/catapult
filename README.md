@@ -90,6 +90,7 @@ Methodology                         | Scrum                          | :x:      
 Workflow                            | Git Flow                       | Git Flow                  | Git Flow
 Workflow Model                      | Upstream or Downstream         | :x:                       | :x:
 Environments                        | LocalDev, Test, QC, Production | Multidev, Dev, Test, Live | Dev Desktop, Dev, Stage, Prod
+Exacting Configuration              | :white_check_mark:             | :x:[2](#references)       | :x:[3](#references)
 Approach                            | Virtual Machine                | Container                 | Virtual Machine
 Data Center                         | DigitalOcean and AWS           | Rackspace                 | AWS
 Scaling                             | Vertical                       | Horizontal                | Vertical
@@ -649,13 +650,15 @@ Performing development in a local environment is critical to reducing risk by ex
 
 ## Performance Testing ##
 
-Often disregarded, performance testing is a key step in ensuring 100% uptime and an excellent user experience. ApacheBench is a great tool to test request performance and concurrency - OSX includes ApacheBench out of the box, see [this StackOverflow](http://stackoverflow.com/a/7407602/4838803) post to get up and running on Windows.
+Often disregarded, performance testing is a crucial component of quality assurance. The risks of neglecting performance testing include downtime, SEO impacts, gaps in analytics, poor user experience, and unknown ability to scale.
 
-ApacheBench enables us to profile requests `-n` (number of requests to perform) and concurrency `-c` (number of multiple requests to make at a time) to test for [C10k and C10M](http://highscalability.com/blog/2013/5/13/the-secret-to-10-million-concurrent-connections-the-kernel-i.html). An example command looks like this:
+With Catapult's exactly duplicated configuration, even the Test environment can accurately represent the performance potential of the Production environment. ApacheBench is a powerful tool to test request performance and concurrency - OSX includes ApacheBench out of the box, while [this StackOverflow post](http://stackoverflow.com/a/7407602/4838803) details how to get up and running on Windows.
+
+ApacheBench enables us to profile request performance (`-n` represents the number of requests to perform) and concurrency (`-c` represents the number of multiple requests to make at a time) to test for performance, including common limits such as [C10k and C10M](http://highscalability.com/blog/2013/5/13/the-secret-to-10-million-concurrent-connections-the-kernel-i.html). An example command looks like this:
 ````
 ab -n 1000 -c 100 http://test.devopsgroup.io/
 ````
-Keep bumping up `-n` and `-c` values and notate failed requests and requests per second.
+Notate failed requests and requests per second while incrementing `-n` and `-c` values.
 
 
 
@@ -761,3 +764,5 @@ Catapult will also be seen throughout local meetups in the Philadelphia and Grea
 
 # References #
 1. Atlassian. Comparing Workflows. https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow. Accessed February 15, 2016.
+2. Pantheon. Load and Performance Testing: Before You Begin. https://pantheon.io/docs/articles/load-and-performance-testing/. Accessed February 20, 2016.
+3. Acquia. Acquia Dev Desktop. https://www.acquia.com/products-services/dev-desktop. Accessed February 20, 2016.
