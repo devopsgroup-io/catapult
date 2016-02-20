@@ -611,13 +611,14 @@ The following options are available:
         * dumps and restores database at ~/_sql
         * updates url references in database
 * software_dbprefix:
-    * `dependancy: software`
+    * `dependency: software`
     * `required: false`
     * `default: null`
     * `example: wp_`
-        * `wp_` is required for base Wordpress installs, Drupal has no prefix by default
+        * the value that prefixes table names within the database
+            * PLEASE NOTE: table prefixes included in software distributions, such as WordPress' `wp_`, must be specified if desired
 * software_workflow:
-    * `dependancy: software`
+    * `dependency: software`
     * `required: true`
     * `default: null`
     * `value: downstream`
@@ -653,13 +654,13 @@ ApacheBench enables us to profile requests `-n` (number of requests to perform) 
 ````
 ab -n 1000 -c 100 http://test.devopsgroup.io/
 ````
-Keep bumping up `-n` and `-c` and notate failed requests and requests per second.
+Keep bumping up `-n` and `-c` values and notate failed requests and requests per second.
 
 
 
 ## Disaster Recovery ##
 
-No one likes when bad things happen - but being able to react immediately is crucial. Catapult affords you fast rebuilding and rollbacks.
+Being able to react immediately to disasters is crucial - Catapult affords you fast rebuilding and rollbacks.
 
 
 
