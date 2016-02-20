@@ -541,22 +541,22 @@ The following options are available:
 * force_auth:
     * `required: false`
     * `default: null`
-    * `example: example`
-        * forces http basic authentication in Test, QC, and Production
-        * `example` is both the username and password
+    * `example: letmein`
+        * forces [http basic authentication](https://en.wikipedia.org/wiki/Basic_access_authentication) in Test, QC, and Production (see `force_auth_exclude`)
+        * `letmein` is both the username and password
 * force_auth_exclude:
-    * `dependancy: force_auth`
+    * `dependency: force_auth`
     * `required: false`
     * `default: null`
     * `values: ["test","qc","production"]`
-        * array of exclusions exclusive to the force_auth option
+        * array of Environments to exclude from the `force_auth` option
 * force_https:
     * `required: false`
     * `default: false`
-    * `value: true`
-        * rewrite all http traffic to https
+    * `values: true, false`
+        * rewrites all http traffic to https
         * subdomains are not supported as limited by CloudFlare
-        * you will receive an unsigned cert error in LocalDev
+        * causes an unsigned cert error in LocalDev
 * repo:
     * `required: true`
     * `example: git@github.com:devopsgroup-io/devopsgroup-io.git`
