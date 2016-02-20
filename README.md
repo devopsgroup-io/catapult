@@ -239,6 +239,7 @@ New Relic | Application, Browser, and Server Monitoring | Free
             1. Add a new SSH Key named "Vagrant" with your newly created id_rsa.pub from ~/secrets/id_rsa.pub key 
     2. **Amazon Web Services** (AWS) sign-up and configuration
         1. Create an account https://portal.aws.amazon.com/gp/aws/developer/registration
+            * [Free Stuff] Receive Free Tier benefits for the first 12 months after signing up https://aws.amazon.com/ec2/pricing/
         2. Sign in to your new AWS console https://console.aws.amazon.com
         3. Go to your AWS Identity and Access Management (IAM) Users Dashboard https://console.aws.amazon.com/iam/home#users
             1. Create a "Catapult" user.
