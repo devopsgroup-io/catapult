@@ -495,7 +495,7 @@ The Company section contains globally used credentials and company information -
         * https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Virtualization/3.1/html/Developer_Guide/appe-REST_API_Guide-Timezones.html
 * timezone_windows:
     * `required: true`
-        * Your timezone in windows standard format that is used to for setting within operating systems and applications
+        * Your timezone in Windows Standard Format that is used to for setting within operating systems and applications
         * https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Virtualization/3.1/html/Developer_Guide/appe-REST_API_Guide-Timezones.html
 
 
