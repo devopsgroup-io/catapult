@@ -461,15 +461,15 @@ Catapult follows Gitflow for its configuration and development model - each envi
 
 Environment | LocalDev | Test | QC | Production
 ------------|----------|------|----|-----------
-**Running Branch**                       | *develop*                                                   | *develop*                                                         | *release*                                                      | *master*
-**Deployments**                          | Manually via `vagrant provision`                            | Automatically via Bamboo (new commits to **develop**)             | Automatically via Bamboo (new commits to **release**)          | Manually via Bamboo
-**Testing Activities**                   | Component Test                                              | Integration Test, System Test                                     | Acceptance Test, Release Test                                  | Operational Qualification
-**Scrum Activity**                       | Sprint Start: Development of User Stories                   | Daily Scrum                                                       | Sprint Review                                                  | Sprint End: Accepted Product Release
-**Scrum Roles**                          | Development Team                                            | Scrum Master, Development Team, Product Owner (optional)          | Scrum Master, Development Team, Product Owner                  | Product Owner
-**Downstream Workflow - Database**       | Restore from **develop** ~/_sql folder of website repo      | Restore from **develop** ~/_sql folder of website repo            | Restore from **release** ~/_sql folder of website repo         | Backup to **develop** ~/_sql folder of website repo during deploy
-**Upstream Workflow - Database**         | Restore from **develop** ~/_sql folder of website repo      | Backup to **develop** ~/_sql folder of website repo during deploy | Restore from **release** ~/_sql folder of website repo         | Restore from **master** ~/_sql folder of website repo
-**Downstream Workflow - Software Files** | rsync files from **Production** if untracked                | rsync files from **Production** if untracked                      | rsync files from **Production** if untracked                   | --
-**Upstream Workflow - Software Files**   | rsync files from **Test** if untracked                      | --                                                                | rsync files from **Test** if untracked                         | rsync files from **Test** if untracked
+**Running Branch**                              | *develop*                                                   | *develop*                                                         | *release*                                                      | *master*
+**Deployments**                                 | Manually via `vagrant provision`                            | Automatically via Bamboo (new commits to **develop**)             | Automatically via Bamboo (new commits to **release**)          | Manually via Bamboo
+**Testing Activities**                          | Component Test                                              | Integration Test, System Test                                     | Acceptance Test, Release Test                                  | Operational Qualification
+**Scrum Activity**                              | Sprint Start: Development of User Stories                   | Daily Scrum                                                       | Sprint Review                                                  | Sprint End: Accepted Product Release
+**Scrum Roles**                                 | Development Team                                            | Scrum Master, Development Team, Product Owner (optional)          | Scrum Master, Development Team, Product Owner                  | Product Owner
+**Downstream Software Workflow - Database**     | Restore from **develop** ~/_sql folder of website repo      | Restore from **develop** ~/_sql folder of website repo            | Restore from **release** ~/_sql folder of website repo         | Backup to **develop** ~/_sql folder of website repo during deploy
+**Upstream Software Workflow - Database**       | Restore from **develop** ~/_sql folder of website repo      | Backup to **develop** ~/_sql folder of website repo during deploy | Restore from **release** ~/_sql folder of website repo         | Restore from **master** ~/_sql folder of website repo
+**Downstream Software Workflow - File Store**   | rsync files from **Production** if git untracked            | rsync files from **Production** if untracked                      | rsync files from **Production** if git untracked               | --
+**Upstream Software Workflow - File Store**     | rsync files from **Test** if git untracked                  | --                                                                | rsync files from **Test** if git untracked                     | rsync files from **Test** if git untracked
 
 
 
@@ -566,19 +566,19 @@ The following options are available:
     * `default: null`
     * `value: codeigniter2`
         * maintains codeigniter2 database config file ~/application/config/database.php
-        * rsyncs untracked ~/uploads
+        * rsyncs git untracked ~/uploads
         * sets permissions for ~/uploads
         * dumps and restores database at ~/_sql
         * updates url references in database
     * `value: codeigniter3`
         * maintains codeigniter3 database config file ~/application/config/database.php
-        * rsyncs untracked ~/uploads
+        * rsyncs git untracked ~/uploads
         * sets permissions for ~/uploads
         * dumps and restores database at ~/_sql
         * updates url references in database
     * `value: drupal6`
         * maintains drupal6 database config file ~/sites/default/settings.php
-        * rsyncs untracked ~/sites/default/files
+        * rsyncs git untracked ~/sites/default/files
         * sets permissions for ~/sites/default/files
         * invokes `drush updatedb`
         * dumps and restores database at ~/_sql
@@ -586,7 +586,7 @@ The following options are available:
         * resets drupal6 admin password
     * `value: drupal7`
         * maintains drupal7 database config file ~/sites/default/settings.php
-        * rsyncs untracked ~/sites/default/files
+        * rsyncs git untracked ~/sites/default/files
         * sets permissions for ~/sites/default/files
         * invokes `drush updatedb`
         * dumps and restores database at ~/_sql
@@ -598,7 +598,7 @@ The following options are available:
         * updates url references in database
     * `value: wordpress`
         * maintains wordpress database config file ~/wp-config.php
-        * rsyncs untracked ~/wp-content/uploads
+        * rsyncs git untracked ~/wp-content/uploads
         * sets permissions for ~/wp-content/uploads
         * invokes `wp-cli core update-db`
         * dumps and restores database at ~/_sql
@@ -606,7 +606,7 @@ The following options are available:
         * resets wordpress admin password
     * `value: xenforo`
         * maintains xenForo database config file ~/library/config.php
-        * rsyncs untracked ~/data and ~/internal_data
+        * rsyncs git untracked ~/data and ~/internal_data
         * sets permissions for ~/data and ~/internal_data
         * dumps and restores database at ~/_sql
         * updates url references in database
@@ -620,13 +620,13 @@ The following options are available:
 * software_workflow:
     * `dependency: software`
     * `required: true`
-    * `default: null`
     * `value: downstream`
-        * Production is the source for the database and software upload directories
-        * this option is used when maintaining a website
+        * specifies Production as the source for the database and software file store
+        * this option is useful for maintaining a website
     * `value: upstream`
-        * Test is the source for the database and software upload directories
-        * this option is used when launching a new website
+        * specifies Test as the source for the database and software file store
+        * this option is useful for launching a new website
+        * PLEASE NOTE: affects the Production website instance - see [Release Management](#release-management)
 * webroot:
     * `required: false`
     * `default: null`
