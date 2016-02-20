@@ -502,7 +502,7 @@ The Company section contains globally used credentials and company information -
 
 ### Environments ###
 
-The Company section contains environment configuration such as IP addresses and system credentials - most of which are automatically set during [Setup Catapult](#setup-catapult) and [Setup Environments](#setup-environments).
+The Environments section contains environment configuration such as IP addresses and system credentials - all of which are automatically set during [Setup Catapult](#setup-catapult) and [Setup Environments](#setup-environments).
 
 
 
