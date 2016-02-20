@@ -531,13 +531,10 @@ The following options are available:
     * `required: false`
     * `default: null`
     * `example: mycompany.com`
-        * a domain name under your control that will append to the top-level-domain (e.g. `.com`)
+        * a domain name under your [name server authority](https://en.wikipedia.org/wiki/Domain_Name_System#Authoritative_name_server) to append to the top-level-domain (e.g. `.com`)
             * useful when you cannot or do not wish to host the Test/QC website at the `domain`
-        * allows for flexibility, dictated by [name server authority](https://en.wikipedia.org/wiki/Domain_Name_System#Authoritative_name_server), while still maintaining the `domain` Environments 
-            * appends the `domain_tld_override` for Environments
-                * dev.example.com.mycompany.com, test.example.com.mycompany.com, qc.example.com.mycompany.com, example.com.mycompany.com
-            * retains the `domain` for Environments
-                * dev.example.com, test.example.com, qc.example.com, example.com
+        * appends the `domain_tld_override` for Environments
+            * dev.example.com.mycompany.com, test.example.com.mycompany.com, qc.example.com.mycompany.com, example.com.mycompany.com
         * PLEASE NOTE: When removing this option from a website with `software`, you need to manually replace URLs in the database respective to the `software_workflow` option.
             * ie `vagrant ssh mycompany.com-test-redhat-mysql`
             * `php /catapult/provisioners/redhat/installers/wp-cli.phar --allow-root --path="/var/www/repositories/apache/example.com/(webroot if applicable)" search-replace ":\/\/(www\.)?(dev\.|test\.)?(example\.com\.mycompany\.com)" "://example.com" --regex`
