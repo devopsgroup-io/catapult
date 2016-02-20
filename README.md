@@ -664,7 +664,7 @@ Notate failed requests and requests per second while incrementing `-n` and `-c` 
 
 ## Disaster Recovery ##
 
-Being able to react immediately to disasters is crucial - Catapult affords you fast rebuilding and rollbacks.
+Being able to react to disasters immediately and consistently is crucial - Catapult affords you fast rebuilding and rollbacks.
 
 
 
@@ -677,8 +677,8 @@ Being able to react immediately to disasters is crucial - Catapult affords you f
 
 ### Website Rollbacks ###
 
-* `software_workflow: upstream` The production database is dropped and restored from the latest sql file in the ~/sql folder. To rollback, reverse the merge commit and run the production deployment.
-* `software_workflow: downstream` The production database is dumped once per day when the production build is run. To rollback, reverse the merge commit and manually restore the production database.
+* `software_workflow: upstream` The production database is dumped and restored from the latest sql dump file in the ~/_sql folder. To rollback, reverse the offending merge commit from the master branch and run the production deployment.
+* `software_workflow: downstream` The production database is dumped once per day when the production build is run. To rollback, reverse the offending database dump auto-commit from the develop branch and manually restore the production database from the desired sql dump file in the ~/_sql folder.
 
 
 
