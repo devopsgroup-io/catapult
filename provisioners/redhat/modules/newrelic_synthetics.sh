@@ -21,7 +21,7 @@ else
     monitor_exists=false
     until [ $i -ge $monitor_count ]; do
         monitor_uri=$(echo "${newrelic_monitors}" | python -c "import json,sys;object=json.load(sys.stdin);print object[\"monitors\"][${i}][\"uri\"]")
-        if echo "${monitor_uri}" | grep --quiet ".*$(catapult websites.apache.$5.domain).*"; then
+        if echo "${monitor_uri}" | grep --quiet "http://$(catapult websites.apache.$5.domain).*"; then
  
             # set a monitor_exists variable so we know not to create one
             monitor_exists=true
