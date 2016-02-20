@@ -1,11 +1,11 @@
 # Catapult #
 <img src="https://cdn.rawgit.com/devopsgroup-io/catapult/master/repositories/apache/_default_/svg/catapult.svg" alt="Catapult" width="200">
 
-:boom: **Catapult** is a complete website and workflow management platform built from leading and affordable technology.
+:boom: **Catapult** is a complete website and workflow management platform built from leading and affordable technologies.
 
 :earth_americas: **Our mission** is to create a lean platform which orchestrates DevOps for website lifecycles with familiar technologies.
 
-:rocket: **Our vision** is to afford developers an accelerated path to reducing risk and increasing performance at minimal cost.
+:rocket: **Our vision** is to afford organizations reduced risk and improved performance while lowering barriers to entry.
 
 <br>
 
