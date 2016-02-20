@@ -638,11 +638,12 @@ The following options are available:
 
 ## Website Development ##
 
-The importance of a LocalDev environment is critical to reducing risk by exacting the environment that exists upstream by leveraging Vagrant and VirtualBox.
+Performing development in a local environment is critical to reducing risk by exacting the environments that exist upstream, accomplished with Vagrant and VirtualBox.
 
 * Repositories for websites are cloned into the Catapult instance at ~/repositories and in the respective apache or iis folder, listed by domain name.
-* Repositories are linked between the host and guest for realtime developing.
-* Need a fresh database backup? Just delete and commit today's backup from the ~/sql folder.
+* Repositories are linked between the host and guest for realtime development.
+* Leverage Catapult's workflow model (configured by `software_workflow`).
+    * To trigger a database refresh, from the develop branch, commit a deletion of today's database backup from the ~/_sql folder.
 
 
 
