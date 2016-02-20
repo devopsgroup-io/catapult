@@ -729,7 +729,7 @@ As part of a new release, the version number in VERSION.yml will be incremented 
 
 ## Partnerships ##
 
-The Catapult team values partnerships and the great services and teams that have built them.
+The Catapult team values partnerships and continuous improvement.
 
 * [01-28-2016] Pantheon provides feedback
 * [01-22-2016] New Relic provides private beta access to their Synthetics API along side Breather, Carfax, Ring Central, Rackspace, and IBM.
@@ -738,7 +738,7 @@ The Catapult team values partnerships and the great services and teams that have
 
 ## Conferences ##
 
-Catapult is making the conference tour! We plan to attend the following the conferences, with more to come. Get a chance to see Catapult in action, presented by it's core developers.
+Catapult is making the conference tour! We plan to attend the following conferences, with more to come. Get a chance to see Catapult in action, presented by it's core developers.
 
 * Spring 2016 [04-08-2016] [Drupaldelphia](http://drupaldelphia.com/)
 * Summer 2016 [Wharton Web Conference](http://www.sas.upenn.edu/wwc/)
@@ -752,7 +752,7 @@ Catapult will also be seen throughout local meetups in the Philadelphia and Grea
 
 * [Philly Tech Meetup](http://www.meetup.com/philly-tech/) 4k+ technologists
 * [Princeton Tech ](http://www.meetup.com/Princeton-Tech/) 3.5k+ technologists
-* [Technical.ly Philly](http://www.meetup.com/Technically-Philly/) 3k+
+* [Technical.ly Philly](http://www.meetup.com/Technically-Philly/) 3k+ technologists
 * [Philadelphia WordPress Meetup Group](http://www.meetup.com/philadelphia-wordpress-meetup-group/) 1.5k+ technologists
 * [Philly DevOps](http://www.meetup.com/PhillyDevOps/) 700+ technologists
 * [Greater Philadelphia Drupal Meetup Group](http://www.meetup.com/drupaldelphia/) 500+ technologists
