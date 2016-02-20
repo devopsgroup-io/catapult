@@ -481,7 +481,7 @@ All instance specific configuration is stored in ~/secrets/configuration.yml and
 
 ### Company ###
 
-The Company section contains globally used credentials and company information - all of which will be completed during [Setup Catapult](#setup-catapult).
+The exclusive Company entry contains top-level global credentials and company information - all of which will be configured during [Setup Catapult](#setup-catapult).
 
 * name:
     * `required: true`
