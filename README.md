@@ -184,16 +184,17 @@ Catapult is quick to setup. Fork the Github repository and start adding your con
             * We maintain this project! [GitHub](https://github.com/smdahlen/vagrant-hostmanager)
         4. `vagrant plugin install vagrant-vbguest` [![Gem](https://img.shields.io/gem/dt/vagrant-vbguest.svg)](https://rubygems.org/gems/vagrant-vbguest)
 3. **SSH Key Pair**
-    1. You will need to create a *passwordless* SSH key pair that will drive authentication for Catapult.
+    1. Create a *passwordless* SSH key pair - this will drive authentication for Catapult.
         1. For instructions please see https://help.github.com/articles/generating-ssh-keys/
         2. Place the newly created *passwordless* SSH key pair id_rsa and id_rsa.pub in the ~/secrets/ folder.
 4. **GPG Key**
-    1. You will need to create your team's gpg_key that will be the single key that encrypts all of your configuration and secrets for your instance.
+    1. Generate a GPG key - this will drive encryption for Catapult.
         1. NEVER SHARE THE KEY WITH ANYONE OTHER THAN YOUR TEAM.
         3. Spaces are not permitted and must be at least 20 characters.
         4. To create a strong key, please visit https://xkpasswd.net/
-        5. It is recommended to print a QR code of the key to distribute to your team, please visit http://educastellano.github.io/qr-code/demo/
-        6. Remember; security is 99% process and 1% technology.
+        5. Place your newly generated GPG key at `~/secrets/configuration-user.yml["settings"]["gpg_key"]`
+        6. It is recommended to print a QR code of the key to distribute to your team, please visit http://educastellano.github.io/qr-code/demo/
+        7. Remember! Security is 99% process and 1% technology.
 5. **GPG Edit Mode**
     1. When **GPG Edit Mode** is enabled (disabled by default) the following files are encrypted using your **GPG Key**:
         1. ~/secrets/id_rsa as ~/secrets/id_rsa.gpg
