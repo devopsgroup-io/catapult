@@ -177,12 +177,14 @@ Catapult is quick to setup. Fork the Github repository and start adding your con
     1. Fork https://github.com/devopsgroup-io/catapult and clone via SourceTree or the git utility of your choice.
 2. **Vagrant Plugins**
     1. Open your command line and cd into the newly cloned repository and install the following Vagrant plugins.
-        1. `vagrant plugin install vagrant-aws` [![Gem](https://img.shields.io/gem/dt/vagrant-aws.svg)](https://rubygems.org/gems/vagrant-aws)
-        2. `vagrant plugin install vagrant-digitalocean` [![Gem](https://img.shields.io/gem/dt/vagrant-digitalocean.svg)](https://rubygems.org/gems/vagrant-digitalocean)
-            * We maintain this project! [GitHub](https://github.com/smdahlen/vagrant-digitalocean)
-        3. `vagrant plugin install vagrant-hostmanager` [![Gem](https://img.shields.io/gem/dt/vagrant-hostmanager.svg)](https://rubygems.org/gems/vagrant-hostmanager)
-            * We maintain this project! [GitHub](https://github.com/smdahlen/vagrant-hostmanager)
-        4. `vagrant plugin install vagrant-vbguest` [![Gem](https://img.shields.io/gem/dt/vagrant-vbguest.svg)](https://rubygems.org/gems/vagrant-vbguest)
+        1. `vagrant plugin install vagrant-aws`
+            * [![Gem](https://img.shields.io/gem/dt/vagrant-aws.svg)](https://rubygems.org/gems/vagrant-aws)
+        2. `vagrant plugin install vagrant-digitalocean`
+            * [![Gem](https://img.shields.io/gem/dt/vagrant-digitalocean.svg)](https://rubygems.org/gems/vagrant-digitalocean) We maintain this project! [GitHub](https://github.com/smdahlen/vagrant-digitalocean)
+        3. `vagrant plugin install vagrant-hostmanager`
+            * [![Gem](https://img.shields.io/gem/dt/vagrant-hostmanager.svg)](https://rubygems.org/gems/vagrant-hostmanager) We maintain this project! [GitHub](https://github.com/smdahlen/vagrant-hostmanager)
+        4. `vagrant plugin install vagrant-vbguest`
+            * [![Gem](https://img.shields.io/gem/dt/vagrant-vbguest.svg)](https://rubygems.org/gems/vagrant-vbguest)
 3. **SSH Key Pair**
     1. Create a *passwordless* SSH key pair - this will drive authentication for Catapult.
         1. For instructions please see https://help.github.com/articles/generating-ssh-keys/
