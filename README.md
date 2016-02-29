@@ -680,9 +680,20 @@ Being able to react to disasters immediately and consistently is crucial - Catap
 
 ### Website Rollbacks ###
 
-* `software_workflow: upstream` The production database is dumped and restored from the latest sql dump file in the ~/_sql folder. To rollback, reverse the offending merge commit from the master branch and run the production deployment.
-* `software_workflow: downstream` The production database is dumped once per day when the production build is run. To rollback, reverse the offending database dump auto-commit from the develop branch and manually restore the production database from the desired sql dump file in the ~/_sql folder.
+**Production Website Rollbacks:**
 
+* `software_workflow: upstream`
+    * Files
+        * Reverse the offending merge commit from the master branch and run the Production deployment.
+    * Database
+        * Reverse the offending merge commit from the master branch and run the Production deployment.
+        * Note: The Production database is overwritten and restored from the latest sql dump file from Test in the ~/_sql folder.
+* `software_workflow: downstream`
+    * Files
+        * Reverse the offending merge commit from the master branch and run the Production deployment.
+    * Database
+        * Reverse the offending database dump auto-commit from the develop branch and manually restore the Production database from the desired sql dump file in the ~/_sql folder.
+        * Note: The Production database is dumped once per day when the production build is run.
 
 
 # Troubleshooting #
