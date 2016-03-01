@@ -645,28 +645,31 @@ The following options are available:
 Performing development in a local environment is critical to reducing risk by exacting the environments that exist upstream, accomplished with Vagrant and VirtualBox.
 
 **Website Repositories**
+
 * Repositories for websites are cloned into the Catapult instance at ~/repositories and in the respective apache or iis folder, listed by domain name.
     * Repositories are linked between the host and guest for realtime development.
 
 **Working with Databases**
+
 * Leverage Catapult's workflow model (configured by `software_workflow`) to trigger a database refresh. From the develop branch, commit a deletion of today's database backup from the ~/_sql folder.
 
 **Forcing www**
-* Forcing www is software specific, unlike forcing the https protocol, which is environment specific and driven by the `force_https` option. To force www, please follow the respective guides per software:
+
+* Forcing www is software specific, unlike forcing the https protocol, which is environment specific and driven by the `force_https` option. To force www ([why force www?](http://www.yes-www.org/)), please follow the respective guides per software:
     * `value: codeigniter2`
-        * 
+        * `~/.htaccess` no official documentation - http://stackoverflow.com/a/4958847/4838803
     * `value: codeigniter3`
-        * 
+        * `~/.htaccess` no official documentation - http://stackoverflow.com/a/4958847/4838803
     * `value: drupal6`
-        * https://github.com/drupal/drupal/blob/6.x-18-security/.htaccess#L87
+        * `~/.htaccess` https://github.com/drupal/drupal/blob/6.x-18-security/.htaccess#L87
     * `value: drupal7`
-        * https://github.com/drupal/drupal/blob/7.x/.htaccess#L89
+        * `~/.htaccess` https://github.com/drupal/drupal/blob/7.x/.htaccess#L89
     * `value: silverstripe`
-        * 
+        * `~/mysite/_config.php` no official documentation - http://www.ssbits.com/snippets/2010/a-config-php-cheatsheet/
     * `value: wordpress`
         * http://codex.wordpress.org/Changing_The_Site_URL
     * `value: xenforo`
-        * 
+        * `~/.htaccess` no official documentation - http://stackoverflow.com/a/4958847/4838803
 
 
 
