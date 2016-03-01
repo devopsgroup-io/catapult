@@ -20,6 +20,9 @@ sudo cat > "/root/.forward" << EOF
 "$(echo "${configuration}" | shyaml get-value company.email)"
 EOF
 
+# remove pretty hostname
+hostnamectl set-hostname "" --pretty
+
 # set dev hostnames
 # @todo set hostnames in upstream servers, will need to align vagrant names, etc
 if ([ $1 = "dev" ]); then

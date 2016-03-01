@@ -6,6 +6,19 @@ else
     redhat_ip="$(echo "${configuration}" | shyaml get-value environments.${1}.servers.redhat.ip_private)"
 fi
 
+# disable the baked in firewalld
+sudo systemctl stop firewalld
+sudo systemctl mask firewalld
+
+# install the iptables-services
+sudo yum install -y iptables-services
+
+# start iptables service
+sudo systemctl start iptables
+
+# ensure iptables starts during boot
+sudo systemctl enable iptables
+
 # establish default policies
 sudo iptables --policy INPUT ACCEPT
 sudo iptables --policy FORWARD ACCEPT
@@ -84,3 +97,10 @@ fi
 sudo iptables --policy INPUT DROP
 # output the iptables
 sudo iptables --list-rules
+
+# save our newly created config
+# saves to cat /etc/sysconfig/iptables
+sudo service iptables save
+
+# restart iptables service
+sudo systemctl restart iptables

@@ -780,6 +780,7 @@ module Catapult
       end
     end
     puts "\nVerification of configuration[\"environments\"]:\n".color(Colors::WHITE)
+    puts "[redhat]"
     # get full list of available digitalocean slugs to validate against
     uri = URI("https://api.digitalocean.com/v2/sizes")
     Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
@@ -1334,7 +1335,7 @@ module Catapult
       puts " * http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html"
       puts " * Keep in mind these response codes and nslookups are from within your network - they may differ externally if you're running your own DNS server internally."
       puts "\nAvailable websites:".color(Colors::WHITE)
-      puts "".ljust(42) + "[software]".ljust(14) + "[workflow]".ljust(14) + "[dev.:80]".ljust(21) + "[test.:80]".ljust(21) + "[qc.:80]".ljust(21) + "[production:80]"
+      puts "".ljust(42) + "[software]".ljust(14) + "[workflow]".ljust(14) + "[80:dev.]".ljust(21) + "[80:test.]".ljust(21) + "[80:qc.]".ljust(21) + "[80:production]"
 
       @configuration["websites"].each do |service,data|
         if @configuration["websites"]["#{service}"] == nil
@@ -1368,49 +1369,49 @@ module Catapult
               begin
                 def Command::http_repsonse(uri_str, limit = 10)
                   if limit == 0
-                    row.push("loop".ljust(7))
+                    row.push("loop")
                   else
                     response = Net::HTTP.get_response(URI(uri_str))
                     case response
                     when Net::HTTPSuccess then
                       if response.code.to_f.between?(200,399)
-                        return response.code.color(Colors::GREEN)
+                        return response.code.ljust(4).color(Colors::GREEN)
                       elsif response.code.to_f.between?(400,499)
-                        return response.code.color(Colors::YELLOW)
+                        return response.code.ljust(4).color(Colors::YELLOW)
                       elsif response.code.to_f.between?(500,599)
-                        return response.code.color(Colors::RED)
+                        return response.code.ljust(4).color(Colors::RED)
                       end
                     when Net::HTTPRedirection then
                       location = response['location']
                       http_repsonse(location, limit - 1)
                     else
                       if response.code.to_f.between?(200,399)
-                        return response.code.color(Colors::GREEN)
+                        return response.code.ljust(4).color(Colors::GREEN)
                       elsif response.code.to_f.between?(400,499)
-                        return response.code.color(Colors::YELLOW)
+                        return response.code.ljust(4).color(Colors::YELLOW)
                       elsif response.code.to_f.between?(500,599)
-                        return response.code.color(Colors::RED)
+                        return response.code.ljust(4).color(Colors::RED)
                       end
                     end
                   end
                 end
                 if instance["domain_tld_override"] == nil
-                  row.push(http_repsonse("http://#{environment}#{instance["domain"]}").ljust(4))
+                  row.push(http_repsonse("http://#{environment}#{instance["domain"]}"))
                 else
-                  row.push(http_repsonse("http://#{environment}#{instance["domain"]}.#{instance["domain_tld_override"]}").ljust(4))
+                  row.push(http_repsonse("http://#{environment}#{instance["domain"]}.#{instance["domain_tld_override"]}"))
                 end
               rescue SocketError
-                row.push("down".color(Colors::RED).ljust(4))
+                row.push("down".ljust(4).color(Colors::RED))
               rescue Errno::ECONNREFUSED
-                row.push("down".color(Colors::RED).ljust(4))
+                row.push("down".ljust(4).color(Colors::RED))
               rescue EOFError
-                row.push("down".color(Colors::RED).ljust(4))
+                row.push("down".ljust(4).color(Colors::RED))
               rescue Net::ReadTimeout
-                row.push("down".color(Colors::RED).ljust(4))
+                row.push("down".ljust(4).color(Colors::RED))
               rescue OpenSSL::SSL::SSLError
-                row.push("err".color(Colors::RED).ljust(4))
+                row.push("err".ljust(4).color(Colors::RED))
               rescue Exception => ex
-                row.push("#{ex.class}".color(Colors::RED).ljust(4))
+                row.push("#{ex.class}".ljust(4).color(Colors::RED))
               end
               # nslookup production top-level domain
               begin
@@ -1420,7 +1421,7 @@ module Catapult
                   row.push((Resolv.getaddress "#{environment}#{instance["domain"]}.#{instance["domain_tld_override"]}").ljust(16))
                 end
               rescue
-                row.push("down".ljust(15).color(Colors::RED))
+                row.push("down".ljust(16).color(Colors::RED))
               end
             end
             puts row.join(" ")
