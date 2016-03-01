@@ -1,8 +1,8 @@
+source "/catapult/provisioners/redhat/modules/catapult.sh"
+
 
 # remove directories from /var/www/repositories/apache/ that no longer exist in configuration
 # create an array of domains
-source "/catapult/provisioners/redhat/modules/catapult.sh"
-
 while IFS='' read -r -d '' key; do
     domain_environment=$(echo "$key" | grep -w "domain" | cut -d ":" -f 2 | tr -d " ")
     if [ "$1" != "production" ]; then
