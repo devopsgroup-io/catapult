@@ -16,6 +16,7 @@
 * Why is this costing so much?
 * Are my environments safe? 
 * Is my website backed up?
+* How quickly can I recover my website after a disaster?
 * Can I easily scale my website for more traffic?
 * What is my uptime?
 
