@@ -12,8 +12,20 @@ fi
 sudo yum install -y httpd
 sudo systemctl enable httpd.service
 sudo systemctl start httpd.service
+
+# install mod_security
+# note enabled by default: see /etc/httpd/conf.d/mod_security.conf
+sudo yum install -y mod_security
+
+# install mod_ssl and create self-signed cert
 sudo yum install -y mod_ssl
 sudo bash /etc/ssl/certs/make-dummy-cert "/etc/ssl/certs/httpd-dummy-cert.key.cert"
+
+# do not expose server information
+# https://httpd.apache.org/docs/2.4/mod/core.html#servertokens
+if ! grep -q "ServerTokens Prod" "/etc/httpd/conf/httpd.conf"; then
+   sudo bash -c 'echo "ServerTokens Prod" >> /etc/httpd/conf/httpd.conf'
+fi
 
 # define the server's servername
 # suppress this - httpd: Could not reliably determine the server's fully qualified domain name, using localhost.localdomain. Set the 'ServerName' directive globally to suppress this message

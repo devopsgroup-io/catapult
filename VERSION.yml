@@ -1,5 +1,5 @@
 ---
-version: 3.42.0
+version: 3.43.0
 major:
     description: "Catapult uses Semantic Versioning. During a MAJOR increment, incompatable API changes are made which require a manual upgrade path. Please follow these directions:"
     notice: "NEW MAJOR VERSION OF CATAPULT AVAILABLE"
