@@ -20,8 +20,6 @@
 * Can I easily scale my website for more traffic?
 * What is my uptime?
 
-<br>
-
 **What makes Catapult different?**
 
 * Catapult is open sourced.
