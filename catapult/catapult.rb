@@ -1016,8 +1016,10 @@ module Catapult
               request = Net::HTTP::Get.new uri.request_uri
               request.basic_auth "#{@configuration["company"]["bitbucket_username"]}", "#{@configuration["company"]["bitbucket_password"]}"
               response = http.request request # Net::HTTPResponse object
-              if response.code.to_f.between?(399,600)
-                @api_bitbucket_repo_access = 500
+              if response.code.to_f == 404
+                catapult_exception("The Bitbucket repo #{instance["repo"]} does not exist")
+              elsif response.code.to_f.between?(399,600)
+                puts "   - The Bitbucket API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
               else
                 api_bitbucket_repo_repositories = JSON.parse(response.body)
                 if response.code.to_f == 200
@@ -1032,8 +1034,10 @@ module Catapult
               request = Net::HTTP::Get.new uri.request_uri
               request.basic_auth "#{@configuration["company"]["bitbucket_username"]}", "#{@configuration["company"]["bitbucket_password"]}"
               response = http.request request # Net::HTTPResponse object
-              if response.code.to_f.between?(399,600)
-                @api_bitbucket_repo_access = 500
+              if response.code.to_f == 404
+                catapult_exception("The Bitbucket repo #{instance["repo"]} does not exist")
+              elsif response.code.to_f.between?(399,600)
+                puts "   - The Bitbucket API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
               else
                 api_bitbucket_repo_privileges = JSON.parse(response.body)
                 api_bitbucket_repo_privileges.each do |member|
@@ -1050,8 +1054,10 @@ module Catapult
               request = Net::HTTP::Get.new uri.request_uri
               request.basic_auth "#{@configuration["company"]["bitbucket_username"]}", "#{@configuration["company"]["bitbucket_password"]}"
               response = http.request request # Net::HTTPResponse object
-              if response.code.to_f.between?(399,600)
-                @api_bitbucket_repo_access = 500
+              if response.code.to_f == 404
+                catapult_exception("The Bitbucket repo #{instance["repo"]} does not exist")
+              elsif response.code.to_f.between?(399,600)
+                puts "   - The Bitbucket API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
               else
                 api_bitbucket_repo_group_privileges = JSON.parse(response.body)
                 api_bitbucket_repo_group_privileges.each do |group|
@@ -1065,9 +1071,7 @@ module Catapult
                 end
               end
             end
-            if @api_bitbucket_repo_access == 500
-                puts "   - The Bitbucket API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
-            elsif @api_bitbucket_repo_access === false
+            if @api_bitbucket_repo_access === false
               catapult_exception("Your Bitbucket user #{@configuration["company"]["bitbucket_username"]} does not have write access to this repository.")
             elsif @api_bitbucket_repo_access === true
               puts "   - Verified your Bitbucket user #{@configuration["company"]["bitbucket_username"]} has write access."
@@ -1079,7 +1083,9 @@ module Catapult
               request = Net::HTTP::Get.new uri.request_uri
               request.basic_auth "#{@configuration["company"]["github_username"]}", "#{@configuration["company"]["github_password"]}"
               response = http.request request # Net::HTTPResponse object
-              if response.code.to_f.between?(399,600)
+              if response.code.to_f == 404
+                catapult_exception("The GitHub repo #{instance["repo"]} does not exist")
+              elsif response.code.to_f.between?(399,600)
                 puts "   - The GitHub API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
               else
                 if response.code.to_f == 204
