@@ -175,9 +175,9 @@ Catapult is controlled via Vagrant and the command line of a Developer's compute
 4. **Sublime Text 3**
     1. Please download and install from http://www.sublimetext.com/3
 5. **GPG2**
-    1. Using OSX ? Please download and install GPG Suite https://gpgtools.org
-    2. Using Windows? Please download and install Gpg4win from http://gpg4win.org/download.html
-
+    1. Using OSX? Please download and install GPG Suite https://gpgtools.org
+    2. Using Linux? If being prompted by the Passphrase GUI Agent, comment out 'use-agent' in ~/.gnupg/gpg.conf
+    3. Using Windows? Please download and install Gpg4win from http://gpg4win.org/download.html
 
 
 ## Instance Setup ##
@@ -739,7 +739,6 @@ Below is a log of service related troubleshooting. If you're having issues relat
     * [09-08-2015] Some database dumps exceed 100MB, so it's recommened to use Bitbucket in those instances as Catapult auto-commits database dumps to your website's repository, up to 500MB worth of database dumps or the one, newest database dump. [Bitbucket](https://help.github.com/articles/what-is-my-disk-quota/) has a 2GB hard repo push limit with no documented file limit and [GitHub](https://help.github.com/articles/what-is-my-disk-quota/) has a 1GB soft repo limit with a 100MB file size limit.
 * **Vagrant**
    * [02-04-2015] When upgrading Vagrant you may run into errors - the most common issue are mismatched plugins, running this command has a good chance of success `sudo rm -Rf ~/.vagrant.d/gems/ && sudo rm ~/.vagrant.d/plugins.json`
-
 
 
 # Contributing #
