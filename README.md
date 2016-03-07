@@ -704,9 +704,10 @@ Take a website with an average of 500 pageviews per hour, or 365,000 pageviews p
 
 Pageviews | Avg. Session Duration | Total Session Seconds | Concurrency Maxiumum
 ----------|-----------------------|-----------------------|---------------------
-1,000 | 10 minutes (600 seconds) | 600,000 | **166**
-1,000 | 1 minute (60 seconds) | 60,000 | **16**
 1,000 | 60 minutes (3,600 seconds) | 3,600,000 | **1,000**
+1,000 | 10 minutes (600 seconds) | 600,000 | **166**
+1,000 | 5 minutes (300 seconds) | 300,000 | **88**
+1,000 | 1 minute (60 seconds) | 60,000 | **16**
 
 **100 concurrent requests performed 10 times**
 ````
@@ -717,9 +718,10 @@ Take a website with an average of 20 pageviews per hour, or 14,600 pageviews per
 
 Pageviews | Avg. Session Duration | Total Session Seconds | Concurrency Maxiumum
 ----------|-----------------------|-----------------------|---------------------
-100 | 10 minutes (600 seconds) | 60,000 | **16**
-100 | 1 minute (60 seconds) | 6,000 | **1.6**
 100 | 60 minutes (3,600 seconds) | 36,000 | **1,000**
+100 | 10 minutes (600 seconds) | 60,000 | **16**
+100 | 5 minutes (300 seconds) | 30,000 | **8**
+100 | 1 minute (60 seconds) | 6,000 | **1.6**
 
 **10 concurrent requests performed 10 times**
 ````
