@@ -143,6 +143,8 @@ See an error or have a suggestion? Email competition@devopsgroup.io
         - [Websites](#websites)
     - [Website Development](#website-development)
     - [Performance Testing](#performance-testing)
+        - [Website Concurrency Maxiumum](#website-concurrency-maximum)
+        - [Interpreting Apache AB Results](#interpreting-apache-ab-results)
     - [Disaster Recovery](#disaster-recovery)
         - [Server Rebuilding](#server-rebuilding) 
         - [Website Rollbacks](#website-rollbacks) 
@@ -692,7 +694,7 @@ With Catapult's exactly duplicated configuration, even the Test environment can 
 
 ApacheBench enables us to profile request performance (`-n` represents the number of requests to perform) and concurrency (`-c` represents the number of multiple requests to make at a time) to test for performance, including common limits such as [C10k and C10M](http://highscalability.com/blog/2013/5/13/the-secret-to-10-million-concurrent-connections-the-kernel-i.html).
 
-### Determining Website Concurrency Maxiumum ###
+### Website Concurrency Maxiumum ###
 
 Using a website with historical Google Analytics data, access the Audience Overview and find the busiest Pageview day from the past 30-days and then drill into that date. Find the hour with the most Pageviews, then the accompanying Avg. Session Duration.
 
@@ -724,7 +726,7 @@ Pageviews | Avg. Session Duration | Total Session Seconds | Concurrency Maxiumum
 ab -l -r -n 100 -c 10 -H "Accept-Encoding: gzip, deflate" http://test.devopsgroup.io/
 ````
 
-### Interpreting the Results ###
+### Interpreting Apache AB Results ###
 
 Using a satisifed [Apdex](https://en.wikipedia.org/wiki/Apdex) of 7 seconds, we can see that 98% of users would be satisfied.
 
