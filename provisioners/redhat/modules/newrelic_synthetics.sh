@@ -6,6 +6,31 @@ newrelic_monitors=$(curl --silent --show-error --connect-timeout 10 --max-time 2
 newrelic_monitors_status=$(echo "${newrelic_monitors}" | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
 newrelic_monitors=$(echo "${newrelic_monitors}" | sed -e 's/HTTPSTATUS\:.*//g')
 
+# north america
+    # AWS_US_EAST_1: Washington, DC, USA
+    # AWS_US_WEST_1: San Francisco, CA, USA
+# south america
+    # AWS_SA_EAST_1: São Paulo, BR
+# europe
+    # LINODE_EU_WEST_1: London, England, UK
+# africa
+    # none available
+# asia
+    # AWS_AP_NORTHEAST_1: Tokyo, JP
+# australia
+    # AWS_AP_SOUTHEAST_2: Syndney, AU
+# antarctica
+    # none available
+
+newrelic_locations="[
+    \"AWS_US_EAST_1\",
+    \"AWS_US_WEST_1\",
+    \"AWS_SA_EAST_1\",
+    \"LINODE_EU_WEST_1\",
+    \"AWS_AP_NORTHEAST_1\",
+    \"AWS_AP_SOUTHEAST_2\"
+]"
+
 # check for a curl error
 if [ $newrelic_monitors_status == 000 ]; then
 
@@ -33,7 +58,7 @@ else
             newrelic_monitor=$(curl --silent --show-error --connect-timeout 10 --max-time 20 --write-out "HTTPSTATUS:%{http_code}" --request PUT "https://synthetics.newrelic.com/synthetics/api/v1/monitors/${monitor_id}" \
             --header "X-Api-Key: $(catapult company.newrelic_admin_api_key)" \
             --header "Content-Type: application/json" \
-            --data "{\"name\":\"$(catapult websites.apache.$5.domain)\",\"frequency\":5,\"uri\":\"http://$(catapult websites.apache.$5.domain)\",\"locations\":[\"AWS_EU_WEST_1\",\"AWS_AP_NORTHEAST_1\",\"AWS_AP_SOUTHEAST_2\",\"AWS_AP_SOUTHEAST_1\",\"AWS_US_EAST_1\",\"LINODE_US_WEST_1\",\"LINODE_US_SOUTH_1\",\"AWS_SA_EAST_1\",\"AWS_US_WEST_2\",\"LINODE_US_CENTRAL_1\",\"LINODE_US_EAST_1\",\"LINODE_EU_WEST_1\",\"AWS_EU_CENTRAL_1\",\"AWS_US_WEST_1\"],\"status\":\"ENABLED\",\"type\":\"simple\",\"slaThreshold\":7.0}")
+            --data "{\"name\":\"$(catapult websites.apache.$5.domain)\",\"frequency\":5,\"uri\":\"http://$(catapult websites.apache.$5.domain)\",\"locations\":${newrelic_locations},\"status\":\"ENABLED\",\"type\":\"simple\",\"slaThreshold\":7.0}")
             newrelic_monitor_status=$(echo "${newrelic_monitor}" | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
             newrelic_monitor=$(echo "${newrelic_monitor}" | sed -e 's/HTTPSTATUS\:.*//g')
 
@@ -61,7 +86,7 @@ else
         newrelic_monitor=$(curl --silent --show-error --connect-timeout 10 --max-time 20 --write-out "HTTPSTATUS:%{http_code}" --request POST "https://synthetics.newrelic.com/synthetics/api/v1/monitors" \
         --header "X-Api-Key: $(catapult company.newrelic_admin_api_key)" \
         --header "Content-Type: application/json" \
-        --data "{\"name\":\"$(catapult websites.apache.$5.domain)\",\"frequency\":5,\"uri\":\"http://$(catapult websites.apache.$5.domain)\",\"locations\":[\"AWS_EU_WEST_1\",\"AWS_AP_NORTHEAST_1\",\"AWS_AP_SOUTHEAST_2\",\"AWS_AP_SOUTHEAST_1\",\"AWS_US_EAST_1\",\"LINODE_US_WEST_1\",\"LINODE_US_SOUTH_1\",\"AWS_SA_EAST_1\",\"AWS_US_WEST_2\",\"LINODE_US_CENTRAL_1\",\"LINODE_US_EAST_1\",\"LINODE_EU_WEST_1\",\"AWS_EU_CENTRAL_1\",\"AWS_US_WEST_1\"],\"status\":\"ENABLED\",\"type\":\"simple\",\"slaThreshold\":7.0}")
+        --data "{\"name\":\"$(catapult websites.apache.$5.domain)\",\"frequency\":5,\"uri\":\"http://$(catapult websites.apache.$5.domain)\",\"locations\":${newrelic_locations},\"status\":\"ENABLED\",\"type\":\"simple\",\"slaThreshold\":7.0}")
         newrelic_monitor_status=$(echo "${newrelic_monitor}" | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
         newrelic_monitor=$(echo "${newrelic_monitor}" | sed -e 's/HTTPSTATUS\:.*//g')
 
