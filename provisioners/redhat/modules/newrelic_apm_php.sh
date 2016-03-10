@@ -9,8 +9,12 @@ sudo yum install -y newrelic-php5
 sed -i -e "s#newrelic\.appname.*#newrelic.appname = \"$(catapult company.name)-${1}-redhat\"#g" "/etc/php.d/newrelic.ini"
 # apm php installed but license key does not match
 NR_INSTALL_SILENT="true", NR_INSTALL_KEY="$(catapult company.newrelic_license_key)" /usr/bin/newrelic-install install
-# reload newrelic daemon
-/etc/init.d/newrelic-daemon restart
+# ensure newrelic daemon is started with latest configuration
+/etc/init.d/newrelic-daemon start
+/etc/init.d/newrelic-daemon reload
+/etc/init.d/newrelic-daemon status
+tail /var/log/newrelic/newrelic-daemon.log
+tail /var/log/newrelic/php_agent.log
 # reload apache
 sudo systemctl reload httpd.service
 sudo systemctl status httpd.service

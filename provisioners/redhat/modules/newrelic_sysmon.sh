@@ -7,5 +7,8 @@ rpm --hash --upgrade --verbose https://download.newrelic.com/pub/newrelic/el5/i3
 sudo yum install -y newrelic-sysmond
 # configure & start the server monitor daemon
 nrsysmond-config --set license_key=$(catapult company.newrelic_license_key)
-# start the server monitor daemon
+# ensure newrelic sysmon daemon is started with latest configuration
 /etc/init.d/newrelic-sysmond start
+/etc/init.d/newrelic-sysmond reload
+/etc/init.d/newrelic-sysmond status
+tail /var/log/newrelic/nrsysmond.log
