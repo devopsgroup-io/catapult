@@ -673,9 +673,14 @@ Performing development in a local environment is critical to reducing risk by ex
     * **MSSQL** https://sourceforge.net/projects/jtds/files/jtds/
         * For convenience, you may also use `~/catapult/installers/jtds-1.3.1.jar`
 * **Connecting to:** LocalDev
-    * The firewall allows direct connection to the database server. Use the values in `~/secrets/configuration.yml` to connect.
+    * The firewall allows direct connection to the database server. 
+        * Use the mysql values in `~/secrets/configuration.yml` to connect.
 * **Connecting to:** Test, QC, Production
-    * The firewall does not allow direct connect to the database servers. You will need to first create a SSH Host to the web server using `~/secrets/id_rsa`, then connect to the database server using values in `~/secrets/configuration.yml`.
+    * The firewall does not allow direct connect to the database servers.
+        * Add a New SSH Host in Oracle SQL Developer with the respective environment's web server host public ip address, root username with key file at `~/secrets/id_rsa`.
+            * Create a New Local Port Forward with the respective environment's database server host private ip address and port 3306.
+        * Then add a New Connection with the respective environment's mysql user values in `~/secrets/configuration.yml`.
+            * The hostname will be localhost since we are forwarding the port through our local SSH tunnel.
 
 **Forcing www**
 * Forcing www is software specific, unlike forcing the https protocol, which is environment specific and driven by the `force_https` option. To force www ([why force www?](http://www.yes-www.org/)), please follow the respective guides per software:
