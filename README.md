@@ -142,6 +142,10 @@ See an error or have a suggestion? Email competition@devopsgroup.io
         - [Environments](#environments)
         - [Websites](#websites)
     - [Website Development](#website-development)
+        - [Website Repositories](#website-repositories)
+        - [Forcing www](#forcing-www)
+        - [Refreshing Databases](#refreshing-databases)
+        - [Connecting to Databases](#connecting-to-databases)
     - [Performance Testing](#performance-testing)
         - [Website Concurrency Maxiumum](#website-concurrency-maximum)
         - [Interpreting Apache AB Results](#interpreting-apache-ab-results)
@@ -657,14 +661,32 @@ The following options are available:
 
 Performing development in a local environment is critical to reducing risk by exacting the environments that exist upstream, accomplished with Vagrant and VirtualBox.
 
-**Website Repositories**
+### Website Repositories ###
 * Repositories for websites are cloned into the Catapult instance at ~/repositories and in the respective apache or iis folder, listed by domain name.
     * Repositories are linked between the host and guest for realtime development.
 
-**Refreshing Database Dumps**
+### Forcing www ###
+* Forcing www is software specific, unlike forcing the https protocol, which is environment specific and driven by the `force_https` option. To force www ([why force www?](http://www.yes-www.org/)), please follow the respective guides per software:
+    * `value: codeigniter2`
+        * `~/.htaccess` no official documentation - http://stackoverflow.com/a/4958847/4838803
+    * `value: codeigniter3`
+        * `~/.htaccess` no official documentation - http://stackoverflow.com/a/4958847/4838803
+    * `value: drupal6`
+        * `~/.htaccess` https://github.com/drupal/drupal/blob/6.x-18-security/.htaccess#L87
+    * `value: drupal7`
+        * `~/.htaccess` https://github.com/drupal/drupal/blob/7.x/.htaccess#L89
+    * `value: silverstripe`
+        * `~/mysite/_config.php` no official documentation - http://www.ssbits.com/snippets/2010/a-config-php-cheatsheet/
+    * `value: wordpress`
+        * http://codex.wordpress.org/Changing_The_Site_URL
+    * `value: xenforo`
+        * `~/.htaccess` no official documentation - http://stackoverflow.com/a/4958847/4838803
+
+### Refreshing Databases ###
+* Databases are dumped once per day to the ~/_sql folder and restored, dependent on the environment and `software_workflow` setting per website - see [Release Management](#release-management) for details.
 * Leverage Catapult's workflow model (configured by `software_workflow`) to trigger a database refresh. From the develop branch, commit a deletion of today's database backup from the ~/_sql folder.
 
-**Connecting to Databases**
+### Connecting to Databases ###
 * Oracle SQL Developer is the recommended tool, to connect to and work with, databases. It is free, commercially supported, cross-platform, and supports multiple database types.
 * **Download and install** [Oracle SQL Developer](http://www.oracle.com/technetwork/developer-tools/sql-developer/downloads/index.html), some platforms require the [Java SE Development Kit](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
 * **Install third party JDBC drivers**: Oracle SQL Developer uses JDBC, via a .jar file, to connect to different database types. To install a new JDBC connector, download the respective .jar file then from Oracle SQL Developer > Preferences > Third Party JDBC Drivers, click Add Entry.<sup>[4](#references)</sup>
@@ -681,23 +703,6 @@ Performing development in a local environment is critical to reducing risk by ex
             * Create a New Local Port Forward with the respective environment's database server host private ip address and port 3306.
         * Then add a New Connection with the respective environment's mysql user values in `~/secrets/configuration.yml`.
             * The hostname will be localhost since we are forwarding the port through our local SSH tunnel.
-
-**Forcing www**
-* Forcing www is software specific, unlike forcing the https protocol, which is environment specific and driven by the `force_https` option. To force www ([why force www?](http://www.yes-www.org/)), please follow the respective guides per software:
-    * `value: codeigniter2`
-        * `~/.htaccess` no official documentation - http://stackoverflow.com/a/4958847/4838803
-    * `value: codeigniter3`
-        * `~/.htaccess` no official documentation - http://stackoverflow.com/a/4958847/4838803
-    * `value: drupal6`
-        * `~/.htaccess` https://github.com/drupal/drupal/blob/6.x-18-security/.htaccess#L87
-    * `value: drupal7`
-        * `~/.htaccess` https://github.com/drupal/drupal/blob/7.x/.htaccess#L89
-    * `value: silverstripe`
-        * `~/mysite/_config.php` no official documentation - http://www.ssbits.com/snippets/2010/a-config-php-cheatsheet/
-    * `value: wordpress`
-        * http://codex.wordpress.org/Changing_The_Site_URL
-    * `value: xenforo`
-        * `~/.htaccess` no official documentation - http://stackoverflow.com/a/4958847/4838803
 
 
 
