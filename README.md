@@ -669,9 +669,9 @@ Performing development in a local environment is critical to reducing risk by ex
 * **Download and install** [Oracle SQL Developer](http://www.oracle.com/technetwork/developer-tools/sql-developer/downloads/index.html), some platforms require the [Java SE Development Kit](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
 * **Install third party JDBC drivers**: Oracle SQL Developer uses JDBC, via a .jar file, to connect to different database types. To install a new JDBC connector, download the respective .jar file then from Oracle SQL Developer > Preferences > Third Party JDBC Drivers, click Add Entry.<sup>[4](#references)</sup>
     * **MySQL** http://dev.mysql.com/downloads/connector/j/5.0.html
-        * For convience, you may also use `~/catapult/installers/mysql-connector-java-5.0.8-bin.jar`
+        * For convenience, you may also use `~/catapult/installers/mysql-connector-java-5.0.8-bin.jar`
     * **MSSQL** https://sourceforge.net/projects/jtds/files/jtds/
-        * For convience, you may also use `~/catapult/installers/jtds-1.3.1.jar`
+        * For convenience, you may also use `~/catapult/installers/jtds-1.3.1.jar`
 * **Connecting to:** LocalDev
     * The firewall allows direct connection to the database server. Use the values in `~/secrets/configuration.yml` to connect.
 * **Connecting to:** Test, QC, Production
