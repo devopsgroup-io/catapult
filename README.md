@@ -658,16 +658,26 @@ The following options are available:
 Performing development in a local environment is critical to reducing risk by exacting the environments that exist upstream, accomplished with Vagrant and VirtualBox.
 
 **Website Repositories**
-
 * Repositories for websites are cloned into the Catapult instance at ~/repositories and in the respective apache or iis folder, listed by domain name.
     * Repositories are linked between the host and guest for realtime development.
 
-**Working with Databases**
-
+**Refreshing Database Dumps**
 * Leverage Catapult's workflow model (configured by `software_workflow`) to trigger a database refresh. From the develop branch, commit a deletion of today's database backup from the ~/_sql folder.
 
-**Forcing www**
+**Connecting to Databases**
+* Oracle SQL Developer is the recommended tool, to connect to and work with, databases. It is free, commercially supported, cross-platform, and supports multiple database types.
+* **Download and install** [Oracle SQL Developer](http://www.oracle.com/technetwork/developer-tools/sql-developer/downloads/index.html), some platforms require the [Java SE Development Kit](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
+* **Install third party JDBC drivers**: Oracle SQL Developer uses JDBC, via a .jar file, to connect to different database types. To install a new JDBC connector, download the respective .jar file then from Oracle SQL Developer > Preferences > Third Party JDBC Drivers, click Add Entry.<sup>[4](#references)</sup>
+    * **MySQL** http://dev.mysql.com/downloads/connector/j/5.0.html
+        * For convience, you may also use `~/catapult/installers/mysql-connector-java-5.0.8-bin.jar`
+    * **MSSQL** https://sourceforge.net/projects/jtds/files/jtds/
+        * For convience, you may also use `~/catapult/installers/jtds-1.3.1.jar`
+* **Connecting to:** LocalDev
+    * The firewall allows direct connection to the database server. Use the values in `~/secrets/configuration.yml` to connect.
+* **Connecting to:** Test, QC, Production
+    * The firewall does not allow direct connect to the database servers. You will need to first create a SSH Host to the web server using `~/secrets/id_rsa`, then connect to the database server using values in `~/secrets/configuration.yml`.
 
+**Forcing www**
 * Forcing www is software specific, unlike forcing the https protocol, which is environment specific and driven by the `force_https` option. To force www ([why force www?](http://www.yes-www.org/)), please follow the respective guides per software:
     * `value: codeigniter2`
         * `~/.htaccess` no official documentation - http://stackoverflow.com/a/4958847/4838803
@@ -858,3 +868,4 @@ Catapult will also be seen throughout local meetups in the Philadelphia and Grea
 1. Atlassian. Comparing Workflows. https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow. Accessed February 15, 2016.
 2. Pantheon. Load and Performance Testing: Before You Begin. https://pantheon.io/docs/articles/load-and-performance-testing/. Accessed February 20, 2016.
 3. Acquia. Acquia Dev Desktop. https://www.acquia.com/products-services/dev-desktop. Accessed February 20, 2016.
+4. Oracle Technology Network. Oracle SQL Developer Migrations: Getting Started. http://www.oracle.com/technetwork/database/migration/omwb-getstarted-093461.html#conf. Accessed March 14, 2016.
