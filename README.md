@@ -490,7 +490,7 @@ Environment | LocalDev | Test | QC | Production
 **Scrum Roles**                                 | Development Team                                            | Scrum Master, Development Team, Product Owner (optional)          | Scrum Master, Development Team, Product Owner                  | Product Owner
 **Downstream Software Workflow - Database**     | Restore from **develop** ~/_sql folder of website repo      | Restore from **develop** ~/_sql folder of website repo            | Restore from **release** ~/_sql folder of website repo         | Backup to **develop** ~/_sql folder of website repo during deploy
 **Upstream Software Workflow - Database**       | Restore from **develop** ~/_sql folder of website repo      | Backup to **develop** ~/_sql folder of website repo during deploy | Restore from **release** ~/_sql folder of website repo         | Restore from **master** ~/_sql folder of website repo
-**Downstream Software Workflow - File Store**   | rsync files from **Production** if git untracked            | rsync files from **Production** if untracked                      | rsync files from **Production** if git untracked               | --
+**Downstream Software Workflow - File Store**   | rsync files from **Production** if git untracked            | rsync files from **Production** if git untracked                  | rsync files from **Production** if git untracked               | --
 **Upstream Software Workflow - File Store**     | rsync files from **Test** if git untracked                  | --                                                                | rsync files from **Test** if git untracked                     | rsync files from **Test** if git untracked
 
 
