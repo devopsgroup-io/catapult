@@ -95,30 +95,33 @@ The free market and competition is great - it pushes the envelope of innovation.
 
 Platform Feature | Catapult | Pantheon | Acquia
 -----------------|----------|----------|--------
-Source                              | Open                           | Closed                        | Closed
-Feature Set                         | Bundled                        | Separated                     | Separated
-Minimum Bundled<br>Monthly Cost     | $40                            | $400                          | $134
-Managed Workflow                    | Git Flow                       | :x:                           | :x:
-Managed Workflow Model              | Upstream or Downstream         | :x:                           | :x:
-Agile Methodology Overlay           | Scrum                          | :x:                           | :x:
-Environments                        | LocalDev, Test, QC, Production | Multidev, Dev, Test, Live     | Dev Desktop, Dev, Stage, Prod
-Exacting Configuration              | :white_check_mark:             | :x:<sup>[2](#references)</sup>| :x:<sup>[3](#references)</sup>
-Approach                            | Virtual Machine                | Container                     | Virtual Machine
-Data Center                         | DigitalOcean and AWS           | Rackspace                     | AWS
-Scaling                             | Vertical                       | Horizontal                    | Vertical
-Scaling Management                  | *Manual                        | Automatic                     | Manual
-Development Environment             | Unlimited Local                | 5 Cloud                       | Unlimited Local
-Development Environment<br>Approach | Exact                          | Exact                         | Similar
-Dashboard - Control                 | CLI                            | CLI & Web                     | CLI & Web
-Dashboard - Monitor                 | CLI & \*Web                    | CLI & Web                     | CLI & Web
-Git                                 | GitHub & Bitbucket             | Proprietary                   | Proprietary 
-Managed DNS                         | CloudFlare                     | :x:                           | :x: 
-Managed HTTPS                       | Free                           | $30/mo + $cert                | $cert
-Managed Monitoring                  | New Relic                      | Proprietary                   | Proprietary
-Supported Software                  | Numerous                       | 2                             | 1
+Source                                     | Open                           | Closed                        | Closed
+Feature Set                                | Bundled                        | Separated                     | Separated
+Supported Software                         | Numerous                       | 2                             | 1
+Minimum Bundled<br>Monthly Cost            | $40                            | $400                          | $134
+Managed Workflow                           | Git Flow                       | :x:                           | :x:
+Managed Workflow Model                     | Upstream or Downstream         | :x:                           | :x:
+Agile Methodology Overlay                  | Scrum                          | :x:                           | :x:
+Environments                               | LocalDev, Test, QC, Production | Multidev, Dev, Test, Live     | Dev Desktop, Dev, Stage, Prod
+Exacting Configuration                     | :white_check_mark:             | :x:<sup>[2](#references)</sup>| :x:<sup>[3](#references)</sup>
+Approach                                   | Virtual Machine                | Container                     | Virtual Machine
+Data Center                                | DigitalOcean and AWS           | Rackspace                     | AWS
+Scaling                                    | Vertical                       | Horizontal                    | Vertical
+Scaling Management                         | *Manual                        | Automatic                     | Manual
+Development Environment                    | Unlimited Local                | 5 Cloud                       | Unlimited Local
+Development Environment<br>Approach        | Exact                          | Exact                         | Similar
+Dashboard - Control                        | CLI                            | CLI & Web                     | CLI & Web
+Dashboard - Monitor                        | Web                            | Web                           | Web
+Managed Public Git Repository Support      | GitHub & Bitbucket             | :x:                           | :x:
+Managed DNS                                | CloudFlare                     | :x:                           | :x:
+Managed Free HTTPS/SSL                     | CloudFlare                     | :x:                           | :x:
+Managed Error Logs                         | New Relic                      | Proprietary                   | Proprietary
+Managed Application Performance Monitoring | New Relic                      | :x:                           | :x:
+Managed Browser Performance Monitoring     | New Relic                      | :x:                           | :x:
+Managed Synthetic Monitoring               | New Relic                      | :x:                           | :x:
+Managed Server Monitoring                  | New Relic                      | :x:                           | Proprietary
 
-\* Catapult introduces new features on a regular basis - this feature is highlighted as a milestone for future release.
-See an error or have a suggestion? Email competition@devopsgroup.io
+See an error or have a suggestion? Email competition@devopsgroup.io - we appreciate all feedback.
 
 
 
