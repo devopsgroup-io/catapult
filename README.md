@@ -98,9 +98,9 @@ Platform Feature | Catapult | Pantheon | Acquia
 Source                              | Open                           | Closed                        | Closed
 Feature Set                         | Bundled                        | Separated                     | Separated
 Minimum Bundled<br>Monthly Cost     | $40                            | $400                          | $134
-Methodology                         | Scrum                          | :x:                           | :x:
-Workflow                            | Git Flow                       | Git Flow                      | Git Flow
-Workflow Model                      | Upstream or Downstream         | :x:                           | :x:
+Managed Workflow                    | Git Flow                       | :x:                           | :x:
+Managed Workflow Model              | Upstream or Downstream         | :x:                           | :x:
+Agile Methodology Overlay           | Scrum                          | :x:                           | :x:
 Environments                        | LocalDev, Test, QC, Production | Multidev, Dev, Test, Live     | Dev Desktop, Dev, Stage, Prod
 Exacting Configuration              | :white_check_mark:             | :x:<sup>[2](#references)</sup>| :x:<sup>[3](#references)</sup>
 Approach                            | Virtual Machine                | Container                     | Virtual Machine
