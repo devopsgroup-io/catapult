@@ -808,9 +808,9 @@ Service           | Catapult Context                         | SOC 1            
 ------------------|------------------------------------------|--------------------------------------------------------------------|--------------------------------------------------------------------|--------------------------------------------------------------------
 AWS EC2 US EAST   | Temporary build servers                  | [:white_check_mark:](https://aws.amazon.com/compliance/soc-faqs/)  | [:white_check_mark:](https://aws.amazon.com/compliance/soc-faqs/)  | [:white_check_mark:](https://aws.amazon.com/compliance/soc-faqs/)
 Bamboo            | Server communication, log files, secrets | [:white_check_mark:](https://www.atlassian.com/cloud/security/)    |                                                                    |
-BitBucket         | Repositories                             | [:white_check_mark:](https://www.atlassian.com/cloud/security/)    |                                                                    |
+BitBucket         | Repository hosting                       | [:white_check_mark:](https://www.atlassian.com/cloud/security/)    |                                                                    |
 DigitalOcean NYC3 | Red Hat server hosting                   |                                                                    | [:white_check_mark:](https://www.digitalocean.com/help/policy/)    | [:white_check_mark:](https://www.digitalocean.com/help/policy/)
-GitHub            | Repositories                             |                                                                    |                                                                    |
+GitHub            | Repository hosting                       |                                                                    |                                                                    |
 New Relic         | Server communication, log files          |                                                                    | [:white_check_mark:](http://newrelic.com/why-new-relic/security)   |
 
 ## Self Compliance ##
@@ -822,9 +822,9 @@ Service           | Catapult Context                         | HIPAA BAA        
 AWS EC2           | Windows server hosting                   | [:white_check_mark:](https://aws.amazon.com/compliance/hipaa-compliance/) | [:white_check_mark:](https://aws.amazon.com/compliance/pci-dss-level-1-faqs/)
 CloudFlare        | Web application firewall                 |                                                                           | [:white_check_mark:](https://support.cloudflare.com/hc/en-us/articles/202249734-CloudFlare-and-PCI-Compliance)
 Bamboo            | Server communication, log files, secrets | [:x:](https://www.atlassian.com/security/security-faq/)                   |
-BitBucket         | Repositories                             | [:x:](https://www.atlassian.com/security/security-faq/)                   |
+BitBucket         | Repository hosting                       | [:x:](https://www.atlassian.com/security/security-faq/)                   |
 DigitalOcean NYC3 | Red Hat server hosting                   | [:question:](https://www.digitalocean.com/help/policy/)                   | [:question:](https://www.digitalocean.com/help/policy/)
-GitHub            | Repositories                             | [:question:](https://help.github.com/articles/github-security/)           |
+GitHub            | Repository hosting                       | [:question:](https://help.github.com/articles/github-security/)           |
 
 See an error or have a suggestion? Email security@devopsgroup.io - we appreciate all feedback.
 
