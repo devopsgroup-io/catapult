@@ -802,25 +802,29 @@ There are many complex compliance and audit standards that are your responsibili
 
 ## Cloud Compliance ##
 
-Security of the cloud.
+Security **of** the cloud. This is the responsibility of the cloud service.
 
-Service                                                                  | SOC 1              | SOC2               | SOC3
--------------------------------------------------------------------------|--------------------|--------------------|-------------------
-[AWS EC2 US EAST](https://aws.amazon.com/compliance/soc-faqs/)           | :white_check_mark: | :white_check_mark: | :white_check_mark:
-[Bamboo](https://www.atlassian.com/cloud/security/)                      | :white_check_mark: |                    |
-[BitBucket](https://www.atlassian.com/cloud/security/)                   | :white_check_mark: |                    |
-[DigitalOcean NYC3](https://www.digitalocean.com/help/policy/)           |                    | :white_check_mark: | :white_check_mark:
+Service           | SOC 1                                                              | SOC 2                                                              | SOC 3
+------------------|--------------------------------------------------------------------|--------------------------------------------------------------------|--------------------------------------------------------------------
+AWS EC2 US EAST   | [:white_check_mark:](https://aws.amazon.com/compliance/soc-faqs/)  | [:white_check_mark:](https://aws.amazon.com/compliance/soc-faqs/)  | [:white_check_mark:](https://aws.amazon.com/compliance/soc-faqs/)
+Bamboo            | [:white_check_mark:](https://www.atlassian.com/cloud/security/)    |                                                                    |
+BitBucket         | [:white_check_mark:](https://www.atlassian.com/cloud/security/)    |                                                                    |
+DigitalOcean NYC3 |                                                                    | [:white_check_mark:](https://www.digitalocean.com/help/policy/)    | [:white_check_mark:](https://www.digitalocean.com/help/policy/)
+GitHub            |                                                                    |                                                                    |
+New Relic         |                                                                    | [:white_check_mark:](http://newrelic.com/why-new-relic/security)   |
 
 ## Self Compliance ##
 
-Security in the cloud.
+Security **in** the cloud. This is your responsibility, however, the underlying service must have a basic support the compliance.
 
-Service                                                                  | HIPAA BAA
--------------------------------------------------------------------------|-----------
-[AWS EC2](https://aws.amazon.com/compliance/hipaa-compliance/)           | :white_check_mark:
-[Bamboo](https://www.atlassian.com/security/security-faq/)               | :x:
-[BitBucket](https://www.atlassian.com/security/security-faq/)            | :x:
-[DigitalOcean NYC3](https://www.digitalocean.com/help/policy/)           | :question:
+Service           | HIPAA BAA                                                                 | PCI DSS Level 1
+------------------|---------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------
+AWS EC2           | [:white_check_mark:](https://aws.amazon.com/compliance/hipaa-compliance/) | [:white_check_mark:](https://aws.amazon.com/compliance/pci-dss-level-1-faqs/)
+CloudFlare        |                                                                           | [:white_check_mark:](https://support.cloudflare.com/hc/en-us/articles/202249734-CloudFlare-and-PCI-Compliance)
+Bamboo            | [:x:](https://www.atlassian.com/security/security-faq/)                   |
+BitBucket         | [:x:](https://www.atlassian.com/security/security-faq/)                   |
+DigitalOcean NYC3 | [:question:](https://www.digitalocean.com/help/policy/)                   | [:question:](https://www.digitalocean.com/help/policy/)
+GitHub            | [:question:](https://help.github.com/articles/github-security/)           |
 
 See an error or have a suggestion? Email security@devopsgroup.io - we appreciate all feedback.
 
