@@ -155,7 +155,10 @@ See an error or have a suggestion? Email competition@devopsgroup.io - we appreci
         - [Interpreting Apache AB Results](#interpreting-apache-ab-results)
     - [Disaster Recovery](#disaster-recovery)
         - [Server Rebuilding](#server-rebuilding) 
-        - [Website Rollbacks](#website-rollbacks) 
+        - [Website Rollbacks](#website-rollbacks)
+- [Security and Compliance](#security-and-compliance)
+    - [Cloud Compliance](#cloud-compliance)
+    - [Self Compliance](#self-compliance)
 - [Troubleshooting](#troubleshooting)
 - [Contributing](#contributing)
     - [Releases](#releases)
@@ -502,8 +505,6 @@ Environment | LocalDev | Test | QC | Production
 
 All instance specific configuration is stored in ~/secrets/configuration.yml and encrypted as ~/secrets/configuration.yml.gpg. There are three main sections - [Company](#company), [Environments](#environments), and [Websites](#websites).
 
-
-
 ### Company ###
 
 The exclusive Company entry contains top-level global credentials and company information - all of which will be configured during [Setup Catapult](#setup-catapult).
@@ -523,13 +524,9 @@ The exclusive Company entry contains top-level global credentials and company in
         * Your timezone in Windows Standard Format that is used to for setting within operating systems and applications
         * https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Virtualization/3.1/html/Developer_Guide/appe-REST_API_Guide-Timezones.html
 
-
-
 ### Environments ###
 
 The setup- and maintenance-free Environments entries contain environment configurations such as IP addresses and system credentials - all of which are automatically set during [Setup Catapult](#setup-catapult) and [Setup Environments](#setup-environments).
-
-
 
 ### Websites ###
 
@@ -775,14 +772,10 @@ Percentage of the requests served within a certain time (ms)
 
 Being able to react to disasters immediately and consistently is crucial - Catapult affords you fast rebuilding and rollbacks.
 
-
-
 ### Server Rebuilding ###
 
 * LocalDev is rebuildable by running `vagrant destroy` then `vagrant up` for the respective virtual machine.
 * Test, QC, and Production are rebuildable by running `vagrant rebuild` for the respective virtual machine - this is necessary (rather than a destroy and up) to retain the IP addresses of the machine.
-
-
 
 ### Website Rollbacks ###
 
@@ -802,6 +795,37 @@ Being able to react to disasters immediately and consistently is crucial - Catap
         * Note: The Production database is dumped once per day when the production build is run.
 
 
+
+# Security and Compliance #
+
+There are many complex compliance and audit standards that are your responsibility to understand and execute. Each Catapult instance is independant to you - including the required services that you signed up for during [Services Setup](#services-setup).
+
+## Cloud Compliance ##
+
+Security of the cloud.
+
+Service                                                                  | SOC 1              | SOC2               | SOC3
+-------------------------------------------------------------------------|--------------------|--------------------|-------------------
+[AWS EC2 US EAST](https://aws.amazon.com/compliance/soc-faqs/)           | :white_check_mark: | :white_check_mark: | :white_check_mark:
+[Bamboo](https://www.atlassian.com/cloud/security/)                      | :white_check_mark: |                    |
+[BitBucket](https://www.atlassian.com/cloud/security/)                   | :white_check_mark: |                    |
+[DigitalOcean NYC3](https://www.digitalocean.com/help/policy/)           |                    | :white_check_mark: | :white_check_mark:
+
+## Self Compliance ##
+
+Security in the cloud.
+
+Service                                                                  | HIPAA BAA
+-------------------------------------------------------------------------|-----------
+[AWS EC2](https://aws.amazon.com/compliance/hipaa-compliance/)           | :white_check_mark:
+[Bamboo](https://www.atlassian.com/security/security-faq/)               | :x:
+[BitBucket](https://www.atlassian.com/security/security-faq/)            | :x:
+[DigitalOcean NYC3](https://www.digitalocean.com/help/policy/)           | :question:
+
+See an error or have a suggestion? Email security@devopsgroup.io - we appreciate all feedback.
+
+
+
 # Troubleshooting #
 
 Below is a log of service related troubleshooting. If you're having issues related to Catapult, [submit a GitHub Issue](https://github.com/devopsgroup-io/catapult/issues/new).
@@ -812,6 +836,7 @@ Below is a log of service related troubleshooting. If you're having issues relat
     * [09-08-2015] Some database dumps exceed 100MB, so it's recommened to use Bitbucket in those instances as Catapult auto-commits database dumps to your website's repository, up to 500MB worth of database dumps or the one, newest database dump. [Bitbucket](https://help.github.com/articles/what-is-my-disk-quota/) has a 2GB hard repo push limit with no documented file limit and [GitHub](https://help.github.com/articles/what-is-my-disk-quota/) has a 1GB soft repo limit with a 100MB file size limit.
 * **Vagrant**
    * [02-04-2015] When upgrading Vagrant you may run into errors - the most common issue are mismatched plugins, running this command has a good chance of success `sudo rm -Rf ~/.vagrant.d/gems/ && sudo rm ~/.vagrant.d/plugins.json`
+
 
 
 # Contributing #
