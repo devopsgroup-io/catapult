@@ -719,7 +719,7 @@ ApacheBench enables us to profile request performance (`-n` represents the numbe
 
 Using a website with historical Google Analytics data, access the Audience Overview and find the busiest Pageview day from the past 30-days and then drill into that date. Find the hour with the most Pageviews, then the accompanying Avg. Session Duration. Using the following formula, we are able to find the Concurrency Maxiumum.
 
-*(Pageviews x Avg. Session Duration - in seconds) / 3,600 seconds* = **Concurrency Maxiumum**
+*(Pageviews x Avg. Session Duration in seconds) / 3,600 seconds* = **Concurrency Maxiumum**
 
 Take a website with an average of 500 pageviews per hour, or 365,000 pageviews per month, which has a busiest hour of 1,000 pageviews.
 
