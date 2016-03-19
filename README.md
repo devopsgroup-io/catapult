@@ -815,7 +815,7 @@ New Relic         | Server communication, log files          |                  
 
 ## Self Compliance ##
 
-Security **in** the cloud. This is your responsibility, however, the underlying service must have a basic support the compliance.
+Security **in** the cloud. This is your responsibility, however, the underlying service must have basic support for the compliance scenario.
 
 Service           | Catapult Context                         | HIPAA BAA                                                                 | PCI DSS Level 1
 ------------------|------------------------------------------|---------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------
