@@ -119,7 +119,7 @@ Managed Server Monitoring                     | New Relic                      |
 Managed Application Error Logs                | New Relic                      | Proprietary                   | Proprietary
 Managed Application Performance Monitoring    | New Relic                      | :x:                           | :x:
 Managed Browser Performance Monitoring        | New Relic                      | :x:                           | :x:
-Managed Synthetics Monitoring                 | New Relic                      | :x:                           | :x:
+Managed Synthetic Monitoring                  | New Relic                      | :x:                           | :x:
 
 See an error or have a suggestion? Email competition@devopsgroup.io - we appreciate all feedback.
 
