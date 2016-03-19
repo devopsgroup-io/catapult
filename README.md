@@ -115,11 +115,11 @@ Dashboard - Monitor                           | Web                            |
 Managed Public Git Website Repository Support | GitHub & Bitbucket             | :x:                           | :x:
 Managed DNS                                   | CloudFlare                     | :x:                           | :x:
 Managed Free HTTPS/SSL                        | CloudFlare                     | :x:                           | :x:
-Managed Error Logs                            | New Relic                      | Proprietary                   | Proprietary
+Managed Server Monitoring                     | New Relic                      | :x:                           | Proprietary
+Managed Application Error Logs                | New Relic                      | Proprietary                   | Proprietary
 Managed Application Performance Monitoring    | New Relic                      | :x:                           | :x:
 Managed Browser Performance Monitoring        | New Relic                      | :x:                           | :x:
-Managed Synthetic Monitoring                  | New Relic                      | :x:                           | :x:
-Managed Server Monitoring                     | New Relic                      | :x:                           | Proprietary
+Managed Synthetics Monitoring                 | New Relic                      | :x:                           | :x:
 
 See an error or have a suggestion? Email competition@devopsgroup.io - we appreciate all feedback.
 
