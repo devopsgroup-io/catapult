@@ -22,14 +22,13 @@
 
 **What makes Catapult different?**
 
-* Catapult is open sourced.
-* Catapult is a single-state architecture - there are no optional features.
-* Catapult only orchestrates - it is not required to run your infrastructure.
-* Catapult uses platform native shell scripts rather than configuration management tools such as Chef, Puppet, Salt.
-* Catapult overlays seamlessly with Scrum methodology.
-* Catapult features Gitflow workflow and branch-based environments.
-* Catapult features a unique workflow model - upstream or downstream.
-* Catapult is extremely cost effective.
+* Catapult is an open source, complete, and distributed architecture
+* Catapult only orchestrates - it is not required to run your infrastructure
+* Catapult uses platform native shell scripts rather than configuration management tools such as Chef, Puppet, Salt
+* Catapult overlays seamlessly with Scrum methodology
+* Catapult features Gitflow workflow while enforcing exactly matching, branch-driven environments
+* Catapult features a unique workflow model - upstream or downstream
+* Catapult is highly cost effective
 
 *Go ahead, give* **Catapult** *a* **shot**.
 
