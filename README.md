@@ -731,7 +731,7 @@ Pageviews | Avg. Session Duration | Total Session Seconds | Concurrency Maxiumum
 
 **100 concurrent requests performed 10 times**
 ````
-ab -l -r -n 1000 -c 100 -H "Accept-Encoding: gzip, deflate" http://drupal7.devopsgroup.io/
+ab -l -r -n 1000 -c 100 -H "Accept-Encoding: gzip, deflate" http://test.drupal7.devopsgroup.io/
 ````
 
 Take a website with an average of 20 pageviews per hour, or 14,600 pageviews per month, which has a busiest hour of 100 pageviews.
@@ -745,7 +745,7 @@ Pageviews | Avg. Session Duration | Total Session Seconds | Concurrency Maxiumum
 
 **10 concurrent requests performed 10 times**
 ````
-ab -l -r -n 100 -c 10 -H "Accept-Encoding: gzip, deflate" http://drupal7.devopsgroup.io/
+ab -l -r -n 100 -c 10 -H "Accept-Encoding: gzip, deflate" http://test.drupal7.devopsgroup.io/
 ````
 
 ### Interpreting Apache AB Results ###
