@@ -29,10 +29,22 @@ sudo yum install -y php-devel
 sudo pear config-set php_ini /etc/php.ini
 sudo yum install -y gcc
 # These extensions are available from » PECL. They may require external libraries. More PECL extensions exist but they are not documented in the PHP manual yet.
+#################
+# pecl extension: php-pecl-zendopcache
+# https://pecl.php.net/package/ZendOpcache
+sudo yum install -y php-pecl-zendopcache
+# disable cache for dev
+if [ "$1" = "dev" ]; then
+    sudo bash -c 'echo "/var/www" > /etc/php.d/opcache-default.blacklist'
+else
+    sudo bash -c 'echo "" > /etc/php.d/opcache-default.blacklist'
+fi
+#################
 # pecl extension: yaml
 # https://pecl.php.net/package/yaml
 sudo yum install -y libyaml-devel
 echo autodetect | sudo pecl upgrade yaml
+#################
 # pecl extension: geoip
 # https://pecl.php.net/package/geoip
 sudo yum install -y geoip-devel
@@ -47,5 +59,6 @@ sudo gunzip --force /usr/share/GeoIP/GeoIPCity.dat.gz
 sudo wget --quiet --read-timeout=10 --tries=5 --output-document=/usr/share/GeoIP/GeoIPASNum.dat.gz  http://download.maxmind.com/download/geoip/database/asnum/GeoIPASNum.dat.gz
 sudo gunzip --force /usr/share/GeoIP/GeoIPASNum.dat.gz
 
-# restart httpd for changes to reflect
+# reload httpd configuration for changes to reflect
+# reload httpd to clear zend opcache
 systemctl reload httpd.service
