@@ -179,10 +179,10 @@ Catapult is controlled via Vagrant and the command line of a Developer's compute
 
 1. **Vagrant**
     * **Using OS X?**
-        1. Please ensure Xcode Command Line Tools are installed by running `xcode-select --install` from Terminal
-        2. Please download and install the latest verson of Vagrant from https://www.vagrantup.com/downloads.html
+        1. Ensure Xcode Command Line Tools are installed by running `xcode-select --install` from Terminal
+        2. Download and install the latest verson of Vagrant from https://www.vagrantup.com/downloads.html
     * **Using Windows?**
-        1. Please download and install the latest verson of Vagrant from https://www.vagrantup.com/downloads.html
+        1. Download and install the latest verson of Vagrant from https://www.vagrantup.com/downloads.html
     * **Using Linux (Debian, Ubuntu)?**
         1. Download the latest version of Vagrant respective to your architecture from https://releases.hashicorp.com/vagrant/ by running e.g. `wget https://releases.hashicorp.com/vagrant/1.8.1/vagrant_1.8.1_x86_64.deb`
         2. Install Vagrant using dpkg e.g. `sudo dpkg --install vagrant_1.8.1_x86_64.deb`
@@ -191,15 +191,13 @@ Catapult is controlled via Vagrant and the command line of a Developer's compute
         2. Install Vagrant using yum e.g. `sudo yum install vagrant_1.8.1_x86_64.rpm`
 2. **VirtualBox**
     * **Using OS X?**
-        1. Please download and install the latest version of VirtualBox from https://www.virtualbox.org/wiki/Downloads
+        1. Download and install the latest version of VirtualBox from https://www.virtualbox.org/wiki/Downloads
     * **Using Windows?**
-        1. Please download and install the latest version of VirtualBox from https://www.virtualbox.org/wiki/Downloads
+        1. Download and install the latest version of VirtualBox from https://www.virtualbox.org/wiki/Downloads
     * **Using Linux (Debian, Ubuntu)?**
-        1. Download the latest version of Vagrant respective to your architecture from https://www.virtualbox.org/wiki/Linux_Downloads by running e.g. `wget http://download.virtualbox.org/virtualbox/5.0.16/virtualbox-5.0_5.0.16-105871~Ubuntu~trusty_amd64.deb`
-        2. Install Vagrant using dpkg e.g. `sudo dpkg --install virtualbox-5.0_5.0.16-105871~Ubuntu~trusty_amd64.deb`
+        1. Download and install the latest version of Vagrant respective to your architecture following directions at https://www.virtualbox.org/wiki/Linux_Downloads
     * **Using Linux (Fedora, Red Hat, Suse)?**
-        1. Download the latest version of Vagrant respective to your architecture from https://www.virtualbox.org/wiki/Linux_Downloads by running e.g. `wget http://download.virtualbox.org/virtualbox/5.0.16/VirtualBox-5.0-5.0.16_105871_fedora22-1.x86_64.rpm`
-        2. Install Vagrant using yum e.g. `sudo yum install VirtualBox-5.0-5.0.16_105871_fedora22-1.x86_64.rpm`
+        1. Download and install the latest version of Vagrant respective to your architecture following directions at https://www.virtualbox.org/wiki/Linux_Downloads
 3. **GPG2**
     * **Using OS X?**
         1. Please download and install GPG Suite https://gpgtools.org
