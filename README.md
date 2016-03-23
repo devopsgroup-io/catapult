@@ -195,9 +195,9 @@ Catapult is controlled via Vagrant and the command line of a Developer's compute
     * **Using Windows?**
         1. Download and install the latest version of VirtualBox from https://www.virtualbox.org/wiki/Downloads
     * **Using Linux (Debian, Ubuntu)?**
-        1. Download and install the latest version of VirtualBox using APT `sudo apt-get install virtualbox`
+        1. Download and install the latest version of VirtualBox using Advanced Packaging Tool (APT) `sudo apt-get install virtualbox`
     * **Using Linux (Fedora, Red Hat, Suse)?**
-        1. Download and install the latest version of VirtualBox using YUM `sudo yum install virtualbox`
+        1. Download and install the latest version of VirtualBox using Yellowdog Updater, Modifed (yum) `sudo yum install virtualbox`
 3. **GPG2**
     * **Using OS X?**
         1. Please download and install GPG Suite https://gpgtools.org
