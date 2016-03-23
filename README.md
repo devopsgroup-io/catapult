@@ -200,17 +200,22 @@ Catapult is controlled via Vagrant and the command line of a Developer's compute
         1. Download and install the latest version of VirtualBox using Yellowdog Updater, Modifed (yum) `sudo yum install virtualbox`
 3. **GPG2**
     * **Using OS X?**
-        1. Please download and install GPG Suite https://gpgtools.org
+        1. Download and install GPG Suite from https://gpgtools.org
     * **Using Windows?**
-        1. Please download and install Gpg4win from http://gpg4win.org/download.html
+        1. Download and install Gpg4win from http://gpg4win.org/download.html
     * **Using Linux?**
         1. GPG is included in the base distribution in most cases.
         1. If being prompted by the Passphrase GUI Agent, comment out 'use-agent' in ~/.gnupg/gpg.conf
 
 Having your team use the same tools is beneficial to streamlining your workflow - below is a list of recommended software tools.
 
-1. **SourceTree**
-    1. Using OS X or Windows? Download and install from https://www.sourcetreeapp.com/
+1. **Git**
+    * **Using OS X?**
+        1. Download and install SourceTree from https://www.sourcetreeapp.com/
+    * **Using Windows?**
+        1. Download and install SourceTree from https://www.sourcetreeapp.com/
+    * **Using Linux?**
+        1. Download and install SmartGit from http://www.syntevo.com/smartgit/
 2. **Sublime Text 3**
     1. Please download and install from http://www.sublimetext.com/3
 
