@@ -178,23 +178,25 @@ Catapult requires a [Developer Setup](#developer-setup), [Instance Setup](#insta
 Catapult is controlled via Vagrant and the command line of a Developer's computer - below is a list of required software.
 
 1. **Vagrant**
-    * Using OS X?
+    * **Using OS X?**
         1. Please ensure Xcode Command Line Tools are installed by running `xcode-select --install` from Terminal
-        2. Please download and install from https://www.vagrantup.com/downloads.html
-    * Using Windows?
-        1. Please download and install from https://www.vagrantup.com/downloads.html
-    * Using Linux (Debian, Ubuntu)?
-        1. Download the most recent version of Vagrant respective to your architecture from https://releases.hashicorp.com/vagrant/ by running e.g. `wget https://releases.hashicorp.com/vagrant/1.8.1/vagrant_1.8.1_x86_64.deb`
-    * Using Linux (Fedora, Red Hat, Suse)?
-        1. Download the most recent version of Vagrant respective to your architecture from https://releases.hashicorp.com/vagrant/ by running e.g. `wget https://releases.hashicorp.com/vagrant/1.8.1/vagrant_1.8.1_x86_64.rpm`
+        2. Please download and install the latest verson of Vagrant from https://www.vagrantup.com/downloads.html
+    * **Using Windows?**
+        1. Please download and install the latest verson of Vagrant from https://www.vagrantup.com/downloads.html
+    * **Using Linux (Debian, Ubuntu)?**
+        1. Download the latest version of Vagrant respective to your architecture from https://releases.hashicorp.com/vagrant/ by running e.g. `wget https://releases.hashicorp.com/vagrant/1.8.1/vagrant_1.8.1_x86_64.deb`
+        2. Install Vagrant using dpkg e.g. `sudo dpkg --install vagrant_1.8.1_x86_64.deb`
+    * **Using Linux (Fedora, Red Hat, Suse)?**
+        1. Download the latest version of Vagrant respective to your architecture from https://releases.hashicorp.com/vagrant/ by running e.g. `wget https://releases.hashicorp.com/vagrant/1.8.1/vagrant_1.8.1_x86_64.rpm`
+        2. Install Vagrant using yum e.g. `sudo yum install vagrant_1.8.1_x86_64.rpm`
 2. **VirtualBox**
     1. Please download and install from https://www.virtualbox.org/wiki/Downloads
 3. **GPG2**
-    * Using OS X?
+    * **Using OS X?**
         1. Please download and install GPG Suite https://gpgtools.org
-    * Using Windows?
+    * **Using Windows?**
         1. Please download and install Gpg4win from http://gpg4win.org/download.html
-    * Using Linux?
+    * **Using Linux?**
         1. GPG is included in the base distribution in most cases.
         1. If being prompted by the Passphrase GUI Agent, comment out 'use-agent' in ~/.gnupg/gpg.conf
 
