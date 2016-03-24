@@ -106,7 +106,7 @@ Exacting Configuration                        | :white_check_mark:             |
 Approach                                      | Virtual Machine                | Container                     | Virtual Machine
 Data Center                                   | DigitalOcean and AWS           | Rackspace                     | AWS
 Scaling                                       | Vertical                       | Horizontal                    | Vertical
-Scaling Management                            | *Manual                        | Automatic                     | Manual
+Scaling Management                            | Manual                         | Automatic                     | Manual
 Development Environment                       | Unlimited Local                | 5 Cloud                       | Unlimited Local
 Development Environment Approach              | Exact                          | Exact                         | Similar
 Dashboard - Control                           | CLI                            | CLI & Web                     | CLI & Web
