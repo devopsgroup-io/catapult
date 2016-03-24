@@ -539,18 +539,18 @@ All instance specific configuration is stored in ~/secrets/configuration.yml and
 
 The exclusive Company entry contains top-level global credentials and company information - all of which will be configured during [Setup Catapult](#setup-catapult).
 
-* name:
-    * `required: true`
+* `name:`
+    * required: no
         * Your company's name or your name
-* email:
-    * `required: true`
+* `email:`
+    * required: no
         * Your company's email or your email that is used for software admin accounts and virtual host admin
-* timezone_redhat:
-    * `required: true`
+* `timezone_redhat:`
+    * required: no
         * Your timezone in tz database format that is used to for setting within operating systems and applications
         * https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Virtualization/3.1/html/Developer_Guide/appe-REST_API_Guide-Timezones.html
-* timezone_windows:
-    * `required: true`
+* `timezone_windows:`
+    * required: no
         * Your timezone in Windows Standard Format that is used to for setting within operating systems and applications
         * https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Virtualization/3.1/html/Developer_Guide/appe-REST_API_Guide-Timezones.html
 
@@ -572,17 +572,16 @@ websites:
 
 The following options are available:
 
-* domain:
-    * `required: true`
-    * `example: example.com`
+* `domain:`
+    * required: yes
+    * example: `domain: example.com`
         * the Production canonical domain name without `www.`
             * one subdomain level is supported (subdomain.example.com)
         * this drives the domains of LocalDev (via hosts file) and Test, QC, Production (via CloudFlare)
             * dev.example.com, test.example.com, qc.example.com, example.com
-* domain_tld_override:
-    * `required: false`
-    * `default: null`
-    * `example: mycompany.com`
+* `domain_tld_override:`
+    * required: no
+    * example: `domain_tld_override: mycompany.com`
         * a domain name under your [name server authority](https://en.wikipedia.org/wiki/Domain_Name_System#Authoritative_name_server) to append to the top-level-domain (e.g. `.com`)
             * useful when you cannot or do not wish to host the Test/QC website at the `domain`
         * appends the `domain_tld_override` for Environments
@@ -590,45 +589,41 @@ The following options are available:
         * PLEASE NOTE: When removing this option from a website with `software`, you need to manually replace URLs in the database respective to the `software_workflow` option.
             * ie `vagrant ssh mycompany.com-test-redhat-mysql`
             * `php /catapult/provisioners/redhat/installers/wp-cli.phar --allow-root --path="/var/www/repositories/apache/example.com/(webroot if applicable)" search-replace ":\/\/(www\.)?(dev\.|test\.)?(example\.com\.mycompany\.com)" "://example.com" --regex`
-* force_auth:
-    * `required: false`
-    * `default: null`
-    * `example: letmein`
-        * forces [http basic authentication](https://en.wikipedia.org/wiki/Basic_access_authentication) in Test, QC, and Production (see `force_auth_exclude`)
+* `force_auth:`
+    * required: no
+    * example: `force_auth: letmein`
+        * forces [HTTP basic authentication](https://en.wikipedia.org/wiki/Basic_access_authentication) in Test, QC, and Production (see `force_auth_exclude`)
         * `letmein` is both the username and password
-* force_auth_exclude:
-    * `dependency: force_auth`
-    * `required: false`
-    * `default: null`
-    * `values: ["test","qc","production"]`
-        * array of Environments to exclude from the `force_auth` option
-* force_https:
-    * `required: false`
-    * `default: false`
-    * `values: true, false`
+* `force_auth_exclude:`
+    * required: no
+    * dependency: `force_auth:`
+    * example: `force_auth_exclude: ["production"]`
+        * array of select environments ["test","qc","production"] to exclude from the `force_auth` option
+* `force_https:`
+    * required: no
+    * `force_https: true`
         * rewrites all http traffic to https
         * subdomains are not supported as limited by CloudFlare
         * causes an unsigned cert error in LocalDev
-* repo:
-    * `required: true`
-    * `example: git@github.com:devopsgroup-io/devopsgroup-io.git`
+* `repo:`
+    * required: yes
+    * example: `repo: git@github.com:devopsgroup-io/devopsgroup-io.git`
         * GitHub and Bitbucket over SSH are supported, HTTPS is not supported
-* software:
-    * `required: false`
-    * `default: null`
-    * `value: codeigniter2`
+* `software:`
+    * required: no
+    * `software: codeigniter2`
         * maintains codeigniter2 database config file ~/application/config/database.php
         * rsyncs git untracked ~/uploads
         * sets permissions for ~/uploads
         * dumps and restores database at ~/_sql
         * updates url references in database
-    * `value: codeigniter3`
+    * `software: codeigniter3`
         * maintains codeigniter3 database config file ~/application/config/database.php
         * rsyncs git untracked ~/uploads
         * sets permissions for ~/uploads
         * dumps and restores database at ~/_sql
         * updates url references in database
-    * `value: drupal6`
+    * `software: drupal6`
         * maintains drupal6 database config file ~/sites/default/settings.php
         * rsyncs git untracked ~/sites/default/files
         * sets permissions for ~/sites/default/files
@@ -636,7 +631,7 @@ The following options are available:
         * dumps and restores database at ~/_sql
         * updates url references in database
         * resets drupal6 admin password
-    * `value: drupal7`
+    * `software: drupal7`
         * maintains drupal7 database config file ~/sites/default/settings.php
         * rsyncs git untracked ~/sites/default/files
         * sets permissions for ~/sites/default/files
@@ -644,11 +639,11 @@ The following options are available:
         * dumps and restores database at ~/_sql
         * updates url references in database
         * resets drupal7 admin password
-    * `value: silverstripe`
+    * `software: silverstripe`
         * maintains silverstripe database config file ~/mysite/_config.php
         * dumps and restores database at ~/_sql
         * updates url references in database
-    * `value: wordpress`
+    * `software: wordpress`
         * maintains wordpress database config file ~/wp-config.php
         * rsyncs git untracked ~/wp-content/uploads
         * sets permissions for ~/wp-content/uploads
@@ -656,33 +651,31 @@ The following options are available:
         * dumps and restores database at ~/_sql
         * updates url references in database
         * resets wordpress admin password
-    * `value: xenforo`
+    * `software: xenforo`
         * maintains xenForo database config file ~/library/config.php
         * rsyncs git untracked ~/data and ~/internal_data
         * sets permissions for ~/data and ~/internal_data
         * dumps and restores database at ~/_sql
         * updates url references in database
-* software_dbprefix:
-    * `dependency: software`
-    * `required: false`
-    * `default: null`
-    * `example: wp_`
+* `software_dbprefix:`
+    * required: no
+    * dependency: `software:`
+    * example: `software_dbprefix: wp_`
         * the value that prefixes table names within the database
             * PLEASE NOTE: table prefixes included in software distributions, such as WordPress' `wp_`, must be specified if desired
-* software_workflow:
-    * `dependency: software`
-    * `required: true`
-    * `value: downstream`
+* `software_workflow:`
+    * required: yes
+    * dependency: `software:`
+    * `software_workflow: downstream`
         * specifies Production as the source for the database and software file store
         * this option is useful for maintaining a website
-    * `value: upstream`
+    * `software_workflow: upstream`
         * specifies Test as the source for the database and software file store
         * this option is useful for launching a new website
         * PLEASE NOTE: affects the Production website instance - see [Release Management](#release-management)
-* webroot:
-    * `required: false`
-    * `default: null`
-    * `example: www/`
+* `webroot:`
+    * required: no
+    * example: `webroot: www/`
         * if the webroot differs from the repo root, specify it here
         * must include the trailing slash
 
