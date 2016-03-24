@@ -697,20 +697,20 @@ Performing development in a local environment is critical to reducing risk by ex
     * Repositories are linked between the host and guest for realtime development.
 
 ### Forcing www ###
-* Forcing www is software specific, unlike forcing the https protocol, which is environment specific and driven by the `force_https` option. To force www ([why force www?](http://www.yes-www.org/)), please follow the respective guides per software:
-    * `value: codeigniter2`
+* Forcing www is software specific, unlike forcing the https protocol, which is environment specific and driven by the `force_https` option. To force www ([why force www?](http://www.yes-www.org/)), please follow the respective guides per `software`:
+    * `software: codeigniter2`
         * `~/.htaccess` no official documentation - http://stackoverflow.com/a/4958847/4838803
-    * `value: codeigniter3`
+    * `software: codeigniter3`
         * `~/.htaccess` no official documentation - http://stackoverflow.com/a/4958847/4838803
-    * `value: drupal6`
+    * `software: drupal6`
         * `~/.htaccess` https://github.com/drupal/drupal/blob/6.x-18-security/.htaccess#L87
-    * `value: drupal7`
+    * `software: drupal7`
         * `~/.htaccess` https://github.com/drupal/drupal/blob/7.x/.htaccess#L89
-    * `value: silverstripe`
+    * `software: silverstripe`
         * `~/mysite/_config.php` no official documentation - http://www.ssbits.com/snippets/2010/a-config-php-cheatsheet/
-    * `value: wordpress`
+    * `software: wordpress`
         * http://codex.wordpress.org/Changing_The_Site_URL
-    * `value: xenforo`
+    * `software: xenforo`
         * `~/.htaccess` no official documentation - http://stackoverflow.com/a/4958847/4838803
 
 ### Refreshing Databases ###
