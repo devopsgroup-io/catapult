@@ -75,17 +75,18 @@ Catapult leverages the following technologies and technology services to impleme
 
 Catapult supports the following software:
 
-* Any PHP project compatible with PHP 5.4
-    * as limited by CentOS 7.2
-* CodeIgniter 2.x
-* CodeIgniter 3.x
-* Drupal 6.x, Drupal 7.x
-    * as required by Drush 7.0.0
-* SilverStripe 2.x
-* WordPress 3.5.2+, WordPress 4.x
-    * as required by WP-CLI
-* XenForo 1.x
+* CodeIgniter 2
+* CodeIgniter 3
+* Drupal 6
+* Drupal 7
+* SilverStripe 2
+* WordPress 3.5.2+
+* WordPress 4
+* XenForo 1
 
+Catapult additionally supports basic PHP projects that do not have a database requirement:
+
+* PHP 5.4 compatible project
 
 
 ## Competition ##
