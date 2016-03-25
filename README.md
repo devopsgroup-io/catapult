@@ -850,6 +850,25 @@ BitBucket         | Repository hosting                       | [:x:](https://www
 DigitalOcean NYC3 | Red Hat server hosting                   | [:question:](https://www.digitalocean.com/help/policy/)                   | [:question:](https://www.digitalocean.com/help/policy/)
 GitHub            | Repository hosting                       | [:question:](https://help.github.com/articles/github-security/)           |
 
+## HTTPS ##
+
+Out of the box Catapult manages free HTTPS compliments of Cloudflare, however, depending on your compliance needs you may need to purchase SSL certificates unique to your company. Once you're aware of your compliance responsiblity, you can then make a decision for purchasing and implementing SSL certificates. Catapult will soon incorporate the ability to add custom SSL certificates.
+
+### SSL Certificate Validation ###
+
+                                               | Domain Validation (DV certificates)                                                          | Organization Validation (OV certificates)                                                   | Extended Validation (EV certificates)
+-----------------------------------------------|----------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------
+Single Domain Certificate                      | :white_check_mark:                                                                           | :white_check_mark:                                                                          | :white_check_mark:
+Wildcard Certificate                           | :white_check_mark:                                                                           | :white_check_mark:                                                                          | :x:
+Multiple Domain Certificate                    | :white_check_mark:                                                                           | :white_check_mark:                                                                          | :white_check_mark:
+Issuing Process                                | Automatic                                                                                    | Application vetted by Certificate Authority                                                 | Application vetted by Certificate Authority
+Issuing Criteria: Domain Name(s)               | :white_check_mark:                                                                           | :white_check_mark:                                                                          | :white_check_mark:
+Issuing Criteria: Organization Existence       | :x:                                                                                          | :white_check_mark:                                                                          | :white_check_mark:
+Issuing Criteria: Organization Legal Existenc  | :x:                                                                                          | :x:                                                                                         | :white_check_mark:
+Industry Accepted Issuing Standard             | :x:                                                                                          | :x:                                                                                         | [CAB EV SSL Certificate Guidelines](https://cabforum.org/extended-validation/)
+Standard Browser Padlock                       | :white_check_mark:                                                                           | :white_check_mark:                                                                          |  :x:
+Greenbar Browser Padlock                       | :x:                                                                                          | :x:                                                                                         |  :white_check_mark:
+
 See an error or have a suggestion? Email security@devopsgroup.io - we appreciate all feedback.
 
 
