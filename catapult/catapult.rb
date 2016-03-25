@@ -70,7 +70,9 @@ module Catapult
         puts "\n"
         puts "Please correct the error then re-run your vagrant command."
         puts "See https://github.com/devopsgroup-io/catapult for more information."
-        File.delete('.lock')
+        if File.exist?('.lock')
+          File.delete('.lock')
+        end
         exit 1
       end
     end
@@ -83,17 +85,21 @@ module Catapult
 
 
     # set variables based on operating system
+    # windows
     if (RbConfig::CONFIG['host_os'] =~ /mswin|msys|mingw|cygwin|bccwin|wince|emc/)
       if File.exist?('C:\Program Files (x86)\Git\bin\git.exe')
         @git = "\"C:\\Program Files (x86)\\Git\\bin\\git.exe\""
+      elsif File.exist?('C:\Program Files\Git\bin\git.exe')
+        @git = "\"C:\\Program Files\\Git\\bin\\git.exe\""
       else
-        catapult_exception("Git is not installed at C:\\Program Files (x86)\\Git\\bin\\git.exe")
+        catapult_exception("Git is not installed at C:\\Program Files (x86)\\Git\\bin\\git.exe or C:\\Program Files\\Git\\bin\\git.exe")
       end
       begin
          require "Win32/Console/ANSI"
       rescue LoadError
          catapult_exception('win32console is not installed, please run "gem install win32console"')
       end
+    # others
     elsif (RbConfig::CONFIG['host_os'] =~ /darwin|mac os|linux|solaris|bsd/)
       @git = "git"
     else
@@ -246,6 +252,8 @@ module Catapult
 
     if File.exist?(\'C:\Program Files (x86)\Git\bin\git.exe\')
       git = "\"C:\\Program Files (x86)\\Git\\bin\\git.exe\""
+    elsif File.exist?(\'C:\Program Files\Git\bin\git.exe\')
+      git = "\"C:\\Program Files\\Git\\bin\\git.exe\""
     else
       git = "git"
     end
