@@ -159,7 +159,7 @@ See an error or have a suggestion? Email competition@devopsgroup.io - we appreci
 - [Compliance and Security](#compliance-and-security)
     - [Cloud Compliance](#cloud-compliance)
     - [Self Compliance](#self-compliance)
-    - [HTTPS and SSL Certificates](#ssl-and-ssl-certificiates)
+    - [HTTPS and SSL Certificates](#https-and-ssl-certificiates)
 - [Troubleshooting](#troubleshooting)
 - [Contributing](#contributing)
     - [Releases](#releases)
