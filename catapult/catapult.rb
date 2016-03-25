@@ -72,7 +72,7 @@ module Catapult
         puts "See https://github.com/devopsgroup-io/catapult for more information."
         if File.exist?('.lock')
           File.delete('.lock')
-        fi
+        end
         exit 1
       end
     end
@@ -252,6 +252,8 @@ module Catapult
 
     if File.exist?(\'C:\Program Files (x86)\Git\bin\git.exe\')
       git = "\"C:\\Program Files (x86)\\Git\\bin\\git.exe\""
+    elsif File.exist?(\'C:\Program Files\Git\bin\git.exe\')
+      git = "\"C:\\Program Files\\Git\\bin\\git.exe\""
     else
       git = "git"
     end
