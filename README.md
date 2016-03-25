@@ -156,9 +156,10 @@ See an error or have a suggestion? Email competition@devopsgroup.io - we appreci
     - [Disaster Recovery](#disaster-recovery)
         - [Server Rebuilding](#server-rebuilding) 
         - [Website Rollbacks](#website-rollbacks)
-- [Security and Compliance](#security-and-compliance)
+- [Compliance and Security](#compliance-and-security)
     - [Cloud Compliance](#cloud-compliance)
     - [Self Compliance](#self-compliance)
+    - [HTTPS and SSL Certificates](#ssl-and-ssl-certificiates)
 - [Troubleshooting](#troubleshooting)
 - [Contributing](#contributing)
     - [Releases](#releases)
@@ -820,7 +821,7 @@ Being able to react to disasters immediately and consistently is crucial - Catap
 
 
 
-# Security and Compliance #
+# Compliance and Security #
 
 There are many complex compliance and audit standards that are your responsibility to understand and execute. Each Catapult instance is independant to you - including the required services that you signed up for during [Services Setup](#services-setup).
 
@@ -850,24 +851,24 @@ BitBucket         | Repository hosting                       | [:x:](https://www
 DigitalOcean NYC3 | Red Hat server hosting                   | [:question:](https://www.digitalocean.com/help/policy/)                   | [:question:](https://www.digitalocean.com/help/policy/)
 GitHub            | Repository hosting                       | [:question:](https://help.github.com/articles/github-security/)           |
 
-## HTTPS ##
+## HTTPS and SSL Certificates ##
 
-Out of the box Catapult manages free HTTPS compliments of Cloudflare, however, depending on your compliance needs you may need to purchase SSL certificates unique to your company. Once you're aware of your compliance responsiblity, you can then make a decision for purchasing and implementing SSL certificates. Catapult will soon incorporate the ability to add custom SSL certificates.
+Catapult manages free HTTPS compliments of Cloudflare, however, depending on your compliance needs you may need to purchase SSL certificates unique to your company. Once you're aware of your compliance responsiblity, you can then make a decision for purchasing and implementing SSL certificates. Catapult will soon incorporate the ability to add custom SSL certificates.
 
-### SSL Certificate Validation ###
-
-                                               | Domain Validation (DV certificates)                                                          | Organization Validation (OV certificates)                                                   | Extended Validation (EV certificates)
+                                               | Domain Validation<br>(DV certificates)                                                       | Organization Validation<br>(OV certificates)                                                | Extended Validation<br>(EV certificates)
 -----------------------------------------------|----------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------
 Single Domain Certificate                      | :white_check_mark:                                                                           | :white_check_mark:                                                                          | :white_check_mark:
 Wildcard Certificate                           | :white_check_mark:                                                                           | :white_check_mark:                                                                          | :x:
 Multiple Domain Certificate                    | :white_check_mark:                                                                           | :white_check_mark:                                                                          | :white_check_mark:
+Cost                                           | $                                                                                            | $$                                                                                          | $$$
 Issuing Process                                | Automatic                                                                                    | Application vetted by Certificate Authority                                                 | Application vetted by Certificate Authority
 Issuing Criteria: Domain Name(s)               | :white_check_mark:                                                                           | :white_check_mark:                                                                          | :white_check_mark:
 Issuing Criteria: Organization Existence       | :x:                                                                                          | :white_check_mark:                                                                          | :white_check_mark:
 Issuing Criteria: Organization Legal Existenc  | :x:                                                                                          | :x:                                                                                         | :white_check_mark:
 Industry Accepted Issuing Standard             | :x:                                                                                          | :x:                                                                                         | [CAB EV SSL Certificate Guidelines](https://cabforum.org/extended-validation/)
-Standard Browser Padlock                       | :white_check_mark:                                                                           | :white_check_mark:                                                                          |  :x:
-Greenbar Browser Padlock                       | :x:                                                                                          | :x:                                                                                         |  :white_check_mark:
+Standard Browser Padlock                       | :white_check_mark:                                                                           | :white_check_mark:                                                                          | :x:
+Greenbar Browser Padlock                       | :x:                                                                                          | :x:                                                                                         | :white_check_mark:
+Browser Compatability                          | Google Chrome 1+<br>Mozilla Firefox 1+<br>Internet Explorer 5+                               | Google Chrome 1+<br>Mozilla Firefox 1+<br>Internet Explorer 5+                              | Google Chrome 1+<br>Mozilla Firefox 3+<br>Internet Explorer 7+
 
 See an error or have a suggestion? Email security@devopsgroup.io - we appreciate all feedback.
 
