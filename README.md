@@ -542,17 +542,17 @@ All instance specific configuration is stored in ~/secrets/configuration.yml and
 The exclusive Company entry contains top-level global credentials and company information - all of which will be configured during [Setup Catapult](#setup-catapult).
 
 * `name:`
-    * required: no
+    * required: yes
         * Your company's name or your name
 * `email:`
-    * required: no
+    * required: yes
         * The primary contact email
 * `timezone_redhat:`
-    * required: no
+    * required: yes
         * Your company's timezone in tz database format
         * See [this list](https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Virtualization/3.1/html/Developer_Guide/appe-REST_API_Guide-Timezones.html) for a list of valid tz database format timezones
 * `timezone_windows:`
-    * required: no
+    * required: yes
         * Your company's timezone in Windows Standard Format
         * See [this list](https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Virtualization/3.1/html/Developer_Guide/appe-REST_API_Guide-Timezones.html) for a list of valid Windows Standard Format timezones
 
