@@ -845,7 +845,7 @@ Security **in** the cloud. This is your responsibility, however, the underlying 
 Service           | Catapult Context                         | HIPAA BAA                                                                 | PCI DSS Level 1
 ------------------|------------------------------------------|---------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------
 AWS EC2           | Windows server hosting                   | [:white_check_mark:](https://aws.amazon.com/compliance/hipaa-compliance/) | [:white_check_mark:](https://aws.amazon.com/compliance/pci-dss-level-1-faqs/)
-CloudFlare        | Web application firewall                 |                                                                           | [:white_check_mark:](https://support.cloudflare.com/hc/en-us/articles/202249734-CloudFlare-and-PCI-Compliance)
+CloudFlare (Pro)  | Web application firewall                 |                                                                           | [:white_check_mark:](https://support.cloudflare.com/hc/en-us/articles/202249734-CloudFlare-and-PCI-Compliance)
 Bamboo            | Server communication, log files, secrets | [:x:](https://www.atlassian.com/security/security-faq/)                   |
 BitBucket         | Repository hosting                       | [:x:](https://www.atlassian.com/security/security-faq/)                   |
 DigitalOcean NYC3 | Red Hat server hosting                   | [:question:](https://www.digitalocean.com/help/policy/)                   | [:question:](https://www.digitalocean.com/help/policy/)
