@@ -869,7 +869,7 @@ Issuing Criteria: Organization Legal Existence | :x:                            
 Industry Accepted Issuing Standard             | :x:                                                                                          | :x:                                                                                         | [CAB EV SSL Certificate Guidelines](https://cabforum.org/extended-validation/)
 Standard Browser Padlock                       | :white_check_mark:                                                                           | :white_check_mark:                                                                          | :x:
 Greenbar Browser Padlock                       | :x:                                                                                          | :x:                                                                                         | :white_check_mark:
-Browser Compatability                          | Google Chrome 1+<br>Mozilla Firefox 1+<br>Internet Explorer 5+                               | Google Chrome 1+<br>Mozilla Firefox 1+<br>Internet Explorer 5+                              | Google Chrome 1+<br>Mozilla Firefox 3+<br>Internet Explorer 7+
+Browser Compatibility                          | Google Chrome 1+<br>Mozilla Firefox 1+<br>Internet Explorer 5+                               | Google Chrome 1+<br>Mozilla Firefox 1+<br>Internet Explorer 5+                              | Google Chrome 1+<br>Mozilla Firefox 3+<br>Internet Explorer 7+
 
 ## Security Breach Notification Laws ##
 
