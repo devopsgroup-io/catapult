@@ -873,7 +873,7 @@ Browser Compatability                          | Google Chrome 1+<br>Mozilla Fir
 
 ## Security Breach Notification Laws ##
 
-Catapult introduces many best practice security measures, however, security of customer data is ultimately your responsibility. Generally speaking, if personal information is compromised, you are required by law to notify the party. Personal information, in the United States, is generally classified as an individual's first and last name in combination with a Social Security number, driver's license number, or financial account number. Laws vary country-by-country and state-by-state - for more information please see [this list](http://www.itgovernanceusa.com/data-breach-notification-laws.aspx) of data breach laws by U.S. state compiled by IT Governence.
+Catapult introduces many best practice security measures, however, security of customer data is ultimately your responsibility. Generally speaking, if personal information is compromised, you are required by law to notify the party. Personal information, in the United States, is generally classified as **an individual's first and last name in combination with a Social Security number, driver's license number, or financial account number**. Laws vary country-by-country and state-by-state - for more information please see [this list](http://www.itgovernanceusa.com/data-breach-notification-laws.aspx) of data breach laws by U.S. state compiled by IT Governence.
 
 See an error or have a suggestion? Email security@devopsgroup.io if confidential or submit a pull request - we appreciate all feedback.
 
