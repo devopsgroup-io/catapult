@@ -96,9 +96,10 @@ The free market and competition is great - it pushes the envelope of innovation.
 Platform Feature | Catapult | Pantheon | Acquia
 -----------------|----------|----------|--------
 Source                                        | Open                           | Closed                        | Closed
-Feature Set                                   | Bundled                        | Separated                     | Separated
+Subscription Feature Set                      | Bundled                        | Separated                     | Separated
 Supported Software                            | Numerous                       | 2                             | 1
 Minimum Bundled<br>Monthly Cost               | $40                            | $400                          | $134
+Websites per Instance/Subscription            | Unlimited                      | 1                             | 1
 Managed Workflow                              | Git Flow                       | :x:                           | :x:
 Managed Workflow Model                        | Upstream or Downstream         | :x:                           | :x:
 Agile Methodology Focus                       | Scrum                          | :x:                           | :x:
