@@ -28,7 +28,8 @@ if [ -d "/var/www/repositories/apache/$(catapult websites.apache.$5.domain)/.git
             && git clean -fd \
             && git checkout $(catapult environments.$1.branch) \
             && sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git fetch" \
-            && sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git pull origin $(catapult environments.$1.branch)"
+            && sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git pull origin $(catapult environments.$1.branch)" \
+            && sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git submodule update --init --recursive"
     fi
 else
     if [ -d "/var/www/repositories/apache/$(catapult websites.apache.$5.domain)" ]; then

@@ -195,11 +195,24 @@ if (-not($config.websites.iis)) {
     foreach ($instance in $config.websites.iis) {
         if (test-path ("c:\inetpub\repositories\iis\{0}\.git" -f $instance.domain) ) {
             start-process -filepath "c:\Program Files (x86)\Git\bin\git.exe" -argumentlist ("-C c:\inetpub\repositories\iis\{0} reset -q --hard HEAD --" -f $instance.domain,$config.environments.$($args[0]).branch) -Wait -RedirectStandardOutput $provision -RedirectStandardError $provisionError
+            get-content $provision
+            get-content $provisionError
             start-process -filepath "c:\Program Files (x86)\Git\bin\git.exe" -argumentlist ("-C c:\inetpub\repositories\iis\{0} checkout ." -f $instance.domain,$config.environments.$($args[0]).branch) -Wait -RedirectStandardOutput $provision -RedirectStandardError $provisionError
+            get-content $provision
+            get-content $provisionError
             start-process -filepath "c:\Program Files (x86)\Git\bin\git.exe" -argumentlist ("-C c:\inetpub\repositories\iis\{0} clean -fd" -f $instance.domain,$config.environments.$($args[0]).branch) -Wait -RedirectStandardOutput $provision -RedirectStandardError $provisionError
+            get-content $provision
+            get-content $provisionError
             start-process -filepath "c:\Program Files (x86)\Git\bin\git.exe" -argumentlist ("-C c:\inetpub\repositories\iis\{0} checkout origin {1}" -f $instance.domain,$config.environments.$($args[0]).branch) -Wait -RedirectStandardOutput $provision -RedirectStandardError $provisionError
+            get-content $provision
+            get-content $provisionError
             start-process -filepath "c:\Program Files (x86)\Git\bin\git.exe" -argumentlist ("-C c:\inetpub\repositories\iis\{0} fetch" -f $instance.domain,$config.environments.$($args[0]).branch) -Wait -RedirectStandardOutput $provision -RedirectStandardError $provisionError
+            get-content $provision
+            get-content $provisionError
             start-process -filepath "c:\Program Files (x86)\Git\bin\git.exe" -argumentlist ("-C c:\inetpub\repositories\iis\{0} pull origin {1}" -f $instance.domain,$config.environments.$($args[0]).branch) -Wait -RedirectStandardOutput $provision -RedirectStandardError $provisionError
+            get-content $provision
+            get-content $provisionError
+            start-process -filepath "c:\Program Files (x86)\Git\bin\git.exe" -argumentlist ("-C c:\inetpub\repositories\iis\{0} submodule update --init --recursive") -Wait -RedirectStandardOutput $provision -RedirectStandardError $provisionError
             get-content $provision
             get-content $provisionError
         } else {
