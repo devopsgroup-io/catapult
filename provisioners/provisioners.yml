@@ -65,3 +65,40 @@ redhat:
           mysql:
             modules: ["system","iptables","time","newrelic_sysmon","software_tools","git_clean","git","software_config","mysql"]
 windows:
+
+software:
+    apache:
+      codeigniter2:
+        repo: "https://github.com/bcit-ci/CodeIgniter.git"
+        branch: "2.2-stable"
+        database_config_file: "application/config/database.php"
+        file_stores: ["uploads"]
+      codeigniter3:
+        repo: "https://github.com/bcit-ci/CodeIgniter.git"
+        branch: "3.0-stable"
+        database_config_file: "application/config/database.php"
+        file_stores: ["uploads"]
+      drupal6:
+        repo: "https://git.drupal.org/project/drupal.git"
+        branch: "6.x"
+        database_config_file: "sites/default/settings.php"
+        file_stores: ["sites/default"]
+      drupal7:
+        repo: "https://git.drupal.org/project/drupal.git"
+        branch: "7.x"
+        database_config_file: "sites/default/settings.php"
+        file_stores: ["sites/default"]
+      silverstripe:
+        repo: "https://github.com/silverstripe/silverstripe-installer"
+        branch: "3.3"
+        database_config_file: "mysite/_config.php"
+      wordpress:
+        repo: "https://github.com/WordPress/WordPress.git"
+        branch: "master"
+        database_config_file: "wp-config.php"
+        file_stores: ["wp-content/uploads"]
+      xenforo:
+        database_config_file: "sites/default/settings.php"
+        file_stores: ["data","internal_data"]
+    iis:
+      
