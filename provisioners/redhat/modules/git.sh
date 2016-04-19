@@ -15,13 +15,21 @@ if [ -d "/var/www/repositories/apache/$(catapult websites.apache.$5.domain)/.git
         sudo rm -rf /var/www/repositories/apache/$(catapult websites.apache.$5.domain)
         sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git clone --recursive -b $(catapult environments.$1.branch) $(catapult websites.apache.$5.repo) /var/www/repositories/apache/$(catapult websites.apache.$5.domain)"
     else
+        # set git config options, note order of config files https://git-scm.com/docs/git-config#FILES
+        cd /var/www/repositories/apache/$(catapult websites.apache.$5.domain) \
+            && git config user.name "Catapult" \
+            && git config user.email "$(catapult company.email)" \
+            && git config core.packedGitLimit 128m \
+            && git config core.packedGitWindowSize 128m \
+            && git config pack.deltaCacheSize 128m \
+            && git config pack.packSizeLimit 128m \
+            && git config pack.windowMemory 128m
         # stash any pending work in localdev as a courtesy
         if [ $1 = "dev" ]; then
             cd /var/www/repositories/apache/$(catapult websites.apache.$5.domain) \
-                && git config --global user.name "Catapult" \
-                && git config --global user.email "$(catapult company.email)" \
                 && git stash save
         fi
+        # pull in the latest after some cleanup
         cd /var/www/repositories/apache/$(catapult websites.apache.$5.domain) \
             && git reset -q --hard HEAD -- \
             && git checkout . \
