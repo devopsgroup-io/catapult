@@ -406,7 +406,6 @@ module Catapult
     if $?.exitstatus > 0
       catapult_exception("Your configuration could not be decrypted, please confirm your team's gpg_key is correct in secrets/configuration-user.yml")
     end
-    configuration_example = YAML.load_file("secrets/configuration.yml.template")
     `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/id_rsa --decrypt secrets/id_rsa.gpg`
     if $?.exitstatus > 0
       catapult_exception("Your configuration could not be decrypted, please confirm your team's gpg_key is correct in secrets/configuration-user.yml")
@@ -415,6 +414,8 @@ module Catapult
     if $?.exitstatus > 0
       catapult_exception("Your configuration could not be decrypted, please confirm your team's gpg_key is correct in secrets/configuration-user.yml")
     end
+    # load provisioners yaml file
+    @provisioners = YAML.load_file("provisioners/provisioners.yml")
 
 
 
@@ -1287,8 +1288,13 @@ module Catapult
           puts "   - Configured Bamboo service for automated deployments."
           # validate software
           unless instance["software"] == nil
-            unless ["codeigniter2","codeigniter3","drupal6","drupal7","silverstripe","wordpress","xenforo"].include?("#{instance["software"]}")
-              catapult_exception("There is an error in your secrets/configuration.yml file.\nThe software for websites => #{service} => domain => #{instance["domain"]} is invalid, it must be one of the following [\"codeigniter2\",\"drupal6\",\"drupal7\",\"wordpress\",\"xenforo\"].")
+            # create an array of available software
+            provisioners_software = Array.new
+            unless @provisioners["software"]["#{service}"] == nil
+              @provisioners["software"]["#{service}"].each { |i, v| provisioners_software.push(i) }
+            end
+            unless provisioners_software.include?("#{instance["software"]}")
+              catapult_exception("There is an error in your secrets/configuration.yml file.\nThe software for websites => #{service} => domain => #{instance["domain"]} is invalid, it must be one of the following #{provisioners_software.join(", ")}.")
             end
             unless ["downstream","upstream"].include?("#{instance["software_workflow"]}")
               catapult_exception("There is an error in your secrets/configuration.yml file.\nThe software for websites => #{service} => domain => #{instance["domain"]} requires the software_workflow option, it must be one of the following [\"downstream\",\"upstream\"].")
@@ -1425,7 +1431,7 @@ module Catapult
               rescue OpenSSL::SSL::SSLError
                 row.push("err".ljust(4).color(Colors::RED))
               rescue Exception => ex
-                row.push("#{ex.class}".ljust(4).color(Colors::RED))
+                row.push("#{ex.class}".slice!(0, 4).ljust(4).color(Colors::RED))
               end
               # nslookup production top-level domain
               begin
