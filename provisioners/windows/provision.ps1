@@ -194,10 +194,10 @@ if (-not($config.websites.iis)) {
     }
     foreach ($instance in $config.websites.iis) {
         if (test-path ("c:\inetpub\repositories\iis\{0}\.git" -f $instance.domain) ) {
-            start-process -filepath "c:\Program Files (x86)\Git\bin\git.exe" -argumentlist ("-C c:\inetpub\repositories\iis\{0} config user.name {1}" -f $instance.domain,"Catapult") -Wait -RedirectStandardOutput $provision -RedirectStandardError $provisionError
+            start-process -filepath "c:\Program Files (x86)\Git\bin\git.exe" -argumentlist ("-C c:\inetpub\repositories\iis\{0} config --global user.name {1}" -f $instance.domain,"Catapult") -Wait -RedirectStandardOutput $provision -RedirectStandardError $provisionError
             get-content $provision
             get-content $provisionError
-            start-process -filepath "c:\Program Files (x86)\Git\bin\git.exe" -argumentlist ("-C c:\inetpub\repositories\iis\{0} config user.email {1}" -f $instance.domain,$config.company.email) -Wait -RedirectStandardOutput $provision -RedirectStandardError $provisionError
+            start-process -filepath "c:\Program Files (x86)\Git\bin\git.exe" -argumentlist ("-C c:\inetpub\repositories\iis\{0} config --global user.email {1}" -f $instance.domain,$config.company.email) -Wait -RedirectStandardOutput $provision -RedirectStandardError $provisionError
             get-content $provision
             get-content $provisionError
             start-process -filepath "c:\Program Files (x86)\Git\bin\git.exe" -argumentlist ("-C c:\inetpub\repositories\iis\{0} config core.packedGitLimit 128m" -f $instance.domain) -Wait -RedirectStandardOutput $provision -RedirectStandardError $provisionError
