@@ -17,8 +17,8 @@ if [ -d "/var/www/repositories/apache/$(catapult websites.apache.$5.domain)/.git
     else
         # set git config options, note order of config files https://git-scm.com/docs/git-config#FILES
         cd /var/www/repositories/apache/$(catapult websites.apache.$5.domain) \
-            && git config user.name "Catapult" \
-            && git config user.email "$(catapult company.email)" \
+            && git config --global user.name "Catapult" \
+            && git config --global user.email "$(catapult company.email)" \
             && git config core.packedGitLimit 128m \
             && git config core.packedGitWindowSize 128m \
             && git config pack.deltaCacheSize 128m \
