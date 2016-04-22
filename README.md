@@ -982,7 +982,7 @@ The Catapult team values partnerships and continuous improvement.
 
 Catapult is making the conference tour! We plan to attend the following conferences, with more to come. Get a chance to see Catapult in action, presented by it's core developers.
 
-* Spring 2016 [04-08-2016] [Drupaldelphia](http://drupaldelphia.com/)
+* Spring 2016 [04-08-2016] [Drupaldelphia](http://drupaldelphia.com/): DevOps Discipline: Detailed and Complete
 * Summer 2016 [Wharton Web Conference](http://www.sas.upenn.edu/wwc/)
 * Winter 2016 [WordCamp US](http://us.wordcamp.org/)
 
