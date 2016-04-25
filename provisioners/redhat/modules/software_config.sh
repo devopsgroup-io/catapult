@@ -173,11 +173,19 @@ fi
 
 # run software database update operations
 if [ "$software" = "codeigniter2" ]; then
-    :
-    #cd "/var/www/repositories/apache/${domain}/${webroot}" && php index.php migrate
+    output=$(cd "/var/www/repositories/apache/${domain}/${webroot}" && php index.php migrate)
+    if echo $output | grep -q "404"; then
+        echo -e "Migrations are not configured"
+    else
+        echo $output
+    fi
 elif [ "$software" = "codeigniter3" ]; then
-    :
-    #cd "/var/www/repositories/apache/${domain}/${webroot}" && php index.php migrate
+    output=$(cd "/var/www/repositories/apache/${domain}/${webroot}" && php index.php migrate)
+    if echo $output | grep -q "404"; then
+        echo -e "Migrations are not configured"
+    else
+        echo $output
+    fi
 elif [ "$software" = "drupal6" ]; then
     cd "/var/www/repositories/apache/${domain}/${webroot}" && drush updatedb -y
 elif [ "$software" = "drupal7" ]; then

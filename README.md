@@ -150,6 +150,7 @@ See an error or have a suggestion? Email competition@devopsgroup.io - we appreci
     - [Website Development](#website-development)
         - [Website Repositories](#website-repositories)
         - [Forcing www](#forcing-www)
+        - [Database Migrations](#database-migrations)
         - [Refreshing Databases](#refreshing-databases)
         - [Connecting to Databases](#connecting-to-databases)
         - [Hotfixes](#hotfixes)
@@ -693,26 +694,43 @@ Performing development in a local environment is critical to reducing risk by ex
 
 ### Website Repositories ###
 
-* Repositories for websites are cloned into the Catapult instance at ~/repositories and in the respective apache or iis folder, listed by domain name.
-    * Repositories are linked between the host and guest for realtime development.
+Repositories for websites are cloned into the Catapult instance at ~/repositories and in the respective apache or iis folder, listed by domain name.
+
+* Repositories are linked between the host and guest for realtime development.
 
 ### Forcing www ###
 
-* Forcing www is software specific, unlike forcing the https protocol, which is environment specific and driven by the `force_https` option. To force www ([why force www?](http://www.yes-www.org/)), please follow the respective guides per `software`:
-    * `software: codeigniter2`
-        * `~/.htaccess` no official documentation - http://stackoverflow.com/a/4958847/4838803
-    * `software: codeigniter3`
-        * `~/.htaccess` no official documentation - http://stackoverflow.com/a/4958847/4838803
-    * `software: drupal6`
-        * `~/.htaccess` https://github.com/drupal/drupal/blob/6.x-18-security/.htaccess#L87
-    * `software: drupal7`
-        * `~/.htaccess` https://github.com/drupal/drupal/blob/7.x/.htaccess#L89
-    * `software: silverstripe`
-        * `~/mysite/_config.php` no official documentation - http://www.ssbits.com/snippets/2010/a-config-php-cheatsheet/
-    * `software: wordpress`
-        * http://codex.wordpress.org/Changing_The_Site_URL
-    * `software: xenforo`
-        * `~/.htaccess` no official documentation - http://stackoverflow.com/a/4958847/4838803
+Forcing www is software specific, unlike forcing the https protocol, which is environment specific and driven by the `force_https` option. To force www ([why force www?](http://www.yes-www.org/)), please follow the respective guides per `software`:
+
+* `software: codeigniter2`
+    * `~/.htaccess` no official documentation - http://stackoverflow.com/a/4958847/4838803
+* `software: codeigniter3`
+    * `~/.htaccess` no official documentation - http://stackoverflow.com/a/4958847/4838803
+* `software: drupal6`
+    * `~/.htaccess` https://github.com/drupal/drupal/blob/6.x-18-security/.htaccess#L87
+* `software: drupal7`
+    * `~/.htaccess` https://github.com/drupal/drupal/blob/7.x/.htaccess#L89
+* `software: silverstripe`
+    * `~/mysite/_config.php` no official documentation - http://www.ssbits.com/snippets/2010/a-config-php-cheatsheet/
+* `software: wordpress`
+    * http://codex.wordpress.org/Changing_The_Site_URL
+* `software: xenforo`
+    * `~/.htaccess` no official documentation - http://stackoverflow.com/a/4958847/4838803
+
+### Database Migrations ###
+
+The best way to handle changes to the software's database schema is through a migrations system. Database migrations are software specific and are invoked via Catapult for you, here we outline the specifics:
+
+Software | Tool | Command | Documentation
+---------|------|---------|--------------
+codeigniter2   | Migrations | `php index.php migrate` | https://ellislab.com/codeigniter/user-guide/libraries/migration.html
+codeigniter3   | Migrations |  | https://www.codeigniter.com/user_guide/libraries/migration.html
+drupal6        | Drush      | `drush updatedb -y`     | https://www.drupal.org/node/150215
+drupal7        | Drush      | `drush updatedb -y`     | https://www.drupal.org/node/150215
+silverstripe   |            |                         |
+wordpress      | WP-CLI     | `wp-cli core update-db` | http://codex.wordpress.org/Creating_Tables_with_Plugins#Adding_an_Upgrade_Function
+xenforo        |            |                         |
+
 
 ### Refreshing Databases ###
 
