@@ -1,8 +1,11 @@
 source "/catapult/provisioners/redhat/modules/catapult.sh"
 
 # install dependancies
+sudo yum install -y php
 sudo yum install -y php-cli
 sudo yum install -y php-dom
+sudo yum install -y php-gd
+sudo yum install -y php-mbstring
 sudo yum install -y php-mysql
 sudo yum install -y php-posix
 sudo yum install -y mariadb
@@ -19,7 +22,7 @@ fi
 composer self-update
 cd /usr/local/src/drush \
     && git fetch \
-    && git checkout 7.1.0 \
+    && git checkout 7.3.0 \
     && composer install
 echo -e "\nDRUSH $(drush --version --format=string)"
 
