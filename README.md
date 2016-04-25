@@ -724,7 +724,7 @@ The best way to handle changes to the software's database schema is through a mi
 Software | Tool | Command | Documentation
 ---------|------|---------|--------------
 codeigniter2   | Migrations | `php index.php migrate` | https://ellislab.com/codeigniter/user-guide/libraries/migration.html
-codeigniter3   | Migrations |  | https://www.codeigniter.com/user_guide/libraries/migration.html
+codeigniter3   | Migrations | `php index.php migrate` | https://www.codeigniter.com/user_guide/libraries/migration.html
 drupal6        | Drush      | `drush updatedb -y`     | https://www.drupal.org/node/150215
 drupal7        | Drush      | `drush updatedb -y`     | https://www.drupal.org/node/150215
 silverstripe   |            |                         |
