@@ -40,9 +40,6 @@ Vagrant.configure("2") do |config|
       provider.memory = 512
       provider.cpus = 1
     end
-    # configure hosts file on both the host and guest
-    config.vm.provision :hostmanager
-    config.hostmanager.aliases = Catapult::Command.dev_redhat_hosts
     # disable the default vagrant share
     config.vm.synced_folder ".", "/vagrant", disabled: true
     config.vm.synced_folder ".", "/catapult", type: "nfs"
