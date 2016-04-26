@@ -22,7 +22,7 @@ fi
 composer self-update
 cd /usr/local/src/drush \
     && git fetch \
-    && git checkout 7.3.0 \
+    && git checkout 7.1.0 \
     && composer install
 echo -e "\nDRUSH $(drush --version --format=string)"
 
