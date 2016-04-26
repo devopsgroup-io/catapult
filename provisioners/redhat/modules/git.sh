@@ -71,6 +71,17 @@ if [ -d "/var/www/repositories/apache/$(catapult websites.apache.$5.domain)/.git
                     fi
                 fi
             done
+            # if the database configuration file is tracked, we need to checkout the correct one so we can pull
+            # we'll provide a warning here as well to remove it from the website repo
+            if [ ! -z "$(catapult websites.apache.$5.software)" ]; then
+                cd "/var/www/repositories/apache/$(catapult websites.apache.$5.domain)/$(catapult websites.apache.$5.webroot)" \
+                    && git check-ignore --quiet "$(catapult websites.apache.$5.webroot)$(provisioners software.apache.$(catapult websites.apache.$5.software).database_config_file)"
+                if [ $? -ne 0 ]; then
+                    echo -e "WARNING: the software database config file $(catapult websites.apache.$5.webroot)$(provisioners software.apache.$(catapult websites.apache.$5.software).database_config_file) is tracked, to continue we had to remove it and will be regenerated shortly, however there will be a potential loss of connectivity for a short period"
+                    cd "/var/www/repositories/apache/$(catapult websites.apache.$5.domain)/$(catapult websites.apache.$5.webroot)" \
+                        && git checkout "$(catapult websites.apache.$5.webroot)$(provisioners software.apache.$(catapult websites.apache.$5.software).database_config_file)"
+                fi
+            fi
             # now that we have everything in our index that we want, commit, pull, then push
             cd "/var/www/repositories/apache/$(catapult websites.apache.$5.domain)" \
                 && git commit --message="Catapult auto-commit ${1}:$(catapult websites.apache.$5.software_workflow):software_files" \
@@ -85,7 +96,7 @@ if [ -d "/var/www/repositories/apache/$(catapult websites.apache.$5.domain)/.git
                 cd /var/www/repositories/apache/$(catapult websites.apache.$5.domain) \
                     && git stash save
             fi
-            # hard reset (tracked), checkout correct branch, clean (untracked), then pull in latest
+            # hard reset (tracked), checkout all from HEAD, clean (untracked), checkout correct branch, then pull in latest
             cd /var/www/repositories/apache/$(catapult websites.apache.$5.domain) \
                 && git reset --quiet --hard HEAD -- \
                 && git checkout . \
