@@ -174,14 +174,14 @@ fi
 # run software database update operations
 if [ "$software" = "codeigniter2" ]; then
     output=$(cd "/var/www/repositories/apache/${domain}/${webroot}" && php index.php migrate)
-    if echo $output | grep -q "404"; then
+    if echo $output | grep -q "<html"; then
         echo -e "Migrations are not configured"
     else
         echo $output
     fi
 elif [ "$software" = "codeigniter3" ]; then
     output=$(cd "/var/www/repositories/apache/${domain}/${webroot}" && php index.php migrate)
-    if echo $output | grep -q "404"; then
+    if echo $output | grep -q "<html"; then
         echo -e "Migrations are not configured"
     else
         echo $output
