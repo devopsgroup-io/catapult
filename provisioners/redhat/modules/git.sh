@@ -75,8 +75,8 @@ if [ -d "/var/www/repositories/apache/$(catapult websites.apache.$5.domain)/.git
             # we'll provide a warning here as well to remove it from the website repo
             if [ ! -z "$(catapult websites.apache.$5.software)" ]; then
                 cd "/var/www/repositories/apache/$(catapult websites.apache.$5.domain)/$(catapult websites.apache.$5.webroot)" \
-                    && git check-ignore --quiet "$(catapult websites.apache.$5.webroot)$(provisioners software.apache.$(catapult websites.apache.$5.software).database_config_file)"
-                if [ $? -ne 0 ]; then
+                    && git ls-files --error-unmatch "$(catapult websites.apache.$5.webroot)$(provisioners software.apache.$(catapult websites.apache.$5.software).database_config_file)" >/dev/null 2>&1
+                if [ $? -eq 0 ]; then
                     echo -e "WARNING: the software database config file $(catapult websites.apache.$5.webroot)$(provisioners software.apache.$(catapult websites.apache.$5.software).database_config_file) is tracked, to continue we had to remove it and will be regenerated shortly, however there will be a potential loss of connectivity for a short period"
                     cd "/var/www/repositories/apache/$(catapult websites.apache.$5.domain)/$(catapult websites.apache.$5.webroot)" \
                         && git checkout "$(catapult websites.apache.$5.webroot)$(provisioners software.apache.$(catapult websites.apache.$5.software).database_config_file)"
@@ -84,7 +84,8 @@ if [ -d "/var/www/repositories/apache/$(catapult websites.apache.$5.domain)/.git
             fi
             # now that we have everything in our index that we want, commit, pull, then push
             cd "/var/www/repositories/apache/$(catapult websites.apache.$5.domain)" \
-                && git commit --message="Catapult auto-commit ${1}:$(catapult websites.apache.$5.software_workflow):software_files" \
+                && git commit --message="Catapult auto-commit ${1}:$(catapult websites.apache.$5.software_workflow):software_files"
+            cd "/var/www/repositories/apache/$(catapult websites.apache.$5.domain)" \
                 && sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git fetch" \
                 && sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git pull origin $(catapult environments.$1.branch)" \
                 && sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git submodule update --init --recursive" \
