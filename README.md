@@ -622,18 +622,23 @@ The following options are available:
     * required: no
     * `software: codeigniter2`
         * maintains codeigniter2 database config file ~/application/config/database.php
+        * commits git tracked ~/uploads
         * rsyncs git untracked ~/uploads
         * sets permissions for ~/uploads
+        * invokes `php index.php migrate`
         * dumps and restores database at ~/_sql
         * updates url references in database
     * `software: codeigniter3`
         * maintains codeigniter3 database config file ~/application/config/database.php
+        * commits git tracked ~/uploads
         * rsyncs git untracked ~/uploads
         * sets permissions for ~/uploads
+        * invokes `php index.php migrate`
         * dumps and restores database at ~/_sql
         * updates url references in database
     * `software: drupal6`
         * maintains drupal6 database config file ~/sites/default/settings.php
+        * commits git tracked ~/sites/default/files
         * rsyncs git untracked ~/sites/default/files
         * sets permissions for ~/sites/default
         * invokes `drush updatedb`
@@ -642,6 +647,7 @@ The following options are available:
         * resets drupal6 admin password
     * `software: drupal7`
         * maintains drupal7 database config file ~/sites/default/settings.php
+        * commits git tracked ~/sites/default/files
         * rsyncs git untracked ~/sites/default/files
         * sets permissions for ~/sites/default
         * invokes `drush updatedb`
@@ -654,6 +660,7 @@ The following options are available:
         * updates url references in database
     * `software: wordpress`
         * maintains wordpress database config file ~/wp-config.php
+        * commits git tracked ~/wp-content/uploads
         * rsyncs git untracked ~/wp-content/uploads
         * sets permissions for ~/wp-content
         * invokes `wp-cli core update-db`
@@ -662,6 +669,7 @@ The following options are available:
         * resets wordpress admin password
     * `software: xenforo`
         * maintains xenForo database config file ~/library/config.php
+        * commits git tracked ~/data and ~/internal_data
         * rsyncs git untracked ~/data and ~/internal_data
         * sets permissions for ~/data and ~/internal_data
         * dumps and restores database at ~/_sql
