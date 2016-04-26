@@ -102,14 +102,6 @@ while IFS='' read -r -d '' key; do
         # respect software_workflow option
         if ([ "${1}" = "production" ] && [ "${software_workflow}" = "downstream" ] && [ "${software_db}" != "" ] && [ "${software_db_tables}" != "0" ]) || ([ "${1}" = "test" ] && [ "${software_workflow}" = "upstream" ] && [ "${software_db}" != "" ] && [ "${software_db_tables}" != "0" ]); then
             echo -e "\t* workflow is set to ${software_workflow} and this is the ${1} environment, performing a database backup"
-            # database dumps are always committed to the develop branch to respect software_workflow
-            cd "/var/www/repositories/apache/${domain}" && git checkout develop 2>&1 | sed "s/^/\t/"
-            cd "/var/www/repositories/apache/${domain}" && git reset -q --hard HEAD -- 2>&1 | sed "s/^/\t/"
-            cd "/var/www/repositories/apache/${domain}" && git checkout . 2>&1 | sed "s/^/\t/"
-            cd "/var/www/repositories/apache/${domain}" && git clean -fd 2>&1 | sed "s/^/\t/"
-            cd "/var/www/repositories/apache/${domain}" && sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git fetch" 2>&1 | sed "s/^/\t/"
-            cd "/var/www/repositories/apache/${domain}" && sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git pull origin develop" 2>&1 | sed "s/^/\t/"
-            cd "/var/www/repositories/apache/${domain}" && sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git submodule update --init --recursive" 2>&1 | sed "s/^/\t/"
             # dump the database as long as it hasn't been dumped for the day already
             # @todo this is intended so that a developer can commit a dump from active work in localdev then the process detect this and kick off the restore rather than dump workflow
             if ! [ -f /var/www/repositories/apache/${domain}/_sql/$(date +"%Y%m%d").sql ]; then
@@ -123,7 +115,9 @@ while IFS='' read -r -d '' key; do
                 elif [ "${software}" = "wordpress" ]; then
                     php /catapult/provisioners/redhat/installers/wp-cli.phar --allow-root cache flush
                 fi
+                # create the _sql directory if it does not exist
                 mkdir -p "/var/www/repositories/apache/${domain}/_sql"
+                # dump the database
                 mysqldump --defaults-extra-file=$dbconf --single-transaction --quick ${1}_${domainvaliddbname} > /var/www/repositories/apache/${domain}/_sql/$(date +"%Y%m%d").sql
                 # ensure no more than 500mb or at least the one, newest, .sql file exists
                 directory_size=$(du --null "/var/www/repositories/apache/${domain}/_sql" | awk '{ print $1 }')
@@ -148,13 +142,11 @@ while IFS='' read -r -d '' key; do
                 fi
                 # git add and commit the _sql folder changes
                 cd "/var/www/repositories/apache/${domain}" && git add --all "/var/www/repositories/apache/${domain}/_sql" 2>&1 | sed "s/^/\t/"
-                cd "/var/www/repositories/apache/${domain}" && git commit -m "Catapult auto-commit ${1}:${software_workflow}. Ensures the database of the website travels with the website's repository. See https://github.com/devopsgroup-io/catapult" 2>&1 | sed "s/^/\t/"
-                cd "/var/www/repositories/apache/${domain}" && sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git push origin develop" 2>&1 | sed "s/^/\t/"
+                cd "/var/www/repositories/apache/${domain}" && git commit --message="Catapult auto-commit ${1}:${software_workflow}:software_database" 2>&1 | sed "s/^/\t/"
+                cd "/var/www/repositories/apache/${domain}" && sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git push origin $(catapult environments.$1.branch)" 2>&1 | sed "s/^/\t/"
             else
                 echo -e "\t\ta backup was already performed today"
             fi
-            # after verifying database dumps, checkout the correct branch again
-            cd "/var/www/repositories/apache/${domain}" && git checkout $(echo "${configuration}" | shyaml get-value environments.${1}.branch) 2>&1 | sed "s/^/\t/"
         else
             if [ -z "${software_db}" ]; then
                 echo -e "\t* workflow is set to ${software_workflow} and this is the ${1} environment, however, the database does not exist. performing a database restore..."
