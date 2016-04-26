@@ -113,7 +113,7 @@ elif [ "${software}" = "xenforo" ]; then
     sudo chmod 0444 "${file}"
 fi
 
-# set ownership of user generated directories
+# set ownership of file store containers
 if [ "$software" = "codeigniter2" ]; then
     if [ -d "/var/www/repositories/apache/${domain}/${webroot}uploads" ]; then
         echo -e "setting permissions for $software upload directory ~/uploads"
@@ -147,12 +147,12 @@ elif [ "$software" = "drupal7" ]; then
         sudo chmod -R 0700 /var/www/repositories/apache/${domain}/${webroot}sites/default
     fi
 elif [ "$software" = "wordpress" ]; then
-    if [ -d "/var/www/repositories/apache/${domain}/${webroot}wp-content/uploads" ]; then
-        echo -e "setting permissions for $software upload directory ~/wp-content/uploads"
+    if [ -d "/var/www/repositories/apache/${domain}/${webroot}wp-content" ]; then
+        echo -e "setting permissions for $software upload directory ~/wp-content"
         if [ "$1" != "dev" ]; then
-            sudo chown -R apache /var/www/repositories/apache/${domain}/${webroot}wp-content/uploads
+            sudo chown -R apache /var/www/repositories/apache/${domain}/${webroot}wp-content
         fi
-        sudo chmod -R 0700 /var/www/repositories/apache/${domain}/${webroot}wp-content/uploads
+        sudo chmod -R 0700 /var/www/repositories/apache/${domain}/${webroot}wp-content
     fi
 elif [ "$software" = "xenforo" ]; then
     if [ -d "/var/www/repositories/apache/${domain}/${webroot}data" ]; then
