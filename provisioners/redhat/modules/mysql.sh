@@ -105,16 +105,6 @@ while IFS='' read -r -d '' key; do
             # dump the database as long as it hasn't been dumped for the day already
             # @todo this is intended so that a developer can commit a dump from active work in localdev then the process detect this and kick off the restore rather than dump workflow
             if ! [ -f /var/www/repositories/apache/${domain}/_sql/$(date +"%Y%m%d").sql ]; then
-                # flush meta tables before mysqldump to cut size, prevent potential issues restoring, and good house cleaning
-                if [ "${software}" = "drupal6" ]; then
-                    cd "/var/www/repositories/apache/${domain}/${webroot}" && drush watchdog-delete all -y
-                    cd "/var/www/repositories/apache/${domain}/${webroot}" && drush cache-clear all -y
-                elif [ "${software}" = "drupal7" ]; then
-                    cd "/var/www/repositories/apache/${domain}/${webroot}" && drush watchdog-delete all -y
-                    cd "/var/www/repositories/apache/${domain}/${webroot}" && drush cache-clear all -y
-                elif [ "${software}" = "wordpress" ]; then
-                    php /catapult/provisioners/redhat/installers/wp-cli.phar --allow-root cache flush
-                fi
                 # create the _sql directory if it does not exist
                 mkdir -p "/var/www/repositories/apache/${domain}/_sql"
                 # dump the database

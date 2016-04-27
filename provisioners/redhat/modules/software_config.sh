@@ -171,27 +171,33 @@ elif [ "$software" = "xenforo" ]; then
     fi
 fi
 
+# flush meta tables to cut size, prevent potential issues restoring, and good house cleaning
 # run software database update operations
 if [ "$software" = "codeigniter2" ]; then
     output=$(cd "/var/www/repositories/apache/${domain}/${webroot}" && php index.php migrate)
-    if echo $output | grep -q "<html"; then
+    if echo $output | grep --extended-regexp --quiet --regexp="<html" --regexp="<\?"; then
         echo -e "Migrations are not configured"
     else
         echo $output
     fi
 elif [ "$software" = "codeigniter3" ]; then
     output=$(cd "/var/www/repositories/apache/${domain}/${webroot}" && php index.php migrate)
-    if echo $output | grep -q "<html"; then
+    if echo $output | grep --extended-regexp --quiet --regexp="<html" --regexp="<\?"; then
         echo -e "Migrations are not configured"
     else
         echo $output
     fi
 elif [ "$software" = "drupal6" ]; then
+    cd "/var/www/repositories/apache/${domain}/${webroot}" && drush watchdog-delete all -y
     cd "/var/www/repositories/apache/${domain}/${webroot}" && drush updatedb -y
+    cd "/var/www/repositories/apache/${domain}/${webroot}" && drush cache-clear all -y
 elif [ "$software" = "drupal7" ]; then
+    cd "/var/www/repositories/apache/${domain}/${webroot}" && drush watchdog-delete all -y
     cd "/var/www/repositories/apache/${domain}/${webroot}" && drush updatedb -y
+    cd "/var/www/repositories/apache/${domain}/${webroot}" && drush cache-clear all -y
 elif [ "$software" = "wordpress" ]; then
     cd "/var/www/repositories/apache/${domain}/${webroot}" && php /catapult/provisioners/redhat/installers/wp-cli.phar --allow-root core update-db
+    cd "/var/www/repositories/apache/${domain}/${webroot}" && php /catapult/provisioners/redhat/installers/wp-cli.phar --allow-root cache flush
 fi
 
 touch "/catapult/provisioners/redhat/logs/software_config.$(catapult websites.apache.$5.domain).complete"
