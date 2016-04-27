@@ -81,8 +81,10 @@ while IFS='' read -r -d '' key; do
     # handle the force_https option
     if [ "${force_https}" = true ]; then
         force_https_value="Redirect Permanent / https://${domain_environment}"
+        force_https_hsts="Header always set Strict-Transport-Security \"max-age=15768000\""
     else
         force_https_value=""
+        force_https_hsts="# HSTS is only enabled when force_https=true"
     fi
     # write vhost apache conf file
     sudo cat > /etc/httpd/sites-available/${domain_environment}.conf << EOF
@@ -124,7 +126,7 @@ while IFS='' read -r -d '' key; do
             # add support for HSTS
             # HSTS: SSLstrip, MITM
             # Firefox 4, Chrome 4, IE 11, Opera 12, Safari (OS X 10.9)
-            Header always set Strict-Transport-Security "max-age=15768000"
+            $force_https_hsts
 
             # allow only secure ciphers that client can negotiate
             # https://wiki.mozilla.org/Security/Server_Side_TLS
