@@ -17,6 +17,7 @@ webroot=$(catapult websites.apache.$5.webroot)
 
 # generate database config files
 if [ "${software}" = "codeigniter2" ]; then
+
     file="/var/www/repositories/apache/${domain}/${webroot}application/config/database.php"
     echo -e "generating ${software} ${file}..."
     if [ -f "${file}" ]; then
@@ -31,7 +32,9 @@ if [ "${software}" = "codeigniter2" ]; then
         -e "s/\$db\['default'\]\['dbprefix'\]\s=\s'';/\$db\['default'\]\['dbprefix'\] = '${software_dbprefix}';/g" \
         /catapult/provisioners/redhat/installers/software/codeigniter2/database.php > "${file}"
     sudo chmod 0444 "${file}"
+
 elif [ "${software}" = "codeigniter3" ]; then
+
     file="/var/www/repositories/apache/${domain}/${webroot}application/config/database.php"
     echo -e "generating ${software} ${file}..."
     if [ -f "${file}" ]; then
@@ -46,7 +49,9 @@ elif [ "${software}" = "codeigniter3" ]; then
         -e "s/'dbprefix'\s=>\s''/'dbprefix' => '${software_dbprefix}'/g" \
         /catapult/provisioners/redhat/installers/software/codeigniter3/database.php > "${file}"
     sudo chmod 0444 "${file}"
+
 elif [ "${software}" = "drupal6" ]; then
+
     file="/var/www/repositories/apache/${domain}/${webroot}sites/default/settings.php"
     echo -e "generating ${software} ${file}..."
     if [ -f "${file}" ]; then
@@ -58,7 +63,9 @@ elif [ "${software}" = "drupal6" ]; then
     sed -e "s/mysql:\/\/username:password@localhost\/databasename/${connectionstring}/g" \
         /catapult/provisioners/redhat/installers/software/drupal6/settings.php > "${file}"
     sudo chmod 0444 "${file}"
+
 elif [ "${software}" = "drupal7" ]; then
+
     file="/var/www/repositories/apache/${domain}/${webroot}sites/default/settings.php"
     echo -e "generating ${software} ${file}..."
     if [ -f "${file}" ]; then
@@ -70,7 +77,28 @@ elif [ "${software}" = "drupal7" ]; then
     sed -e "s/\$databases\s=\sarray();/${connectionstring}/g" \
         /catapult/provisioners/redhat/installers/software/drupal7/settings.php > "${file}"
     sudo chmod 0444 "${file}"
+
+elif [ "${software}" = "joomla3" ]; then
+
+    file="/var/www/repositories/apache/${domain}/${webroot}configuration.php"
+    echo -e "generating ${software} ${file}..."
+    if [ -f "${file}" ]; then
+        sudo chmod 0777 "${file}"
+    else
+        mkdir -p $(dirname "${file}")
+    fi
+    sed -e "s/public\s\$host\s=\s'';/public \$host = '${redhat_mysql_ip}';/g" \
+        -e "s/public\s\$user\s=\s'';/public \$user = '${mysql_user}';/g" \
+        -e "s/public\s\$password\s=\s'';/public \$password = '${mysql_user_password}';/g" \
+        -e "s/public\s\$db\s=\s'';/public \$db = '${1}_${domainvaliddbname}';/g" \
+        -e "s/public\s\$dbprefix\s=\s'';/public \$dbprefix = '${software_dbprefix}';/g" \
+        -e "s/public\s\$log_path\s=\s'';/public \$log_path = '\\/var\\/www\\/repositories\\/apache\\/${domain}\\/${webroot}logs';/g" \
+        -e "s/public\s\$tmp_path\s=\s'';/public \$tmp_path = '\\/var\\/www\\/repositories\\/apache\\/${domain}\\/${webroot}tmp';/g" \
+        /catapult/provisioners/redhat/installers/software/joomla3/configuration.php > "${file}"
+    sudo chmod 0444 "${file}"
+
 elif [ "${software}" = "silverstripe" ]; then
+
     file="/var/www/repositories/apache/${domain}/${webroot}mysite/_config.php"
     echo -e "generating ${software} ${file}..."
     if [ -f "${file}" ]; then
@@ -82,7 +110,9 @@ elif [ "${software}" = "silverstripe" ]; then
     sed -e "s/\$databaseConfig\s=\sarray();/${connectionstring}/g" \
         /catapult/provisioners/redhat/installers/software/silverstripe/_config.php > "${file}"
     sudo chmod 0444 "${file}"
+
 elif [ "${software}" = "wordpress" ]; then
+
     file="/var/www/repositories/apache/${domain}/${webroot}wp-config.php"
     echo -e "generating ${software} ${file}..."
     if [ -f "${file}" ]; then
@@ -97,7 +127,9 @@ elif [ "${software}" = "wordpress" ]; then
         -e "s/'wp_'/'${software_dbprefix}'/g" \
         /catapult/provisioners/redhat/installers/software/wordpress/wp-config.php > "${file}"
     sudo chmod 0444 "${file}"
+
 elif [ "${software}" = "xenforo" ]; then
+
     file="/var/www/repositories/apache/${domain}/${webroot}library/config.php"
     echo -e "generating ${software} ${file}..."
     if [ -f "${file}" ]; then
@@ -195,6 +227,10 @@ elif [ "$software" = "drupal7" ]; then
     cd "/var/www/repositories/apache/${domain}/${webroot}" && drush watchdog-delete all -y
     cd "/var/www/repositories/apache/${domain}/${webroot}" && drush updatedb -y
     cd "/var/www/repositories/apache/${domain}/${webroot}" && drush cache-clear all -y
+elif [ "$software" = "joomla3" ]; then
+    cd "/var/www/repositories/apache/${domain}/${webroot}" && php cli/garbagecron.php
+    cd "/var/www/repositories/apache/${domain}/${webroot}" && php cli/update_cron.php
+    cd "/var/www/repositories/apache/${domain}/${webroot}" && php cli/deletefiles.php
 elif [ "$software" = "wordpress" ]; then
     cd "/var/www/repositories/apache/${domain}/${webroot}" && php /catapult/provisioners/redhat/installers/wp-cli.phar --allow-root core update-db
     cd "/var/www/repositories/apache/${domain}/${webroot}" && php /catapult/provisioners/redhat/installers/wp-cli.phar --allow-root cache flush

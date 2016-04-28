@@ -92,6 +92,10 @@ software:
         database_config_file: "sites/default/settings.php"
         file_store_containers: ["sites/default"]
         file_stores: ["sites/default/files"]
+      joomla3:
+        repo: "https://github.com/joomla/joomla-cms.git"
+        branch: "3.6.x"
+        database_config_file: "configuration.php"
       silverstripe:
         repo: "https://github.com/silverstripe/silverstripe-installer"
         branch: "3.3"
