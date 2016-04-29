@@ -189,6 +189,20 @@ if [ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-values-0 redha
                     # sample cpu usage
                     cpu_load_sample_decimal=$(top -bn 1 | awk '{print $9}' | tail -n +8 | awk '{s+=$1} END {print s}')
                     cpu_load_samples+=(${cpu_load_sample_decimal%.*})
+                    # add up all of the cpu samples
+                    cpu_load_samples_sum=0
+                    for i in ${cpu_load_samples[@]}; do
+                      let cpu_load_samples_sum+=$i
+                    done
+                    # get the count of the cpu samples
+                    cpu_load_samples_total="${#cpu_load_samples[@]}"
+                    # calculate cpu average
+                    if [ "${cpu_load_samples_total}" -gt 0 ]; then
+                        cpu_load_samples_average=$((cpu_load_samples_sum / cpu_load_samples_total))
+                    else
+                        cpu_load_samples_average=0
+                    fi
+                    echo "> waiting for parallel processes to complete [$(( $(ls -l /catapult/provisioners/redhat/logs/${module}.*.log 2>/dev/null | wc -l) - $(ls -l /catapult/provisioners/redhat/logs/${module}.*.complete 2>/dev/null | wc -l) )) active / 5 max] [$(ls -l /catapult/provisioners/redhat/logs/${module}.*.complete  2>/dev/null | wc -l) completed] [${cpu_load_samples_average}% average cpu]"
                     sleep 2
                 done
                 echo -e "=> domain: ${domain}"
