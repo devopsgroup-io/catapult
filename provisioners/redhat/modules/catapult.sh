@@ -16,19 +16,19 @@ function catapult_array {
     fi
 }
 
-provisioners=$(cat /catapult/provisioners/provisioners.yml)
+configuration_provisioners=$(cat /catapult/provisioners/provisioners.yml)
 function provisioners {
-    echo "${provisioners}" | shyaml get-value $1 > /dev/null 2>&1
+    echo "${configuration_provisioners}" | shyaml get-value $1 > /dev/null 2>&1
     if [ $? -eq 0 ]; then
-        echo "${provisioners}" | shyaml get-value $1
+        echo "${configuration_provisioners}" | shyaml get-value $1
     else
         echo ""
     fi
 }
 function provisioners_array {
-    echo "${provisioners}" | shyaml get-values $1 > /dev/null 2>&1
+    echo "${configuration_provisioners}" | shyaml get-values $1 > /dev/null 2>&1
     if [ $? -eq 0 ]; then
-        echo "${provisioners}" | shyaml get-values $1
+        echo "${configuration_provisioners}" | shyaml get-values $1
     else
         echo ""
     fi

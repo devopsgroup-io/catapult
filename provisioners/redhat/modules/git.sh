@@ -42,35 +42,37 @@ if [ -d "/var/www/repositories/apache/$(catapult websites.apache.$5.domain)/.git
             cd "/var/www/repositories/apache/$(catapult websites.apache.$5.domain)" \
                 && git reset -- "/var/www/repositories/apache/$(catapult websites.apache.$5.domain)/$(catapult websites.apache.$5.webroot)$(provisioners software.apache.$(catapult websites.apache.$5.software).database_config_file)"
             # loop through each file store as a way to reduce repository size and avoid limits
-            for file_store in $(provisioners_array software.apache.$(catapult websites.apache.$5.software).file_stores); do
-                file_store="/var/www/repositories/apache/$(catapult websites.apache.$5.domain)/$(catapult websites.apache.$5.webroot)${file_store}"
-                # confirm the file store exists
-                if [ -d "${file_store}" ]; then
-                    # get the file store size
-                    file_store_size=$(du --summarize "${file_store}" | awk '{ print $1 }')
-                    echo -e "website file store ${file_store} size: $(( ${file_store_size} / 1024 ))MB"
-                    # determine whether the file store is untracked or tracked
-                    cd "/var/www/repositories/apache/$(catapult websites.apache.$5.domain)" \
-                        && git check-ignore --quiet "${file_store}"
-                    if [ $? -eq 0 ]; then
-                        echo -e "- this website file store ${file_store} is untracked"
-                        echo -e "- this website file store will be rsynced"
-                        echo -e "- rely on virtual machine backups for disaster recovery"
-                    else
-                        # determine if the file store is too large
-                        if [ "${file_store_size}" -gt "${directory_size_maximum}" ]; then
-                            echo -e "- this website file store ${file_store} is tracked but over the limit to commit [$(( ${file_store_size} / 1024 ))MB / $(( ${directory_size_maximum} / 1024 ))MB max]"
+            if [ ! -z "$(provisioners_array software.apache.$(catapult websites.apache.$5.software).file_stores)" ]; then
+                for file_store in $(provisioners_array software.apache.$(catapult websites.apache.$5.software).file_stores); do
+                    file_store="/var/www/repositories/apache/$(catapult websites.apache.$5.domain)/$(catapult websites.apache.$5.webroot)${file_store}"
+                    # confirm the file store exists
+                    if [ -d "${file_store}" ]; then
+                        # get the file store size
+                        file_store_size=$(du --summarize "${file_store}" | awk '{ print $1 }')
+                        echo -e "website file store ${file_store} size: $(( ${file_store_size} / 1024 ))MB"
+                        # determine whether the file store is untracked or tracked
+                        cd "/var/www/repositories/apache/$(catapult websites.apache.$5.domain)" \
+                            && git check-ignore --quiet "${file_store}"
+                        if [ $? -eq 0 ]; then
+                            echo -e "- this website file store ${file_store} is untracked"
                             echo -e "- this website file store will be rsynced"
                             echo -e "- rely on virtual machine backups for disaster recovery"
-                            cd "/var/www/repositories/apache/$(catapult websites.apache.$5.domain)" \
-                                && git reset --all "${file_store}"
                         else
-                            echo -e "- this website file store ${file_store} is tracked and within the limit to commit [$(( ${file_store_size} / 1024 ))MB / $(( ${directory_size_maximum} / 1024 ))MB max]"
-                            echo -e "- this website file store will be committed"
+                            # determine if the file store is too large
+                            if [ "${file_store_size}" -gt "${directory_size_maximum}" ]; then
+                                echo -e "- this website file store ${file_store} is tracked but over the limit to commit [$(( ${file_store_size} / 1024 ))MB / $(( ${directory_size_maximum} / 1024 ))MB max]"
+                                echo -e "- this website file store will be rsynced"
+                                echo -e "- rely on virtual machine backups for disaster recovery"
+                                cd "/var/www/repositories/apache/$(catapult websites.apache.$5.domain)" \
+                                    && git reset --all "${file_store}"
+                            else
+                                echo -e "- this website file store ${file_store} is tracked and within the limit to commit [$(( ${file_store_size} / 1024 ))MB / $(( ${directory_size_maximum} / 1024 ))MB max]"
+                                echo -e "- this website file store will be committed"
+                            fi
                         fi
                     fi
-                fi
-            done
+                done
+            fi
             # if the database configuration file is tracked, we need to checkout the correct one so we can pull
             # we'll provide a warning here as well to remove it from the website repo
             if [ ! -z "$(catapult websites.apache.$5.software)" ]; then
