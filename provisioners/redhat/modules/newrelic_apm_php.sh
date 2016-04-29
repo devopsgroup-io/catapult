@@ -6,7 +6,7 @@ rpm --hash --upgrade --verbose https://download.newrelic.com/pub/newrelic/el5/i3
 # install the apm php package
 sudo yum install -y newrelic-php5
 # set the apm php appname
-sed -i -e "s#newrelic\.appname.*#newrelic.appname = \"$(catapult company.name)-${1}-redhat\"#g" "/etc/php.d/newrelic.ini"
+sed -i -e "s#newrelic\.appname.*#newrelic.appname = \"$(catapult company.name | tr '[:upper:]' '[:lower:]')-${1}-redhat\"#g" "/etc/php.d/newrelic.ini"
 # apm php installed but license key does not match
 NR_INSTALL_SILENT="true", NR_INSTALL_KEY="$(catapult company.newrelic_license_key)" /usr/bin/newrelic-install install
 # ensure newrelic daemon is started with latest configuration

@@ -54,19 +54,19 @@ if [ -d "/var/www/repositories/apache/$(catapult websites.apache.$5.domain)/.git
                         cd "/var/www/repositories/apache/$(catapult websites.apache.$5.domain)" \
                             && git check-ignore --quiet "${file_store}"
                         if [ $? -eq 0 ]; then
-                            echo -e "- this website file store ${file_store} is untracked"
+                            echo -e "- this website file store is untracked"
                             echo -e "- this website file store will be rsynced"
                             echo -e "- rely on virtual machine backups for disaster recovery"
                         else
                             # determine if the file store is too large
                             if [ "${file_store_size}" -gt "${directory_size_maximum}" ]; then
-                                echo -e "- this website file store ${file_store} is tracked but over the limit to commit [$(( ${file_store_size} / 1024 ))MB / $(( ${directory_size_maximum} / 1024 ))MB max]"
+                                echo -e "- this website file store is tracked but over the limit to commit [$(( ${file_store_size} / 1024 ))MB / $(( ${directory_size_maximum} / 1024 ))MB max]"
                                 echo -e "- this website file store will be rsynced"
                                 echo -e "- rely on virtual machine backups for disaster recovery"
                                 cd "/var/www/repositories/apache/$(catapult websites.apache.$5.domain)" \
                                     && git reset --all "${file_store}"
                             else
-                                echo -e "- this website file store ${file_store} is tracked and within the limit to commit [$(( ${file_store_size} / 1024 ))MB / $(( ${directory_size_maximum} / 1024 ))MB max]"
+                                echo -e "- this website file store is tracked and within the limit to commit [$(( ${file_store_size} / 1024 ))MB / $(( ${directory_size_maximum} / 1024 ))MB max]"
                                 echo -e "- this website file store will be committed"
                             fi
                         fi

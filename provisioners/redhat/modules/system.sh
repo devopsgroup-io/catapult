@@ -25,6 +25,12 @@ hostnamectl set-hostname "" --pretty
 
 # set dev hostnames
 # @todo set hostnames in upstream servers, will need to align vagrant names, etc
-if ([ $1 = "dev" ]); then
-    hostnamectl set-hostname "$(echo "${configuration}" | shyaml get-value company.name)-${1}-redhat-${4}"
+if ([ "${4}" = "apache" ]); then
+    hostnamectl set-hostname "$(catapult company.name | tr '[:upper:]' '[:lower:]')-${1}-redhat"
+elif ([ "${4}" = "mysql" ]); then
+    hostnamectl set-hostname "$(catapult company.name | tr '[:upper:]' '[:lower:]')-${1}-redhat-${4}"
 fi
+
+# disable swap
+# @todo look into a tuned and small 256MB swap file 
+sudo swapoff --all
