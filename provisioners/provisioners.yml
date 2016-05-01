@@ -44,10 +44,13 @@ redhat:
           description: "Installs and updates PHP and PHP modules."
           multithreading: false
         rsync:
-          description: "Copies meta files contingent on the software_workflow for websites with software."
+          description: "Copies software file stores contingent on the software_workflow for websites with software."
           multithreading: true
         software_config:
-          description: "Creates database configuration files and sets upload directory permissions for websites with software."
+          description: "Creates software database configuration files and sets software file store container directory permissions for websites with software."
+          multithreading: true
+        software_database_operations:
+          description: "Performs software database operations for websites with software."
           multithreading: true
         software_tools:
           description: "Installs and configures software CLI tools."
@@ -63,7 +66,7 @@ redhat:
           apache:
             modules: ["system","iptables","time","newrelic_sysmon","software_tools","git_clean","git","rsync","software_config","apache","apache_vhosts_clean","apache_vhosts","php","newrelic_apm_php","cloudflare_zones","cloudflare_dns","cloudflare_cache","newrelic_synthetics"]
           mysql:
-            modules: ["system","iptables","time","newrelic_sysmon","software_tools","git_clean","git","software_config","mysql"]
+            modules: ["system","iptables","time","newrelic_sysmon","software_tools","git_clean","git","software_config","mysql","software_database_operations"]
 windows:
 
 software:
@@ -72,13 +75,13 @@ software:
         repo: "https://github.com/bcit-ci/CodeIgniter.git"
         branch: "2.2-stable"
         database_config_file: "application/config/database.php"
-        file_store_container: ["uploads"]
+        file_store_containers: ["uploads"]
         file_stores: ["uploads"]
       codeigniter3:
         repo: "https://github.com/bcit-ci/CodeIgniter.git"
         branch: "3.0-stable"
         database_config_file: "application/config/database.php"
-        file_store_container: ["uploads"]
+        file_store_containers: ["uploads"]
         file_stores: ["uploads"]
       drupal6:
         repo: "https://git.drupal.org/project/drupal.git"
@@ -96,10 +99,17 @@ software:
         repo: "https://github.com/joomla/joomla-cms.git"
         branch: "3.6.x"
         database_config_file: "configuration.php"
+        file_store_containers: ["administrator/cache","cache","logs","tmp"]
       silverstripe:
         repo: "https://github.com/silverstripe/silverstripe-installer"
         branch: "3.3"
         database_config_file: "mysite/_config.php"
+      suitecrm7:
+        repo: "https://github.com/salesagility/SuiteCRM.git"
+        branch: "master"
+        database_config_file: "config_override.php"
+        file_store_containers: ["cache","custom","data","modules","upload","themes"]
+        file_stores: ["uploads"]
       wordpress:
         repo: "https://github.com/WordPress/WordPress.git"
         branch: "master"

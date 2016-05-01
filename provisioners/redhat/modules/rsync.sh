@@ -22,7 +22,7 @@ else
     # define a maximum directory size
     directory_size_maximum=$(( 1024 * 750 ))
 
-    # loop through each required module
+    # loop through each software file store
     cat "/catapult/provisioners/provisioners.yml" | shyaml get-values-0 software.apache.$(catapult websites.apache.$5.software).file_stores |
     while read -r -d $'\0' file_store; do
 
