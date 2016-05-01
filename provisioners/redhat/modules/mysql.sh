@@ -231,12 +231,12 @@ while IFS='' read -r -d '' key; do
             echo -e "\t* resetting ${software} admin password..."
             mysql --defaults-extra-file=$dbconf ${1}_${domainvaliddbname} -e "
                 INSERT INTO ${software_dbprefix}users (uid, pass, mail, status)
-                VALUES ('1',MD5('$(catapult environments.${1}.software.drupal.admin_password)'),'$(catapult company.email)','1')
+                VALUES ('1', MD5('$(catapult environments.${1}.software.drupal.admin_password)'), '$(catapult company.email)', '1')
                 ON DUPLICATE KEY UPDATE name='admin', mail='$(catapult company.email)', pass=MD5('$(catapult environments.${1}.software.drupal.admin_password)'), status='1';
             "
             mysql --defaults-extra-file=$dbconf ${1}_${domainvaliddbname} -e "
                 INSERT INTO ${software_dbprefix}users_roles (uid, rid)
-                VALUES ('1','3')
+                VALUES ('1', '3')
                 ON DUPLICATE KEY UPDATE rid='3';
             "
         elif [[ "${software}" = "drupal7" ]]; then
@@ -245,12 +245,12 @@ while IFS='' read -r -d '' key; do
             password_hash=$(echo "${password_hash}" | awk '{ print $4 }' | tr -d " " | tr -d "\n")
             mysql --defaults-extra-file=$dbconf ${1}_${domainvaliddbname} -e "
                 INSERT INTO ${software_dbprefix}users (uid, pass, mail, status)
-                VALUES ('1','${password_hash}','$(catapult company.email)','1')
+                VALUES ('1', '${password_hash}', '$(catapult company.email)', '1')
                 ON DUPLICATE KEY UPDATE name='admin', mail='$(catapult company.email)', pass='${password_hash}', status='1';
             "
             mysql --defaults-extra-file=$dbconf ${1}_${domainvaliddbname} -e "
                 INSERT INTO ${software_dbprefix}users_roles (uid, rid)
-                VALUES ('1','3')
+                VALUES ('1', '3')
                 ON DUPLICATE KEY UPDATE rid='3';
             "
         elif [[ "${software}" = "joomla3" ]]; then
@@ -259,6 +259,13 @@ while IFS='' read -r -d '' key; do
                 UPDATE ${software_dbprefix}users
                 SET username='admin', email='$(catapult company.email)', password=MD5('$(catapult environments.${1}.software.wordpress.admin_password)'), block='0'
                 WHERE name='Super User';
+            "
+        elif [[ "${software}" = "suitecrm7" ]]; then
+            echo -e "\t* resetting ${software} admin password..."
+            mysql --defaults-extra-file=$dbconf ${1}_${domainvaliddbname} -e "
+                INSERT INTO users (id, user_name, user_hash, is_admin)
+                VALUES ('1', 'admin', MD5('$(catapult environments.${1}.software.wordpress.admin_password)'), '1')
+                ON DUPLICATE KEY UPDATE user_name='admin', user_hash=MD5('$(catapult environments.${1}.software.wordpress.admin_password)'), is_admin='1';
             "
         elif [[ "${software}" = "wordpress" ]]; then
             echo -e "\t* resetting ${software} admin password..."
