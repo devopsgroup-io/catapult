@@ -333,7 +333,8 @@ module Catapult
     elsif "#{branch}" == "develop"
       puts " * You are on the develop branch, this branch contains your unique secrets/configuration.yml.gpg, secrets/id_rsa.gpg, and secrets/id_rsa.pub.gpg secrets/configuration."
       puts " * The develop branch is running in the localdev and test environments, please first test then commit your configuration to the develop branch."
-      puts " * Once you're satisified with your new configuration in localdev and test, create a pull request from develop into master."
+      puts " * Once you're satisified with your new configuration in localdev and test, create a pull request from develop into release."
+      puts " * Once you're satisified with your new configuration in qc, create a pull request from release into master."
       if @configuration_user["settings"]["gpg_edit"]
         puts " * GPG Edit Mode is enabled at secrets/configuration-user.yml[\"settings\"][\"gpg_edit\"], if there are changes to secrets/configuration.yml, secrets/id_rsa, or secrets/id_rsa.pub, they will be re-encrypted."
       end
@@ -894,7 +895,7 @@ module Catapult
         end
       
       end
-      # if server passwords do not exist, create them
+      # if environment passwords do not exist, create them
       unless @configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["mysql"]["user_password"]
         @configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["mysql"]["user_password"] = SecureRandom.urlsafe_base64(16)
         `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml --decrypt secrets/configuration.yml.gpg`
@@ -903,6 +904,12 @@ module Catapult
       end
       unless @configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["mysql"]["root_password"]
         @configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["mysql"]["root_password"] = SecureRandom.urlsafe_base64(16)
+        `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml --decrypt secrets/configuration.yml.gpg`
+        File.open('secrets/configuration.yml', 'w') {|f| f.write configuration.to_yaml }
+        `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml.gpg --armor --cipher-algo AES256 --symmetric secrets/configuration.yml`
+      end
+      unless @configuration["environments"]["#{environment}"]["software"]["admin_password"]
+        @configuration["environments"]["#{environment}"]["software"]["admin_password"] = SecureRandom.urlsafe_base64(16)
         `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml --decrypt secrets/configuration.yml.gpg`
         File.open('secrets/configuration.yml', 'w') {|f| f.write configuration.to_yaml }
         `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml.gpg --armor --cipher-algo AES256 --symmetric secrets/configuration.yml`
