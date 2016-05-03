@@ -79,6 +79,7 @@ Catapult intelligently manages the following software:
 * CodeIgniter 3
 * Drupal 6
 * Drupal 7
+* ExpressionEngine 3
 * Joomla 3
 * SilverStripe 2
 * SuiteCRM 7
@@ -634,6 +635,7 @@ The following options are available:
     * `software: codeigniter3`
     * `software: drupal6`
     * `software: drupal7`
+    * `software: expressionengine3`
     * `software: joomla3`
     * `software: silverstripe`
     * `software: suitecrm7`
@@ -679,15 +681,16 @@ Forcing www is generally software specific, unlike forcing the https protocol, w
 
 Software | File | Documentation
 ---------|------|---------|--------------
-`codeigniter2`   | .htaccess          | no official documentation - http://stackoverflow.com/a/4958847/4838803
-`codeigniter3`   | .htaccess          | no official documentation - http://stackoverflow.com/a/4958847/4838803
-`drupal6`        | .htaccess          | https://www.drupal.org/node/150215
-`drupal7`        | .htaccess          | https://www.drupal.org/node/150215
-`joomla3`        |                    |
-`silverstripe`   | mysite/_config.php | no official documentation - http://www.ssbits.com/snippets/2010/a-config-php-cheatsheet/
-`suitecrm7`      |                    | 
-`wordpress`      |                    | http://codex.wordpress.org/Changing_The_Site_URL
-`xenforo`        | .htaccess          | no official documentation - http://stackoverflow.com/a/4958847/4838803
+`codeigniter2`      | .htaccess          | no official documentation - http://stackoverflow.com/a/4958847/4838803
+`codeigniter3`      | .htaccess          | no official documentation - http://stackoverflow.com/a/4958847/4838803
+`drupal6`           | .htaccess          | https://www.drupal.org/node/150215
+`drupal7`           | .htaccess          | https://www.drupal.org/node/150215
+`expressionengine3` |                    |
+`joomla3`           |                    |
+`silverstripe`      | mysite/_config.php | no official documentation - http://www.ssbits.com/snippets/2010/a-config-php-cheatsheet/
+`suitecrm7`         |                    | 
+`wordpress`         |                    | http://codex.wordpress.org/Changing_The_Site_URL
+`xenforo`           | .htaccess          | no official documentation - http://stackoverflow.com/a/4958847/4838803
 
 ### Database Migrations ###
 
@@ -695,15 +698,16 @@ The best way to handle changes to the software's database schema is through a mi
 
 Software | Tool | Command | Documentation
 ---------|------|---------|--------------
-`codeigniter2`   | Migrations | `php index.php migrate` | https://ellislab.com/codeigniter/user-guide/libraries/migration.html
-`codeigniter3`   | Migrations | `php index.php migrate` | https://www.codeigniter.com/user_guide/libraries/migration.html
-`drupal6`        | Drush      | `drush updatedb -y`     | https://www.drupal.org/node/150215
-`drupal7`        | Drush      | `drush updatedb -y`     | https://www.drupal.org/node/150215
-`joomla3`        |            |                         |
-`silverstripe`   |            |                         |
-`suitecrm7`      |            |                         |
-`wordpress`      | WP-CLI     | `wp-cli core update-db` | http://codex.wordpress.org/Creating_Tables_with_Plugins#Adding_an_Upgrade_Function
-`xenforo`        |            |                         |
+`codeigniter2`      | Migrations | `php index.php migrate` | https://ellislab.com/codeigniter/user-guide/libraries/migration.html
+`codeigniter3`      | Migrations | `php index.php migrate` | https://www.codeigniter.com/user_guide/libraries/migration.html
+`drupal6`           | Drush      | `drush updatedb -y`     | https://www.drupal.org/node/150215
+`drupal7`           | Drush      | `drush updatedb -y`     | https://www.drupal.org/node/150215
+`expressionengine3` |            |                         |
+`joomla3`           |            |                         |
+`silverstripe`      |            |                         |
+`suitecrm7`         |            |                         |
+`wordpress`         | WP-CLI     | `wp-cli core update-db` | http://codex.wordpress.org/Creating_Tables_with_Plugins#Adding_an_Upgrade_Function
+`xenforo`           |            |                         |
 
 ### Refreshing Databases ###
 
