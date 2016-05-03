@@ -24,7 +24,7 @@ if [ "${software}" = "codeigniter2" ]; then
     if [ -f "${file}" ]; then
         sudo chmod 0777 "${file}"
     else
-        mkdir -p $(dirname "${file}")
+        mkdir --parents $(dirname "${file}")
     fi
     sed -e "s/\$db\['default'\]\['hostname'\]\s=\s'localhost';/\$db\['default'\]\['hostname'\] = '${redhat_mysql_ip}';/g" \
         -e "s/\$db\['default'\]\['username'\]\s=\s'';/\$db\['default'\]\['username'\] = '${mysql_user}';/g" \
@@ -41,7 +41,7 @@ elif [ "${software}" = "codeigniter3" ]; then
     if [ -f "${file}" ]; then
         sudo chmod 0777 "${file}"
     else
-        mkdir -p $(dirname "${file}")
+        mkdir --parents $(dirname "${file}")
     fi
     sed -e "s/'hostname'\s=>\s'localhost'/'hostname' => '${redhat_mysql_ip}'/g" \
         -e "s/'username'\s=>\s''/'username' => '${mysql_user}'/g" \
@@ -58,7 +58,7 @@ elif [ "${software}" = "drupal6" ]; then
     if [ -f "${file}" ]; then
         sudo chmod 0777 "${file}"
     else
-        mkdir -p $(dirname "${file}")
+        mkdir --parents $(dirname "${file}")
     fi
     connectionstring="mysql:\/\/${mysql_user}:${mysql_user_password}@${redhat_mysql_ip}\/${1}_${domainvaliddbname}"
     sed -e "s/mysql:\/\/username:password@localhost\/databasename/${connectionstring}/g" \
@@ -72,7 +72,7 @@ elif [ "${software}" = "drupal7" ]; then
     if [ -f "${file}" ]; then
         sudo chmod 0777 "${file}"
     else
-        mkdir -p $(dirname "${file}")
+        mkdir --parents $(dirname "${file}")
     fi
     connectionstring="\$databases['default']['default'] = array('driver' => 'mysql','database' => '${1}_${domainvaliddbname}','username' => '${mysql_user}','password' => '${mysql_user_password}','host' => '${redhat_mysql_ip}','prefix' => '${software_dbprefix}');"
     sed -e "s/\$databases\s=\sarray();/${connectionstring}/g" \
@@ -86,7 +86,7 @@ elif [ "${software}" = "joomla3" ]; then
     if [ -f "${file}" ]; then
         sudo chmod 0777 "${file}"
     else
-        mkdir -p $(dirname "${file}")
+        mkdir --parents $(dirname "${file}")
     fi
     sed -e "s/public\s\$host\s=\s'';/public \$host = '${redhat_mysql_ip}';/g" \
         -e "s/public\s\$user\s=\s'';/public \$user = '${mysql_user}';/g" \
@@ -105,7 +105,7 @@ elif [ "${software}" = "silverstripe" ]; then
     if [ -f "${file}" ]; then
         sudo chmod 0777 "${file}"
     else
-        mkdir -p $(dirname "${file}")
+        mkdir --parents $(dirname "${file}")
     fi
     connectionstring="\$databaseConfig = array(\"type\" => \"MySQLDatabase\",\"server\" => \"${redhat_mysql_ip}\",\"username\" => \"${mysql_user}\",\"password\" => \"${mysql_user_password}\",\"database\" => \"${1}_${domainvaliddbname}\");"
     sed -e "s/\$databaseConfig\s=\sarray();/${connectionstring}/g" \
@@ -119,7 +119,7 @@ elif [ "${software}" = "suitecrm7" ]; then
     if [ -f "${file}" ]; then
         sudo chmod 0777 "${file}"
     else
-        mkdir -p $(dirname "${file}")
+        mkdir --parents $(dirname "${file}")
     fi
     sed -e "s/\$sugar_config\['dbconfig'\]\['db_host_name'\]\s=\s'';/\$sugar_config\['dbconfig'\]\['db_host_name'\] = '${redhat_mysql_ip}';/g" \
         -e "s/\$sugar_config\['dbconfig'\]\['db_user_name'\]\s=\s'';/\$sugar_config\['dbconfig'\]\['db_user_name'\] = '${mysql_user}';/g" \
@@ -135,7 +135,7 @@ elif [ "${software}" = "wordpress" ]; then
     if [ -f "${file}" ]; then
         sudo chmod 0777 "${file}"
     else
-        mkdir -p $(dirname "${file}")
+        mkdir --parents $(dirname "${file}")
     fi
     sed -e "s/database_name_here/${1}_${domainvaliddbname}/g" \
         -e "s/username_here/${mysql_user}/g" \
@@ -152,7 +152,7 @@ elif [ "${software}" = "xenforo" ]; then
     if [ -f "${file}" ]; then
         sudo chmod 0777 "${file}"
     else
-        mkdir -p $(dirname "${file}")
+        mkdir --parents $(dirname "${file}")
     fi
     sed -e "s/\$config\['db'\]\['host'\]\s=\s'localhost';/\$config\['db'\]\['host'\] = '${redhat_mysql_ip}';/g" \
         -e "s/\$config\['db'\]\['username'\]\s=\s'';/\$config\['db'\]\['username'\] = '${mysql_user}';/g" \
@@ -172,15 +172,18 @@ else
         file_store_container="/var/www/repositories/apache/${domain}/${webroot}${file_store_container}"
         echo -e "software file store container: ${file_store_container}"
 
+        # if the file store container does not exist, create it
         if [ ! -d "${file_store_container}" ]; then
-            echo -e "- file store container does not exist"
-        else
-            echo -e "- setting directory permissions..."
-            if [ "$1" != "dev" ]; then
-                sudo chown -R apache "${file_store_container}"
-            fi
-            sudo chmod -R 0700 "${file_store_container}"
+            echo -e "- file store container does not exist, creating..."
+            sudo mkdir --parents "${file_store_container}"
         fi
+
+        # set the file store container permissions
+        echo -e "- setting directory permissions..."
+        if [ "$1" != "dev" ]; then
+            sudo chown -R apache "${file_store_container}"
+        fi
+        sudo chmod -R 0700 "${file_store_container}"
     done
 
 fi

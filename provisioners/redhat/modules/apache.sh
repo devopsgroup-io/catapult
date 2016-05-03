@@ -34,8 +34,8 @@ if ! grep -q "ServerName localhost" "/etc/httpd/conf/httpd.conf"; then
 fi
 
 # use sites-available, sites-enabled convention. this is a debianism - but the convention is common and easy understand
-sudo mkdir -p /etc/httpd/sites-available
-sudo mkdir -p /etc/httpd/sites-enabled
+sudo mkdir --parents /etc/httpd/sites-available
+sudo mkdir --parents /etc/httpd/sites-enabled
 if ! grep -q "IncludeOptional sites-enabled/\*.conf" "/etc/httpd/conf/httpd.conf"; then
    sudo bash -c 'echo "IncludeOptional sites-enabled/*.conf" >> "/etc/httpd/conf/httpd.conf"'
 fi
