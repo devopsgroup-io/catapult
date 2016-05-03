@@ -108,7 +108,7 @@ software:
         repo: "https://github.com/salesagility/SuiteCRM.git"
         branch: "master"
         database_config_file: "config_override.php"
-        file_store_containers: ["cache","custom","data","modules","upload","themes"]
+        file_store_containers: ["cache","custom","data","modules","upload","themes","tmp"]
         file_stores: ["uploads"]
       wordpress:
         repo: "https://github.com/WordPress/WordPress.git"

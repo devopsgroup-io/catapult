@@ -38,7 +38,7 @@ while IFS='' read -r -d '' key; do
     else
         echo -e "\t * configuring vhost for ${1}.${domain_root}"
     fi
-    sudo mkdir -p /var/log/httpd/${domain_environment}
+    sudo mkdir --parents /var/log/httpd/${domain_environment}
     sudo touch /var/log/httpd/${domain_environment}/access.log
     sudo touch /var/log/httpd/${domain_environment}/error.log
     # set domain_tld_override_alias_additions for vhost
