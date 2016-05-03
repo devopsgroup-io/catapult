@@ -75,13 +75,13 @@ software:
         repo: "https://github.com/bcit-ci/CodeIgniter.git"
         branch: "2.2-stable"
         database_config_file: "application/config/database.php"
-        file_store_containers: ["uploads"]
+        file_store_containers: ["application/logs","uploads"]
         file_stores: ["uploads"]
       codeigniter3:
         repo: "https://github.com/bcit-ci/CodeIgniter.git"
         branch: "3.0-stable"
         database_config_file: "application/config/database.php"
-        file_store_containers: ["uploads"]
+        file_store_containers: ["application/logs","uploads"]
         file_stores: ["uploads"]
       drupal6:
         repo: "https://git.drupal.org/project/drupal.git"
