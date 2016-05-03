@@ -224,11 +224,11 @@ module Catapult
           puts "The upgrade path warning from MAJOR version #{@version_this["version"].to_i} to #{@version_upstream["version"].to_i} is:"
           puts " * #{@version_upstream["major"][@version_upstream_integer][@version_this_integer]}"
           puts "Given that you are prepared for the above, please follow these instructions to upgrade manually from within the root of Catapult:"
-          puts " * `git pull upstream master`"
+          puts " * `git pull --no-edit --strategy-option=theirs upstream master`"
           puts " * `git push origin develop`"
           puts "\n"
         else
-          `#{@git} pull upstream master`
+          `#{@git} pull --no-edit --strategy-option=theirs upstream master`
           `#{@git} push origin develop`
         end
       end
