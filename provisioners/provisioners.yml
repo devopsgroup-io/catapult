@@ -95,6 +95,10 @@ software:
         database_config_file: "sites/default/settings.php"
         file_store_containers: ["sites/default"]
         file_stores: ["sites/default/files"]
+      expressionengine3:
+        repo: PRIVATE
+        database_config_file: "system/user/config/config.php"
+        file_store_containers: ["system/user/cache","system/user/templates","images/avatars","images/captchas","images/member_photos","images/pm_attachments","images/signature_attachments","images/uploads"]
       joomla3:
         repo: "https://github.com/joomla/joomla-cms.git"
         branch: "3.6.x"
@@ -117,6 +121,7 @@ software:
         file_store_containers: ["wp-content"]
         file_stores: ["wp-content/uploads"]
       xenforo:
+        repo: PRIVATE
         database_config_file: "sites/default/settings.php"
         file_store_containers: ["data","internal_data"]
         file_stores: ["data","internal_data"]
