@@ -79,6 +79,23 @@ elif [ "${software}" = "drupal7" ]; then
         /catapult/provisioners/redhat/installers/software/${software}/settings.php > "${file}"
     sudo chmod 0444 "${file}"
 
+elif [ "${software}" = "expressionengine3" ]; then
+
+    file="/var/www/repositories/apache/${domain}/${webroot}${database_config_file}"
+    echo -e "generating ${software} ${file}..."
+    if [ -f "${file}" ]; then
+        sudo chmod 0777 "${file}"
+    else
+        mkdir --parents $(dirname "${file}")
+    fi
+    sed -e "s/'hostname'\s=>\s''/'hostname' => '${redhat_mysql_ip}'/g" \
+        -e "s/'username'\s=>\s''/'username' => '${mysql_user}'/g" \
+        -e "s/'password'\s=>\s''/'password' => '${mysql_user_password}'/g" \
+        -e "s/'database'\s=>\s''/'database' => '${1}_${domainvaliddbname}'/g" \
+        -e "s/'dbprefix'\s=>\s''/'dbprefix' => '${software_dbprefix}'/g" \
+        /catapult/provisioners/redhat/installers/software/${software}/config.php > "${file}"
+    sudo chmod 0444 "${file}"
+
 elif [ "${software}" = "joomla3" ]; then
 
     file="/var/www/repositories/apache/${domain}/${webroot}${database_config_file}"
