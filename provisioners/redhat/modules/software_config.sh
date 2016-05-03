@@ -163,7 +163,7 @@ elif [ "${software}" = "xenforo" ]; then
 fi
 
 # set directory permissions of software file store containers
-if [ -z $(provisioners_array software.apache.${software}.file_store_containers) ]; then
+if [ -z "$(provisioners_array software.apache.${software}.file_store_containers)" ]; then
     echo "this software has no file store containers"
 else
     cat "/catapult/provisioners/provisioners.yml" | shyaml get-values-0 software.apache.$(catapult websites.apache.$5.software).file_store_containers |
