@@ -147,15 +147,17 @@ if [ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-values-0 redha
             done
             # enable job control
             set -m
-            # create an array for cpu samples
+            # create an array for cpu load samples
             cpu_load_samples=()
+            # create an array for mem swap samples
+            mem_swap_samples=()
             # create a website index to pass to each sub-process
             website_index=0
             # loop through websites and start sub-processes
             while read -r -d $'\0' website; do
                 # only allow a certain number of parallel bash sub-processes at once
                 while [ $(( $(ls -l /catapult/provisioners/redhat/logs/${module}.*.log 2>/dev/null | wc -l) - $(ls -l /catapult/provisioners/redhat/logs/${module}.*.complete 2>/dev/null | wc -l) )) -gt 5 ]; do
-                    # sample cpu usage
+                    # sample cpu load
                     cpu_load_sample_decimal=$(top -bn 1 | awk '{print $9}' | tail -n +8 | awk '{s+=$1} END {print s}')
                     cpu_load_samples+=(${cpu_load_sample_decimal%.*})
                     # add up all of the cpu samples
@@ -171,7 +173,23 @@ if [ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-values-0 redha
                     else
                         cpu_load_samples_average=0
                     fi
-                    echo "> waiting to start more parallel processes [$(( $(ls -l /catapult/provisioners/redhat/logs/${module}.*.log 2>/dev/null | wc -l) - $(ls -l /catapult/provisioners/redhat/logs/${module}.*.complete 2>/dev/null | wc -l) )) active / 5 max] [$(ls -l /catapult/provisioners/redhat/logs/${module}.*.complete  2>/dev/null | wc -l) completed] [${cpu_load_samples_average}% average cpu]"
+                    # sample mem swap
+                    mem_swap_sample=$(free --mega | grep "Swap:" | awk '{print $3}')
+                    mem_swap_samples+=(${mem_swap_sample})
+                    # add up all of the mem samples
+                    mem_swap_samples_sum=0
+                    for i in ${mem_swap_samples[@]}; do
+                      let mem_swap_samples_sum+=$i
+                    done
+                    # get the count of the mem samples
+                    mem_swap_samples_total="${#mem_swap_samples[@]}"
+                    # calculate mem average
+                    if [ "${mem_swap_samples_total}" -gt 0 ]; then
+                        mem_swap_samples_average=$((mem_swap_samples_sum / mem_swap_samples_total))
+                    else
+                        mem_swap_samples_average=0
+                    fi
+                    echo "> waiting to start more parallel processes [$(( $(ls -l /catapult/provisioners/redhat/logs/${module}.*.log 2>/dev/null | wc -l) - $(ls -l /catapult/provisioners/redhat/logs/${module}.*.complete 2>/dev/null | wc -l) )) active / 5 max / $(ls -l /catapult/provisioners/redhat/logs/${module}.*.complete  2>/dev/null | wc -l) completed] [${cpu_load_samples_average}% average cpu] [${mem_swap_samples_average}MB / 256MB average mem swap]"
                     sleep 2
                 done
                 bash "/catapult/provisioners/redhat/modules/${module}.sh" $1 $2 $3 $4 $website_index >> "/catapult/provisioners/redhat/logs/${module}.$(echo "${website}" | shyaml get-value domain).log" 2>&1 &
@@ -186,7 +204,7 @@ if [ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-values-0 redha
                 software_dbprefix=$(echo "${website}" | shyaml get-value software_dbprefix 2>/dev/null )
                 software_workflow=$(echo "${website}" | shyaml get-value software_workflow 2>/dev/null )
                 while [ ! -e "/catapult/provisioners/redhat/logs/${module}.${domain}.complete" ]; do
-                    # sample cpu usage
+                    # sample cpu load
                     cpu_load_sample_decimal=$(top -bn 1 | awk '{print $9}' | tail -n +8 | awk '{s+=$1} END {print s}')
                     cpu_load_samples+=(${cpu_load_sample_decimal%.*})
                     # add up all of the cpu samples
@@ -202,7 +220,23 @@ if [ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-values-0 redha
                     else
                         cpu_load_samples_average=0
                     fi
-                    echo "> waiting for parallel processes to complete [$(( $(ls -l /catapult/provisioners/redhat/logs/${module}.*.log 2>/dev/null | wc -l) - $(ls -l /catapult/provisioners/redhat/logs/${module}.*.complete 2>/dev/null | wc -l) )) active / 5 max] [$(ls -l /catapult/provisioners/redhat/logs/${module}.*.complete  2>/dev/null | wc -l) completed] [${cpu_load_samples_average}% average cpu]"
+                    # sample mem swap
+                    mem_swap_sample=$(free --mega | grep "Swap:" | awk '{print $3}')
+                    mem_swap_samples+=(${mem_swap_sample})
+                    # add up all of the mem samples
+                    mem_swap_samples_sum=0
+                    for i in ${mem_swap_samples[@]}; do
+                      let mem_swap_samples_sum+=$i
+                    done
+                    # get the count of the mem samples
+                    mem_swap_samples_total="${#mem_swap_samples[@]}"
+                    # calculate mem average
+                    if [ "${mem_swap_samples_total}" -gt 0 ]; then
+                        mem_swap_samples_average=$((mem_swap_samples_sum / mem_swap_samples_total))
+                    else
+                        mem_swap_samples_average=0
+                    fi
+                    echo "> waiting for parallel processes to complete [$(( $(ls -l /catapult/provisioners/redhat/logs/${module}.*.log 2>/dev/null | wc -l) - $(ls -l /catapult/provisioners/redhat/logs/${module}.*.complete 2>/dev/null | wc -l) )) active / 5 max / $(ls -l /catapult/provisioners/redhat/logs/${module}.*.complete  2>/dev/null | wc -l) completed] [${cpu_load_samples_average}% average cpu] [${mem_swap_samples_average}MB / 256MB average mem swap]"
                     sleep 2
                 done
                 echo -e "=> domain: ${domain}"
