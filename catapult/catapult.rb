@@ -809,6 +809,9 @@ module Catapult
         end
       end
     end
+
+
+
     # validate @configuration["environments"]
     @configuration["environments"].each do |environment,data|
       #validate digitalocean droplets
@@ -927,6 +930,15 @@ module Catapult
         `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml.gpg --armor --cipher-algo AES256 --symmetric secrets/configuration.yml`
       end
     end
+
+
+
+    # remove lock file
+    File.delete('.lock')
+
+
+
+    # validate @configuration["websites"]
     puts "\nVerification of configuration[\"websites\"]:\n".color(Colors::WHITE)
     # add catapult temporarily to verify repo and add bamboo services
     @configuration["websites"]["catapult"] = *(["domain" => "#{@repo}", "repo" => "#{@repo}"])
@@ -1325,6 +1337,7 @@ module Catapult
     @configuration["websites"].delete("catapult")
 
 
+
     # create arrays of domains for localdev hosts file
     @dev_redhat_hosts = Array.new
     unless @configuration["websites"]["apache"] == nil
@@ -1346,9 +1359,6 @@ module Catapult
       end
     end
 
-
-    # remove lock file
-    File.delete('.lock')
 
 
     # vagrant status binding
