@@ -34,6 +34,15 @@ $config['site_label'] = '';
 $config['cookie_prefix'] = '';
 $config['cookie_httponly'] = 'y';
 
+// these are required for running in different environments
+$config['avatar_url'] = '';
+$config['captcha_url'] = '';
+$config['cookie_domain'] = '';
+$config['cp_url'] = '';
+$config['emoticon_url'] = '';
+$config['sig_img_url'] = '';
+$config['site_url'] = '';
+$config['theme_folder_url'] = '';
 
 // END EE config items
 

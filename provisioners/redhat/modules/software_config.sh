@@ -10,6 +10,21 @@ else
 fi
 
 domain=$(catapult websites.apache.$5.domain)
+domain_tld_override=$(catapult websites.apache.$5.domain_tld_override)
+# get the final domain for the environment
+if [ -z "${domain_tld_override}" ]; then
+    if [ "${1}" = "production" ]; then
+        domain_expanded="${domain}"
+    else
+        domain_expanded="${1}.${domain}"
+    fi
+else
+    if [ "${1}" = "production" ]; then
+        domain_expanded="${domain}.${domain_tld_override}"
+    else
+        domain_expanded="${1}.${domain}.${domain_tld_override}"
+    fi
+fi
 domainvaliddbname=$(catapult websites.apache.$5.domain | tr "." "_")
 software=$(catapult websites.apache.$5.software)
 software_dbprefix=$(catapult websites.apache.$5.software_dbprefix)
@@ -81,6 +96,8 @@ elif [ "${software}" = "drupal7" ]; then
 
 elif [ "${software}" = "expressionengine3" ]; then
 
+    # https://docs.expressionengine.com/latest/general/system_configuration_overrides.html
+
     file="/var/www/repositories/apache/${domain}/${webroot}${database_config_file}"
     echo -e "generating ${software} ${file}..."
     if [ -f "${file}" ]; then
@@ -93,6 +110,14 @@ elif [ "${software}" = "expressionengine3" ]; then
         -e "s/'password'\s=>\s''/'password' => '${mysql_user_password}'/g" \
         -e "s/'database'\s=>\s''/'database' => '${1}_${domainvaliddbname}'/g" \
         -e "s/'dbprefix'\s=>\s''/'dbprefix' => '${software_dbprefix}'/g" \
+        -e "s/\$config\['avatar_url'\]\s=\s'';/\$config\['avatar_url'\] = 'http:\\/\\/${domain_expanded}\\/images\\/avatars';/g" \
+        -e "s/\$config\['captcha_url'\]\s=\s'';/\$config\['captcha_url'\] = 'http:\\/\\/${domain_expanded}\\/images\\/captchas';/g" \
+        -e "s/\$config\['cookie_domain'\]\s=\s'';/\$config\['cookie_domain'\] = '.${domain_expanded}';/g" \
+        -e "s/\$config\['cp_url'\]\s=\s'';/\$config\['cp_url'\] = 'http:\\/\\/${domain_expanded}\\/admin.php';/g" \
+        -e "s/\$config\['emoticon_url'\]\s=\s'';/\$config\['emoticon_url'\] = 'http:\\/\\/${domain_expanded}\\/images\\/smileys';/g" \
+        -e "s/\$config\['sig_img_url'\]\s=\s'';/\$config\['sig_img_url'\] = 'http:\\/\\/${domain_expanded}\\/images\\/signatures';/g" \
+        -e "s/\$config\['site_url'\]\s=\s'';/\$config\['site_url'\] = 'http:\\/\\/${domain_expanded}';/g" \
+        -e "s/\$config\['theme_folder_url'\]\s=\s'';/\$config\['theme_folder_url'\] = 'http:\\/\\/${domain_expanded}\\/themes';/g" \
         /catapult/provisioners/redhat/installers/software/${software}/config.php > "${file}"
     sudo chmod 0444 "${file}"
 
