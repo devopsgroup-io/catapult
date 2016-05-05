@@ -31,6 +31,9 @@ elif [ "$software" = "joomla3" ]; then
     cd "/var/www/repositories/apache/${domain}/${webroot}" && php cli/garbagecron.php
     cd "/var/www/repositories/apache/${domain}/${webroot}" && php cli/update_cron.php
     cd "/var/www/repositories/apache/${domain}/${webroot}" && php cli/deletefiles.php
+elif [ "$software" = "moodle3" ]; then
+    cd "/var/www/repositories/apache/${domain}/${webroot}" && php admin/cli/cron.php
+    cd "/var/www/repositories/apache/${domain}/${webroot}" && php admin/cli/purge_caches.php
 elif [ "$software" = "suitecrm7" ]; then
     cd "/var/www/repositories/apache/${domain}/${webroot}" && php cron.php
 elif [ "$software" = "wordpress" ]; then

@@ -209,7 +209,7 @@ while IFS='' read -r -d '' key; do
 
                         # pre-process database sql file
                         # for software without a cli tool for database url reference replacements, use sed to pre-process sql file and replace url references
-                        if ([ "${software}" = "codeigniter2" ] || [ "${software}" = "codeigniter3" ] || [ "${software}" = "drupal6" ] || [ "${software}" = "drupal7" ] || [ "${software}" = "expressionengine3" ] || [ "${software}" = "joomla3" ] || [ "${software}" = "silverstripe" ] || [ "${software}" = "suitecrm7" ] || [ "${software}" = "xenforo" ]); then
+                        if ([ "${software}" = "codeigniter2" ] || [ "${software}" = "codeigniter3" ] || [ "${software}" = "drupal6" ] || [ "${software}" = "drupal7" ] || [ "${software}" = "expressionengine3" ] || [ "${software}" = "joomla3" ] || [ "${software}" = "moodle3" ] || [ "${software}" = "silverstripe" ] || [ "${software}" = "suitecrm7" ] || [ "${software}" = "xenforo" ]); then
                             echo -e "\t* replacing URLs in the database to align with the enivronment..."
                             replacements=$(grep --extended-regexp --only-matching --regexp=":\/\/(www\.)?(dev\.|test\.|qc\.)?(${domain_url_replace})" "/var/www/repositories/apache/${domain}/_sql/$(basename "$file")" | wc --lines)
                             sed --regexp-extended --expression="s/:\/\/(www\.)?(dev\.|test\.|qc\.)?(${domain_url_replace})/:\/\/\1${domain_url}/g" "/var/www/repositories/apache/${domain}/_sql/$(basename "$file")" > "/var/www/repositories/apache/${domain}/_sql/${1}.$(basename "$file")"
@@ -266,6 +266,13 @@ while IFS='' read -r -d '' key; do
                 UPDATE ${software_dbprefix}users
                 SET username='admin', email='$(catapult company.email)', password=MD5('$(catapult environments.${1}.software.admin_password)'), block='0'
                 WHERE name='Super User';
+            "
+        elif [[ "${software}" = "moodle3" ]]; then
+            echo -e "\t* resetting ${software} admin password..."
+            mysql --defaults-extra-file=$dbconf ${1}_${domainvaliddbname} -e "
+                UPDATE ${software_dbprefix}user
+                SET username='admin', password=MD5('$(catapult environments.${1}.software.admin_password)'), suspended='0', email='$(catapult company.email)'
+                WHERE id='2';
             "
         elif [[ "${software}" = "suitecrm7" ]]; then
             echo -e "\t* resetting ${software} admin password..."
