@@ -155,7 +155,7 @@ elif [ "${software}" = "moodle3" ]; then
         --expression="s/\$CFG->dbpass\s=\s'password';/\$CFG->dbpass = '${mysql_user_password}';/g" \
         --expression="s/\$CFG->prefix\s=\s'mdl_';/\$CFG->prefix = '${software_dbprefix}';/g" \
         --expression="s/\$CFG->wwwroot\s=\s'';/\$CFG->wwwroot = 'http:\\/\\/${domain_expanded}';/g" \
-        --expression="s/\$CFG->dataroot\s=\s'';/\$CFG->dataroot = '\\/var\\/www\\/repositories\\/apache\\/${domain}\\/${webroot}moodledata';/g" \
+        --expression="s/\$CFG->dataroot\s=\s'moodledata';/\$CFG->dataroot = '\\/var\\/www\\/repositories\\/apache\\/${domain}\\/${webroot}moodledata';/g" \
         /catapult/provisioners/redhat/installers/software/${software}/config.php > "${file}"
     sudo chmod 0444 "${file}"
 
