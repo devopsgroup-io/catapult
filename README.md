@@ -82,7 +82,7 @@ Catapult intelligently manages the following software:
 * ExpressionEngine 3
 * Joomla 3
 * Moodle 3
-* SilverStripe 2
+* SilverStripe 3
 * SuiteCRM 7
 * WordPress 3.5.2+
 * WordPress 4
@@ -153,6 +153,7 @@ See an error or have a suggestion? Email competition@devopsgroup.io - we appreci
         - [Websites](#websites)
     - [Website Development](#website-development)
         - [Website Repositories](#website-repositories)
+        - [Fresh Software Installs](#fresh-software-installs)
         - [Forcing www](#forcing-www)
         - [Database Migrations](#database-migrations)
         - [Refreshing Databases](#refreshing-databases)
@@ -639,7 +640,7 @@ The following options are available:
     * `software: expressionengine3`
     * `software: joomla3`
     * `software: moodle3`
-    * `software: silverstripe`
+    * `software: silverstripe3`
     * `software: suitecrm7`
     * `software: wordpress`
     * `software: xenforo`
@@ -677,12 +678,30 @@ Repositories for websites are cloned into the Catapult instance at ~/repositorie
 
 * Repositories are linked between the host and guest for realtime development.
 
+### Fresh Software Installs ###
+
+Catapult enforces software configuration best practices for both fresh installs and existing software repositories, the typical workflow would be to fork the software project on GitHub and add to your `configuration.yml` file. Given the broad spectrum of software requirements there are minor configurations and caveats for specific software types outlined here:
+
+Software | Notes
+---------|------
+`codeigniter2`      |
+`codeigniter3`      |
+`drupal6`           |
+`drupal7`           |
+`expressionengine3` |
+`joomla3`           |
+`moodle3`           | Catapult requires the `moodledata` directory to be within the webroot, it's pertinant to create a `.gitignore` and `.htaccess` file for this directory.
+`silverstripe3`     | First fork the silver-stripe-installer repository then add a git submodule of silver-framework at a `framework` directory in the root. During a fresh install, the database config file `mysite/_config.php` will need to be given 0777 permissions.
+`suitecrm7`         |
+`wordpress`         |
+`xenforo`           |
+
 ### Forcing www ###
 
 Forcing www is generally software specific, unlike forcing the https protocol, which is environment specific and driven by the `force_https` option. To force www ([why force www?](http://www.yes-www.org/)), please follow the respective guides per `software`:
 
 Software | File | Documentation
----------|------|---------|--------------
+---------|------|--------------
 `codeigniter2`      | .htaccess          | no official documentation - http://stackoverflow.com/a/4958847/4838803
 `codeigniter3`      | .htaccess          | no official documentation - http://stackoverflow.com/a/4958847/4838803
 `drupal6`           | .htaccess          | https://www.drupal.org/node/150215
@@ -690,7 +709,7 @@ Software | File | Documentation
 `expressionengine3` |                    |
 `joomla3`           |                    |
 `moodle3`           |                    |
-`silverstripe`      | mysite/_config.php | no official documentation - http://www.ssbits.com/snippets/2010/a-config-php-cheatsheet/
+`silverstripe3`     | mysite/_config.php | no official documentation - http://stackoverflow.com/a/26865882
 `suitecrm7`         |                    | 
 `wordpress`         |                    | http://codex.wordpress.org/Changing_The_Site_URL
 `xenforo`           | .htaccess          | no official documentation - http://stackoverflow.com/a/4958847/4838803
@@ -701,17 +720,17 @@ The best way to handle changes to the software's database schema is through a mi
 
 Software | Tool | Command | Documentation
 ---------|------|---------|--------------
-`codeigniter2`      | Migrations | `php index.php migrate` | https://ellislab.com/codeigniter/user-guide/libraries/migration.html
-`codeigniter3`      | Migrations | `php index.php migrate` | https://www.codeigniter.com/user_guide/libraries/migration.html
-`drupal6`           | Drush      | `drush updatedb -y`     | https://www.drupal.org/node/150215
-`drupal7`           | Drush      | `drush updatedb -y`     | https://www.drupal.org/node/150215
-`expressionengine3` |            |                         |
-`joomla3`           |            |                         |
-`moodle3`           |            |                         |
-`silverstripe`      |            |                         |
-`suitecrm7`         |            |                         |
-`wordpress`         | WP-CLI     | `wp-cli core update-db` | http://codex.wordpress.org/Creating_Tables_with_Plugins#Adding_an_Upgrade_Function
-`xenforo`           |            |                         |
+`codeigniter2`      | Migrations    | `php index.php migrate`                                | https://ellislab.com/codeigniter/user-guide/libraries/migration.html
+`codeigniter3`      | Migrations    | `php index.php migrate`                                | https://www.codeigniter.com/user_guide/libraries/migration.html
+`drupal6`           | Drush         | `drush updatedb -y`                                    | https://www.drupal.org/node/150215
+`drupal7`           | Drush         | `drush updatedb -y`                                    | https://www.drupal.org/node/150215
+`expressionengine3` |               |                                                        |
+`joomla3`           |               |                                                        |
+`moodle3`           |               |                                                        |
+`silverstripe3`     | MigrationTask | `php framework/cli-script.php dev/tasks/MigrationTask` | http://api.silverstripe.org/3.3/class-MigrationTask.html
+`suitecrm7`         |               |                                                        |
+`wordpress`         | WP-CLI        | `wp-cli core update-db`                                | http://codex.wordpress.org/Creating_Tables_with_Plugins#Adding_an_Upgrade_Function
+`xenforo`           |               |                                                        |
 
 ### Refreshing Databases ###
 
