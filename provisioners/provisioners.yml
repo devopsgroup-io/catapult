@@ -114,6 +114,8 @@ software:
         repo: "https://github.com/silverstripe/silverstripe-installer"
         branch: "3.3"
         database_config_file: "mysite/_config.php"
+        file_store_containers: ["assets"]
+        file_stores: ["assets/Uploads"]
       suitecrm7:
         repo: "https://github.com/salesagility/SuiteCRM.git"
         branch: "master"
