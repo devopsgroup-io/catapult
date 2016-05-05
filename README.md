@@ -81,6 +81,7 @@ Catapult intelligently manages the following software:
 * Drupal 7
 * ExpressionEngine 3
 * Joomla 3
+* Moodle 3
 * SilverStripe 2
 * SuiteCRM 7
 * WordPress 3.5.2+
@@ -637,6 +638,7 @@ The following options are available:
     * `software: drupal7`
     * `software: expressionengine3`
     * `software: joomla3`
+    * `software: moodle3`
     * `software: silverstripe`
     * `software: suitecrm7`
     * `software: wordpress`
@@ -687,6 +689,7 @@ Software | File | Documentation
 `drupal7`           | .htaccess          | https://www.drupal.org/node/150215
 `expressionengine3` |                    |
 `joomla3`           |                    |
+`moodle3`           |                    |
 `silverstripe`      | mysite/_config.php | no official documentation - http://www.ssbits.com/snippets/2010/a-config-php-cheatsheet/
 `suitecrm7`         |                    | 
 `wordpress`         |                    | http://codex.wordpress.org/Changing_The_Site_URL
@@ -704,6 +707,7 @@ Software | Tool | Command | Documentation
 `drupal7`           | Drush      | `drush updatedb -y`     | https://www.drupal.org/node/150215
 `expressionengine3` |            |                         |
 `joomla3`           |            |                         |
+`moodle3`           |            |                         |
 `silverstripe`      |            |                         |
 `suitecrm7`         |            |                         |
 `wordpress`         | WP-CLI     | `wp-cli core update-db` | http://codex.wordpress.org/Creating_Tables_with_Plugins#Adding_an_Upgrade_Function
