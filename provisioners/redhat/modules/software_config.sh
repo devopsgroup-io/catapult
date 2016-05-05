@@ -231,7 +231,7 @@ else
     while read -r -d $'\0' file_store_container; do
 
         file_store_container="/var/www/repositories/apache/${domain}/${webroot}${file_store_container}"
-         echo -e "software file store container: ${file_store_container}"
+        echo -e "software file store container: ${file_store_container}"
 
         # if the file store container does not exist, create it
         if [ ! -d "${file_store_container}" ]; then
