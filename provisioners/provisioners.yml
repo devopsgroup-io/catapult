@@ -108,6 +108,7 @@ software:
         repo: "https://github.com/moodle/moodle.git"
         branch: "MOODLE_30_STABLE"
         file_store_containers: ["moodledata"]
+        file_stores: ["moodledata/filedir"]
         database_config_file: "config.php"
       silverstripe:
         repo: "https://github.com/silverstripe/silverstripe-installer"
