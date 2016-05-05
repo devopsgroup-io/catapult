@@ -5,7 +5,7 @@ $project = 'mysite';
 
 global $databaseConfig;
 $databaseConfig = array(
-    'type' => 'MySQLDatabase',
+    'type' => 'MySQLPDODatabase',
     'server' => '',
     'username' => '',
     'password' => '',
