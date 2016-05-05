@@ -110,7 +110,7 @@ software:
         file_store_containers: ["moodledata"]
         file_stores: ["moodledata/filedir"]
         database_config_file: "config.php"
-      silverstripe:
+      silverstripe3:
         repo: "https://github.com/silverstripe/silverstripe-installer"
         branch: "3.3"
         database_config_file: "mysite/_config.php"

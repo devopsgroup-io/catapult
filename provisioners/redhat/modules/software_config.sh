@@ -10,6 +10,10 @@ else
 fi
 
 domain=$(catapult websites.apache.$5.domain)
+domain_environment=$(catapult websites.apache.$5.domain)
+if [ "$1" != "production" ]; then
+    domain_environment="${1}.${domain_environment}"
+fi
 domain_tld_override=$(catapult websites.apache.$5.domain_tld_override)
 # get the final domain for the environment
 if [ -z "${domain_tld_override}" ]; then
@@ -118,6 +122,7 @@ elif [ "${software}" = "expressionengine3" ]; then
         --expression="s/\$config\['sig_img_url'\]\s=\s'';/\$config\['sig_img_url'\] = 'http:\\/\\/${domain_expanded}\\/images\\/signatures';/g" \
         --expression="s/\$config\['site_url'\]\s=\s'';/\$config\['site_url'\] = 'http:\\/\\/${domain_expanded}';/g" \
         --expression="s/\$config\['theme_folder_url'\]\s=\s'';/\$config\['theme_folder_url'\] = 'http:\\/\\/${domain_expanded}\\/themes';/g" \
+        --expression="s/\$config\['new_relic_app_name'\]\s=\s'';/\$config\['new_relic_app_name'\] = '${domain_environment}';/g" \
         /catapult/provisioners/redhat/installers/software/${software}/config.php > "${file}"
     sudo chmod 0444 "${file}"
 
@@ -159,7 +164,7 @@ elif [ "${software}" = "moodle3" ]; then
         /catapult/provisioners/redhat/installers/software/${software}/config.php > "${file}"
     sudo chmod 0444 "${file}"
 
-elif [ "${software}" = "silverstripe" ]; then
+elif [ "${software}" = "silverstripe3" ]; then
 
     file="/var/www/repositories/apache/${domain}/${webroot}${database_config_file}"
     echo -e "generating ${software} ${file}..."
@@ -168,8 +173,10 @@ elif [ "${software}" = "silverstripe" ]; then
     else
         mkdir --parents $(dirname "${file}")
     fi
-    connectionstring="\$databaseConfig = array(\"type\" => \"MySQLDatabase\",\"server\" => \"${redhat_mysql_ip}\",\"username\" => \"${mysql_user}\",\"password\" => \"${mysql_user_password}\",\"database\" => \"${1}_${domainvaliddbname}\");"
-    sed --expression="s/\$databaseConfig\s=\sarray();/${connectionstring}/g" \
+    sed --expression="s/'server'\s=>\s''/'server' => '${redhat_mysql_ip}'/g" \
+        --expression="s/'username'\s=>\s''/'username' => '${mysql_user}'/g" \
+        --expression="s/'password'\s=>\s''/'password' => '${mysql_user_password}'/g" \
+        --expression="s/'database'\s=>\s''/'database' => '${1}_${domainvaliddbname}'/g" \
         /catapult/provisioners/redhat/installers/software/${software}/_config.php > "${file}"
     sudo chmod 0444 "${file}"
 

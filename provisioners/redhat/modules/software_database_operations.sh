@@ -6,12 +6,14 @@ webroot=$(catapult websites.apache.$5.webroot)
 
 # run software database operations
 if [ "$software" = "codeigniter2" ]; then
+
     output=$(cd "/var/www/repositories/apache/${domain}/${webroot}" && php index.php migrate)
     if echo $output | grep --extended-regexp --quiet --regexp="<html" --regexp="<\?"; then
         echo -e "Migrations are not configured"
     else
         echo $output
     fi
+
 elif [ "$software" = "codeigniter3" ]; then
     output=$(cd "/var/www/repositories/apache/${domain}/${webroot}" && php index.php migrate)
     if echo $output | grep --extended-regexp --quiet --regexp="<html" --regexp="<\?"; then
@@ -19,26 +21,44 @@ elif [ "$software" = "codeigniter3" ]; then
     else
         echo $output
     fi
+
 elif [ "$software" = "drupal6" ]; then
+
     cd "/var/www/repositories/apache/${domain}/${webroot}" && drush watchdog-delete all -y
     cd "/var/www/repositories/apache/${domain}/${webroot}" && drush updatedb -y
     cd "/var/www/repositories/apache/${domain}/${webroot}" && drush cache-clear all -y
+
 elif [ "$software" = "drupal7" ]; then
+
     cd "/var/www/repositories/apache/${domain}/${webroot}" && drush watchdog-delete all -y
     cd "/var/www/repositories/apache/${domain}/${webroot}" && drush updatedb -y
     cd "/var/www/repositories/apache/${domain}/${webroot}" && drush cache-clear all -y
+
 elif [ "$software" = "joomla3" ]; then
+
     cd "/var/www/repositories/apache/${domain}/${webroot}" && php cli/garbagecron.php
     cd "/var/www/repositories/apache/${domain}/${webroot}" && php cli/update_cron.php
     cd "/var/www/repositories/apache/${domain}/${webroot}" && php cli/deletefiles.php
+
 elif [ "$software" = "moodle3" ]; then
+
     cd "/var/www/repositories/apache/${domain}/${webroot}" && php admin/cli/cron.php
     cd "/var/www/repositories/apache/${domain}/${webroot}" && php admin/cli/purge_caches.php
+
+elif [ "$software" = "silverstripe3" ]; then
+
+    cd "/var/www/repositories/apache/${domain}/${webroot}" && php framework/cli-script.php dev/tasks/MigrationTask
+    cd "/var/www/repositories/apache/${domain}/${webroot}" && php framework/cli-script.php dev/build "flush=1"
+
 elif [ "$software" = "suitecrm7" ]; then
+
     cd "/var/www/repositories/apache/${domain}/${webroot}" && php cron.php
+
 elif [ "$software" = "wordpress" ]; then
+
     cd "/var/www/repositories/apache/${domain}/${webroot}" && php /catapult/provisioners/redhat/installers/wp-cli.phar --allow-root core update-db
     cd "/var/www/repositories/apache/${domain}/${webroot}" && php /catapult/provisioners/redhat/installers/wp-cli.phar --allow-root cache flush
+
 else
     echo "this software does not have any database operations to perform"
 fi

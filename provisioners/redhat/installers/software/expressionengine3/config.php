@@ -43,6 +43,7 @@ $config['emoticon_url'] = '';
 $config['sig_img_url'] = '';
 $config['site_url'] = '';
 $config['theme_folder_url'] = '';
+$config['newrelic_app_name'] = '';
 
 // END EE config items
 
