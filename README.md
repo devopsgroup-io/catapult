@@ -73,7 +73,7 @@ Catapult leverages the following technologies and technology services to impleme
 
 ## Supported Software ##
 
-Catapult intelligently manages the following software:
+Catapult supports and intelligently manages the following software chosen from trending usage statistics from [BuiltWith](https://trends.builtwith.com/cms):
 
 * CodeIgniter 2
 * CodeIgniter 3
