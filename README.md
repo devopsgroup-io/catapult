@@ -88,7 +88,7 @@ Catapult supports and intelligently manages the following software chosen from t
 * WordPress >=3.5.2
 * WordPress 4
 * XenForo 1
-* Zend Framework 2.0.* <=2.4.x
+* Zend Framework 2.0.* <=2.4.*
 
 Catapult additionally supports basic PHP projects that do not have a database requirement:
 
