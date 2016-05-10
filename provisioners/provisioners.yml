@@ -118,13 +118,13 @@ software:
         file_stores: ["assets/Uploads"]
       suitecrm7:
         repo: "https://github.com/salesagility/SuiteCRM.git"
-        branch: "master"
+        branch: "7.5.x"
         database_config_file: "config_override.php"
         file_store_containers: ["cache","custom","data","modules","upload","themes","tmp"]
         file_stores: ["uploads"]
       wordpress:
         repo: "https://github.com/WordPress/WordPress.git"
-        branch: "master"
+        branch: "4.5-branch"
         database_config_file: "wp-config.php"
         file_store_containers: ["wp-content"]
         file_stores: ["wp-content/uploads"]
@@ -133,5 +133,9 @@ software:
         database_config_file: "sites/default/settings.php"
         file_store_containers: ["data","internal_data"]
         file_stores: ["data","internal_data"]
+      zendframework2:
+        repo: "https://github.com/zendframework/zendframework.git"
+        tag: "release-2.4.10"
+        database_config_file: "config/autoload/global.php"
     iis:
       
