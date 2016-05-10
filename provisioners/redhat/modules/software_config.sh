@@ -32,13 +32,14 @@ fi
 domainvaliddbname=$(catapult websites.apache.$5.domain | tr "." "_")
 software=$(catapult websites.apache.$5.software)
 software_dbprefix=$(catapult websites.apache.$5.software_dbprefix)
+softwareroot=$(provisioners software.apache.${software}.softwareroot)
 webroot=$(catapult websites.apache.$5.webroot)
 database_config_file=$(provisioners software.apache.${software}.database_config_file)
 
 # generate database config files
 if [ "${software}" = "codeigniter2" ]; then
 
-    file="/var/www/repositories/apache/${domain}/${webroot}${database_config_file}"
+    file="/var/www/repositories/apache/${domain}/${webroot}${softwareroot}${database_config_file}"
     echo -e "generating ${software} ${file}..."
     if [ -f "${file}" ]; then
         sudo chmod 0777 "${file}"
@@ -55,7 +56,7 @@ if [ "${software}" = "codeigniter2" ]; then
 
 elif [ "${software}" = "codeigniter3" ]; then
 
-    file="/var/www/repositories/apache/${domain}/${webroot}${database_config_file}"
+    file="/var/www/repositories/apache/${domain}/${webroot}${softwareroot}${database_config_file}"
     echo -e "generating ${software} ${file}..."
     if [ -f "${file}" ]; then
         sudo chmod 0777 "${file}"
@@ -72,7 +73,7 @@ elif [ "${software}" = "codeigniter3" ]; then
 
 elif [ "${software}" = "drupal6" ]; then
 
-    file="/var/www/repositories/apache/${domain}/${webroot}${database_config_file}"
+    file="/var/www/repositories/apache/${domain}/${webroot}${softwareroot}${database_config_file}"
     echo -e "generating ${software} ${file}..."
     if [ -f "${file}" ]; then
         sudo chmod 0777 "${file}"
@@ -86,7 +87,7 @@ elif [ "${software}" = "drupal6" ]; then
 
 elif [ "${software}" = "drupal7" ]; then
 
-    file="/var/www/repositories/apache/${domain}/${webroot}${database_config_file}"
+    file="/var/www/repositories/apache/${domain}/${webroot}${softwareroot}${database_config_file}"
     echo -e "generating ${software} ${file}..."
     if [ -f "${file}" ]; then
         sudo chmod 0777 "${file}"
@@ -102,7 +103,7 @@ elif [ "${software}" = "expressionengine3" ]; then
 
     # https://docs.expressionengine.com/latest/general/system_configuration_overrides.html
 
-    file="/var/www/repositories/apache/${domain}/${webroot}${database_config_file}"
+    file="/var/www/repositories/apache/${domain}/${webroot}${softwareroot}${database_config_file}"
     echo -e "generating ${software} ${file}..."
     if [ -f "${file}" ]; then
         sudo chmod 0777 "${file}"
@@ -128,7 +129,7 @@ elif [ "${software}" = "expressionengine3" ]; then
 
 elif [ "${software}" = "joomla3" ]; then
 
-    file="/var/www/repositories/apache/${domain}/${webroot}${database_config_file}"
+    file="/var/www/repositories/apache/${domain}/${webroot}${softwareroot}${database_config_file}"
     echo -e "generating ${software} ${file}..."
     if [ -f "${file}" ]; then
         sudo chmod 0777 "${file}"
@@ -145,9 +146,25 @@ elif [ "${software}" = "joomla3" ]; then
         /catapult/provisioners/redhat/installers/software/${software}/configuration.php > "${file}"
     sudo chmod 0444 "${file}"
 
+elif [ "${software}" = "laravel5" ]; then
+
+    file="/var/www/repositories/apache/${domain}/${webroot}${softwareroot}${database_config_file}"
+    echo -e "generating ${software} ${file}..."
+    if [ -f "${file}" ]; then
+        sudo chmod 0777 "${file}"
+    else
+        mkdir --parents $(dirname "${file}")
+    fi
+    sed --expression="s/env('DB_HOST',\s'localhost')/'${redhat_mysql_ip}'/g" \
+        --expression="s/env('DB_DATABASE',\s'forge')/'${1}_${domainvaliddbname}'/g" \
+        --expression="s/env('DB_USERNAME',\s'forge')/'${mysql_user}'/g" \
+        --expression="s/env('DB_PASSWORD',\s'')/'${mysql_user_password}'/g" \
+        /catapult/provisioners/redhat/installers/software/${software}/database.php > "${file}"
+    sudo chmod 0444 "${file}"
+
 elif [ "${software}" = "moodle3" ]; then
 
-    file="/var/www/repositories/apache/${domain}/${webroot}${database_config_file}"
+    file="/var/www/repositories/apache/${domain}/${webroot}${softwareroot}${database_config_file}"
     echo -e "generating ${software} ${file}..."
     if [ -f "${file}" ]; then
         sudo chmod 0777 "${file}"
@@ -166,7 +183,7 @@ elif [ "${software}" = "moodle3" ]; then
 
 elif [ "${software}" = "silverstripe3" ]; then
 
-    file="/var/www/repositories/apache/${domain}/${webroot}${database_config_file}"
+    file="/var/www/repositories/apache/${domain}/${webroot}${softwareroot}${database_config_file}"
     echo -e "generating ${software} ${file}..."
     if [ -f "${file}" ]; then
         sudo chmod 0777 "${file}"
@@ -182,7 +199,7 @@ elif [ "${software}" = "silverstripe3" ]; then
 
 elif [ "${software}" = "suitecrm7" ]; then
 
-    file="/var/www/repositories/apache/${domain}/${webroot}${database_config_file}"
+    file="/var/www/repositories/apache/${domain}/${webroot}${softwareroot}${database_config_file}"
     echo -e "generating ${software} ${file}..."
     if [ -f "${file}" ]; then
         sudo chmod 0777 "${file}"
@@ -198,7 +215,7 @@ elif [ "${software}" = "suitecrm7" ]; then
 
 elif [ "${software}" = "wordpress" ]; then
 
-    file="/var/www/repositories/apache/${domain}/${webroot}${database_config_file}"
+    file="/var/www/repositories/apache/${domain}/${webroot}${softwareroot}${database_config_file}"
     echo -e "generating ${software} ${file}..."
     if [ -f "${file}" ]; then
         sudo chmod 0777 "${file}"
@@ -215,7 +232,7 @@ elif [ "${software}" = "wordpress" ]; then
 
 elif [ "${software}" = "xenforo" ]; then
 
-    file="/var/www/repositories/apache/${domain}/${webroot}${database_config_file}"
+    file="/var/www/repositories/apache/${domain}/${webroot}${softwareroot}${database_config_file}"
     echo -e "generating ${software} ${file}..."
     if [ -f "${file}" ]; then
         sudo chmod 0777 "${file}"
@@ -231,7 +248,7 @@ elif [ "${software}" = "xenforo" ]; then
 
 elif [ "${software}" = "zendframework2" ]; then
 
-    file="/var/www/repositories/apache/${domain}/${database_config_file}"
+    file="/var/www/repositories/apache/${domain}/${webroot}${softwareroot}${database_config_file}"
     echo -e "generating ${software} ${file}..."
     if [ -f "${file}" ]; then
         sudo chmod 0777 "${file}"
@@ -254,7 +271,7 @@ else
     cat "/catapult/provisioners/provisioners.yml" | shyaml get-values-0 software.apache.$(catapult websites.apache.$5.software).file_store_containers |
     while read -r -d $'\0' file_store_container; do
 
-        file_store_container="/var/www/repositories/apache/${domain}/${webroot}${file_store_container}"
+        file_store_container="/var/www/repositories/apache/${domain}/${webroot}${softwareroot}${file_store_container}"
         echo -e "software file store container: ${file_store_container}"
 
         # if the file store container does not exist, create it

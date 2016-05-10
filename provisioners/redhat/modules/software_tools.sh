@@ -1,13 +1,6 @@
 source "/catapult/provisioners/redhat/modules/catapult.sh"
 
-# install dependancies
-sudo yum install -y php
-sudo yum install -y php-cli
-sudo yum install -y php-dom
-sudo yum install -y php-gd
-sudo yum install -y php-mbstring
-sudo yum install -y php-mysql
-sudo yum install -y php-posix
+# install dependancies, relies on php.sh
 sudo yum install -y mariadb
 
 # install drush
