@@ -87,6 +87,7 @@ Catapult intelligently manages the following software:
 * WordPress 3.5.2+
 * WordPress 4
 * XenForo 1
+* Zend Framework 2 - 2.4.x
 
 Catapult additionally supports basic PHP projects that do not have a database requirement:
 
@@ -644,6 +645,7 @@ The following options are available:
     * `software: suitecrm7`
     * `software: wordpress`
     * `software: xenforo`
+    * `software: zendframework2`
 * `software_dbprefix:`
     * required: no
     * dependency: `software:`
@@ -695,6 +697,7 @@ Software | Notes
 `suitecrm7`         |
 `wordpress`         |
 `xenforo`           |
+`zendframework2`    | Your best bet is to start from the [zendframework/ZendSkeletonApplication](https://github.com/zendframework/ZendSkeletonApplication) GitHub project. Catapult assumes Zend Framwork is at the root of your repo and writes a database config file at `config/autoload/global.php`, you will also need to set `webroot: public/` in your Catapult configuration.
 
 ### Forcing www ###
 
@@ -713,6 +716,7 @@ Software | File | Documentation
 `suitecrm7`         |                    | 
 `wordpress`         |                    | http://codex.wordpress.org/Changing_The_Site_URL
 `xenforo`           | .htaccess          | no official documentation - http://stackoverflow.com/a/4958847/4838803
+`zendframework2`    |                    |
 
 ### Database Migrations ###
 
@@ -731,6 +735,7 @@ Software | Tool | Command | Documentation
 `suitecrm7`         |               |                                                        |
 `wordpress`         | WP-CLI        | `wp-cli core update-db`                                | http://codex.wordpress.org/Creating_Tables_with_Plugins#Adding_an_Upgrade_Function
 `xenforo`           |               |                                                        |
+`zendframework2`    |               |                                                        |
 
 ### Refreshing Databases ###
 

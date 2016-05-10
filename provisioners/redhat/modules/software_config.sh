@@ -228,6 +228,23 @@ elif [ "${software}" = "xenforo" ]; then
         --expression="s/\$config\['db'\]\['dbname'\]\s=\s'';/\$config\['db'\]\['dbname'\] = '${1}_${domainvaliddbname}';/g" \
         /catapult/provisioners/redhat/installers/software/${software}/config.php > "${file}"
     sudo chmod 0444 "${file}"
+
+elif [ "${software}" = "zendframework2" ]; then
+
+    file="/var/www/repositories/apache/${domain}/${database_config_file}"
+    echo -e "generating ${software} ${file}..."
+    if [ -f "${file}" ]; then
+        sudo chmod 0777 "${file}"
+    else
+        mkdir --parents $(dirname "${file}")
+    fi
+    sed --expression="s/zf2tutorial/${1}_${domainvaliddbname}/g" \
+        --expression="s/localhost/${redhat_mysql_ip}/g" \
+        --expression="s/'username'\s=>\s''/'username' => '${mysql_user}'/g" \
+        --expression="s/'password'\s=>\s''/'password' => '${mysql_user_password}'/g" \
+        /catapult/provisioners/redhat/installers/software/${software}/global.php > "${file}"
+    sudo chmod 0444 "${file}"
+
 fi
 
 # set directory permissions of software file store containers

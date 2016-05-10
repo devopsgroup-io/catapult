@@ -209,7 +209,7 @@ while IFS='' read -r -d '' key; do
 
                         # pre-process database sql file
                         # for software without a cli tool for database url reference replacements, use sed to pre-process sql file and replace url references
-                        if ([ "${software}" = "codeigniter2" ] || [ "${software}" = "codeigniter3" ] || [ "${software}" = "drupal6" ] || [ "${software}" = "drupal7" ] || [ "${software}" = "expressionengine3" ] || [ "${software}" = "joomla3" ] || [ "${software}" = "moodle3" ] || [ "${software}" = "silverstripe3" ] || [ "${software}" = "suitecrm7" ] || [ "${software}" = "xenforo" ]); then
+                        if ([ "${software}" = "codeigniter2" ] || [ "${software}" = "codeigniter3" ] || [ "${software}" = "drupal6" ] || [ "${software}" = "drupal7" ] || [ "${software}" = "expressionengine3" ] || [ "${software}" = "joomla3" ] || [ "${software}" = "moodle3" ] || [ "${software}" = "silverstripe3" ] || [ "${software}" = "suitecrm7" ] || [ "${software}" = "xenforo" ] || [ "${software}" = "zendframework2" ]); then
                             echo -e "\t* replacing URLs in the database to align with the enivronment..."
                             replacements=$(grep --extended-regexp --only-matching --regexp=":\/\/(www\.)?(dev\.|test\.|qc\.)?(${domain_url_replace})" "/var/www/repositories/apache/${domain}/_sql/$(basename "$file")" | wc --lines)
                             sed --regexp-extended --expression="s/:\/\/(www\.)?(dev\.|test\.|qc\.)?(${domain_url_replace})/:\/\/\1${domain_url}/g" "/var/www/repositories/apache/${domain}/_sql/$(basename "$file")" > "/var/www/repositories/apache/${domain}/_sql/${1}.$(basename "$file")"
