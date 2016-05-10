@@ -24,7 +24,7 @@
 
 * Catapult is an open source, complete, and distributed architecture
 * Catapult only orchestrates - it is not required to run your infrastructure
-* Catapult uses platform native shell scripts rather than configuration management tools such as Chef, Puppet, Salt
+* Catapult uses platform native shell scripting rather than configuration management tools such as Chef, Puppet, Salt
 * Catapult overlays seamlessly with Scrum methodology
 * Catapult features Gitflow workflow while enforcing exactly matching, branch-driven environments
 * Catapult features a unique workflow model - upstream or downstream
