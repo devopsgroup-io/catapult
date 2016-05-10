@@ -155,8 +155,9 @@ if [ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-values-0 redha
             website_index=0
             # loop through websites and start sub-processes
             while read -r -d $'\0' website; do
+                sleep 1
                 # only allow a certain number of parallel bash sub-processes at once
-                while [ $(( $(ls -l /catapult/provisioners/redhat/logs/${module}.*.log 2>/dev/null | wc -l) - $(ls -l /catapult/provisioners/redhat/logs/${module}.*.complete 2>/dev/null | wc -l) )) -gt 5 ]; do
+                while [ $(( $(ls -l /catapult/provisioners/redhat/logs/${module}.*.log 2>/dev/null | wc -l) - $(ls -l /catapult/provisioners/redhat/logs/${module}.*.complete 2>/dev/null | wc -l) )) -gt 4 ]; do
                     # sample cpu load
                     cpu_load_sample_decimal=$(top -bn 1 | awk '{print $9}' | tail -n +8 | awk '{s+=$1} END {print s}')
                     cpu_load_samples+=(${cpu_load_sample_decimal%.*})
