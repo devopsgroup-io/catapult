@@ -64,9 +64,9 @@ redhat:
     servers:
         redhat:
           apache:
-            modules: ["system","iptables","time","newrelic_sysmon","software_tools","git_clean","git","rsync","software_config","apache","apache_vhosts_clean","apache_vhosts","php","newrelic_apm_php","cloudflare_zones","cloudflare_dns","cloudflare_cache","newrelic_synthetics"]
+            modules: ["system","iptables","time","newrelic_sysmon","git_clean","git","rsync","software_config","php","software_tools","apache","apache_vhosts_clean","apache_vhosts","newrelic_apm_php","cloudflare_zones","cloudflare_dns","cloudflare_cache","newrelic_synthetics"]
           mysql:
-            modules: ["system","iptables","time","newrelic_sysmon","software_tools","git_clean","git","software_config","mysql","software_database_operations"]
+            modules: ["system","iptables","time","newrelic_sysmon","git_clean","git","software_config","php","software_tools","mysql","software_database_operations"]
 windows:
 
 software:
@@ -104,6 +104,13 @@ software:
         branch: "3.6.x"
         database_config_file: "configuration.php"
         file_store_containers: ["administrator/cache","cache","logs","tmp"]
+      laravel5:
+        repo: "https://github.com/laravel/laravel.git"
+        tag: "v5.0.22"
+        database_config_file: "config/database.php"
+        file_store_containers: ["bootstrap/cache","resources","storage"]
+        file_stores: ["resources","storage"]
+        softwareroot: "../"
       moodle3:
         repo: "https://github.com/moodle/moodle.git"
         branch: "MOODLE_30_STABLE"
@@ -137,5 +144,6 @@ software:
         repo: "https://github.com/zendframework/zendframework.git"
         tag: "release-2.4.10"
         database_config_file: "config/autoload/global.php"
+        softwareroot: "../"
     iis:
       

@@ -11,6 +11,7 @@ fi
 domain=$(catapult websites.apache.$5.domain)
 software=$(catapult websites.apache.$5.software)
 software_workflow=$(catapult websites.apache.$5.software_workflow)
+softwareroot=$(provisioners software.apache.${software}.softwareroot)
 webroot=$(catapult websites.apache.$5.webroot)
 
 if [ -z $(provisioners_array software.apache.${software}.file_stores) ]; then
@@ -26,7 +27,7 @@ else
     cat "/catapult/provisioners/provisioners.yml" | shyaml get-values-0 software.apache.$(catapult websites.apache.$5.software).file_stores |
     while read -r -d $'\0' file_store; do
 
-        file_store="/var/www/repositories/apache/${domain}/${webroot}${file_store}/"
+        file_store="/var/www/repositories/apache/${domain}/${webroot}${softwareroot}${file_store}/"
         echo -e "software file store: ${file_store}"
 
         if ([ "${software_workflow}" = "downstream" ] && [ "$1" != "production" ]); then
