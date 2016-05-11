@@ -70,3 +70,14 @@ fi
 
 # output the resulting swap
 swapon --summary
+
+# tune the swap temporarily for runtime
+# https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux/6/html/Performance_Tuning_Guide/s-memory-tunables.html
+sudo sysctl vm.swappiness=10
+sudo sysctl vm.vfs_cache_pressure=50
+
+# tune the swap permanently for boot
+sudo cat > "/etc/sysctl.d/catapult.conf" << EOF
+vm.swappiness=10
+vm.vfs_cache_pressure=50
+EOF
