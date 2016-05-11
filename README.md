@@ -83,15 +83,15 @@ Drupal 6                          | `drupal6`              | February 13, 2008  
 Drupal 7                          | `drupal7`              | January 5, 2011    |
 ExpressionEngine 3                | `expressionengine3`    | October 13, 2015   |
 Joomla 3                          | `joomla3`              | September 27, 2012 |
-Laravel 5.0.*                     | `laravel5`             |  |
-MediaWiki 1                       | `mediawiki1`           |  |
-Moodle 3                          | `moodle3`              |  |
-SilverStripe 3                    | `silverstripe3`        |  |
-SuiteCRM 7                        | `suitecrm7`            |  |
-WordPress >=3.5.2                 | `wordpress`            |  |
-WordPress 4                       | `wordpress`            |  |
-XenForo 1                         | `xenforo`              |  |
-Zend Framework 2.0.* <=2.4.*      | `zendframework2`       |  |
+Laravel 5.0.*                     | `laravel5`             | February 4, 2015   |
+MediaWiki 1                       | `mediawiki1`           | December 8, 2003   |
+Moodle 3                          | `moodle3`              | November 16, 2015  |
+SilverStripe 3                    | `silverstripe3`        | June 29, 2012      |
+SuiteCRM 7                        | `suitecrm7`            | October 21, 2013   |
+WordPress >=3.5.2                 | `wordpress`            | June 17, 2010      |
+WordPress 4                       | `wordpress`            | September 4, 2014  |
+XenForo 1                         | `xenforo`              | March 8, 2011      |
+Zend Framework 2.0.* <=2.4.*      | `zendframework2`       | September 5, 2012  |
 
 Catapult additionally supports basic PHP projects that do not have a database requirement:
 
