@@ -48,6 +48,12 @@ elif [ "$software" = "laravel5" ]; then
     cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && php artisan clear-compiled
     cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && php artisan optimize
 
+elif [ "$software" = "mediawiki1" ]; then
+
+    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && php maintenance/update.php
+    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && php maintenance/runJobs.php
+    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && php maintenance/rebuildall.php
+
 elif [ "$software" = "moodle3" ]; then
 
     cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && php admin/cli/cron.php

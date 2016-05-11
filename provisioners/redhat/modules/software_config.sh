@@ -162,6 +162,24 @@ elif [ "${software}" = "laravel5" ]; then
         /catapult/provisioners/redhat/installers/software/${software}/database.php > "${file}"
     sudo chmod 0444 "${file}"
 
+elif [ "${software}" = "mediawiki1" ]; then
+
+    file="/var/www/repositories/apache/${domain}/${webroot}${softwareroot}${database_config_file}"
+    echo -e "generating ${software} ${file}..."
+    if [ -f "${file}" ]; then
+        sudo chmod 0777 "${file}"
+    else
+        mkdir --parents $(dirname "${file}")
+    fi
+    sed --expression="s/\$wgScriptPath\s=\s\"\";/\$wgScriptPath = \"http:\\/\\/${domain_expanded}\";/g" \
+        --expression="s/\$wgDBserver\s=\s\"\";/\$wgDBserver = \"${redhat_mysql_ip}\";/g" \
+        --expression="s/\$wgDBname\s=\s\"\";/\$wgDBname = \"${1}_${domainvaliddbname}\";/g" \
+        --expression="s/\$wgDBuser\s=\s\"\";/\$wgDBuser = \"${mysql_user}\";/g" \
+        --expression="s/\$wgDBpassword\s=\s\"\";/\$wgDBpassword = \"${mysql_user_password}\";/g" \
+        --expression="s/\$wgDBprefix\s=\s\"\";/\$wgDBprefix = \"${software_dbprefix}\";/g" \
+        /catapult/provisioners/redhat/installers/software/${software}/LocalSettings.php > "${file}"
+    sudo chmod 0444 "${file}"
+
 elif [ "${software}" = "moodle3" ]; then
 
     file="/var/www/repositories/apache/${domain}/${webroot}${softwareroot}${database_config_file}"

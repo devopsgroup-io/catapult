@@ -89,6 +89,7 @@ while IFS='' read -r -d '' key; do
     software_workflow=$(echo "$key" | grep -w "software_workflow" | cut -d ":" -f 2 | tr -d " ")
     software_db=$(mysql --defaults-extra-file=$dbconf --silent --skip-column-names --execute "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = '${1}_${domainvaliddbname}'")
     software_db_tables=$(mysql --defaults-extra-file=$dbconf --silent --skip-column-names --execute "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = '${1}_${domainvaliddbname}'")    
+    softwareroot=$(provisioners software.apache.${software}.softwareroot)
     webroot=$(echo "$key" | grep -w "webroot" | cut -d ":" -f 2 | tr -d " ")
 
     if [ "${1}" = "production" ]; then
@@ -216,6 +217,7 @@ while IFS='' read -r -d '' key; do
                          || [ "${software}" = "expressionengine3" ] \
                          || [ "${software}" = "joomla3" ] \
                          || [ "${software}" = "laravel5" ] \
+                         || [ "${software}" = "mediawiki1" ] \
                          || [ "${software}" = "moodle3" ] \
                          || [ "${software}" = "silverstripe3" ] \
                          || [ "${software}" = "suitecrm7" ] \
@@ -282,6 +284,21 @@ while IFS='' read -r -d '' key; do
                 UPDATE ${software_dbprefix}users
                 SET username='admin', email='$(catapult company.email)', password=MD5('$(catapult environments.${1}.software.admin_password)'), block='0'
                 WHERE name='Super User';
+            "
+
+        elif [[ "${software}" = "mediawiki1" ]]; then
+
+            echo -e "\t* resetting ${software} admin password..."
+            mysql --defaults-extra-file=$dbconf ${1}_${domainvaliddbname} -e "
+                INSERT INTO ${software_dbprefix}user (user_id, user_name, user_email)
+                VALUES ('1', 'admin', '$(catapult company.email)')
+                ON DUPLICATE KEY UPDATE user_name='admin', user_email='$(catapult company.email)';
+            "
+            cd "/var/www/repositories/apache/${domain}/${webroot}" && php maintenance/changePassword.php --userid="1" --password="$(catapult environments.${1}.software.admin_password)"
+            mysql --defaults-extra-file=$dbconf ${1}_${domainvaliddbname} -e "
+                INSERT INTO ${software_dbprefix}user_groups (ug_user, ug_group)
+                VALUES ('1', 'sysop')
+                ON DUPLICATE KEY UPDATE ug_user=ug_user, ug_group=ug_group;
             "
 
         elif [[ "${software}" = "moodle3" ]]; then

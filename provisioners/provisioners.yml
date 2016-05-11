@@ -111,6 +111,12 @@ software:
         file_store_containers: ["bootstrap/cache","resources","storage"]
         file_stores: ["resources","storage"]
         softwareroot: "../"
+      mediawiki1:
+        repo: "https://github.com/wikimedia/mediawiki.git"
+        branch: "REL1_25"
+        database_config_file: "LocalSettings.php"
+        file_store_containers: ["images"]
+        file_stores: ["images"]
       moodle3:
         repo: "https://github.com/moodle/moodle.git"
         branch: "MOODLE_30_STABLE"
