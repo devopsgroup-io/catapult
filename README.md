@@ -82,6 +82,7 @@ Catapult supports and intelligently manages the following software chosen from t
 * ExpressionEngine 3
 * Joomla 3
 * Laravel 5.0.*
+* MediaWiki 1
 * Moodle 3
 * SilverStripe 3
 * SuiteCRM 7
@@ -642,6 +643,7 @@ The following options are available:
     * `software: expressionengine3`
     * `software: joomla3`
     * `software: laravel5`
+    * `software: mediawiki1`
     * `software: moodle3`
     * `software: silverstripe3`
     * `software: suitecrm7`
@@ -692,14 +694,15 @@ Software | Approach | Notes
 `codeigniter3`      |          |
 `drupal6`           |          |
 `drupal7`           |          |
-`expressionengine3` |          |
+`expressionengine3` | Download |
 `joomla3`           | Fork     |
 `laravel5`          | Composer | Follow the [Composer Create-Project](https://laravel.com/docs/5.0/installation) documentation.
+`mediawiki1`        | Fork     |
 `moodle3`           | Fork     | Catapult requires the `moodledata` directory to be within the webroot, it's pertinant to create a `.gitignore` and `.htaccess` file for this directory.
 `silverstripe3`     | Fork     | First fork the silver-stripe-installer repository then add a git submodule of silver-framework at a `framework` directory in the root. During a fresh install, the database config file `mysite/_config.php` will need to be given 0777 permissions.
 `suitecrm7`         | Fork     |
 `wordpress`         | Fork     |
-`xenforo`           |          |
+`xenforo`           | Download |
 `zendframework2`    | Fork     | Your best bet is to start from the [zendframework/ZendSkeletonApplication](https://github.com/zendframework/ZendSkeletonApplication) GitHub project. Catapult assumes Zend Framwork is at the root of your repo and writes a database config file at `config/autoload/global.php`, you will also need to set `webroot: public/` in your Catapult configuration.
 
 ### Forcing www ###
@@ -717,6 +720,7 @@ Software | Approach | Documentation
 `expressionengine3` |                      |
 `joomla3`           |                      |
 `laravel5`          |                      |
+`mediawiki1`        |                      |
 `moodle3`           |                      |
 `silverstripe3`     | `mysite/_config.php` | http://api.silverstripe.org/3.1/class-Director.html -> http://stackoverflow.com/a/26865882
 `suitecrm7`         |                      | 
@@ -730,19 +734,20 @@ The best way to handle changes to the software's database schema is through a mi
 
 Software | Tool | Command | Documentation
 ---------|------|---------|--------------
-`codeigniter2`      | Migrations    | `php index.php migrate`                                | https://ellislab.com/codeigniter/user-guide/libraries/migration.html
-`codeigniter3`      | Migrations    | `php index.php migrate`                                | https://www.codeigniter.com/user_guide/libraries/migration.html
-`drupal6`           | Drush         | `drush updatedb -y`                                    | https://www.drupal.org/node/150215
-`drupal7`           | Drush         | `drush updatedb -y`                                    | https://www.drupal.org/node/150215
-`expressionengine3` |               |                                                        |
-`joomla3`           |               |                                                        |
-`laravel5`          | Migrations    | `php artisan migrate`                                  | https://laravel.com/docs/5.0/migrations
-`moodle3`           |               |                                                        |
-`silverstripe3`     | MigrationTask | `php framework/cli-script.php dev/tasks/MigrationTask` | http://api.silverstripe.org/3.3/class-MigrationTask.html
-`suitecrm7`         |               |                                                        |
-`wordpress`         | WP-CLI        | `wp-cli core update-db`                                | http://codex.wordpress.org/Creating_Tables_with_Plugins#Adding_an_Upgrade_Function
-`xenforo`           |               |                                                        |
-`zendframework2`    |               |                                                        |
+`codeigniter2`      | Migrations      | `php index.php migrate`                                | https://ellislab.com/codeigniter/user-guide/libraries/migration.html
+`codeigniter3`      | Migrations      | `php index.php migrate`                                | https://www.codeigniter.com/user_guide/libraries/migration.html
+`drupal6`           | Drush           | `drush updatedb -y`                                    | https://www.drupal.org/node/150215
+`drupal7`           | Drush           | `drush updatedb -y`                                    | https://www.drupal.org/node/150215
+`expressionengine3` |                 |                                                        |
+`joomla3`           |                 |                                                        |
+`laravel5`          | Migrations      | `php artisan migrate`                                  | https://laravel.com/docs/5.0/migrations
+`mediawiki1`        | UpdateMediaWiki | `php maintenance/update.php`                           | https://www.mediawiki.org/wiki/Manual:Update.php
+`moodle3`           |                 |                                                        |
+`silverstripe3`     | MigrationTask   | `php framework/cli-script.php dev/tasks/MigrationTask` | http://api.silverstripe.org/3.3/class-MigrationTask.html
+`suitecrm7`         |                 |                                                        |
+`wordpress`         | WP-CLI          | `wp-cli core update-db`                                | http://codex.wordpress.org/Creating_Tables_with_Plugins#Adding_an_Upgrade_Function
+`xenforo`           |                 |                                                        |
+`zendframework2`    |                 |                                                        |
 
 ### Refreshing Databases ###
 

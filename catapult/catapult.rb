@@ -94,11 +94,6 @@ module Catapult
       else
         catapult_exception("Git is not installed at C:\\Program Files (x86)\\Git\\bin\\git.exe or C:\\Program Files\\Git\\bin\\git.exe")
       end
-      begin
-         require "Win32/Console/ANSI"
-      rescue LoadError
-         catapult_exception('win32console is not installed, please run "gem install win32console"')
-      end
     # others
     elsif (RbConfig::CONFIG['host_os'] =~ /darwin|mac os|linux|solaris|bsd/)
       @git = "git"
