@@ -1363,18 +1363,18 @@ module Catapult
       puts "\n\n\nAvailable websites legend:".color(Colors::WHITE)
       puts "\n[http response codes]"
       puts " * The below http response codes are started from http:// and up to 10 redirects allowed - so if you're forcing https://, you will end up with that code below."
-      puts " * 200 ok, 301 moved permanently, 302 found, 400 bad request, 401 unauthorized, 403 forbidden, 404 not found, 500 internal server error, 502 bad gateway, 503 service unavailable, 504 gateway timeout"
-      puts " * http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html"
+      puts "   - 200 ok, 301 moved permanently, 302 found"
+      puts "   - 400 bad request, 401 unauthorized, 403 forbidden, 404 not found"
+      puts "   - 500 internal server error, 502 bad gateway, 503 service unavailable, 504 gateway timeout"
+      puts "   - For a complete list, please visit http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html"
       puts " * Keep in mind these response codes and nslookups are from within your network - they may differ externally if you're running your own DNS server internally."
       puts "\nAvailable websites:".color(Colors::WHITE)
 
       @configuration["websites"].each do |service,data|
-        puts "\n[#{service}]"
+        puts "\n[#{service}] #{@configuration["websites"]["#{service}"].nil? ? "0" : @configuration["websites"]["#{service}"].length} websites"
         puts "[domain]".ljust(40) + "[domain_tld_override]".ljust(30) + "[software]".ljust(21) + "[workflow]".ljust(14) + "[80:dev.]".ljust(22) + "[80:test.]".ljust(22) + "[80:qc.]".ljust(22) + "[80:production]"
         puts "\n"
-        if @configuration["websites"]["#{service}"] == nil
-          puts " * none"
-        else
+        if @configuration["websites"]["#{service}"] != nil
           @configuration["websites"]["#{service}"].each do |instance|
             # count websites
             totalwebsites = totalwebsites + 1
@@ -1458,11 +1458,6 @@ module Catapult
           end
         end
       end
-      # start a new row
-      row = Array.new
-      puts "\n[total]"
-      row.push(" #{totalwebsites}")
-      puts row.join(" ")
     end
 
 
