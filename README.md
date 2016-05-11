@@ -75,21 +75,23 @@ Catapult leverages the following technologies and technology services to impleme
 
 Catapult supports and intelligently manages the following software chosen from trending usage statistics from [BuiltWith](https://trends.builtwith.com/cms) and align with the [CentOS 7 trunk](http://mirror.centos.org/centos/7/os/x86_64/Packages/):
 
-* CodeIgniter 2
-* CodeIgniter 3
-* Drupal 6
-* Drupal 7
-* ExpressionEngine 3
-* Joomla 3
-* Laravel 5.0.*
-* MediaWiki 1
-* Moodle 3
-* SilverStripe 3
-* SuiteCRM 7
-* WordPress >=3.5.2
-* WordPress 4
-* XenForo 1
-* Zend Framework 2.0.* <=2.4.*
+Software | Catapult Key | End-of-Life
+---------|--------------|------------
+CodeIgniter 2                     | `codeigniter2`         | 
+CodeIgniter 3                     | `codeigniter3`         | 
+Drupal 6                          | `drupal6`              | [February 24, 2016](https://www.drupal.org/drupal-6-eol)
+Drupal 7                          | `drupal7`              | 
+ExpressionEngine 3                | `expressionengine3`    | 
+Joomla 3                          | `joomla3`              | 
+Laravel 5.0.*                     | `laravel5`             | 
+MediaWiki 1                       | `mediawiki1`           | 
+Moodle 3                          | `moodle3`              | 
+SilverStripe 3                    | `silverstripe3`        | 
+SuiteCRM 7                        | `suitecrm7`            | 
+WordPress >=3.5.2                 | `wordpress`            | 
+WordPress 4                       | `wordpress`            | 
+XenForo 1                         | `xenforo`              | 
+Zend Framework 2.0.* <=2.4.*      | `zendframework2`       | 
 
 Catapult additionally supports basic PHP projects that do not have a database requirement:
 
