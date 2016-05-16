@@ -194,7 +194,6 @@ Catapult requires a [Developer Setup](#developer-setup), [Instance Setup](#insta
 
 Catapult is controlled via Vagrant and the command line of a Developer's workstation - below is a list of required software that will need to be installed.
 
-**Please Note:**
 * OS X workstations: 100% compatabile and tested
 * Linux workstations: 100% compatabile and tested
 * Windows workstations: Currently limited support
