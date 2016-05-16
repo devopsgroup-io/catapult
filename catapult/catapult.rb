@@ -67,6 +67,26 @@ module Catapult
     end
 
 
+    # check for and install vagrant plugins
+    def Command::vagrant_plugins(plugins)
+      logger = Vagrant::UI::Colored.new
+      result = false
+      plugins.each do |p|
+        pm = Vagrant::Plugin::Manager.new(
+          Vagrant::Plugin::Manager.user_plugins_file
+        )
+        plugin_hash = pm.installed_plugins
+        next if plugin_hash.has_key?(p)
+        result = true
+        logger.warn("Installing plugin #{p}")
+        pm.install_plugin(p)
+      end
+      if result
+        catapult_exception('Required Vagrant plugins were installed, please re-run your Vagrant command for the plugins to take effect.')
+      end
+    end
+
+
     # define the minimum vagrant version
     Vagrant.require_version "> 1.4.0"
 
@@ -96,17 +116,16 @@ module Catapult
       if Vagrant::VERSION == "1.8.1"
         catapult_exception("There is an issue with Vagrant v1.8.1 on Windows, please install a lesser or greater version.")
       end
-      # add support for nfs
-      unless Vagrant.has_plugin?("vagrant-winnfsd")
-        catapult_exception('vagrant-winnfsd is not installed, please run "vagrant plugin install vagrant-winnfsd"')
-      end
+      # define required vagrant plugins
+      vagrant_plugins(["vagrant-aws","vagrant-digitalocean","vagrant-hostmanager","vagrant-vbguest","vagrant-winnfsd"]);
     # others
     elsif (RbConfig::CONFIG['host_os'] =~ /darwin|mac os|linux|solaris|bsd/)
       @git = "git"
+      # define required vagrant plugins
+      vagrant_plugins(["vagrant-aws","vagrant-digitalocean","vagrant-hostmanager","vagrant-vbguest"]);
     else
       catapult_exception("Cannot detect your operating system, please submit an issue at https://github.com/devopsgroup-io/catapult")
     end
-
 
 
     # locking in order to prevent multiple executions occurring at once (e.g. competing command line and Bamboo executions)
@@ -125,21 +144,6 @@ module Catapult
     end
 
 
-    # check for vagrant plugins
-    unless Vagrant.has_plugin?("vagrant-aws")
-      catapult_exception('vagrant-aws is not installed, please run "vagrant plugin install vagrant-aws"')
-    end
-    unless Vagrant.has_plugin?("vagrant-digitalocean")
-      catapult_exception('vagrant-digitalocean is not installed, please run "vagrant plugin install vagrant-digitalocean"')
-    end
-    unless Vagrant.has_plugin?("vagrant-hostmanager")
-      catapult_exception('vagrant-hostmanager is not installed, please run "vagrant plugin install vagrant-hostmanager"')
-    end
-    unless Vagrant.has_plugin?("vagrant-vbguest")
-      catapult_exception('vagrant-vbguest is not installed, please run "vagrant plugin install vagrant-vbguest"')
-    end
-
-
     # require vm name on up and provision
     if ["up","provision"].include?(ARGV[0])
       if ARGV.length == 1
@@ -153,11 +157,20 @@ module Catapult
     puts File.read("catapult/catapult.txt")
     puts "\n"
     version = YAML.load_file("VERSION.yml")
+    version_git = `#{@git} --version`.strip
+    version_virtualbox = `vboxmanage --version`.strip
     repo = `#{@git} config --get remote.origin.url`.strip
     branch = `#{@git} rev-parse --abbrev-ref HEAD`.strip
-    puts "==> CATAPULT VERSION: #{version["version"]}"
-    puts "==> CATAPULT GIT REPO: #{repo}"
-    puts "==> GIT BRANCH: #{branch}"
+    puts "=> CATAPULT VERSION: #{version["version"]}"
+    puts "=> CATAPULT GIT REPO: #{repo}"
+    puts "=> GIT BRANCH: #{branch}"
+    puts "\n"
+    puts "==> WORKSTATION INFORMATION"
+    puts "=> OPERATING SYSTEM: #{RbConfig::CONFIG['host_os']}"
+    puts "=> GIT VERSION: #{version_git}"
+    puts "=> RUBY VERSION: #{RUBY_VERSION}"
+    puts "=> VAGRANT VERSION: #{Vagrant::VERSION}"
+    puts "=> VIRTUALBOX VERSION: #{version_virtualbox}"
 
 
     # configure catapult and git
