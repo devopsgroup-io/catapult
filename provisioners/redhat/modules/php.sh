@@ -7,6 +7,7 @@ sudo yum install -y php
 sudo yum install -y php-cli
 # These are not actual extensions. They are part of the PHP core and cannot be left out of a PHP binary with compilation options.
 sed -i -e "s#\;date\.timezone.*#date.timezone = \"$(catapult company.timezone_redhat)\"#g" /etc/php.ini
+sed -i -e "s#\upload_max_filesize.*#upload_max_filesize = 10M#g" /etc/php.ini
 
 # bundled extensions
 # These extensions are bundled with PHP.

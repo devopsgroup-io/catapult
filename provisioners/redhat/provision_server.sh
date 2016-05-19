@@ -1,6 +1,13 @@
 # resources function
 function resources() {
+    module="${1}"
+
     cpu_utilization=$(top -bn 1 | awk '{print $9}' | tail -n +8 | awk '{s+=$1} END {print s}')
+    if [ "${cpu_utilization%.*}" -gt 80 ]; then
+        output_cpu_utilization="![${cpu_utilization%.*}% cpu]"
+    else
+        output_cpu_utilization=" [${cpu_utilization%.*}% cpu]"
+    fi
 
     mem_total=$(free --mega | grep "Mem:" | awk '{print $2}')
     mem_utilization=$(free --mega | grep "Mem:" | awk '{print $3}')
@@ -16,8 +23,19 @@ function resources() {
     eth1_rx=$(cat /proc/net/dev | tail -n +3 | sed -n '2p' | awk '{print $2}' | awk '{ var = $1 / 1024 / 1024 ; print var }')
     eth1_tx=$(cat /proc/net/dev | tail -n +3 | sed -n '2p' | awk '{print $10}' | awk '{ var = $1 / 1024 / 1024 ; print var }')
 
+    module_processes_started=$(ls -l /catapult/provisioners/redhat/logs/${module}.*.log 2>/dev/null | wc -l)
+    module_processes_completed=$(ls -l /catapult/provisioners/redhat/logs/${module}.*.complete 2>/dev/null | wc -l)
+    module_processes_active=$(( $module_processes_started - $module_processes_completed ))
+    if [ "${module_processes_active}" -gt 4 ]; then
+        output_module_processes="![${module_processes_active} active / ${module_processes_completed} completed]"
+    else
+        output_module_processes=" [${module_processes_active} active / ${module_processes_completed} completed]"
+    fi
+
     echo -e " \
-[${cpu_utilization%.*}% cpu] \
+> managing parallel processes \
+${output_module_processes} \
+${output_cpu_utilization} \
 [${mem_utilization}MB / ${mem_total}MB mem] \
 [${swap_utilization}MB / ${swap_total}MB swap] \
 [${eth0_name} ${eth0_rx%.*}MB rx ${eth0_tx%.*}MB tx] \
@@ -80,16 +98,21 @@ if [ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-values-0 redha
             website_index=0
             # loop through websites and start sub-processes
             while read -r -d $'\0' website; do
-                sleep 1
                 # only allow a certain number of parallel bash sub-processes at once
-                while [ $(( $(ls -l /catapult/provisioners/redhat/logs/${module}.*.log 2>/dev/null | wc -l) - $(ls -l /catapult/provisioners/redhat/logs/${module}.*.complete 2>/dev/null | wc -l) )) -gt 4 ]; do
-                    echo "> waiting to start more parallel processes [$(( $(ls -l /catapult/provisioners/redhat/logs/${module}.*.log 2>/dev/null | wc -l) - $(ls -l /catapult/provisioners/redhat/logs/${module}.*.complete 2>/dev/null | wc -l) )) active / 5 max / $(ls -l /catapult/provisioners/redhat/logs/${module}.*.complete  2>/dev/null | wc -l) completed] $(resources)"
-                    sleep 2
+                sleep 1
+                while true; do
+                    resources=$(resources ${module})
+                    if ([[ $resources == *"!"* ]]); then
+                        echo "${resources}"
+                        sleep 1
+                    else
+                        echo "${resources}"
+                        break
+                    fi
                 done
                 bash "/catapult/provisioners/redhat/modules/${module}.sh" $1 $2 $3 $4 $website_index >> "/catapult/provisioners/redhat/logs/${module}.$(echo "${website}" | shyaml get-value domain).log" 2>&1 &
                 (( website_index += 1 ))
             done < <(echo "${configuration}" | shyaml get-values-0 websites.apache)
-            echo "==> all parallel processes started, waiting for all parallel processes to complete..."
             # determine when each subprocess finishes
             while read -r -d $'\0' website; do
                 domain=$(echo "${website}" | shyaml get-value domain)
@@ -97,9 +120,15 @@ if [ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-values-0 redha
                 software=$(echo "${website}" | shyaml get-value software 2>/dev/null )
                 software_dbprefix=$(echo "${website}" | shyaml get-value software_dbprefix 2>/dev/null )
                 software_workflow=$(echo "${website}" | shyaml get-value software_workflow 2>/dev/null )
-                while [ ! -e "/catapult/provisioners/redhat/logs/${module}.${domain}.complete" ]; do
-                    echo "> waiting for parallel processes to complete [$(( $(ls -l /catapult/provisioners/redhat/logs/${module}.*.log 2>/dev/null | wc -l) - $(ls -l /catapult/provisioners/redhat/logs/${module}.*.complete 2>/dev/null | wc -l) )) active / 5 max / $(ls -l /catapult/provisioners/redhat/logs/${module}.*.complete  2>/dev/null | wc -l) completed]  $(resources)"
-                    sleep 2
+                # only allow a certain number of parallel bash sub-processes at once
+                while true; do
+                    resources=$(resources ${module})
+                    if [ ! -e "/catapult/provisioners/redhat/logs/${module}.${domain}.complete" ]; then
+                        echo "${resources}"
+                        sleep 1
+                    else
+                        break
+                    fi
                 done
                 echo -e "=> domain: ${domain}"
                 echo -e "=> domain_tld_override: ${domain_tld_override}"

@@ -29,6 +29,12 @@ else
         domain_expanded="${1}.${domain}.${domain_tld_override}"
     fi
 fi
+force_https=$(catapult websites.apache.$5.force_https)
+if [ "${force_https}" = "True" ]; then
+    domain_expanded_protocol="https:\\/\\/${domain_expanded}"
+else
+    domain_expanded_protocol="http:\\/\\/${domain_expanded}"
+fi
 domainvaliddbname=$(catapult websites.apache.$5.domain | tr "." "_")
 software=$(catapult websites.apache.$5.software)
 software_dbprefix=$(catapult websites.apache.$5.software_dbprefix)
@@ -115,14 +121,14 @@ elif [ "${software}" = "expressionengine3" ]; then
         --expression="s/'password'\s=>\s''/'password' => '${mysql_user_password}'/g" \
         --expression="s/'database'\s=>\s''/'database' => '${1}_${domainvaliddbname}'/g" \
         --expression="s/'dbprefix'\s=>\s''/'dbprefix' => '${software_dbprefix}'/g" \
-        --expression="s/\$config\['avatar_url'\]\s=\s'';/\$config\['avatar_url'\] = 'http:\\/\\/${domain_expanded}\\/images\\/avatars';/g" \
-        --expression="s/\$config\['captcha_url'\]\s=\s'';/\$config\['captcha_url'\] = 'http:\\/\\/${domain_expanded}\\/images\\/captchas';/g" \
+        --expression="s/\$config\['avatar_url'\]\s=\s'';/\$config\['avatar_url'\] = '${domain_expanded_protocol}\\/images\\/avatars';/g" \
+        --expression="s/\$config\['captcha_url'\]\s=\s'';/\$config\['captcha_url'\] = '${domain_expanded_protocol}\\/images\\/captchas';/g" \
         --expression="s/\$config\['cookie_domain'\]\s=\s'';/\$config\['cookie_domain'\] = '.${domain_expanded}';/g" \
-        --expression="s/\$config\['cp_url'\]\s=\s'';/\$config\['cp_url'\] = 'http:\\/\\/${domain_expanded}\\/admin.php';/g" \
-        --expression="s/\$config\['emoticon_url'\]\s=\s'';/\$config\['emoticon_url'\] = 'http:\\/\\/${domain_expanded}\\/images\\/smileys';/g" \
-        --expression="s/\$config\['sig_img_url'\]\s=\s'';/\$config\['sig_img_url'\] = 'http:\\/\\/${domain_expanded}\\/images\\/signatures';/g" \
-        --expression="s/\$config\['site_url'\]\s=\s'';/\$config\['site_url'\] = 'http:\\/\\/${domain_expanded}';/g" \
-        --expression="s/\$config\['theme_folder_url'\]\s=\s'';/\$config\['theme_folder_url'\] = 'http:\\/\\/${domain_expanded}\\/themes';/g" \
+        --expression="s/\$config\['cp_url'\]\s=\s'';/\$config\['cp_url'\] = '${domain_expanded_protocol}\\/admin.php';/g" \
+        --expression="s/\$config\['emoticon_url'\]\s=\s'';/\$config\['emoticon_url'\] = '${domain_expanded_protocol}\\/images\\/smileys';/g" \
+        --expression="s/\$config\['sig_img_url'\]\s=\s'';/\$config\['sig_img_url'\] = '${domain_expanded_protocol}\\/images\\/signatures';/g" \
+        --expression="s/\$config\['site_url'\]\s=\s'';/\$config\['site_url'\] = '${domain_expanded_protocol}';/g" \
+        --expression="s/\$config\['theme_folder_url'\]\s=\s'';/\$config\['theme_folder_url'\] = '${domain_expanded_protocol}\\/themes';/g" \
         --expression="s/\$config\['new_relic_app_name'\]\s=\s'';/\$config\['new_relic_app_name'\] = '${domain_environment}';/g" \
         /catapult/provisioners/redhat/installers/software/${software}/config.php > "${file}"
     sudo chmod 0444 "${file}"
@@ -171,7 +177,7 @@ elif [ "${software}" = "mediawiki1" ]; then
     else
         mkdir --parents $(dirname "${file}")
     fi
-    sed --expression="s/\$wgScriptPath\s=\s\"\";/\$wgScriptPath = \"http:\\/\\/${domain_expanded}\";/g" \
+    sed --expression="s/\$wgScriptPath\s=\s\"\";/\$wgScriptPath = \"${domain_expanded_protocol}\";/g" \
         --expression="s/\$wgDBserver\s=\s\"\";/\$wgDBserver = \"${redhat_mysql_ip}\";/g" \
         --expression="s/\$wgDBname\s=\s\"\";/\$wgDBname = \"${1}_${domainvaliddbname}\";/g" \
         --expression="s/\$wgDBuser\s=\s\"\";/\$wgDBuser = \"${mysql_user}\";/g" \
@@ -194,7 +200,7 @@ elif [ "${software}" = "moodle3" ]; then
         --expression="s/\$CFG->dbuser\s=\s'username';/\$CFG->dbuser = '${mysql_user}';/g" \
         --expression="s/\$CFG->dbpass\s=\s'password';/\$CFG->dbpass = '${mysql_user_password}';/g" \
         --expression="s/\$CFG->prefix\s=\s'mdl_';/\$CFG->prefix = '${software_dbprefix}';/g" \
-        --expression="s/\$CFG->wwwroot\s=\s'';/\$CFG->wwwroot = 'http:\\/\\/${domain_expanded}';/g" \
+        --expression="s/\$CFG->wwwroot\s=\s'';/\$CFG->wwwroot = '${domain_expanded_protocol}';/g" \
         --expression="s/\$CFG->dataroot\s=\s'moodledata';/\$CFG->dataroot = '\\/var\\/www\\/repositories\\/apache\\/${domain}\\/${webroot}moodledata';/g" \
         /catapult/provisioners/redhat/installers/software/${software}/config.php > "${file}"
     sudo chmod 0444 "${file}"
@@ -228,6 +234,7 @@ elif [ "${software}" = "suitecrm7" ]; then
         --expression="s/\$sugar_config\['dbconfig'\]\['db_user_name'\]\s=\s'';/\$sugar_config\['dbconfig'\]\['db_user_name'\] = '${mysql_user}';/g" \
         --expression="s/\$sugar_config\['dbconfig'\]\['db_password'\]\s=\s'';/\$sugar_config\['dbconfig'\]\['db_password'\] = '${mysql_user_password}';/g" \
         --expression="s/\$sugar_config\['dbconfig'\]\['db_name'\]\s=\s'';/\$sugar_config\['dbconfig'\]\['db_name'\] = '${1}_${domainvaliddbname}';/g" \
+        --expression="s/\$sugar_config\['site_url'\]\s=\s'';/\$sugar_config\['site_url'\] = '${domain_expanded_protocol}';/g" \
         /catapult/provisioners/redhat/installers/software/${software}/config_override.php > "${file}"
     sudo chmod 0444 "${file}"
 
