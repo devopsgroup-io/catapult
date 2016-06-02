@@ -1,5 +1,7 @@
 source "/catapult/provisioners/redhat/modules/catapult.sh"
 
+valid_http_response_codes=("200" "400")
+
 # get a list of monitors
 newrelic_monitors=$(curl --silent --show-error --connect-timeout 10 --max-time 20 --write-out "HTTPSTATUS:%{http_code}" --request GET "https://synthetics.newrelic.com/synthetics/api/v1/monitors" \
 --header "X-Api-Key: $(catapult company.newrelic_admin_api_key)")
@@ -32,9 +34,9 @@ newrelic_locations="[
 ]"
 
 # check for a curl error
-if [ $newrelic_monitors_status == 000 ]; then
+if [[ ! "${valid_http_response_codes[@]}" =~ "${newrelic_monitors_status}" ]]; then
 
-    echo "there was a problem with the new relic admin api request - please visit https://status.newrelic.com/ to see if there is a problem"
+    echo -e "[${newrelic_monitors_status}] there was a problem with the new relic admin api request - please visit https://status.newrelic.com/ to see if there is a problem"
 
 else
 
@@ -63,11 +65,11 @@ else
             newrelic_monitor=$(echo "${newrelic_monitor}" | sed -e 's/HTTPSTATUS\:.*//g')
 
             # check for a curl error
-            if [ $newrelic_monitor_status == 000 ]; then
-                echo "there was a problem with the new relic admin api request - please visit https://status.newrelic.com/ to see if there is a problem"
+            if [[ ! "${valid_http_response_codes[@]}" =~ "${newrelic_monitor_status}" ]]; then
+                echo -e "[${newrelic_monitors_status}] there was a problem with the new relic admin api request - please visit https://status.newrelic.com/ to see if there is a problem"
             # a success is null, nice 
             elif [ "${newrelic_monitor}" != "" ]; then
-                echo "there was a problem with the new relic admin api request - please visit https://status.newrelic.com/ to see if there is a problem"
+                echo -e "[${newrelic_monitors_status}] there was a problem with the new relic admin api request - please visit https://status.newrelic.com/ to see if there is a problem"
                 echo "${newrelic_monitor}"
             # success
             else
@@ -91,11 +93,11 @@ else
         newrelic_monitor=$(echo "${newrelic_monitor}" | sed -e 's/HTTPSTATUS\:.*//g')
 
         # check for a curl error
-        if [ $newrelic_monitor_status == 000 ]; then
-            echo "there was a problem with the new relic admin api request - please visit https://status.newrelic.com/ to see if there is a problem"
+        if [[ ! "${valid_http_response_codes[@]}" =~ "${newrelic_monitor_status}" ]]; then
+            echo -e "[${newrelic_monitors_status}] there was a problem with the new relic admin api request - please visit https://status.newrelic.com/ to see if there is a problem"
         # a success is null, nice 
         elif [ "${newrelic_monitor}" != "" ]; then
-            echo "there was a problem with the new relic admin api request - please visit https://status.newrelic.com/ to see if there is a problem"
+            echo -e "[${newrelic_monitors_status}] there was a problem with the new relic admin api request - please visit https://status.newrelic.com/ to see if there is a problem"
             echo "${newrelic_monitor}"
         # success
         else

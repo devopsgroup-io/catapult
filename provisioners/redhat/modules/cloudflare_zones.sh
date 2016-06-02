@@ -10,6 +10,8 @@ if [ ! -z "${domain_tld_override}" ]; then
     domains+=("${domain}.${domain_tld_override}")
 fi
 
+valid_http_response_codes=("200" "400")
+
 for domain in "${domains[@]}"; do
 
     # create array from domain
@@ -25,8 +27,8 @@ for domain in "${domains[@]}"; do
     cloudflare_zone=$(echo "${cloudflare_zone}" | sed -e 's/HTTPSTATUS\:.*//g')
 
     # output the result
-    if [ $cloudflare_zone_status == 000 ]; then
-        echo "there was a problem with the cloudflare api request - please visit https://www.cloudflarestatus.com to see if there is a problem"
+    if [[ ! "${valid_http_response_codes[@]}" =~ "${cloudflare_zone_status}" ]]; then
+        echo -e "[${cloudflare_zone_status}] there was a problem with the cloudflare api request - please visit https://www.cloudflarestatus.com to see if there is a problem"
     elif [ "$(echo "${cloudflare_zone}" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["success"]')" == "False" ]; then
         echo "[${domain_levels[-2]}.${domain_levels[-1]}] $(echo ${cloudflare_zone} | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["errors"][0]["message"]')"
     else
