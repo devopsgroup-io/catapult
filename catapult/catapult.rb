@@ -805,7 +805,7 @@ module Catapult
         request.add_field "X-Api-Key", "#{@configuration["company"]["newrelic_admin_api_key"]}"
         response = http.request request
         if response.code.to_f.between?(399,499)
-          #catapult_exception("The New Relic Admin API could not authenticate, please verify [\"company\"][\"newrelic_admin_api_key\"].")
+          catapult_exception("The New Relic Admin API could not authenticate, please verify [\"company\"][\"newrelic_admin_api_key\"].")
         elsif response.code.to_f.between?(500,600)
           puts "   - The New Relic Admin API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
         else

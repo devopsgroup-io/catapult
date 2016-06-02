@@ -10,6 +10,8 @@ if [ ! -z "${domain_tld_override}" ]; then
     domains+=("${domain}.${domain_tld_override}")
 fi
 
+valid_http_response_codes=("200" "400")
+
 for domain in "${domains[@]}"; do
 
     # create array from domain
@@ -24,9 +26,9 @@ for domain in "${domains[@]}"; do
     cloudflare_zone=$(echo "${cloudflare_zone}" | sed -e 's/HTTPSTATUS\:.*//g')
 
     # check for a curl error
-    if [ $cloudflare_zone_status == 000 ]; then
+    if [[ ! "${valid_http_response_codes[@]}" =~ "${cloudflare_zone_status}" ]]; then
 
-        echo "there was a problem with the cloudflare api request - please visit https://www.cloudflarestatus.com to see if there is a problem"
+        echo -e "[${cloudflare_zone_status}] 1 there was a problem with the cloudflare api request - please visit https://www.cloudflarestatus.com to see if there is a problem"
 
     # clear cloudflare zone cache by zone id, if it exists
     elif [ "$(echo "${cloudflare_zone}" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["result"]')" != "[]" ]; then
@@ -37,12 +39,12 @@ for domain in "${domains[@]}"; do
         --header "X-Auth-Key: $(catapult company.cloudflare_api_key)" \
         --header "Content-Type: application/json" \
         --data "{\"purge_everything\":true}")
-        cloudflare_zone_cache_status=$(echo "${cloudflare_zone}" | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
-        cloudflare_zone_cache=$(echo "${cloudflare_zone}" | sed -e 's/HTTPSTATUS\:.*//g')
+        cloudflare_zone_cache_status=$(echo "${cloudflare_zone_cache}" | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
+        cloudflare_zone_cache=$(echo "${cloudflare_zone_cache}" | sed -e 's/HTTPSTATUS\:.*//g')
 
         # check for a curl error
-        if [ $cloudflare_zone_status == 000 ]; then
-            echo "there was a problem with the cloudflare api request - please visit https://www.cloudflarestatus.com to see if there is a problem"
+        if [[ ! "${valid_http_response_codes[@]}" =~ "${cloudflare_zone_cache_status}" ]]; then
+            echo -e "[${cloudflare_zone_status}] 2 there was a problem with the cloudflare api request - please visit https://www.cloudflarestatus.com to see if there is a problem"
         elif [ "$(echo "${cloudflare_zone_cache}" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["success"]')" == "False" ]; then
             echo "[${domain_levels[-2]}.${domain_levels[-1]}] $(echo ${cloudflare_zone_cache} | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["errors"][0]["message"]')"
         else

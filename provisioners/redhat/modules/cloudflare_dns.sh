@@ -10,6 +10,8 @@ if [ ! -z "${domain_tld_override}" ]; then
     domains+=("${domain}.${domain_tld_override}")
 fi
 
+valid_http_response_codes=("200" "400")
+
 for domain in "${domains[@]}"; do
 
     # create array from domain
@@ -24,8 +26,8 @@ for domain in "${domains[@]}"; do
     cloudflare_zone=$(echo "${cloudflare_zone}" | sed -e 's/HTTPSTATUS\:.*//g')
 
     # check for a curl error
-    if [ $cloudflare_zone_status == 000 ]; then
-        echo "there was a problem with the cloudflare api request - please visit https://www.cloudflarestatus.com to see if there is a problem"
+    if [[ ! "${valid_http_response_codes[@]}" =~ "${cloudflare_zone_status}" ]]; then
+        echo -e "[${cloudflare_zone_status}] there was a problem with the cloudflare api request - please visit https://www.cloudflarestatus.com to see if there is a problem"
     elif [ "$(echo "${cloudflare_zone}" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["result"]')" == "[]" ]; then
         echo "[${domain}] cloudflare zone does not exist"
     else
@@ -54,8 +56,8 @@ for domain in "${domains[@]}"; do
             dns_record=$(echo "${dns_record}" | sed -e 's/HTTPSTATUS\:.*//g')
 
             # check for a curl error
-            if [ $dns_record_status == 000 ]; then
-                echo "there was a problem with the cloudflare api request - please visit https://www.cloudflarestatus.com to see if there is a problem"
+            if [[ ! "${valid_http_response_codes[@]}" =~ "${dns_record_status}" ]]; then
+                echo -e "[${dns_record_status}] there was a problem with the cloudflare api request - please visit https://www.cloudflarestatus.com to see if there is a problem"
             # create dns a record
             elif [ "$(echo "${dns_record}" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["result"]')" == "[]" ]; then
                 dns_record=$(curl --silent --show-error  --connect-timeout 30 --max-time 60 --write-out "HTTPSTATUS:%{http_code}" --request POST "https://api.cloudflare.com/client/v4/zones/${cloudflare_zone_id}/dns_records" \
@@ -78,8 +80,8 @@ for domain in "${domains[@]}"; do
             fi
 
             # output the result
-            if [ $dns_record_status == 000 ]; then
-                echo "there was a problem with the cloudflare api request - please visit https://www.cloudflarestatus.com to see if there is a problem"
+            if [[ ! "${valid_http_response_codes[@]}" =~ "${dns_record_status}" ]]; then
+                echo -e "[${dns_record_status}] there was a problem with the cloudflare api request - please visit https://www.cloudflarestatus.com to see if there is a problem"
             elif [ "$(echo "${dns_record}" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["success"]')" == "False" ]; then
                 echo "[${domain_dns_record}] $(echo ${dns_record} | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["errors"][0]["message"]')"
             else
