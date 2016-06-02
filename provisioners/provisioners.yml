@@ -64,7 +64,7 @@ redhat:
     servers:
         redhat:
           apache:
-            modules: ["system","iptables","time","newrelic_sysmon","git_clean","git","rsync","software_config","php","software_tools","apache","apache_vhosts_clean","apache_vhosts","newrelic_apm_php","cloudflare_zones","cloudflare_dns","cloudflare_cache","newrelic_synthetics"]
+            modules: ["system","iptables","time","newrelic_sysmon","git_clean","git","rsync","software_config","php","software_tools","apache","apache_vhosts_clean","apache_vhosts","newrelic_apm_php","cloudflare_zones","cloudflare_dns","cloudflare_cache"]
           mysql:
             modules: ["system","iptables","time","newrelic_sysmon","git_clean","git","software_config","php","software_tools","mysql","software_database_operations"]
 windows:
