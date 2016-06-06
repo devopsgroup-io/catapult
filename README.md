@@ -315,7 +315,7 @@ Bamboo | Continuous Integration | $10
 **DNS:** | |
 CloudFlare | Cloud DNS | Free
 **Monitoring:** | |
-New Relic | Application, Browser, and Server Monitoring | Free
+New Relic | Application, Browser, Server, and *Synthetics Monitoring | Free [*No free tier beyond trial](#partnerships)
 **Total** | | $40+
 \* Depending on load, resources may need to be increased. However, a few websites with builds running irregularly will not incur over a couple dollars more per month.
 
@@ -1025,6 +1025,7 @@ As part of a new release, the version number in VERSION.yml will be incremented 
 
 The Catapult team values partnerships and continuous improvement.
 
+* [06-03-2016] New Relic creates request on Catapult's behalf for a free entry point for the New Relic Synthetics API
 * [01-28-2016] Pantheon provides feedback
 * [01-22-2016] New Relic provides private beta access to their Synthetics API along side Breather, Carfax, Ring Central, Rackspace, and IBM.
 
