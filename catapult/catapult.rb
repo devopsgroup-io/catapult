@@ -79,7 +79,7 @@ module Catapult
         next if plugin_hash.has_key?(p)
         result = true
         logger.warn("Installing plugin #{p}")
-        pm.install_plugin(p)
+        pm.install_plugin(p, sources: ["https://rubygems.org"])
       end
       if result
         catapult_exception('Required Vagrant plugins were installed, please re-run your Vagrant command for the plugins to take effect.')
