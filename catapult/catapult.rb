@@ -469,7 +469,7 @@ module Catapult
         request.add_field "Authorization", "Bearer #{@configuration["company"]["digitalocean_personal_access_token"]}"
         response = http.request request
         if response.code.to_f.between?(399,499)
-          catapult_exception("The DigitalOcean API could not authenticate, please verify [\"company\"][\"digitalocean_personal_access_token\"].")
+          catapult_exception("#{response.code} The DigitalOcean API could not authenticate, please verify [\"company\"][\"digitalocean_personal_access_token\"].")
         elsif response.code.to_f.between?(500,600)
           puts "   - The DigitalOcean API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
         else
@@ -515,7 +515,7 @@ module Catapult
         request.basic_auth "#{@configuration["company"]["bitbucket_username"]}", "#{@configuration["company"]["bitbucket_password"]}"
         response = http.request request
         if response.code.to_f.between?(399,499)
-          catapult_exception("The Bitbucket API could not authenticate, please verify [\"company\"][\"bitbucket_username\"] and [\"company\"][\"bitbucket_password\"].")
+          catapult_exception("#{response.code} The Bitbucket API could not authenticate, please verify [\"company\"][\"bitbucket_username\"] and [\"company\"][\"bitbucket_password\"].")
         elsif response.code.to_f.between?(500,600)
           puts "   - The Bitbucket API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
         else
@@ -564,7 +564,7 @@ module Catapult
         request.basic_auth "#{@configuration["company"]["github_username"]}", "#{@configuration["company"]["github_password"]}"
         response = http.request request
         if response.code.to_f.between?(399,499)
-          catapult_exception("The GitHub API could not authenticate, please verify [\"company\"][\"github_username\"] and [\"company\"][\"github_password\"].")
+          catapult_exception("#{response.code} The GitHub API could not authenticate, please verify [\"company\"][\"github_username\"] and [\"company\"][\"github_password\"].")
         elsif response.code.to_f.between?(500,600)
           puts "   - The GitHub API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
         else
@@ -613,7 +613,7 @@ module Catapult
         request.basic_auth "#{@configuration["company"]["bamboo_username"]}", "#{@configuration["company"]["bamboo_password"]}"
         response = http.request request
         if response.code.to_f.between?(399,499)
-          catapult_exception("The Bamboo API could not authenticate, please verify [\"company\"][\"bamboo_base_url\"] and [\"company\"][\"bamboo_username\"] and [\"company\"][\"bamboo_password\"].")
+          catapult_exception("#{response.code} The Bamboo API could not authenticate, please verify [\"company\"][\"bamboo_base_url\"] and [\"company\"][\"bamboo_username\"] and [\"company\"][\"bamboo_password\"].")
         elsif response.code.to_f.between?(500,600)
           puts "   - The Bamboo API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
         else
@@ -747,7 +747,7 @@ module Catapult
         request.add_field "content-type", "application/json" #@todo this doesn't seem to work
         response = http.request request
         if response.code.to_f.between?(399,499)
-          catapult_exception("The AWS API could not authenticate, please verify [\"company\"][\"aws_access_key\"] and [\"company\"][\"aws_secret_key\"].")
+          catapult_exception("#{response.code} The AWS API could not authenticate, please verify [\"company\"][\"aws_access_key\"] and [\"company\"][\"aws_secret_key\"].")
         elsif response.code.to_f.between?(500,600)
           puts "   - The AWS API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
         else
@@ -767,7 +767,7 @@ module Catapult
         request.add_field "X-Auth-Email", "#{@configuration["company"]["cloudflare_email"]}"
         response = http.request request
         if response.code.to_f.between?(399,499)
-          catapult_exception("The CloudFlare API could not authenticate, please verify [\"company\"][\"cloudflare_api_key\"] and [\"company\"][\"cloudflare_email\"].")
+          catapult_exception("#{response.code} The CloudFlare API could not authenticate, please verify [\"company\"][\"cloudflare_api_key\"] and [\"company\"][\"cloudflare_email\"].")
         elsif response.code.to_f.between?(500,600)
           puts "   - The CloudFlare API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
         else
@@ -786,7 +786,7 @@ module Catapult
         request.add_field "X-Api-Key", "#{@configuration["company"]["newrelic_api_key"]}"
         response = http.request request
         if response.code.to_f.between?(399,499)
-          catapult_exception("The New Relic API could not authenticate, please verify [\"company\"][\"newrelic_api_key\"] and [\"company\"][\"newrelic_license_key\"].")
+          catapult_exception("#{response.code} The New Relic API could not authenticate, please verify [\"company\"][\"newrelic_api_key\"] and [\"company\"][\"newrelic_license_key\"].")
         elsif response.code.to_f.between?(500,600)
           puts "   - The New Relic API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
         else
@@ -805,7 +805,8 @@ module Catapult
         request.add_field "X-Api-Key", "#{@configuration["company"]["newrelic_admin_api_key"]}"
         response = http.request request
         if response.code.to_f.between?(399,499)
-          catapult_exception("The New Relic Admin API could not authenticate, please verify [\"company\"][\"newrelic_admin_api_key\"].")
+          puts " * New Relic Admin API could not authenticate (Synthetics tests will not be created).".color(Colors::YELLOW)
+          #catapult_exception("#{response.code} The New Relic Admin API could not authenticate, please verify [\"company\"][\"newrelic_admin_api_key\"].")
         elsif response.code.to_f.between?(500,600)
           puts "   - The New Relic Admin API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
         else
@@ -823,7 +824,7 @@ module Catapult
       request.add_field "Authorization", "Bearer #{@configuration["company"]["digitalocean_personal_access_token"]}"
       response = http.request request
       if response.code.to_f.between?(399,499)
-        catapult_exception("The DigitalOcean API could not authenticate, please verify [\"company\"][\"digitalocean_personal_access_token\"].")
+        catapult_exception("#{response.code} The DigitalOcean API could not authenticate, please verify [\"company\"][\"digitalocean_personal_access_token\"].")
       elsif response.code.to_f.between?(500,600)
         puts "   - The DigitalOcean API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
       else
