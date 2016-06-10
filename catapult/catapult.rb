@@ -509,7 +509,7 @@ module Catapult
     if @configuration["company"]["bitbucket_username"] == nil || @configuration["company"]["bitbucket_password"] == nil
       catapult_exception("Please set [\"company\"][\"bitbucket_username\"] and [\"company\"][\"bitbucket_password\"] in secrets/configuration.yml")
     else
-      uri = URI("https://api.bitbucket.org/1.0/user/repositories")
+      uri = URI("https://api.bitbucket.org/1.0/user")
       Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
         request = Net::HTTP::Get.new uri.request_uri
         request.basic_auth "#{@configuration["company"]["bitbucket_username"]}", "#{@configuration["company"]["bitbucket_password"]}"
