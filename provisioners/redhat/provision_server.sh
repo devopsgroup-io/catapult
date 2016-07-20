@@ -4,16 +4,28 @@ function resources() {
 
     cpu_utilization=$(top -bn 1 | awk '{print $9}' | tail -n +8 | awk '{s+=$1} END {print s}')
     if [ "${cpu_utilization%.*}" -gt 80 ]; then
-        output_cpu_utilization="![${cpu_utilization%.*}% cpu]"
+        output_cpu_utilization=$(printf "![cpu %4s]" ${cpu_utilization%.*}%)
     else
-        output_cpu_utilization=" [${cpu_utilization%.*}% cpu]"
+        output_cpu_utilization=$(printf " [cpu %4s]" ${cpu_utilization%.*}%)
     fi
 
     mem_total=$(free --mega | grep "Mem:" | awk '{print $2}')
-    mem_utilization=$(free --mega | grep "Mem:" | awk '{print $3}')
+    mem_usage=$(free --mega | grep "Mem:" | awk '{print $3}')
+    mem_utilization=$(free | grep "Mem:" | awk '{print $3/$2 * 100.0}')
+    if [ "${mem_utilization%.*}" -gt 80 ]; then
+        output_mem_utilization="![mem ${mem_utilization%.*}% ${mem_usage}/${mem_total}MB]"
+    else
+        output_mem_utilization=" [mem ${mem_utilization%.*}% ${mem_usage}/${mem_total}MB]"
+    fi
 
     swap_total=$(free --mega | grep "Swap:" | awk '{print $2}')
-    swap_utilization=$(free --mega | grep "Swap:" | awk '{print $3}')
+    swap_usage=$(free --mega | grep "Swap:" | awk '{print $3}')
+    swap_utilization=$(free | grep "Swap:" | awk '{print $3/$2 * 100.0}')
+    if [ "${swap_utilization%.*}" -gt 80 ]; then
+        output_swap_utilization="![swap ${swap_utilization%.*}% ${swap_usage}/${swap_total}MB]"
+    else
+        output_swap_utilization=" [swap ${swap_utilization%.*}% ${swap_usage}/${swap_total}MB]"
+    fi
 
     eth0_name=$(cat /proc/net/dev | tail -n +3 | sed -n '1p' | awk '{print $1}')
     eth0_rx=$(cat /proc/net/dev | tail -n +3 | sed -n '1p' | awk '{print $2}' | awk '{ var = $1 / 1024 / 1024 ; print var }')
@@ -24,22 +36,22 @@ function resources() {
     eth1_tx=$(cat /proc/net/dev | tail -n +3 | sed -n '2p' | awk '{print $10}' | awk '{ var = $1 / 1024 / 1024 ; print var }')
 
     module_processes_started=$(ls -l /catapult/provisioners/redhat/logs/${module}.*.log 2>/dev/null | wc -l)
-    module_processes_completed=$(ls -l /catapult/provisioners/redhat/logs/${module}.*.complete 2>/dev/null | wc -l)
-    module_processes_active=$(( $module_processes_started - $module_processes_completed ))
+    module_processes_complete=$(ls -l /catapult/provisioners/redhat/logs/${module}.*.complete 2>/dev/null | wc -l)
+    module_processes_active=$(( $module_processes_started - $module_processes_complete ))
     if [ "${module_processes_active}" -gt 4 ]; then
-        output_module_processes="![${module_processes_active} active / ${module_processes_completed} completed]"
+        output_module_processes="![$(printf "%-2s" ${module_processes_active}) active - $(printf "%-2s" ${module_processes_complete}) complete]"
     else
-        output_module_processes=" [${module_processes_active} active / ${module_processes_completed} completed]"
+        output_module_processes=" [$(printf "%-2s" ${module_processes_active}) active - $(printf "%-2s" ${module_processes_complete}) complete]"
     fi
 
     echo -e " \
 > managing parallel processes \
 ${output_module_processes} \
 ${output_cpu_utilization} \
-[${mem_utilization}MB / ${mem_total}MB mem] \
-[${swap_utilization}MB / ${swap_total}MB swap] \
-[${eth0_name} ${eth0_rx%.*}MB rx ${eth0_tx%.*}MB tx] \
-[${eth1_name} ${eth1_rx%.*}MB rx ${eth1_tx%.*}MB tx] \
+${output_mem_utilization} \
+${output_swap_utilization} \
+[${eth0_name//:} ${eth0_rx%.*}rx:${eth0_tx%.*}tx MB] \
+[${eth1_name//:} ${eth1_rx%.*}rx:${eth1_tx%.*}tx MB] \
     "
 }
 
