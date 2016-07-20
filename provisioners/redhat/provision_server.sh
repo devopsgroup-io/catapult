@@ -21,11 +21,7 @@ function resources() {
     swap_total=$(free --mega | grep "Swap:" | awk '{print $2}')
     swap_usage=$(free --mega | grep "Swap:" | awk '{print $3}')
     swap_utilization=$(free | grep "Swap:" | awk '{print $3/$2 * 100.0}')
-    if [ "${swap_utilization%.*}" -gt 80 ]; then
-        output_swap_utilization="![swap ${swap_utilization%.*}% ${swap_usage}/${swap_total}MB]"
-    else
-        output_swap_utilization=" [swap ${swap_utilization%.*}% ${swap_usage}/${swap_total}MB]"
-    fi
+    output_swap_utilization="[swap ${swap_utilization%.*}% ${swap_usage}/${swap_total}MB]"
 
     eth0_name=$(cat /proc/net/dev | tail -n +3 | sed -n '1p' | awk '{print $1}')
     eth0_rx=$(cat /proc/net/dev | tail -n +3 | sed -n '1p' | awk '{print $2}' | awk '{ var = $1 / 1024 / 1024 ; print var }')
