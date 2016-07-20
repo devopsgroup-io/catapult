@@ -4,15 +4,15 @@ source "/catapult/provisioners/redhat/modules/catapult.sh"
 if [ -d "/var/www/repositories/apache/$(catapult websites.apache.$5.domain)/.git" ]; then
     if [ "$(cd /var/www/repositories/apache/$(catapult websites.apache.$5.domain) && git config --get remote.origin.url)" != "$(catapult websites.apache.$5.repo)" ]; then
         echo "the repo has changed in secrets/configuration.yml, removing and cloning the new repository..."
-        sudo rm -rf /var/www/repositories/apache/$(catapult websites.apache.$5.domain)
+        sudo rm --force --recursive /var/www/repositories/apache/$(catapult websites.apache.$5.domain)
         sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git clone --recursive -b $(catapult environments.$1.branch) $(catapult websites.apache.$5.repo) /var/www/repositories/apache/$(catapult websites.apache.$5.domain)"
-    elif [ "$(cd /var/www/repositories/apache/$(catapult websites.apache.$5.domain) && ls -afq .git/refs/heads | wc -l )" == "2" ]; then
+    elif [ "$(cd /var/www/repositories/apache/$(catapult websites.apache.$5.domain) && find .git/objects -type f | wc -l )" == "0" ]; then
         echo "the repo appears to be empty, removing and re-cloning the repository..."
-        sudo rm -rf /var/www/repositories/apache/$(catapult websites.apache.$5.domain)
+        sudo rm --force --recursive /var/www/repositories/apache/$(catapult websites.apache.$5.domain)
         sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git clone --recursive -b $(catapult environments.$1.branch) $(catapult websites.apache.$5.repo) /var/www/repositories/apache/$(catapult websites.apache.$5.domain)"
     elif [ "$(cd /var/www/repositories/apache/$(catapult websites.apache.$5.domain) && git rev-list HEAD | tail -n 1 )" != "$(cd /var/www/repositories/apache/$(catapult websites.apache.$5.domain) && git rev-list origin/master | tail -n 1 )" ]; then
         echo "the repo has changed, removing and cloning the new repository..."
-        sudo rm -rf /var/www/repositories/apache/$(catapult websites.apache.$5.domain)
+        sudo rm --force --recursive /var/www/repositories/apache/$(catapult websites.apache.$5.domain)
         sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git clone --recursive -b $(catapult environments.$1.branch) $(catapult websites.apache.$5.repo) /var/www/repositories/apache/$(catapult websites.apache.$5.domain)"
     else
         directory_size=$(du --exclude=.git --summarize "/var/www/repositories/apache/$(catapult websites.apache.$5.domain)" | awk '{ print $1 }')
@@ -117,12 +117,16 @@ if [ -d "/var/www/repositories/apache/$(catapult websites.apache.$5.domain)/.git
                 && sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git submodule update --init --recursive" \
                 && sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git push origin $(catapult environments.$1.branch)"
         fi
+        # last but not least, run git gc to cleanup unnecessary files and optimize the local repository
+        # using the --auto flag will prevent gc from running every time, which on larger repositories can take a while
+        cd /var/www/repositories/apache/$(catapult websites.apache.$5.domain) \
+            && git gc --auto
     fi
 else
     if [ -d "/var/www/repositories/apache/$(catapult websites.apache.$5.domain)" ]; then
         echo "the .git folder is missing, removing the directory and re-cloning the repository."
         sudo chmod 0777 -R /var/www/repositories/apache/$(catapult websites.apache.$5.domain)
-        sudo rm -rf /var/www/repositories/apache/$(catapult websites.apache.$5.domain)
+        sudo rm --force --recursive /var/www/repositories/apache/$(catapult websites.apache.$5.domain)
     fi
     sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git clone --recursive -b $(catapult environments.$1.branch) $(catapult websites.apache.$5.repo) /var/www/repositories/apache/$(catapult websites.apache.$5.domain)"
 fi
