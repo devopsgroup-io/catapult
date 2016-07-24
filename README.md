@@ -170,7 +170,7 @@ See an error or have a suggestion? Email competition@devopsgroup.io - we appreci
         - [Connecting to Databases](#connecting-to-databases)
         - [Hotfixes](#hotfixes)
     - [Performance Testing](#performance-testing)
-        - [Website Concurrency Maxiumum](#website-concurrency-maximum)
+        - [Website Concurrency Maximum](#website-concurrency-maximum)
         - [Interpreting Apache AB Results](#interpreting-apache-ab-results)
     - [Disaster Recovery](#disaster-recovery)
         - [Server Rebuilding](#server-rebuilding) 
@@ -839,7 +839,7 @@ With Catapult's exactly duplicated configuration, even the Test environment can 
 
 ApacheBench enables us to profile request performance (`-n` represents the number of requests to perform) and concurrency (`-c` represents the number of multiple requests to make at a time) to test for performance, including common limits such as [C10k and C10M](http://highscalability.com/blog/2013/5/13/the-secret-to-10-million-concurrent-connections-the-kernel-i.html).
 
-### Website Concurrency Maxiumum ###
+### Website Concurrency Maximum ###
 
 Using a website with historical Google Analytics data, access the Audience Overview and find the busiest Pageview day from the past 30-days and then drill into that date. Find the hour with the most Pageviews, then the accompanying Avg. Session Duration. Using the following formula, we are able to find the Concurrency Maxiumum.
 
