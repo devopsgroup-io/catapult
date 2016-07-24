@@ -1,11 +1,16 @@
 # Catapult #
 <img src="https://cdn.rawgit.com/devopsgroup-io/catapult/master/repositories/apache/_default_/svg/catapult.svg" alt="Catapult" width="200">
 
+Catapult defines a best-practice infrastructure so you don't have to - it also aligns with Agile methodologies, like Scrum, to afford you everything you need to develop and deploy a website with ease.
+
+<img src="https://cdn.rawgit.com/devopsgroup-io/catapult/master/repositories/apache/_default_/catapult_infrastructure.png" alt="Catapult Infrastructure">
+
 :boom: **Catapult** is a complete website and workflow management platform built from leading and affordable technologies.
 
 :earth_americas: **Our mission** is to create a lean platform which orchestrates DevOps for website lifecycles with familiar technologies.
 
 :rocket: **Our vision** is to afford organizations reduced risk and improved performance while lowering barriers to entry.
+
 
 <br>
 
