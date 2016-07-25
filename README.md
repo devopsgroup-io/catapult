@@ -3,7 +3,7 @@
 
 Catapult defines a best-practice infrastructure so you don't have to - it also aligns with Agile methodologies, like Scrum, to afford you everything you need to develop and deploy a website with ease.
 
-<img src="https://cdn.rawgit.com/devopsgroup-io/catapult/master/repositories/apache/_default_/catapult_infrastructure.png" alt="Catapult Infrastructure">
+<img src="https://cdn.rawgit.com/devopsgroup-io/catapult/master/catapult/installers/images/catapult_infrastructure.png" alt="Catapult Infrastructure">
 
 :boom: **Catapult** is a complete website and workflow management platform built from leading and affordable technologies.
 
@@ -844,6 +844,8 @@ ApacheBench enables us to profile request performance (`-n` represents the numbe
 Using a website with historical Google Analytics data, access the Audience Overview and find the busiest Pageview day from the past 30-days and then drill into that date. Find the hour with the most Pageviews, then the accompanying Avg. Session Duration. Using the following formula, we are able to find the Concurrency Maxiumum.
 
 *(Pageviews x Avg. Session Duration in seconds) / 3,600 seconds* = **Concurrency Maxiumum**
+
+<img src="https://cdn.rawgit.com/devopsgroup-io/catapult/master/catapult/installers/images/catapult_website_concurrency_maximum.png" alt="Catapult Website Concurrency Maximum">
 
 **365,000 pageviews per month**
 
