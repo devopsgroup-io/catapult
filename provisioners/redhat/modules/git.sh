@@ -97,7 +97,7 @@ if [ -d "/var/www/repositories/apache/$(catapult websites.apache.$5.domain)/.git
             # stash any pending work in localdev as a courtesy (branch may vary)
             if [ "${1}" = "dev" ]; then
                 cd /var/www/repositories/apache/$(catapult websites.apache.$5.domain) \
-                    && git stash save
+                    && git stash save --include-untracked
             fi
             # hard reset (tracked), checkout all from HEAD, clean (untracked), checkout correct branch, then pull in latest
             cd /var/www/repositories/apache/$(catapult websites.apache.$5.domain) \
