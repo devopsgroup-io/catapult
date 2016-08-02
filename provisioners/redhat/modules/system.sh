@@ -118,3 +118,18 @@ until [ $i -ge 10 ]; do
     fi
     i=$[$i+1]
 done
+
+
+
+# install yum-cron to apply updates nightly
+sudo yum install -y yum-cron
+sudo systemctl enable yum-cron.service
+sudo systemctl start yum-cron.service
+# auto download updates
+sudo sed --in-place --expression='/^download_updates\s=/s|.*|download_updates = yes|' /etc/yum/yum-cron.conf
+# auto apply updates
+sudo sed --in-place --expression='/^apply_updates\s=/s|.*|apply_updates = yes|' /etc/yum/yum-cron.conf
+# do not send any messages to stdout or email
+sudo sed --in-place --expression='/^emit_via\s=/s|.*|emit_via = None|' /etc/yum/yum-cron.conf
+# restart the service to re-read any new configuration
+sudo systemctl restart yum-cron.service
