@@ -12,7 +12,8 @@ while IFS='' read -r -d '' key; do
     array_conf_domain_environment+=("${domain_environment}.conf")
     array_htpasswd_domain_environment+=("${domain_environment}.htpasswd")
 done < <(echo "${configuration}" | shyaml get-values-0 websites.apache)
-# cleanup /var/log/httpd/*/access.log and /var/log/httpd/*/error.log
+
+# cleanup /var/log/httpd/${domain}/ directories
 for directory in /var/log/httpd/*/; do
     # when there are no matches, for defaults to the match /var/log/httpd/*/, ignore this result
     # on a new provision, there will be no log directories
@@ -22,10 +23,6 @@ for directory in /var/log/httpd/*/; do
             echo -e "\t * cleaning up /var/log/httpd/${folder_domain_environment}/ as the website has been removed for your configuration..."
             sudo chmod 0777 -R $directory
             sudo rm -rf $directory
-        else
-            echo -e "\t * emptying log files in /var/log/httpd/${folder_domain_environment}/..."
-            sudo cat /dev/null > /var/log/httpd/${folder_domain_environment}/access.log
-            sudo cat /dev/null > /var/log/httpd/${folder_domain_environment}/error.log
         fi
     fi
 done

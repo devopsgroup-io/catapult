@@ -39,8 +39,8 @@ while IFS='' read -r -d '' key; do
         echo -e "\t * configuring vhost for ${1}.${domain_root}"
     fi
     sudo mkdir --parents /var/log/httpd/${domain_environment}
-    sudo touch /var/log/httpd/${domain_environment}/access.log
-    sudo touch /var/log/httpd/${domain_environment}/error.log
+    sudo touch /var/log/httpd/${domain_environment}/access_log
+    sudo touch /var/log/httpd/${domain_environment}/error_log
     # set domain_tld_override_alias_additions for vhost
     if [ -z "${domain_tld_override}" ]; then
         domain_tld_override_alias_additions=""
@@ -107,8 +107,8 @@ while IFS='' read -r -d '' key; do
         ServerAlias www.${domain_environment}
         $domain_tld_override_alias_additions
         DocumentRoot /var/www/repositories/apache/${domain}/${webroot}
-        ErrorLog /var/log/httpd/${domain_environment}/error.log
-        CustomLog /var/log/httpd/${domain_environment}/access.log combined
+        ErrorLog /var/log/httpd/${domain_environment}/error_log
+        CustomLog /var/log/httpd/${domain_environment}/access_log combined
         LogLevel warn
         $force_auth_value
         $force_https_value
@@ -120,8 +120,8 @@ while IFS='' read -r -d '' key; do
             ServerName ${domain_environment}
             ServerAlias www.${domain_environment}
             DocumentRoot /var/www/repositories/apache/${domain}/${webroot}
-            ErrorLog /var/log/httpd/${domain_environment}/error.log
-            CustomLog /var/log/httpd/${domain_environment}/access.log combined
+            ErrorLog /var/log/httpd/${domain_environment}/error_log
+            CustomLog /var/log/httpd/${domain_environment}/access_log combined
             LogLevel warn
             SSLEngine on
 

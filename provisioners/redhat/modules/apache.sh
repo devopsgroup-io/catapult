@@ -1,13 +1,5 @@
 source "/catapult/provisioners/redhat/modules/catapult.sh"
 
-# reset httpd log files
-if [ -e /var/log/httpd/access_log ]; then
-  sudo cat /dev/null > /var/log/httpd/access_log
-fi
-if [ -e /var/log/httpd/error_log ]; then
-  sudo cat /dev/null > /var/log/httpd/error_log
-fi
-
 # install apache
 sudo yum install -y httpd
 sudo systemctl enable httpd.service
@@ -75,6 +67,36 @@ sudo cat > /etc/httpd/sites-enabled/_default_.conf << EOF
         SSLCertificateKeyFile /etc/ssl/certs/httpd-dummy-cert.key.cert
     </VirtualHost>
 </IfModule>
+EOF
+
+# configure log rotation for apache
+sudo cat > /etc/logrotate.d/httpd << EOF
+/var/log/httpd/*log {
+    daily
+    delaycompress
+    notifempty
+    maxage 7
+    missingok
+    sharedscripts
+    postrotate
+        /bin/systemctl reload httpd.service > /dev/null 2>/dev/null || true
+    endscript
+}
+EOF
+
+# configure log rotation for apache vhosts
+sudo cat > /etc/logrotate.d/httpd_vhosts << EOF
+/var/log/httpd/*/*log {
+    daily
+    delaycompress
+    notifempty
+    maxage 7
+    missingok
+    sharedscripts
+    postrotate
+        /bin/systemctl reload httpd.service > /dev/null 2>/dev/null || true
+    endscript
+}
 EOF
 
 # reload apache
