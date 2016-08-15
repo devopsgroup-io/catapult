@@ -69,6 +69,7 @@ Add-Type -AssemblyName System.IO.Compression.FileSystem
 Import-Module PSWindowsUpdate
 if (Get-Module -ListAvailable -Name PSWindowsUpdate) {
     echo "PSWindowsUpdate loaded"
+    echo (Get-Module PSWindowsUpdate) | Format-Table -Property Version
 } else {
     echo "PSWindowsUpdate failed to load"
 }
@@ -128,6 +129,7 @@ echo "`n`n==> Importing servermanager"
 import-module servermanager
 if (Get-Module -ListAvailable -Name servermanager) {
     echo "servermanager loaded"
+    echo (Get-Module servermanager) | Format-Table -Property Version
 } else {
     echo "servermanager failed to load"
 }
@@ -144,6 +146,7 @@ echo "`n`n==> Importing webadministration"
 import-module webadministration
 if (Get-Module -ListAvailable -Name webadministration) {
     echo "webadministration loaded"
+    echo (Get-Module webadministration) | Format-Table -Property Version
 } else {
     echo "webadministration failed to load"
 }
@@ -215,25 +218,25 @@ if (-not($config.websites.iis)) {
             start-process -filepath "c:\Program Files (x86)\Git\bin\git.exe" -argumentlist ("-C c:\inetpub\repositories\iis\{0} config pack.windowMemory 128m" -f $instance.domain) -Wait -RedirectStandardOutput $provision -RedirectStandardError $provisionError
             get-content $provision
             get-content $provisionError
-            start-process -filepath "c:\Program Files (x86)\Git\bin\git.exe" -argumentlist ("-C c:\inetpub\repositories\iis\{0} reset -q --hard HEAD --" -f $instance.domain,$config.environments.$($args[0]).branch) -Wait -RedirectStandardOutput $provision -RedirectStandardError $provisionError
+            start-process -filepath "c:\Program Files (x86)\Git\bin\git.exe" -argumentlist ("-C c:\inetpub\repositories\iis\{0} reset -q --hard HEAD --" -f $instance.domain) -Wait -RedirectStandardOutput $provision -RedirectStandardError $provisionError
             get-content $provision
             get-content $provisionError
-            start-process -filepath "c:\Program Files (x86)\Git\bin\git.exe" -argumentlist ("-C c:\inetpub\repositories\iis\{0} checkout ." -f $instance.domain,$config.environments.$($args[0]).branch) -Wait -RedirectStandardOutput $provision -RedirectStandardError $provisionError
+            start-process -filepath "c:\Program Files (x86)\Git\bin\git.exe" -argumentlist ("-C c:\inetpub\repositories\iis\{0} checkout ." -f $instance.domain) -Wait -RedirectStandardOutput $provision -RedirectStandardError $provisionError
             get-content $provision
             get-content $provisionError
-            start-process -filepath "c:\Program Files (x86)\Git\bin\git.exe" -argumentlist ("-C c:\inetpub\repositories\iis\{0} clean -fd" -f $instance.domain,$config.environments.$($args[0]).branch) -Wait -RedirectStandardOutput $provision -RedirectStandardError $provisionError
+            start-process -filepath "c:\Program Files (x86)\Git\bin\git.exe" -argumentlist ("-C c:\inetpub\repositories\iis\{0} clean -fd" -f $instance.domain) -Wait -RedirectStandardOutput $provision -RedirectStandardError $provisionError
             get-content $provision
             get-content $provisionError
-            start-process -filepath "c:\Program Files (x86)\Git\bin\git.exe" -argumentlist ("-C c:\inetpub\repositories\iis\{0} checkout origin {1}" -f $instance.domain,$config.environments.$($args[0]).branch) -Wait -RedirectStandardOutput $provision -RedirectStandardError $provisionError
+            start-process -filepath "c:\Program Files (x86)\Git\bin\git.exe" -argumentlist ("-C c:\inetpub\repositories\iis\{0} checkout {1}" -f $instance.domain,$config.environments.$($args[0]).branch) -Wait -RedirectStandardOutput $provision -RedirectStandardError $provisionError
             get-content $provision
             get-content $provisionError
-            start-process -filepath "c:\Program Files (x86)\Git\bin\git.exe" -argumentlist ("-C c:\inetpub\repositories\iis\{0} fetch" -f $instance.domain,$config.environments.$($args[0]).branch) -Wait -RedirectStandardOutput $provision -RedirectStandardError $provisionError
+            start-process -filepath "c:\Program Files (x86)\Git\bin\git.exe" -argumentlist ("-C c:\inetpub\repositories\iis\{0} fetch" -f $instance.domain) -Wait -RedirectStandardOutput $provision -RedirectStandardError $provisionError
             get-content $provision
             get-content $provisionError
             start-process -filepath "c:\Program Files (x86)\Git\bin\git.exe" -argumentlist ("-C c:\inetpub\repositories\iis\{0} pull origin {1}" -f $instance.domain,$config.environments.$($args[0]).branch) -Wait -RedirectStandardOutput $provision -RedirectStandardError $provisionError
             get-content $provision
             get-content $provisionError
-            start-process -filepath "c:\Program Files (x86)\Git\bin\git.exe" -argumentlist ("-C c:\inetpub\repositories\iis\{0} submodule update --init --recursive") -Wait -RedirectStandardOutput $provision -RedirectStandardError $provisionError
+            start-process -filepath "c:\Program Files (x86)\Git\bin\git.exe" -argumentlist ("-C c:\inetpub\repositories\iis\{0} submodule update --init --recursive" -f $instance.domain) -Wait -RedirectStandardOutput $provision -RedirectStandardError $provisionError
             get-content $provision
             get-content $provisionError
         } else {
