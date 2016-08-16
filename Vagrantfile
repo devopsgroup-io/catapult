@@ -2,7 +2,7 @@
 # vi: set ft=ruby :
 
 
-require "./catapult/catapult.rb"
+require "#{File.dirname(__FILE__)}/catapult/catapult.rb"
 
 
 Vagrant.configure("2") do |config|
