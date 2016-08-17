@@ -6,5 +6,12 @@ sudo timedatectl set-timezone "$(echo "${configuration}" | shyaml get-value comp
 sudo yum install -y ntp
 sudo systemctl enable ntpd.service
 sudo systemctl start ntpd.service
-# echo datetimezone
-date
+
+echo "> ntp peers"
+ntpq -p
+
+echo "> ntp partner"
+ntpstat
+
+echo "> current datetime"
+timedatectl status

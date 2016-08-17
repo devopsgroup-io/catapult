@@ -93,7 +93,7 @@ MediaWiki 1                       | `mediawiki1`           | December 8, 2003   
 Moodle 3                          | `moodle3`              | November 16, 2015  |
 SilverStripe 3                    | `silverstripe3`        | June 29, 2012      |
 SuiteCRM 7                        | `suitecrm7`            | October 21, 2013   |
-WordPress >=3.5.2                 | `wordpress`            | June 17, 2010      |
+WordPress >=3.7                   | `wordpress`            | June 17, 2010      |
 WordPress 4                       | `wordpress`            | September 4, 2014  |
 XenForo 1                         | `xenforo`              | March 8, 2011      |
 Zend Framework 2.0.x <=2.4.x      | `zendframework2`       | September 5, 2012  |
