@@ -70,8 +70,8 @@ elif [ "$software" = "suitecrm7" ]; then
 
 elif [ "$software" = "wordpress" ]; then
 
-    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && php /catapult/provisioners/redhat/installers/wp-cli.phar --allow-root core update-db
-    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && php /catapult/provisioners/redhat/installers/wp-cli.phar --allow-root cache flush
+    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && wp-cli --allow-root core update-db
+    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && wp-cli --allow-root cache flush
 
 else
     echo "this software does not have any database operations to perform"

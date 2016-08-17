@@ -239,7 +239,7 @@ while IFS='' read -r -d '' key; do
                         # for software with a cli tool for database url reference replacements, use cli tool to post-process database and replace url references
                         if [[ "${software}" = "wordpress" ]]; then
                             echo -e "\t* replacing URLs in the database to align with the enivronment..."
-                            php /catapult/provisioners/redhat/installers/wp-cli.phar --allow-root --path="/var/www/repositories/apache/${domain}/${webroot}" search-replace ":\/\/(www\.)?(dev\.|test\.|qc\.)?(${domain_url_replace})" "://\$1${domain_url}" --regex | sed "s/^/\t\t/"
+                            wp-cli --allow-root --path="/var/www/repositories/apache/${domain}/${webroot}" search-replace ":\/\/(www\.)?(dev\.|test\.|qc\.)?(${domain_url_replace})" "://\$1${domain_url}" --regex | sed "s/^/\t\t/"
                             mysql --defaults-extra-file=$dbconf ${1}_${domainvaliddbname} -e "UPDATE ${software_dbprefix}options SET option_value='$(catapult company.email)' WHERE option_name = 'admin_email';"
                         fi
                     fi
@@ -338,7 +338,7 @@ while IFS='' read -r -d '' key; do
                 VALUES ('1', 'admin', MD5('$(catapult environments.${1}.software.wordpress.admin_password)'), 'admin', '$(catapult company.email)', '0', 'admin')
                 ON DUPLICATE KEY UPDATE user_login='admin', user_pass=MD5('$(catapult environments.${1}.software.wordpress.admin_password)'), user_nicename='admin', user_email='$(catapult company.email)', user_status='0', display_name='admin';
             "
-            php /catapult/provisioners/redhat/installers/wp-cli.phar --allow-root --path="/var/www/repositories/apache/${domain}/${webroot}" user add-role 1 administrator
+            wp-cli --allow-root --path="/var/www/repositories/apache/${domain}/${webroot}" user add-role 1 administrator
 
         fi  
     fi
