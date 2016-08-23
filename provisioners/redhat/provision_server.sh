@@ -83,23 +83,23 @@ if [ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-values-0 redha
     # loop through each required module
     cat "/catapult/provisioners/provisioners.yml" | shyaml get-values-0 redhat.servers.redhat.$4.modules |
     while read -r -d $'\0' module; do
+        # cleanup leftover utility files
+        for file in /catapult/provisioners/redhat/logs/${module}.*.log; do
+            if [ -e "$file" ]; then
+                rm $file
+            fi
+        done
+        for file in /catapult/provisioners/redhat/logs/${module}.*.complete; do
+            if [ -e "$file" ]; then
+                rm $file
+            fi
+        done
         start=$(date +%s)
         echo -e "\n\n\n==> MODULE: ${module}"
         echo -e "==> DESCRIPTION: $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-value redhat.modules.${module}.description)"
         echo -e "==> MULTITHREADING: $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-value redhat.modules.${module}.multithreading)"
         # if multithreading is supported
         if ([ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-value redhat.modules.${module}.multithreading) == "True" ]); then
-            # cleanup leftover utility files
-            for file in /catapult/provisioners/redhat/logs/${module}.*.log; do
-                if [ -e "$file" ]; then
-                    rm $file
-                fi
-            done
-            for file in /catapult/provisioners/redhat/logs/${module}.*.complete; do
-                if [ -e "$file" ]; then
-                    rm $file
-                fi
-            done
             # enable job control
             set -m
             # create a website index to pass to each sub-process
@@ -145,30 +145,32 @@ if [ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-values-0 redha
                 echo -e "=> software_workflow: ${software_workflow}"
                 cat "/catapult/provisioners/redhat/logs/${module}.${domain}.log" | sed 's/^/     /'
             done < <(echo "${configuration}" | shyaml get-values-0 websites.apache)
-            # cleanup leftover utility files
-            for file in /catapult/provisioners/redhat/logs/${module}.*.log; do
-                if [ -e "$file" ]; then
-                    rm $file
-                fi
-            done
-            for file in /catapult/provisioners/redhat/logs/${module}.*.complete; do
-                if [ -e "$file" ]; then
-                    rm $file
-                fi
-            done
         else
             bash "/catapult/provisioners/redhat/modules/${module}.sh" $1 $2 $3 $4
         fi
         end=$(date +%s)
         echo -e "==> MODULE: ${module}"
         echo -e "==> DURATION: $(($end - $start)) seconds"
+        # cleanup leftover utility files
+        for file in /catapult/provisioners/redhat/logs/${module}.*.log; do
+            if [ -e "$file" ]; then
+                rm $file
+            fi
+        done
+        for file in /catapult/provisioners/redhat/logs/${module}.*.complete; do
+            if [ -e "$file" ]; then
+                rm $file
+            fi
+        done
     done
 
     provisionend=$(date +%s)
+    provisiontotal=$(date -d@$(($provisionend - $provisionstart)) -u +%H:%M:%S)
     # remove configuration
     source "/catapult/provisioners/redhat/modules/catapult_clean.sh"
     echo -e "\n\n\n==> PROVISION: ${4}"
-    echo -e "==> DURATION: $(($provisionend - $provisionstart)) total seconds" | tee -a /catapult/provisioners/redhat/logs/$4.log
+    echo -e "==> FINISH: $(date)" | tee -a /catapult/provisioners/redhat/logs/$4.log
+    echo -e "==> DURATION: ${provisiontotal} total time" | tee -a /catapult/provisioners/redhat/logs/$4.log
 else
     "Error: Cannot detect the server type."
     exit 1
