@@ -289,12 +289,12 @@ Catapult is quick to setup. Fork the Github repository and start adding your con
         6. It is recommended to print a QR code of the key to distribute to your team, please visit http://educastellano.github.io/qr-code/demo/
         7. Remember! Security is 99% process and 1% technology.
 5. **GPG Edit Mode**
-    1. When **GPG Edit Mode** is enabled (disabled by default) the following files are encrypted using your **GPG Key**:
-        1. ~/secrets/id_rsa as ~/secrets/id_rsa.gpg
-        2. ~/secrets/id_rsa.pub as ~/secrets/id_rsa.pub.gpg
-        3. ~/secrets/configuration.yml as ~/secrets/configuration.yml.gpg
-    2. To enable **GPG Edit Mode**, set `~/secrets/configuration-user.yml["settings"]["gpg_edit"]` to true.
-    3. Once gpg_edit is set to true and while on your fork's develop branch, run `vagrant status`, this will encrypt your configuration that you will then be able to commit and push safely to your public Catapult fork.
+    1. **GPG Edit Mode** is set at `~/secrets/configuration-user.yml["settings"]["gpg_edit"]` (`false` by default) and is used to encrypt your Catapult configuration secrets using your **GPG Key**:
+        1. `~/secrets/id_rsa` as `~/secrets/id_rsa.gpg`
+        2. `~/secrets/id_rsa.pub` as `~/secrets/id_rsa.pub.gpg`
+        3. `~/secrets/configuration.yml` as `~/secrets/configuration.yml.gpg`
+    1. **GPG Edit Mode** requires that you are on your Catapult fork's `develop` branch.
+    3. Running any Vagrant command (e.g. `vagrant status`) will encrypt your configuration, of which, will allow you to commit and push safely to your public Catapult fork.
 
 
 
