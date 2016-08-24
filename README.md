@@ -267,7 +267,7 @@ Catapult is quick to setup. Fork the Github repository and start adding your con
 1. **Fork Catapult**
     1. Fork https://github.com/devopsgroup-io/catapult and clone via SourceTree or the git utility of your choice.
 2. **Vagrant Plugins**
-    1. Open your command line and cd into the newly cloned repository and install the following Vagrant plugins.
+    1. Open your command line and change directory into the newly cloned repository and install the following Vagrant plugins.
         1. `vagrant plugin install vagrant-aws`
             * [![Gem](https://img.shields.io/gem/dt/vagrant-aws.svg)](https://rubygems.org/gems/vagrant-aws)
         2. `vagrant plugin install vagrant-digitalocean`
@@ -444,7 +444,7 @@ New Relic | Application, Browser, Server, and *Synthetics Monitoring | Free [*No
         3. Go to your Account Settings > Account > Summary.
         5. Place your License key at `~/secrets/configuration.yml["company"]["newrelic_license_key"]`
 6. **Verify Configuration:**    
-    1. To verify all of the configuration that you just set, open your command line and cd into your fork of Catapult, then run `vagrant status`. Catapult will confirm connection to all of the Services and inform you of any problems.
+    1. To verify all of the configuration that you just set, open your command line and change directory into your fork of Catapult, then run `vagrant status`. Catapult will confirm connection to all of the Services and inform you of any problems.
 
 
 
