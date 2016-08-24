@@ -572,7 +572,7 @@ Environment | LocalDev | Test | QC | Production
 
 ## Catapult Configuration ##
 
-All instance specific configuration is stored in ~/secrets/configuration.yml and encrypted as ~/secrets/configuration.yml.gpg. There are three main sections - [Company](#company), [Environments](#environments), and [Websites](#websites).
+All Catapult configuration is stored in `~/secrets/configuration.yml` and encrypted as `~/secrets/configuration.yml.gpg`. There are three main sections - [Company](#company), [Environments](#environments), and [Websites](#websites).
 
 ### Company ###
 
