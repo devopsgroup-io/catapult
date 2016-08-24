@@ -232,7 +232,7 @@ Catapult is controlled via Vagrant and the command line of a developer's worksta
         1. Download and install Gpg4win from http://gpg4win.org/download.html
     * **Using Linux?**
         1. GPG is included in the base distribution in most cases.
-        1. If being prompted by the Passphrase GUI Agent, comment out 'use-agent' in ~/.gnupg/gpg.conf
+        1. If being prompted by the Passphrase GUI Agent, comment out 'use-agent' in `~/.gnupg/gpg.conf`
 4. **Git**
     * **Using OS X?**
         1. Git commandline is included in the base distribution in most cases.
@@ -279,7 +279,7 @@ Catapult is quick to setup. Fork the Github repository and start adding your con
 3. **SSH Key Pair**
     1. Create a *passwordless* SSH key pair - this will drive authentication for Catapult.
         1. For instructions please see https://help.github.com/articles/generating-ssh-keys/
-        2. Place the newly created *passwordless* SSH key pair id_rsa and id_rsa.pub in the ~/secrets/ folder.
+        2. Place the newly created *passwordless* SSH key pair id_rsa and id_rsa.pub in the `~/secrets/` folder.
 4. **GPG Key**
     1. Generate a GPG key - this will drive encryption for Catapult.
         1. NEVER SHARE THE KEY WITH ANYONE OTHER THAN YOUR TEAM.
@@ -331,7 +331,7 @@ New Relic | Application, Browser, Server, and *Synthetics Monitoring | Free [*No
         2. Go to your DigitalOcean Applications & API Dashboard https://cloud.digitalocean.com/settings/api
             1. Create a Personal Access Token named "Vagrant" and place the token value at `~/secrets/configuration.yml["company"]["digitalocean_personal_access_token"]`
         3. Go to your DigitalOcean Security Dashboard https://cloud.digitalocean.com/settings/security
-            1. Add a new SSH Key named "Vagrant" with your newly created id_rsa.pub from ~/secrets/id_rsa.pub key 
+            1. Add a new SSH Key named "Vagrant" with your newly created id_rsa.pub from `~/secrets/id_rsa.pub` key 
     2. **Amazon Web Services** (AWS) sign-up and configuration
         1. Create an account https://portal.aws.amazon.com/gp/aws/developer/registration
             * [Free Stuff] Receive Free Tier benefits for the first 12 months after signing up https://aws.amazon.com/ec2/pricing/
@@ -348,7 +348,7 @@ New Relic | Application, Browser, Server, and *Synthetics Monitoring | Free [*No
             2. Select Add Users to Group and add your newly created "Catapult" user.
         6. Go to your AWS EC2 Key Pairs Dashboard https://console.aws.amazon.com/ec2/home#KeyPairs
             1. Click Import Key Pair
-            2. Add your newly created id_rsa.pub from ~/secrets/id_rsa.pub key
+            2. Add your newly created id_rsa.pub from `~/secrets/id_rsa.pub` key
             3. Set the Key pair name to "Catapult"
         7. Go to your AWS EC2 Security Groups Dashboard https://console.aws.amazon.com/ec2/home#SecurityGroups
             1. Select the "default" Group Name
@@ -361,12 +361,12 @@ New Relic | Application, Browser, Server, and *Synthetics Monitoring | Free [*No
         1. Create an account at https://bitbucket.org
             1. Place the username (not the email address) that you used to sign up for Bitbucket at `~/secrets/configuration.yml["company"]["bitbucket_username"]`
             2. Place the password of the account for Bitbucket at `~/secrets/configuration.yml["company"]["bitbucket_password"]`
-        2. Add your newly created id_rsa.pub from ~/secrets/id_rsa.pub key in https://bitbucket.org/account/user/`your-user-here`/ssh-keys/ named "Catapult"
+        2. Add your newly created id_rsa.pub from `~/secrets/id_rsa.pub` key in https://bitbucket.org/account/user/`your-user-here`/ssh-keys/ named "Catapult"
     2. **GitHub** sign-up and configuration
         1. Create an account at https://github.com
             1. Place the username (not the email address) that you used to sign up for GitHub at `~/secrets/configuration.yml["company"]["github_username"]`
             2. Place the password of the account for GitHub at `~/secrets/configuration.yml["company"]["github_password"]`
-        2. Add your newly created id_rsa.pub from ~/secrets/id_rsa.pub key in https://github.com/settings/ssh named "Catapult"
+        2. Add your newly created id_rsa.pub from `~/secrets/id_rsa.pub key in https://github.com/settings/ssh named "Catapult"
 3. **Automated Deployments:**
     2. **Bamboo** sign-up and configuration
         1. Create a Bamboo Cloud account at https://www.atlassian.com/software/bamboo
@@ -556,17 +556,17 @@ Catapult follows Gitflow for its **infrastructure configuration** *and* **websit
 
 Environment | LocalDev | Test | QC | Production
 ------------|----------|------|----|-----------
-**Running Branch**                                       | *develop*                                                   | *develop*                                                                                                    | *release*                                                      | *master*
-**Deployments**                                          | Manually via `vagrant provision`                            | Automatically via Bamboo (new commits to **develop**)                                                        | Automatically via Bamboo (new commits to **release**)          | Manually via Bamboo
-**Testing Activities**                                   | Component Test                                              | Integration Test, System Test                                                                                | Acceptance Test, Release Test                                  | Operational Qualification
-**Scrum Activity**                                       | Sprint Start: Development of User Stories                   | Daily Scrum                                                                                                  | Sprint Review                                                  | Sprint End: Accepted Product Release
-**Scrum Roles**                                          | Development Team                                            | Scrum Master, Development Team, Product Owner (optional)                                                     | Scrum Master, Development Team, Product Owner                  | Product Owner
-**Downstream Software Workflow - Database**              | Restore from **develop** ~/_sql folder of website repo      | Restore from **develop** ~/_sql folder of website repo                                                       | Restore from **release** ~/_sql folder of website repo         | Auto-commit one backup per day (up to 500MB or 1) to **master** ~/_sql folder of website repo during deploy
-**Downstream Software Workflow - Untracked File Stores** | rsync file stores from **Production**                       | rsync file stores from **Production**                                                                        | rsync file stores from **Production**                          | Pull file stores from **master**
-**Downstream Software Workflow - Tracked File Stores**   | Pull file stores from **develop**                           | Pull file stores from **develop**                                                                            | Pull file stores from **release**                              | Auto-commit file stores (up to 750MB each) to **master** of website repo during deploy
-**Upstream Software Workflow - Database**                | Restore from **develop** ~/_sql folder of website repo      | Auto-commit one backup per day (up to 500MB or 1) to **develop** ~/_sql folder of website repo during deploy | Restore from **release** ~/_sql folder of website repo         | Restore from **master** ~/_sql folder of website repo
-**Upstream Software Workflow - Untracked File Stores**   | rsync file stores from **Test**                             | Pull file stores from **develop**                                                                            | rsync file stores from **Test**                                | rsync file stores from **Test**
-**Upstream Software Workflow - Tracked File Stores**     | Pull file stores from **develop**                           | Auto-commit file stores (up to 750MB each) to **develop** of website repo during deploy                      | Pull file stores from **release**                              | Pull file stores from **master**
+**Running Branch**                                       | *develop*                                                   | *develop*                                                                                                      | *release*                                                      | *master*
+**Deployments**                                          | Manually via `vagrant provision`                            | Automatically via Bamboo (new commits to **develop**)                                                          | Automatically via Bamboo (new commits to **release**)          | Manually via Bamboo
+**Testing Activities**                                   | Component Test                                              | Integration Test, System Test                                                                                  | Acceptance Test, Release Test                                  | Operational Qualification
+**Scrum Activity**                                       | Sprint Start: Development of User Stories                   | Daily Scrum                                                                                                    | Sprint Review                                                  | Sprint End: Accepted Product Release
+**Scrum Roles**                                          | Development Team                                            | Scrum Master, Development Team, Product Owner (optional)                                                       | Scrum Master, Development Team, Product Owner                  | Product Owner
+**Downstream Software Workflow - Database**              | Restore from **develop** `~/_sql` folder of website repo    | Restore from **develop** `~/_sql` folder of website repo                                                       | Restore from **release** `~/_sql` folder of website repo       | Auto-commit one backup per day (up to 500MB or 1) to **master** `~/_sql` folder of website repo during deploy
+**Downstream Software Workflow - Untracked File Stores** | rsync file stores from **Production**                       | rsync file stores from **Production**                                                                          | rsync file stores from **Production**                          | Pull file stores from **master**
+**Downstream Software Workflow - Tracked File Stores**   | Pull file stores from **develop**                           | Pull file stores from **develop**                                                                              | Pull file stores from **release**                              | Auto-commit file stores (up to 750MB each) to **master** of website repo during deploy
+**Upstream Software Workflow - Database**                | Restore from **develop** `~/_sql` folder of website repo    | Auto-commit one backup per day (up to 500MB or 1) to **develop** `~/_sql` folder of website repo during deploy | Restore from **release** `~/_sql` folder of website repo       | Restore from **master** `~/_sql` folder of website repo
+**Upstream Software Workflow - Untracked File Stores**   | rsync file stores from **Test**                             | Pull file stores from **develop**                                                                              | rsync file stores from **Test**                                | rsync file stores from **Test**
+**Upstream Software Workflow - Tracked File Stores**     | Pull file stores from **develop**                           | Auto-commit file stores (up to 750MB each) to **develop** of website repo during deploy                        | Pull file stores from **release**                              | Pull file stores from **master**
 
 **NOTE:** Catapult will automatically pull **master** into **develop** when in the **Downstream Software Workflow** direction.
 
@@ -702,7 +702,7 @@ Performing development in a local environment is critical to reducing risk by ex
 
 ### Website Repositories ###
 
-Repositories for websites are cloned into the Catapult instance at ~/repositories and in the respective apache or iis folder, listed by domain name.
+Repositories for websites are cloned into the Catapult instance at `~/repositories` and in the respective apache or iis folder, listed by domain name.
 
 * Repositories are linked between the host and guest for realtime development.
 
@@ -773,8 +773,8 @@ Software | Tool | Command | Documentation
 
 ### Refreshing Databases ###
 
-* Databases are dumped once per day to the ~/_sql folder and restored, dependent on the environment and `software_workflow` setting per website - see [Release Management](#release-management) for details.
-* Leverage Catapult's workflow model (configured by `software_workflow`) to trigger a database refresh. From the develop branch, commit a deletion of today's database backup from the ~/_sql folder.
+* Databases are dumped once per day to the `~/_sql` folder and restored, dependent on the environment and `software_workflow` setting per website - see [Release Management](#release-management) for details.
+* Leverage Catapult's workflow model (configured by `software_workflow`) to trigger a database refresh. From the develop branch, commit a deletion of today's database backup from the `~/_sql` folder.
 
 ### Connecting to Databases ###
 
@@ -916,12 +916,12 @@ Being able to react to disasters immediately and consistently is crucial - Catap
         * Reverse the offending merge commit from the master branch and run the Production deployment.
     * Database
         * Reverse the offending merge commit from the master branch and run the Production deployment.
-        * Note: The Production database is overwritten and restored from the latest sql dump file from Test in the ~/_sql folder.
+        * Note: The Production database is overwritten and restored from the latest sql dump file from Test in the `~/_sql` folder.
 * `software_workflow: downstream`
     * Files
         * Reverse the offending merge commit from the master branch and run the Production deployment.
     * Database
-        * Reverse the offending database dump auto-commit from the develop branch and manually restore the Production database from the desired sql dump file in the ~/_sql folder.
+        * Reverse the offending database dump auto-commit from the develop branch and manually restore the Production database from the desired sql dump file in the `~/_sql` folder.
         * Note: The Production database is dumped once per day when the production build is run.
 
 
