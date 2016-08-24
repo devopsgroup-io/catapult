@@ -300,7 +300,7 @@ Catapult is quick to setup. Fork the Github repository and start adding your con
 
 ## Services Setup ##
 
-Catapult uses several third-party services to pull everything off - below is a list of the required services and sign-up and configuration steps.
+Catapult is built with a distributed services model, below are the required third-party services and their sign-up and configuration steps.
 
 Service | Description | Monthly Cost
 --------|-------------|-------------
