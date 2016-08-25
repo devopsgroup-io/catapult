@@ -216,7 +216,17 @@ Catapult is controlled via Vagrant and the command line of a developer's worksta
     * **Using Linux (Fedora, Red Hat, Suse)?**
         1. Download the latest version of Vagrant respective to your architecture from https://releases.hashicorp.com/vagrant/ by running e.g. `wget https://releases.hashicorp.com/vagrant/1.8.1/vagrant_1.8.1_x86_64.rpm`
         2. Install Vagrant using yum e.g. `sudo yum install vagrant_1.8.1_x86_64.rpm`
-2. **VirtualBox**
+2. **Vagrant Plugins**
+    1. Open your command line and install the following Vagrant plugins:
+        1. `vagrant plugin install vagrant-aws`
+            * [![Gem](https://img.shields.io/gem/dt/vagrant-aws.svg)](https://rubygems.org/gems/vagrant-aws)
+        2. `vagrant plugin install vagrant-digitalocean`
+            * [![Gem](https://img.shields.io/gem/dt/vagrant-digitalocean.svg)](https://rubygems.org/gems/vagrant-digitalocean) We maintain this project! [GitHub](https://github.com/smdahlen/vagrant-digitalocean)
+        3. `vagrant plugin install vagrant-hostmanager`
+            * [![Gem](https://img.shields.io/gem/dt/vagrant-hostmanager.svg)](https://rubygems.org/gems/vagrant-hostmanager) We maintain this project! [GitHub](https://github.com/smdahlen/vagrant-hostmanager)
+        4. `vagrant plugin install vagrant-vbguest`
+            * [![Gem](https://img.shields.io/gem/dt/vagrant-vbguest.svg)](https://rubygems.org/gems/vagrant-vbguest)
+3. **VirtualBox**
     * **Using OS X?**
         1. Download and install the latest version of VirtualBox from https://www.virtualbox.org/wiki/Downloads
     * **Using Windows?**
@@ -225,7 +235,7 @@ Catapult is controlled via Vagrant and the command line of a developer's worksta
         1. Download and install the latest version of VirtualBox using Advanced Packaging Tool (APT) `sudo apt-get install virtualbox`
     * **Using Linux (Fedora, Red Hat, Suse)?**
         1. Download and install the latest version of VirtualBox using Yellowdog Updater, Modifed (yum) `sudo yum install virtualbox`
-3. **GPG2**
+4. **GPG2**
     * **Using OS X?**
         1. Download and install GPG Suite from https://gpgtools.org
     * **Using Windows?**
@@ -233,7 +243,7 @@ Catapult is controlled via Vagrant and the command line of a developer's worksta
     * **Using Linux?**
         1. GPG is included in the base distribution in most cases.
         1. If being prompted by the Passphrase GUI Agent, comment out 'use-agent' in `~/.gnupg/gpg.conf`
-4. **Git**
+5. **Git**
     * **Using OS X?**
         1. Git commandline is included in the base distribution in most cases.
         1. For a streamlined Git GUI, download and install SourceTree from https://www.sourcetreeapp.com/
@@ -242,7 +252,7 @@ Catapult is controlled via Vagrant and the command line of a developer's worksta
     * **Using Linux?**
         1. Git commandline is included in the base distribution in most cases.
         1. For a streamlined Git GUI, download and install SmartGit from http://www.syntevo.com/smartgit/
-5. **Terminal**
+6. **Terminal**
     * **Using OS X?**
         1. The terminal in the base distrubitions are 100% compatible.
     * **Using Windows?**
@@ -266,21 +276,11 @@ Catapult is quick to setup. Fork the Github repository and start adding your con
 
 1. **Fork Catapult**
     1. Fork https://github.com/devopsgroup-io/catapult and clone via SourceTree or the git utility of your choice.
-2. **Vagrant Plugins**
-    1. Open your command line and change directory into the newly cloned repository and install the following Vagrant plugins.
-        1. `vagrant plugin install vagrant-aws`
-            * [![Gem](https://img.shields.io/gem/dt/vagrant-aws.svg)](https://rubygems.org/gems/vagrant-aws)
-        2. `vagrant plugin install vagrant-digitalocean`
-            * [![Gem](https://img.shields.io/gem/dt/vagrant-digitalocean.svg)](https://rubygems.org/gems/vagrant-digitalocean) We maintain this project! [GitHub](https://github.com/smdahlen/vagrant-digitalocean)
-        3. `vagrant plugin install vagrant-hostmanager`
-            * [![Gem](https://img.shields.io/gem/dt/vagrant-hostmanager.svg)](https://rubygems.org/gems/vagrant-hostmanager) We maintain this project! [GitHub](https://github.com/smdahlen/vagrant-hostmanager)
-        4. `vagrant plugin install vagrant-vbguest`
-            * [![Gem](https://img.shields.io/gem/dt/vagrant-vbguest.svg)](https://rubygems.org/gems/vagrant-vbguest)
-3. **SSH Key Pair**
+2. **SSH Key Pair**
     1. Create a *passwordless* SSH key pair - this will drive authentication for Catapult.
         1. For instructions please see https://help.github.com/articles/generating-ssh-keys/
         2. Place the newly created *passwordless* SSH key pair id_rsa and id_rsa.pub in the `~/secrets/` folder.
-4. **GPG Key**
+3. **GPG Key**
     1. Generate a GPG key - this will drive encryption for Catapult.
         1. NEVER SHARE THE KEY WITH ANYONE OTHER THAN YOUR TEAM.
         3. Spaces are not permitted and must be at least 20 characters.
@@ -288,7 +288,7 @@ Catapult is quick to setup. Fork the Github repository and start adding your con
         5. Place your newly generated GPG key at `~/secrets/configuration-user.yml["settings"]["gpg_key"]`
         6. It is recommended to print a QR code of the key to distribute to your team, please visit http://educastellano.github.io/qr-code/demo/
         7. Remember! Security is 99% process and 1% technology.
-5. **GPG Edit Mode**
+4. **GPG Edit Mode**
     1. **GPG Edit Mode** is set at `~/secrets/configuration-user.yml["settings"]["gpg_edit"]` (`false` by default) and is used to encrypt your Catapult configuration secrets using your **GPG Key**:
         1. `~/secrets/id_rsa` as `~/secrets/id_rsa.gpg`
         2. `~/secrets/id_rsa.pub` as `~/secrets/id_rsa.pub.gpg`
