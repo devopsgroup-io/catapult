@@ -279,7 +279,7 @@ Catapult is quick to setup. Fork the Github repository and start adding your con
 2. **SSH Key Pair**
     1. Create a *passwordless* SSH key pair - this will drive authentication for Catapult.
         1. For instructions please see https://help.github.com/articles/generating-ssh-keys/
-        2. Place the newly created *passwordless* SSH key pair id_rsa and id_rsa.pub in the `~/secrets/` folder.
+        2. Place the newly created *passwordless* SSH key pair `id_rsa` and `id_rsa.pub` in the `~/secrets/` folder.
 3. **GPG Key**
     1. Generate a GPG key - this will drive encryption for Catapult.
         1. NEVER SHARE THE KEY WITH ANYONE OTHER THAN YOUR TEAM.
@@ -326,7 +326,7 @@ Monitoring | New Relic Application (APM), Browser, Server, and \***Synthetics | 
         2. Go to your DigitalOcean Applications & API Dashboard https://cloud.digitalocean.com/settings/api
             1. Create a Personal Access Token named "Vagrant" and place the token value at `~/secrets/configuration.yml["company"]["digitalocean_personal_access_token"]`
         3. Go to your DigitalOcean Security Dashboard https://cloud.digitalocean.com/settings/security
-            1. Add a new SSH Key named "Vagrant" with your newly created id_rsa.pub from `~/secrets/id_rsa.pub` key 
+            1. Add a new SSH Key named "Vagrant" with your newly created `id_rsa.pub` from `~/secrets/id_rsa.pub` key 
     2. **Amazon Web Services** (AWS) sign-up and configuration
         1. Create an account https://portal.aws.amazon.com/gp/aws/developer/registration
             * [Free Stuff] Receive Free Tier benefits for the first 12 months after signing up https://aws.amazon.com/ec2/pricing/
@@ -343,7 +343,7 @@ Monitoring | New Relic Application (APM), Browser, Server, and \***Synthetics | 
             2. Select Add Users to Group and add your newly created "Catapult" user.
         6. Go to your AWS EC2 Key Pairs Dashboard https://console.aws.amazon.com/ec2/home#KeyPairs
             1. Click Import Key Pair
-            2. Add your newly created id_rsa.pub from `~/secrets/id_rsa.pub` key
+            2. Add your newly created `id_rsa.pub` from `~/secrets/id_rsa.pub` key
             3. Set the Key pair name to "Catapult"
         7. Go to your AWS EC2 Security Groups Dashboard https://console.aws.amazon.com/ec2/home#SecurityGroups
             1. Select the "default" Group Name
@@ -356,12 +356,12 @@ Monitoring | New Relic Application (APM), Browser, Server, and \***Synthetics | 
         1. Create an account at https://bitbucket.org
             1. Place the username (not the email address) that you used to sign up for Bitbucket at `~/secrets/configuration.yml["company"]["bitbucket_username"]`
             2. Place the password of the account for Bitbucket at `~/secrets/configuration.yml["company"]["bitbucket_password"]`
-        2. Add your newly created id_rsa.pub from `~/secrets/id_rsa.pub` key in https://bitbucket.org/account/user/`your-user-here`/ssh-keys/ named "Catapult"
+        2. Add your newly created `id_rsa.pub` from `~/secrets/id_rsa.pub` key in https://bitbucket.org/account/user/`your-user-here`/ssh-keys/ named "Catapult"
     2. **GitHub** sign-up and configuration
         1. Create an account at https://github.com
             1. Place the username (not the email address) that you used to sign up for GitHub at `~/secrets/configuration.yml["company"]["github_username"]`
             2. Place the password of the account for GitHub at `~/secrets/configuration.yml["company"]["github_password"]`
-        2. Add your newly created id_rsa.pub from `~/secrets/id_rsa.pub key in https://github.com/settings/ssh named "Catapult"
+        2. Add your newly created `id_rsa.pub` from `~/secrets/id_rsa.pub` key in https://github.com/settings/ssh named "Catapult"
 3. **Automated Deployments:**
     2. **Bamboo** sign-up and configuration
         1. Create a Bamboo Cloud account at https://www.atlassian.com/software/bamboo
