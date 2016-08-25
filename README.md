@@ -571,7 +571,7 @@ All Catapult configuration is stored in `~/secrets/configuration.yml` and encryp
 
 ### Company ###
 
-The exclusive Company entry contains top-level global credentials and company information - all of which will be configured during [Setup Catapult](#setup-catapult).
+The exclusive Company entry contains top-level company information and service credentials, configured during [Setup Catapult](#setup-catapult).
 
 * `name:`
     * required: yes
@@ -587,6 +587,25 @@ The exclusive Company entry contains top-level global credentials and company in
     * required: yes
         * Your company's timezone in Windows Standard Format
         * See [this list](https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Virtualization/3.1/html/Developer_Guide/appe-REST_API_Guide-Timezones.html) for a list of valid Windows Standard Format timezones
+
+The remaining keys include credentials to services, ideally rotated on a bi-annual basis. When rotated, all Bamboo builds need to be stopped and then the configuration changes merged into all branches of your Catapult's fork (`develop` > `release` > `master`), then builds restarted.
+
+* `digitalocean_personal_access_token`
+* `bitbucket_username`
+* `bitbucket_password`
+* `github_username`
+* `github_password`
+* `bamboo_base_url`
+* `bamboo_username`
+* `aws_access_key`
+* `aws_secret_key`
+* `bamboo_password`
+* `cloudflare_api_key`
+* `cloudflare_email`
+* `newrelic_admin_api_key`
+* `newrelic_api_key`
+* `newrelic_license_key`
+
 
 ### Environments ###
 
