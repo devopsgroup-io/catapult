@@ -308,7 +308,7 @@ Cloud Hosting | DigitalOcean | Web and Database Servers | \*$30+
 Source Code Repositories | Atlassian Bitbucket | Private Repositories | Free
 Source Code Repositories | GitHub | Public Repositories | Free
 Continuous Integration | Amazon Web Services (AWS) | Build Server | \**$0+
-Continuous Integration | Atlassian Bamboo | Continuous Integration | $10
+Continuous Integration | Atlassian Bamboo | Deployment Management | $10
 DNS | CloudFlare | Cloud DNS | Free
 Monitoring | New Relic Application (APM), Browser, Server, and \***Synthetics | Performance and Infrastructure Monitoring | Free
 **Total** | | | $40+
