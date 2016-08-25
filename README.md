@@ -588,7 +588,7 @@ The exclusive Company entry contains top-level company information and service c
         * Your company's timezone in Windows Standard Format
         * See [this list](https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Virtualization/3.1/html/Developer_Guide/appe-REST_API_Guide-Timezones.html) for a list of valid Windows Standard Format timezones
 
-The remaining keys include credentials to services, ideally rotated on a bi-annual basis. When rotated, all Bamboo builds need to be stopped and then the configuration changes merged into all branches of your Catapult's fork (`develop` > `release` > `master`), then builds restarted.
+The remaining keys include credentials to services, ideally rotated on a bi-annual basis. When rotated, all Bamboo builds need to be disabled and then the configuration changes merged into all branches of your Catapult's fork (`develop` > `release` > `master`), then builds enabled.
 
 * `digitalocean_personal_access_token`
 * `bitbucket_username`
