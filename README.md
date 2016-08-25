@@ -300,29 +300,24 @@ Catapult is quick to setup. Fork the Github repository and start adding your con
 
 ## Services Setup ##
 
-Catapult is built with a distributed services model, below are the required third-party services and their sign-up and configuration steps.
+Catapult is designed with a distributed services model, below are the required third-party services and their sign-up and configuration steps.
 
-Service | Description | Monthly Cost
---------|-------------|-------------
-**Cloud Hosting:** | |
-DigitalOcean | Test Web Server | \*$5+
-DigitalOcean | Test Database Server | \*$5+
-DigitalOcean | QC Web Server | \*$5+
-DigitalOcean | QC Database Server | \*$5+
-DigitalOcean | Production Web Server | \*$5+
-DigitalOcean | Production Database Server | \*$5+
-**Repositories:** | |
-Bitbucket | Private Repositories | Free
-GitHub | Public Repositories | Free
-**Continuous Integration:** | |
-Amazon Web Services | Build Server | \*$0+
-Bamboo | Continuous Integration | $10
-**DNS:** | |
-CloudFlare | Cloud DNS | Free
-**Monitoring:** | |
-New Relic | Application, Browser, Server, and *Synthetics Monitoring | Free [*No free tier beyond trial](#partnerships)
-**Total** | | $40+
-\* Depending on load, resources may need to be increased. However, a few websites with builds running irregularly will not incur over a couple dollars more per month.
+Service | Product | Description | Monthly Cost
+--------|---------|-------------|-------------
+Cloud Hosting | DigitalOcean | Web and Database Servers | \*$30+
+Source Code Repositories | Atlassian Bitbucket | Private Repositories | Free
+Source Code Repositories | GitHub | Public Repositories | Free
+Continuous Integration | Amazon Web Services (AWS) | Build Server | \**$0+
+Continuous Integration | Atlassian Bamboo | Continuous Integration | $10
+DNS | CloudFlare | Cloud DNS | Free
+Monitoring | New Relic Application (APM), Browser, Server, and \***Synthetics | Free
+**Total** | | | $40+
+
+\* Depending on load, resources may need to be increased.
+
+\** New AWS customers receive 1-year free of micro services. Beyond this period, a few websites with builds running irregularly will gennerally incur over a couple dollars more per month.
+
+\*** New Relic [No free tier beyond trial](#partnerships)
 
 1. **Cloud Hosting:**    
     1. **DigitalOcean** sign-up and configuration
