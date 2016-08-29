@@ -50,14 +50,14 @@ if [ -d "/var/www/repositories/apache/${domain}/.git" ]; then
             touch "/var/www/repositories/apache/${domain}/.gitignore"
             # manage the database config file entry in the .gitignore file
             if ! grep -q "${webroot}${softwareroot}${database_config_file}" "/var/www/repositories/apache/${domain}/.gitignore"; then
-               sudo bash -c 'echo "${webroot}${softwareroot}${database_config_file}" >> "/var/www/repositories/apache/${domain}/.gitignore"'
+               sudo bash -c "echo \"${webroot}${softwareroot}${database_config_file}\" >> \"/var/www/repositories/apache/${domain}/.gitignore\""
             fi
-            # if the database config file is tracked, remove it from the git index with rm --cached so the config file remains (would have to be accurate) - will get overwritten by software_config's generated one
-            cd "/var/www/repositories/apache/${domain}" \
-                && git rm --cached "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}${database_config_file}"
             # add everything in the repository to the git index (keep in mind untracked file stores)
             cd "/var/www/repositories/apache/${domain}" \
                 && git add --all :/
+            # if the database config file is tracked, remove it from the git index with rm --cached so the config file remains (would have to be accurate) - will get overwritten by software_config's generated one
+            cd "/var/www/repositories/apache/${domain}" \
+                && git rm --cached "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}${database_config_file}"
             # loop through each file store as a way to reduce repository size and avoid limits
             if [ ! -z "$(provisioners_array software.apache.${software}.file_stores)" ]; then
                 for file_store in $(provisioners_array software.apache.${software}.file_stores); do
