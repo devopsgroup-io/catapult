@@ -12,6 +12,7 @@ host = "localhost"
 user = "root"
 password = "$(catapult environments.${1}.servers.redhat_mysql.mysql.root_password)"
 EOF
+# set a variable to the .cnf
 dbconf="/catapult/provisioners/redhat/installers/${1}.cnf"
 
 # only set root password on fresh install of mysql
@@ -73,10 +74,12 @@ done
 # flush privileges
 mysql --defaults-extra-file=$dbconf -e "FLUSH PRIVILEGES"
 
-# this overwrite all items in cron, we write stdout to > /dev/null so that we only get emailed stderr
-cat <(echo "0 3 * * * mysqlcheck -u maintenance --all-databases --auto-repair --optimize > /dev/null") | crontab -
-# adding more cron tasks would look like this
-# cat <(crontab -l) <(echo "0 4 * * * mysqldump...") | crontab -
+# configure a cron task for database maintenance
+touch /etc/cron.daily/catapult-mysql.cron
+cat > "/etc/cron.daily/catapult-mysql.cron" << EOF
+#!/bin/bash
+mysqlcheck -u maintenance --all-databases --auto-repair --optimize
+EOF
 
 echo "${configuration}" | shyaml get-values-0 websites.apache |
 while IFS='' read -r -d '' key; do

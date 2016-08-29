@@ -2,25 +2,28 @@ source "/catapult/provisioners/redhat/modules/catapult.sh"
 
 domain=$(catapult websites.apache.$5.domain)
 software=$(catapult websites.apache.$5.software)
-softwareroot=$(provisioners software.apache.${software}.softwareroot)
+software_auto_update=$(catapult websites.apache.$5.software_auto_update)
+software_workflow=$(catapult websites.apache.$5.software_workflow)
 webroot=$(catapult websites.apache.$5.webroot)
+
+softwareroot=$(provisioners software.apache.${software}.softwareroot)
 
 # run software database operations
 if [ "$software" = "codeigniter2" ]; then
 
-    output=$(cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && php index.php migrate)
-    if echo $output | grep --extended-regexp --quiet --regexp="<html" --regexp="<\?"; then
+    result=$(cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && php index.php migrate)
+    if echo $result | grep --extended-regexp --quiet --regexp="<html" --regexp="<\?"; then
         echo -e "Migrations are not configured"
     else
-        echo $output
+        echo $result
     fi
 
 elif [ "$software" = "codeigniter3" ]; then
-    output=$(cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && php index.php migrate)
-    if echo $output | grep --extended-regexp --quiet --regexp="<html" --regexp="<\?"; then
+    result=$(cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && php index.php migrate)
+    if echo $result | grep --extended-regexp --quiet --regexp="<html" --regexp="<\?"; then
         echo -e "Migrations are not configured"
     else
-        echo $output
+        echo $result
     fi
 
 elif [ "$software" = "drupal6" ]; then
@@ -39,9 +42,11 @@ elif [ "$software" = "joomla3" ]; then
 
     cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && php cli/garbagecron.php
     cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && php cli/update_cron.php
+    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && php cli/finder_indexer.php
     cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && php cli/deletefiles.php
 
 elif [ "$software" = "laravel5" ]; then
+
     cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && php artisan key:generate
     cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && php artisan migrate
     cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && php artisan cache:clear
@@ -72,6 +77,14 @@ elif [ "$software" = "wordpress" ]; then
 
     cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && wp-cli --allow-root core update-db
     cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && wp-cli --allow-root cache flush
+
+elif [ "$software" = "xenforo" ]; then
+
+    : #no-op
+
+elif [ "$software" = "zendframework2" ]; then
+
+    : #no-op
 
 else
     echo "this software does not have any database operations to perform"
