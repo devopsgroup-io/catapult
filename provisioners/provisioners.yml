@@ -46,11 +46,14 @@ redhat:
         rsync:
           description: "Copies software file stores contingent on the software_workflow for websites with software."
           multithreading: true
+        software_auto_update:
+          description: "Performs automatic software updates."
+          multithreading: true
         software_config:
           description: "Creates software database configuration files and sets software file store container directory permissions for websites with software."
           multithreading: true
         software_database_operations:
-          description: "Performs software database operations for websites with software."
+          description: "Performs software operations for websites with software."
           multithreading: true
         software_tools:
           description: "Installs and configures software CLI tools."
@@ -64,9 +67,9 @@ redhat:
     servers:
         redhat:
           apache:
-            modules: ["system","iptables","time","newrelic_sysmon","git_clean","git","rsync","software_config","php","software_tools","apache","apache_vhosts_clean","apache_vhosts","newrelic_apm_php","cloudflare_zones","cloudflare_dns","cloudflare_cache","newrelic_synthetics"]
+            modules: ["system","iptables","time","newrelic_sysmon","git_clean","software_auto_update","git","rsync","software_config","php","software_tools","apache","apache_vhosts_clean","apache_vhosts","newrelic_apm_php","cloudflare_zones","cloudflare_dns"]
           mysql:
-            modules: ["system","iptables","time","newrelic_sysmon","git_clean","git","software_config","php","software_tools","mysql","software_database_operations"]
+            modules: ["system","iptables","time","newrelic_sysmon","git_clean","git","rsync","software_config","php","software_tools","software_database_operations","mysql","cloudflare_cache","newrelic_synthetics"]
 windows:
 
 software:

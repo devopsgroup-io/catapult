@@ -14,6 +14,8 @@ sed -i -e "s#\;date\.timezone.*#date.timezone = \"$(catapult company.timezone_re
 sed -i -e "s#\upload_max_filesize.*#upload_max_filesize = 10M#g" /etc/php.ini
 # hide x-powered-by
 sed -i -e "s#\expose_php.*#expose_php = Off#g" /etc/php.ini
+# increase php memory limit for tools like composer
+sed -i -e "s#\memory_limit.*#memory_limit = 256M#g" /etc/php.ini
 
 # bundled extensions
 # These extensions are bundled with PHP.

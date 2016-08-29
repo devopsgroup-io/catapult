@@ -163,7 +163,7 @@ See an error or have a suggestion? Email competition@devopsgroup.io - we appreci
         - [Websites](#websites)
     - [Website Development](#website-development)
         - [Website Repositories](#website-repositories)
-        - [Fresh Software Installs](#fresh-software-installs)
+        - [Software Updates and Fresh Installs](#software-updates-and-fresh-installs)
         - [Forcing www](#forcing-www)
         - [Database Migrations](#database-migrations)
         - [Refreshing Databases](#refreshing-databases)
@@ -665,13 +665,13 @@ The following options are available:
 * `software:`
     * required: no
     * description: manages many aspects of software respective to each environment for websites with supported software types
-        * maintains softare database config file
+        * maintains software database config file
         * manages tracked and untracked software file stores intelligently via git and rsync
         * manages permissions of software file store containers
+        * manages software database operations
         * manages software database backups and restores intelligently via git
         * manages software url references in database
         * manages software admin account integrity
-        * manages software database operations
     * `software: codeigniter2`
     * `software: codeigniter3`
     * `software: drupal6`
@@ -686,6 +686,13 @@ The following options are available:
     * `software: wordpress`
     * `software: xenforo`
     * `software: zendframework2`
+* `software_auto_update:`
+    * required: no
+    * dependency: `software:`
+    * example: `software_auto_update: true`
+        * manages software updates to the latest compatible version using the software's CLI tool
+        * updates only occur in the `software_workflow` environment
+        * not all `software` is supported, see [Software Updates and Fresh Installs](#software-updates-and-fresh-installs)
 * `software_dbprefix:`
     * required: no
     * dependency: `software:`
@@ -720,26 +727,26 @@ Repositories for websites are cloned into the Catapult instance at `~/repositori
 
 * Repositories are linked between the host and guest for realtime development.
 
-### Fresh Software Installs ###
+### Software Updates and Fresh Installs ###
 
-Catapult enforces software configuration best practices for both fresh installs and existing software repositories, the typical workflow would be to fork the software project on GitHub and add to your `configuration.yml` file. Given the broad spectrum of software requirements there are minor configurations and caveats for specific software types outlined here:
+Catapult enforces software configuration best practice for software fresh installs and updates. A typical software fresh install workflow would be to fork the software project on GitHub and add then add a new website entry to your `~/configuration.yml` file. Given the broad spectrum of software requirements there are minor configuration caveats worth noting:
 
-Software | Approach | Notes
----------|----------|------
-`codeigniter2`      |          |
-`codeigniter3`      |          |
-`drupal6`           |          |
-`drupal7`           |          |
-`expressionengine3` | Download |
-`joomla3`           | Fork     |
-`laravel5`          | Composer | Follow the [Composer Create-Project](https://laravel.com/docs/5.0/installation) documentation.
-`mediawiki1`        | Fork     |
-`moodle3`           | Fork     | Catapult requires the `moodledata` directory to be within the webroot, it's pertinant to create a `.gitignore` and `.htaccess` file for this directory.
-`silverstripe3`     | Fork     | First fork the silver-stripe-installer repository then add a git submodule of silver-framework at a `framework` directory in the root. During a fresh install, the database config file `mysite/_config.php` will need to be given 0777 permissions.
-`suitecrm7`         | Fork     |
-`wordpress`         | Fork     |
-`xenforo`           | Download |
-`zendframework2`    | Fork     | Your best bet is to start from the [zendframework/ZendSkeletonApplication](https://github.com/zendframework/ZendSkeletonApplication) GitHub project. Catapult assumes Zend Framwork is at the root of your repo and writes a database config file at `config/autoload/global.php`, you will also need to set `webroot: public/` in your Catapult configuration.
+Software | `software_auto_update` Support | Install Approach | Install Notes
+---------|--------------------------------|------------------|--------------
+`codeigniter2`      | [:x:](http://www.codeigniter.com/userguide2/installation/upgrading.html) |          |
+`codeigniter3`      | [:x:](http://www.codeigniter.com/user_guide/installation/upgrading.html) |          |
+`drupal6`           | [:white_check_mark:]                                                     | Drush    | `drush dl drupal-6`
+`drupal7`           | [:white_check_mark:]                                                     | Drush    | `drush dl drupal-7`
+`expressionengine3` | [:x:](ttps://docs.expressionengine.com/latest/installation/update.html)  | Download |
+`joomla3`           | [:x:](https://docs.joomla.org/J3.x:Updating_from_an_existing_version)    | Fork     |
+`laravel5`          | [:x:](https://www.laravel.com/docs/master/upgrade)                       | Composer | Follow the [Composer Create-Project](https://laravel.com/docs/5.0/installation) documentation.
+`mediawiki1`        | [:x:](https://www.mediawiki.org/wiki/Manual:Upgrading)                   | Fork     |
+`moodle3`           | [:white_check_mark:]                                                     | Fork     | Catapult requires the `moodledata` directory to be within the webroot, it's pertinant to create a `.gitignore` and `.htaccess` file for this directory.
+`silverstripe3`     | [:x:](https://docs.silverstripe.org/en/3.4/upgrading/)                   | Composer | Follow the [Installing and Upgrading with Composer](https://docs.silverstripe.org/en/3.4/getting_started/composer/). During a fresh install, the database config file `mysite/_config.php` will need to be given 0777 permissions.
+`suitecrm7`         | [:x:](https://suitecrm.com/wiki/index.php/Upgrade)                       | Fork     |
+`wordpress`         | [:white_check_mark:]                                                     | Fork     |
+`xenforo`           | [:x:](https://xenforo.com/help/upgrades/)                                | Download |
+`zendframework2`    | [:white_check_mark:]                                                     | Fork     | Your best bet is to start from the [zendframework/ZendSkeletonApplication](https://github.com/zendframework/ZendSkeletonApplication) GitHub project. Catapult assumes Zend Framwork is at the root of your repo and writes a database config file at `config/autoload/global.php`, you will also need to set `webroot: public/` in your Catapult configuration.
 
 ### Forcing www ###
 
