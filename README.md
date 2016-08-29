@@ -304,7 +304,7 @@ Catapult is designed with a distributed services model, below are the required t
 
 Service | Product | Use Case | Monthly Cost
 --------|---------|----------|-------------
-Cloud Hosting | DigitalOcean | Web and Database Servers | \*$30+
+Cloud Hosting | DigitalOcean | 6 Web and Database Servers | \*$30+
 Source Code Repositories | Atlassian Bitbucket | Private Repositories | Free
 Source Code Repositories | GitHub | Public Repositories | Free
 Continuous Integration | Amazon Web Services (AWS) | Build Server | \**$0+
@@ -313,11 +313,11 @@ DNS | CloudFlare | Cloud DNS | Free
 Monitoring | New Relic Application (APM), Browser, Server, and \***Synthetics | Performance and Infrastructure Monitoring | Free
 **Total** | | | $40+
 
-\* Depending on load, resources may need to be increased.
+\* Depending on load, resources may need to be increased, starting at an additional [$5 per month per server](https://www.digitalocean.com/pricing/).
 
-\** New AWS customers receive 1-year free of micro services. Beyond this period, a few websites with builds running irregularly will gennerally incur over a couple dollars more per month.
+\** New AWS customers receive 1-year free of micro services. Beyond this period, a few websites with builds running irregularly will generally incur over a couple dollars more per month.
 
-\*** New Relic [No free tier beyond trial](#partnerships)
+\*** New Relic customers receive a trial "pro" period ranging from 14-days to 30-days, however, there is [no free tier beyond the trial](#partnerships)
 
 1. **Cloud Hosting:**    
     1. **DigitalOcean** sign-up and configuration
@@ -735,18 +735,18 @@ Software | `software_auto_update` Support | Install Approach | Install Notes
 ---------|--------------------------------|------------------|--------------
 `codeigniter2`      | [:x:](http://www.codeigniter.com/userguide2/installation/upgrading.html) |          |
 `codeigniter3`      | [:x:](http://www.codeigniter.com/user_guide/installation/upgrading.html) |          |
-`drupal6`           | [:white_check_mark:]                                                     | Drush    | `drush dl drupal-6`
-`drupal7`           | [:white_check_mark:]                                                     | Drush    | `drush dl drupal-7`
+`drupal6`           | :white_check_mark:                                                       | Drush    | `drush dl drupal-6`
+`drupal7`           | :white_check_mark:                                                       | Drush    | `drush dl drupal-7`
 `expressionengine3` | [:x:](ttps://docs.expressionengine.com/latest/installation/update.html)  | Download |
 `joomla3`           | [:x:](https://docs.joomla.org/J3.x:Updating_from_an_existing_version)    | Fork     |
 `laravel5`          | [:x:](https://www.laravel.com/docs/master/upgrade)                       | Composer | Follow the [Composer Create-Project](https://laravel.com/docs/5.0/installation) documentation.
 `mediawiki1`        | [:x:](https://www.mediawiki.org/wiki/Manual:Upgrading)                   | Fork     |
-`moodle3`           | [:white_check_mark:]                                                     | Fork     | Catapult requires the `moodledata` directory to be within the webroot, it's pertinant to create a `.gitignore` and `.htaccess` file for this directory.
+`moodle3`           | :white_check_mark:                                                       | Fork     | Catapult requires the `moodledata` directory to be within the webroot, it's pertinant to create a `.gitignore` and `.htaccess` file for this directory.
 `silverstripe3`     | [:x:](https://docs.silverstripe.org/en/3.4/upgrading/)                   | Composer | Follow the [Installing and Upgrading with Composer](https://docs.silverstripe.org/en/3.4/getting_started/composer/). During a fresh install, the database config file `mysite/_config.php` will need to be given 0777 permissions.
 `suitecrm7`         | [:x:](https://suitecrm.com/wiki/index.php/Upgrade)                       | Fork     |
-`wordpress`         | [:white_check_mark:]                                                     | Fork     |
+`wordpress`         | :white_check_mark:                                                       | Fork     |
 `xenforo`           | [:x:](https://xenforo.com/help/upgrades/)                                | Download |
-`zendframework2`    | [:white_check_mark:]                                                     | Fork     | Your best bet is to start from the [zendframework/ZendSkeletonApplication](https://github.com/zendframework/ZendSkeletonApplication) GitHub project. Catapult assumes Zend Framwork is at the root of your repo and writes a database config file at `config/autoload/global.php`, you will also need to set `webroot: public/` in your Catapult configuration.
+`zendframework2`    | :white_check_mark:                                                       | Fork     | Your best bet is to start from the [zendframework/ZendSkeletonApplication](https://github.com/zendframework/ZendSkeletonApplication) GitHub project. Catapult assumes Zend Framwork is at the root of your repo and writes a database config file at `config/autoload/global.php`, you will also need to set `webroot: public/` in your Catapult configuration.
 
 ### Forcing www ###
 
