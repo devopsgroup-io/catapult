@@ -37,7 +37,7 @@ if [ -d "/var/www/repositories/apache/$(catapult websites.apache.$5.domain)/.git
         if ([ "$(catapult environments.$1.branch)" = "${branch}" ] && [ "${1}" = "production" ] && [ "$(catapult websites.apache.$5.software_workflow)" = "downstream" ]) || ([ "$(catapult environments.$1.branch)" = "${branch}" ] && [ "${1}" = "test" ] && [ "$(catapult websites.apache.$5.software_workflow)" = "upstream" ]); then
             # add everything in the webroot to the git index (keep in mind untracked file stores)
             cd "/var/www/repositories/apache/$(catapult websites.apache.$5.domain)/$(catapult websites.apache.$5.webroot)" \
-                && git add --all
+                && git add --all :/
             # git reset the database config file to ensure we never track it or lose a database connection
             cd "/var/www/repositories/apache/$(catapult websites.apache.$5.domain)" \
                 && git reset -- "/var/www/repositories/apache/$(catapult websites.apache.$5.domain)/$(catapult websites.apache.$5.webroot)$(provisioners software.apache.$(catapult websites.apache.$5.software).database_config_file)"
