@@ -26,11 +26,13 @@ if hash composer 2>/dev/null && hash drush 2>/dev/null && hash wp-cli 2>/dev/nul
 
         elif [ "$software" = "drupal6" ]; then
 
-            cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush pm-updatecode
+            cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush -y pm-refresh
+            cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush -y pm-updatecode
 
         elif [ "$software" = "drupal7" ]; then
 
-            cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush pm-updatecode
+            cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush -y pm-refresh
+            cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush -y pm-updatecode
 
         elif [ "$software" = "joomla3" ]; then
 
@@ -82,15 +84,19 @@ if hash composer 2>/dev/null && hash drush 2>/dev/null && hash wp-cli 2>/dev/nul
 
         else
 
-            echo "this software does not have any database operations to perform"
+            echo "\t* this software does not have any database operations to perform, skipping auto update..."
 
         fi
 
     else
 
-        echo -e "\t* workflow is set to ${software_workflow} and this is the ${1} environment, skipping auto update..."
+        echo -e "\t* workflow is set to ${software_workflow}, this is the ${1} environment, and software_auto_update is not configured; skipping auto update..."
 
     fi
+
+else
+
+    echo -e "\t* software tools have yet to be installed, skipping..."
 
 fi
 
