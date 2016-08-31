@@ -126,6 +126,7 @@ if [ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-values-0 redha
                 domain=$(echo "${website}" | shyaml get-value domain)
                 domain_tld_override=$(echo "${website}" | shyaml get-value domain_tld_override 2>/dev/null )
                 software=$(echo "${website}" | shyaml get-value software 2>/dev/null )
+                software_auto_update=$(echo "${website}" | shyaml get-value software_auto_update 2>/dev/null )
                 software_dbprefix=$(echo "${website}" | shyaml get-value software_dbprefix 2>/dev/null )
                 software_workflow=$(echo "${website}" | shyaml get-value software_workflow 2>/dev/null )
                 # only allow a certain number of parallel bash sub-processes at once
@@ -141,6 +142,7 @@ if [ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-values-0 redha
                 echo -e "=> domain: ${domain}"
                 echo -e "=> domain_tld_override: ${domain_tld_override}"
                 echo -e "=> software: ${software}"
+                echo -e "=> software_auto_update: ${software_auto_update}"
                 echo -e "=> software_dbprefix: ${software_dbprefix}"
                 echo -e "=> software_workflow: ${software_workflow}"
                 cat "/catapult/provisioners/redhat/logs/${module}.${domain}.log" | sed 's/^/     /'

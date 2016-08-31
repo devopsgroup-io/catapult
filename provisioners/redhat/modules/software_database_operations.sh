@@ -28,15 +28,19 @@ elif [ "$software" = "codeigniter3" ]; then
 
 elif [ "$software" = "drupal6" ]; then
 
-    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush watchdog-delete all -y
-    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush updatedb -y
-    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush cache-clear all -y
+    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush -y watchdog-delete all
+    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush -y updatedb
+    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush -y cache-clear all
 
 elif [ "$software" = "drupal7" ]; then
 
-    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush watchdog-delete all -y
-    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush updatedb -y
-    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush cache-clear all -y
+    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush -y watchdog-delete all
+    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush -y updatedb
+    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush -y cache-clear all
+
+elif [ "$software" = "expressionengine3" ]; then
+
+    echo "nothing to perform, skipping..."
 
 elif [ "$software" = "joomla3" ]; then
 
@@ -80,14 +84,12 @@ elif [ "$software" = "wordpress" ]; then
 
 elif [ "$software" = "xenforo" ]; then
 
-    : #no-op
+    echo "nothing to perform, skipping..."
 
 elif [ "$software" = "zendframework2" ]; then
 
-    : #no-op
+    echo "nothing to perform, skipping..."
 
-else
-    echo "this software does not have any database operations to perform"
 fi
 
 touch "/catapult/provisioners/redhat/logs/software_database_operations.$(catapult websites.apache.$5.domain).complete"
