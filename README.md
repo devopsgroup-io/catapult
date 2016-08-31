@@ -194,6 +194,7 @@ Catapult requires a [Developer Setup](#developer-setup), [Instance Setup](#insta
 **Please Note:**
 * It is advised to turn off any antivirus software that you may have installed during setup and usage of Catapult - tasks such as forwarding ports and writing hosts files may be blocked.
 * Virtualizaion must be enabled in the BIOS of the developer's workstation - follow [this how-to](https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux/5/html/Virtualization/sect-Virtualization-Troubleshooting-Enabling_Intel_VT_and_AMD_V_virtualization_hardware_extensions_in_BIOS.html) to get started.
+* Using a VPN client during usage of LocalDev may result in lost communication between your workstation and the guests, requiring a `vagrant reload` to regain SSH and/or WinRM communication.
 
 ## Developer Setup ##
 
@@ -690,7 +691,7 @@ The following options are available:
     * required: no
     * dependency: `software:`
     * example: `software_auto_update: true`
-        * manages software updates to the latest compatible version using the software's CLI tool
+        * manages software core and pluggable component (plugins, modules, etc) updates to the latest compatible versions using the software's CLI tool
         * updates only occur in the `software_workflow` environment
         * not all `software` is supported, see [Software Updates and Fresh Installs](#software-updates-and-fresh-installs)
 * `software_dbprefix:`
