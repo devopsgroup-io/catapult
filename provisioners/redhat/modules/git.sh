@@ -37,6 +37,7 @@ if [ -d "/var/www/repositories/apache/${domain}/.git" ]; then
         cd "/var/www/repositories/apache/${domain}" \
             && git config --global user.name "Catapult" \
             && git config --global user.email "$(catapult company.email)" \
+            && git config core.autocrlf true \
             && git config core.packedGitLimit 128m \
             && git config core.packedGitWindowSize 128m \
             && git config pack.deltaCacheSize 128m \
