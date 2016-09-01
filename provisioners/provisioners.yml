@@ -80,39 +80,39 @@ software:
         database_config_file: "application/config/database.php"
         file_store_containers: ["application/logs","uploads"]
         file_stores: ["uploads"]
-        version: 2
+        version: [2]
       codeigniter3:
         repo: "https://github.com/bcit-ci/CodeIgniter.git"
         branch: "3.0-stable"
         database_config_file: "application/config/database.php"
         file_store_containers: ["application/logs","uploads"]
         file_stores: ["uploads"]
-        version: 3
+        version: [3]
       drupal6:
         repo: "https://git.drupal.org/project/drupal.git"
         branch: "6.x"
         database_config_file: "sites/default/settings.php"
         file_store_containers: ["sites/default"]
         file_stores: ["sites/default/files"]
-        version: 6
+        version: [6]
       drupal7:
         repo: "https://git.drupal.org/project/drupal.git"
         branch: "7.x"
         database_config_file: "sites/default/settings.php"
         file_store_containers: ["sites/default"]
         file_stores: ["sites/default/files"]
-        version: 7
+        version: [7]
       expressionengine3:
         repo: PRIVATE
         database_config_file: "system/user/config/config.php"
         file_store_containers: ["system/user/cache","system/user/templates","images/avatars","images/captchas","images/member_photos","images/pm_attachments","images/signature_attachments","images/uploads"]
-        version: 3
+        version: [3]
       joomla3:
         repo: "https://github.com/joomla/joomla-cms.git"
         branch: "3.6.x"
         database_config_file: "configuration.php"
         file_store_containers: ["administrator/cache","cache","logs","tmp"]
-        version: 3
+        version: [3]
       laravel5:
         repo: "https://github.com/laravel/laravel.git"
         tag: "v5.0.22"
@@ -120,53 +120,52 @@ software:
         file_store_containers: ["bootstrap/cache","resources","storage"]
         file_stores: ["resources","storage"]
         softwareroot: "../"
-        version: 5
+        version: [5]
       mediawiki1:
         repo: "https://github.com/wikimedia/mediawiki.git"
         branch: "REL1_25"
         database_config_file: "LocalSettings.php"
         file_store_containers: ["images"]
         file_stores: ["images"]
-        version: 3
+        version: [3]
       moodle3:
         repo: "https://github.com/moodle/moodle.git"
         branch: "MOODLE_30_STABLE"
         file_store_containers: ["moodledata"]
         file_stores: ["moodledata/filedir"]
         database_config_file: "config.php"
-        version: 3
+        version: [3]
       silverstripe3:
         repo: "https://github.com/silverstripe/silverstripe-installer"
         branch: "3.3"
         database_config_file: "mysite/_config.php"
         file_store_containers: ["assets"]
         file_stores: ["assets/Uploads"]
-        version: 3
+        version: [3]
       suitecrm7:
         repo: "https://github.com/salesagility/SuiteCRM.git"
         branch: "7.5.x"
         database_config_file: "config_override.php"
         file_store_containers: ["cache","custom","data","modules","upload","themes","tmp"]
         file_stores: ["uploads"]
-        version: 7
+        version: [7]
       wordpress:
         repo: "https://github.com/WordPress/WordPress.git"
         branch: "4.5-branch"
         database_config_file: "wp-config.php"
         file_store_containers: ["wp-content"]
         file_stores: ["wp-content/uploads"]
-        version: 4
+        version: [3,4]
       xenforo:
         repo: PRIVATE
         database_config_file: "sites/default/settings.php"
         file_store_containers: ["data","internal_data"]
         file_stores: ["data","internal_data"]
-        version: 1
+        version: [1]
       zendframework2:
         repo: "https://github.com/zendframework/zendframework.git"
         tag: "release-2.4.10"
         database_config_file: "config/autoload/global.php"
         softwareroot: "../"
-        version: 2
+        version: [2]
     iis:
-      
