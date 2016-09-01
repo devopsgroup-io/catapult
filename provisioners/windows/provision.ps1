@@ -85,7 +85,7 @@ echo "A reboot (LocalDev: vagrant reload) may be required after windows updates"
 
 echo "`n`n==> Installing .NET 4.0 (This may take a while...)"
 if (-not(test-path -path "c:\windows\Microsoft.NET\Framework64\v4.0.30319\")) {
-    # ((new-object net.webclient).DownloadFile("http://download.microsoft.com/download/9/5/A/95A9616B-7A37-4AF6-BC36-D6EA96C8DAAE/dotNetFx40_Full_x86_x64.exe","c:\tmp\dotNetFx40_Full_x86_x64.exe")) 
+    # ((new-object net.webclient).DownloadFile("http://download.microsoft.com/download/9/5/A/95A9616B-7A37-4AF6-BC36-D6EA96C8DAAE/dotNetFx40_Full_x86_x64.exe","c:\tmp\dotNetFx40_Full_x86_x64.exe"))
     start-process -filepath "c:\catapult\provisioners\windows\installers\dotNetFx40_Full_x86_x64.exe" -argumentlist "/q /norestart /log c:\catapult\provisioners\windows\logs\dotNetFx40_Full_x86_x64.exe.log" -Wait -RedirectStandardOutput $provision -RedirectStandardError $provisionError
     echo "Restarting Windows..."
     echo "Please invoke 'vagrant provision' when it's back up"
@@ -251,7 +251,7 @@ if (-not($config.websites.iis)) {
         $domains += $instance.domain
     }
     # cleanup directories from domains array
-    get-childitem "c:\catapult\repositories\iis\*" | ?{ $_.PSIsContainer } | foreach-object {
+    get-childitem "c:\inetpub\repositories\iis\*" | ?{ $_.PSIsContainer } | foreach-object {
         $domain = split-path $_.FullName -leaf
         if (-not($domains -contains $domain)) {
             echo "`n`nWebsite does not exist in secrets/configuration.yml, removing $domain ..."
@@ -306,8 +306,19 @@ if (-not($config.websites.iis)) {
         }
         # 80
         new-website -name ("$($args[0]).{0}" -f $instance.domain) -hostheader ("$($args[0]).{0}" -f $instance.domain) -port 80 -physicalpath ("c:\inetpub\repositories\iis\{0}\{1}" -f $instance.domain,$instance.webroot) -applicationpool ("$($args[0]).{0}" -f $instance.domain) -force
+
+        # 80:www
+        new-webbinding -name ("$($args[0]).{0}" -f $instance.domain) -hostheader ("www.$($args[0]).{0}" -f $instance.domain) -port 80
+
         # 443
         new-webbinding -name ("$($args[0]).{0}" -f $instance.domain) -hostheader ("$($args[0]).{0}" -f $instance.domain) -port 443 -protocol https -sslflags 1
+
+        # 443:www
+        new-webbinding -name ("$($args[0]).{0}" -f $instance.domain) -hostheader ("www.$($args[0]).{0}" -f $instance.domain) -port 443 -protocol https -sslflags 1
+
+        # set website user account
+        set-itemproperty ("$($args[0]).{0}" -f $instance.domain) -name username -value "$env:username"
+        set-itemproperty ("$($args[0]).{0}" -f $instance.domain) -name password -value "$env:username"
     }
 
     echo "`n`n==> Creating SSL Bindings"
