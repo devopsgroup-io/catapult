@@ -815,8 +815,11 @@ module Catapult
         end
       end
     end
+
+
+
+    # validate @configuration["environments"]
     puts "\nVerification of configuration[\"environments\"]:\n".color(Colors::WHITE)
-    puts "[redhat]"
     # get full list of available digitalocean slugs to validate against
     uri = URI("https://api.digitalocean.com/v2/sizes")
     Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
@@ -835,92 +838,83 @@ module Catapult
         end
       end
     end
-
-
-
-    # validate @configuration["environments"]
+    # loop through each environment
     @configuration["environments"].each do |environment,data|
-      #validate digitalocean droplets
+
+      # validate servers
       unless "#{environment}" == "dev" || @api_digitalocean == nil
 
-        # redhat droplet
-        droplet = @api_digitalocean["droplets"].find { |element| element['name'] == "#{@configuration["company"]["name"].downcase}-#{environment}-redhat" }
-        # if redhat digitalocean droplet has been created
-        if droplet != nil
-          droplet_ip = droplet["networks"]["v4"].find { |element| element["type"] == "public" }
-          droplet_ip_private = droplet["networks"]["v4"].find { |element| element["type"] == "private" }
-          puts " * DigitalOcean droplet #{@configuration["company"]["name"].downcase}-#{environment}-redhat has been found."
-          puts "   - [status] #{droplet["status"]} [memory] #{droplet["size"]["memory"]} [vcpus] #{droplet["size"]["vcpus"]} [disk] #{droplet["size"]["disk"]} [$/month] $#{droplet["size"]["price_monthly"]}"
-          puts "   - [created] #{droplet["created_at"]} [slug] #{droplet["size"]["slug"]} [region] #{droplet["region"]["name"]} [kernel] #{droplet["kernel"]["name"]}"
-          puts "   - [ipv4_public] #{droplet_ip["ip_address"]} [ipv4_private] #{droplet_ip_private["ip_address"]}"
-          # get public ip address and write to secrets/configuration.yml
-          unless @configuration["environments"]["#{environment}"]["servers"]["redhat"]["ip"] == droplet_ip["ip_address"]
-            @configuration["environments"]["#{environment}"]["servers"]["redhat"]["ip"] = "#{droplet_ip["ip_address"]}"
-            `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml --decrypt secrets/configuration.yml.gpg`
-            File.open('secrets/configuration.yml', 'w') {|f| f.write configuration.to_yaml }
-            `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml.gpg --armor --cipher-algo AES256 --symmetric secrets/configuration.yml`
-          end
-          # get private ip address and write to secrets/configuration.yml
-          unless @configuration["environments"]["#{environment}"]["servers"]["redhat"]["ip_private"] == droplet_ip_private["ip_address"]
-            @configuration["environments"]["#{environment}"]["servers"]["redhat"]["ip_private"] = "#{droplet_ip_private["ip_address"]}"
-            `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml --decrypt secrets/configuration.yml.gpg`
-            File.open('secrets/configuration.yml', 'w') {|f| f.write configuration.to_yaml }
-            `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml.gpg --armor --cipher-algo AES256 --symmetric secrets/configuration.yml`
-          end
-          # get slug and write to secrets/configuration.yml
-          unless @configuration["environments"]["#{environment}"]["servers"]["redhat"]["slug"] == droplet["size"]["slug"]
-            @configuration["environments"]["#{environment}"]["servers"]["redhat"]["slug"] = droplet["size"]["slug"]
-            `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml --decrypt secrets/configuration.yml.gpg`
-            File.open('secrets/configuration.yml', 'w') {|f| f.write configuration.to_yaml }
-            `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml.gpg --armor --cipher-algo AES256 --symmetric secrets/configuration.yml`
-          end
-        # if redhat digitalocean droplet has NOT been created
-        elsif @configuration["environments"]["#{environment}"]["servers"]["redhat"]["slug"] == nil
-          catapult_exception("There is an error in your secrets/configuration.yml file.\nThe slug (DigitalOcean droplet size) for #{environment} => servers => redhat is empty and the droplet has not been created. Please choose from the following (see DigitalOcean.com for pricing):\n#{@api_digitalocean_slugs}")
-        elsif not @api_digitalocean_slugs.include?("#{@configuration["environments"]["#{environment}"]["servers"]["redhat"]["slug"]}")
-          catapult_exception("There is an error in your secrets/configuration.yml file.\nThe slug (DigitalOcean droplet size) for #{environment} => servers => redhat is invalid and the droplet has not been created. Please choose from the following (see DigitalOcean.com for pricing):\n#{@api_digitalocean_slugs}")
-        else
-          puts " * DigitalOcean droplet #{@configuration["company"]["name"].downcase}-#{environment}-redhat has not been created, please vagrant up #{@configuration["company"]["name"].downcase}-#{environment}-redhat"
-        end
+        @configuration["environments"]["#{environment}"]["servers"].each do |server,data|
 
-        # redhat_mysql droplet
-        droplet = @api_digitalocean["droplets"].find { |element| element['name'] == "#{@configuration["company"]["name"].downcase}-#{environment}-redhat-mysql" }
-        # if redhat_mysql digitalocean droplet has been created
-        if droplet != nil
-          droplet_ip = droplet["networks"]["v4"].find { |element| element["type"] == "public" }
-          droplet_ip_private = droplet["networks"]["v4"].find { |element| element["type"] == "private" }
-          puts " * DigitalOcean droplet #{@configuration["company"]["name"].downcase}-#{environment}-redhat_mysql has been found."
-          puts "   - [status] #{droplet["status"]} [memory] #{droplet["size"]["memory"]} [vcpus] #{droplet["size"]["vcpus"]} [disk] #{droplet["size"]["disk"]} [$/month] $#{droplet["size"]["price_monthly"]}"
-          puts "   - [created] #{droplet["created_at"]} [slug] #{droplet["size"]["slug"]} [region] #{droplet["region"]["name"]} [kernel] #{droplet["kernel"]["name"]}"
-          puts "   - [ipv4_public] #{droplet_ip["ip_address"]} [ipv4_private] #{droplet_ip_private["ip_address"]}"
-          # get public ip address and write to secrets/configuration.yml
-          unless @configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["ip"] == droplet_ip["ip_address"]
-            @configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["ip"] = "#{droplet_ip["ip_address"]}"
-            `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml --decrypt secrets/configuration.yml.gpg`
-            File.open('secrets/configuration.yml', 'w') {|f| f.write configuration.to_yaml }
-            `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml.gpg --armor --cipher-algo AES256 --symmetric secrets/configuration.yml`
+          # validate redhat digitalocean droplets
+          if "#{server}".start_with?("redhat")
+
+            droplet = @api_digitalocean["droplets"].find { |element| element['name'] == "#{@configuration["company"]["name"].downcase}-#{environment}-#{server.gsub("_","-")}" }
+
+            # if digitalocean droplet has been created
+            if droplet != nil
+              droplet_ip = droplet["networks"]["v4"].find { |element| element["type"] == "public" }
+              droplet_ip_private = droplet["networks"]["v4"].find { |element| element["type"] == "private" }
+              puts " * DigitalOcean droplet #{@configuration["company"]["name"].downcase}-#{environment}-#{server.gsub("_","-")} has been found."
+              puts "   - [status] #{droplet["status"]} [memory] #{droplet["size"]["memory"]} [vcpus] #{droplet["size"]["vcpus"]} [disk] #{droplet["size"]["disk"]} [$/month] $#{droplet["size"]["price_monthly"]}"
+              puts "   - [created] #{droplet["created_at"]} [slug] #{droplet["size"]["slug"]} [region] #{droplet["region"]["name"]}"
+              puts "   - [kernel] #{droplet["kernel"]["name"]}"
+              puts "   - [ipv4_public] #{droplet_ip["ip_address"]} [ipv4_private] #{droplet_ip_private["ip_address"]}"
+              # make sure the droplet has the correct kernel, if not, update it
+              if "#{droplet["kernel"]["id"]}" != "7516"
+                puts "   - The Kernel version must be updated to DigitalOcean GrubLoader v0.2, performing now...".color(Colors::YELLOW)
+                uri = URI("https://api.digitalocean.com/v2/droplets/#{droplet["id"]}/actions")
+                Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
+                  request = Net::HTTP::Post.new uri.request_uri
+                  request.add_field "Authorization", "Bearer #{@configuration["company"]["digitalocean_personal_access_token"]}"
+                  request.add_field "Content-Type", "application/json"
+                  request.body = ""\
+                    "{"\
+                      "\"type\":\"change_kernel\","\
+                      "\"kernel\":7516"\
+                    "}"
+                  response = http.request request
+                  if response.code.to_f.between?(399,499)
+                    catapult_exception("#{response.code} The DigitalOcean API could not authenticate, please verify [\"company\"][\"digitalocean_personal_access_token\"].")
+                  elsif response.code.to_f.between?(500,600)
+                    puts "   - The DigitalOcean API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
+                  else
+                    puts "   - Successfully updated the kernel, moving on... (this may impact provisioning and automated deployments)"
+                  end
+                end
+              end
+              # get public ip address and write to secrets/configuration.yml
+              unless @configuration["environments"]["#{environment}"]["servers"]["#{server}"]["ip"] == droplet_ip["ip_address"]
+                @configuration["environments"]["#{environment}"]["servers"]["#{server}"]["ip"] = "#{droplet_ip["ip_address"]}"
+                `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml --decrypt secrets/configuration.yml.gpg`
+                File.open('secrets/configuration.yml', 'w') {|f| f.write configuration.to_yaml }
+                `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml.gpg --armor --cipher-algo AES256 --symmetric secrets/configuration.yml`
+              end
+              # get private ip address and write to secrets/configuration.yml
+              unless @configuration["environments"]["#{environment}"]["servers"]["#{server}"]["ip_private"] == droplet_ip_private["ip_address"]
+                @configuration["environments"]["#{environment}"]["servers"]["#{server}"]["ip_private"] = "#{droplet_ip_private["ip_address"]}"
+                `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml --decrypt secrets/configuration.yml.gpg`
+                File.open('secrets/configuration.yml', 'w') {|f| f.write configuration.to_yaml }
+                `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml.gpg --armor --cipher-algo AES256 --symmetric secrets/configuration.yml`
+              end
+              # get slug and write to secrets/configuration.yml
+              unless @configuration["environments"]["#{environment}"]["servers"]["#{server}"]["slug"] == droplet["size"]["slug"]
+                @configuration["environments"]["#{environment}"]["servers"]["#{server}"]["slug"] = droplet["size"]["slug"]
+                `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml --decrypt secrets/configuration.yml.gpg`
+                File.open('secrets/configuration.yml', 'w') {|f| f.write configuration.to_yaml }
+                `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml.gpg --armor --cipher-algo AES256 --symmetric secrets/configuration.yml`
+              end
+            # if digitalocean droplet has NOT been created
+            elsif @configuration["environments"]["#{environment}"]["servers"]["#{server}"]["slug"] == nil
+              catapult_exception("There is an error in your secrets/configuration.yml file.\nThe slug (DigitalOcean droplet size) for #{environment} => servers => redhat is empty and the droplet has not been created. Please choose from the following (see DigitalOcean.com for pricing):\n#{@api_digitalocean_slugs}")
+            elsif not @api_digitalocean_slugs.include?("#{@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["slug"]}")
+              catapult_exception("There is an error in your secrets/configuration.yml file.\nThe slug (DigitalOcean droplet size) for #{environment} => servers => redhat is invalid and the droplet has not been created. Please choose from the following (see DigitalOcean.com for pricing):\n#{@api_digitalocean_slugs}")
+            else
+              puts " * DigitalOcean droplet #{@configuration["company"]["name"].downcase}-#{environment}-#{server.gsub("_","-")} has not been created, please vagrant up #{@configuration["company"]["name"].downcase}-#{environment}-#{server.gsub("_","-")}"
+            end
+
           end
-          # get private ip address and write to secrets/configuration.yml
-          unless @configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["ip_private"] == droplet_ip_private["ip_address"]
-            @configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["ip_private"] = "#{droplet_ip_private["ip_address"]}"
-            `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml --decrypt secrets/configuration.yml.gpg`
-            File.open('secrets/configuration.yml', 'w') {|f| f.write configuration.to_yaml }
-            `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml.gpg --armor --cipher-algo AES256 --symmetric secrets/configuration.yml`
-          end
-          # get slug and write to secrets/configuration.yml
-          unless @configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["slug"] == droplet["size"]["slug"]
-            @configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["slug"] = droplet["size"]["slug"]
-            `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml --decrypt secrets/configuration.yml.gpg`
-            File.open('secrets/configuration.yml', 'w') {|f| f.write configuration.to_yaml }
-            `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml.gpg --armor --cipher-algo AES256 --symmetric secrets/configuration.yml`
-          end
-        # if redhat_mysql digitalocean droplet has NOT been created
-        elsif @configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["slug"] == nil
-          catapult_exception("There is an error in your secrets/configuration.yml file.\nThe slug (DigitalOcean droplet size) for #{environment} => servers => redhat_mysql is empty and the droplet has not been created. Please choose from the following (see DigitalOcean.com for pricing):\n#{@api_digitalocean_slugs}")
-        elsif not @api_digitalocean_slugs.include?("#{@configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["slug"]}")
-          catapult_exception("There is an error in your secrets/configuration.yml file.\nThe slug (DigitalOcean droplet size) for #{environment} => servers => redhat_mysql is invalid and the droplet has not been created. Please choose from the following (see DigitalOcean.com for pricing):\n#{@api_digitalocean_slugs}")
-        else
-          puts " * DigitalOcean droplet #{@configuration["company"]["name"].downcase}-#{environment}-redhat_mysql has not been created, please vagrant up #{@configuration["company"]["name"].downcase}-#{environment}-redhat_mysql"
+
         end
       
       end
@@ -1310,6 +1304,7 @@ module Catapult
             Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
               request = Net::HTTP::Post.new uri.request_uri
               request.basic_auth "#{@configuration["company"]["github_username"]}", "#{@configuration["company"]["github_password"]}"
+              request.add_field "Content-Type", "application/json"
               request.body = ""\
                 "{"\
                   "\"name\":\"bamboo\","\

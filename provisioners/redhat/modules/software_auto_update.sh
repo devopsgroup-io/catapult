@@ -21,7 +21,7 @@ if hash composer 2>/dev/null && hash drush 2>/dev/null && hash wp-cli 2>/dev/nul
 
     if [ "${software}" = "codeigniter2" ]; then
 
-        version=$(cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && cat system/core/CodeIgniter.php 2>/dev/null | grep "define('CI_VERSION'" | grep --extended-regexp --only-matching --regexp="[0-9]\.[0-9][0-9]?[0-9]?(\.[0-9][0-9]?[0-9]?)?")
+        version=$(cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && cat system/core/CodeIgniter.php 2>/dev/null | grep "define('CI_VERSION'" | grep --extended-regexp --only-matching --regexp="[0-9]\.[0-9][0-9]?[0-9]?(\.[0-9][0-9]?[0-9]?)?" || echo "0")
 
         if [[ "${softwareversion_array[@]}" =~ "$(grep --only-matching --regexp="^[0-9]" <<< "${version}")" ]]; then
             echo -e "\nSUPPORTED SOFTWARE VERSION DETECTED: ${version}\n"
@@ -36,7 +36,7 @@ if hash composer 2>/dev/null && hash drush 2>/dev/null && hash wp-cli 2>/dev/nul
 
     elif [ "${software}" = "codeigniter3" ]; then
 
-        version=$(cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && cat system/core/CodeIgniter.php 2>/dev/null | grep "define('CI_VERSION'" | grep --extended-regexp --only-matching --regexp="[0-9]\.[0-9][0-9]?[0-9]?(\.[0-9][0-9]?[0-9]?)?")
+        version=$(cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && cat system/core/CodeIgniter.php 2>/dev/null | grep "define('CI_VERSION'" | grep --extended-regexp --only-matching --regexp="[0-9]\.[0-9][0-9]?[0-9]?(\.[0-9][0-9]?[0-9]?)?" || echo "0")
 
         if [[ "${softwareversion_array[@]}" =~ "$(grep --only-matching --regexp="^[0-9]" <<< "${version}")" ]]; then
             echo -e "\nSUPPORTED SOFTWARE VERSION DETECTED: ${version}\n"
@@ -51,7 +51,7 @@ if hash composer 2>/dev/null && hash drush 2>/dev/null && hash wp-cli 2>/dev/nul
 
     elif [ "${software}" = "drupal6" ]; then
 
-        version=$(cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && cat modules/system/system.module 2>/dev/null | grep "define('VERSION'" | grep --extended-regexp --only-matching --regexp="[0-9]\.[0-9][0-9]?[0-9]?(\.[0-9][0-9]?[0-9]?)?")
+        version=$(cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && cat modules/system/system.module 2>/dev/null | grep "define('VERSION'" | grep --extended-regexp --only-matching --regexp="[0-9]\.[0-9][0-9]?[0-9]?(\.[0-9][0-9]?[0-9]?)?" || echo "0")
 
         if [[ "${softwareversion_array[@]}" =~ "$(grep --only-matching --regexp="^[0-9]" <<< "${version}")" ]]; then
             echo -e "\nSUPPORTED SOFTWARE VERSION DETECTED: ${version}\n"
@@ -67,7 +67,7 @@ if hash composer 2>/dev/null && hash drush 2>/dev/null && hash wp-cli 2>/dev/nul
 
     elif [ "${software}" = "drupal7" ]; then
 
-        version=$(cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && cat includes/bootstrap.inc 2>/dev/null | grep "define('VERSION'" | grep --extended-regexp --only-matching --regexp="[0-9]\.[0-9][0-9]?[0-9]?(\.[0-9][0-9]?[0-9]?)?")
+        version=$(cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && cat includes/bootstrap.inc 2>/dev/null | grep "define('VERSION'" | grep --extended-regexp --only-matching --regexp="[0-9]\.[0-9][0-9]?[0-9]?(\.[0-9][0-9]?[0-9]?)?" || echo "0")
 
         if [[ "${softwareversion_array[@]}" =~ "$(grep --only-matching --regexp="^[0-9]" <<< "${version}")" ]]; then
             echo -e "\nSUPPORTED SOFTWARE VERSION DETECTED: ${version}\n"
@@ -83,7 +83,7 @@ if hash composer 2>/dev/null && hash drush 2>/dev/null && hash wp-cli 2>/dev/nul
 
     elif [ "${software}" = "expressionengine3" ]; then
 
-        version=$(cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && cat system/ee/legacy/libraries/Core.php 2>/dev/null | grep "define('APP_VER'" | grep --extended-regexp --only-matching --regexp="[0-9]\.[0-9][0-9]?[0-9]?(\.[0-9][0-9]?[0-9]?)?")
+        version=$(cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && cat system/ee/legacy/libraries/Core.php 2>/dev/null | grep "define('APP_VER'" | grep --extended-regexp --only-matching --regexp="[0-9]\.[0-9][0-9]?[0-9]?(\.[0-9][0-9]?[0-9]?)?" || echo "0")
 
         if [[ "${softwareversion_array[@]}" =~ "$(grep --only-matching --regexp="^[0-9]" <<< "${version}")" ]]; then
             echo -e "\nSUPPORTED SOFTWARE VERSION DETECTED: ${version}\n"
@@ -98,7 +98,7 @@ if hash composer 2>/dev/null && hash drush 2>/dev/null && hash wp-cli 2>/dev/nul
 
     elif [ "${software}" = "joomla3" ]; then
 
-        version=$(cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && cat libraries/cms/version/version.php 2>/dev/null | grep "const RELEASE =" | grep --extended-regexp --only-matching --regexp="[0-9]\.[0-9][0-9]?[0-9]?(\.[0-9][0-9]?[0-9]?)?")
+        version=$(cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && cat libraries/cms/version/version.php 2>/dev/null | grep "const RELEASE =" | grep --extended-regexp --only-matching --regexp="[0-9]\.[0-9][0-9]?[0-9]?(\.[0-9][0-9]?[0-9]?)?" || echo "0")
 
         if [[ "${softwareversion_array[@]}" =~ "$(grep --only-matching --regexp="^[0-9]" <<< "${version}")" ]]; then
             echo -e "\nSUPPORTED SOFTWARE VERSION DETECTED: ${version}\n"
@@ -115,7 +115,7 @@ if hash composer 2>/dev/null && hash drush 2>/dev/null && hash wp-cli 2>/dev/nul
 
     elif [ "${software}" = "laravel5" ]; then
 
-        version=$(cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && cat vendor/laravel/framework/src/Illuminate/Foundation/Application.php 2>/dev/null | grep "const VERSION =" | grep --extended-regexp --only-matching --regexp="[0-9]\.[0-9][0-9]?[0-9]?(\.[0-9][0-9]?[0-9]?)?")
+        version=$(cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && cat vendor/laravel/framework/src/Illuminate/Foundation/Application.php 2>/dev/null | grep "const VERSION =" | grep --extended-regexp --only-matching --regexp="[0-9]\.[0-9][0-9]?[0-9]?(\.[0-9][0-9]?[0-9]?)?" || echo "0")
 
         if [[ "${softwareversion_array[@]}" =~ "$(grep --only-matching --regexp="^[0-9]" <<< "${version}")" ]]; then
             echo -e "\nSUPPORTED SOFTWARE VERSION DETECTED: ${version}\n"
@@ -132,7 +132,7 @@ if hash composer 2>/dev/null && hash drush 2>/dev/null && hash wp-cli 2>/dev/nul
 
     elif [ "${software}" = "mediawiki1" ]; then
 
-        version=$(cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && cat includes/DefaultSettings.php 2>/dev/null | grep "\$wgVersion = " | grep --extended-regexp --only-matching --regexp="[0-9]\.[0-9][0-9]?[0-9]?(\.[0-9][0-9]?[0-9]?)?")
+        version=$(cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && cat includes/DefaultSettings.php 2>/dev/null | grep "\$wgVersion = " | grep --extended-regexp --only-matching --regexp="[0-9]\.[0-9][0-9]?[0-9]?(\.[0-9][0-9]?[0-9]?)?" || echo "0")
 
         if [[ "${softwareversion_array[@]}" =~ "$(grep --only-matching --regexp="^[0-9]" <<< "${version}")" ]]; then
             echo -e "\nSUPPORTED SOFTWARE VERSION DETECTED: ${version}\n"
@@ -149,7 +149,7 @@ if hash composer 2>/dev/null && hash drush 2>/dev/null && hash wp-cli 2>/dev/nul
 
     elif [ "${software}" = "moodle3" ]; then
 
-        version=$(cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && cat version.php 2>/dev/null | grep "\$release" | grep --extended-regexp --only-matching --regexp="[0-9]\.[0-9][0-9]?[0-9]?(\.[0-9][0-9]?[0-9]?)?")
+        version=$(cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && cat version.php 2>/dev/null | grep "\$release" | grep --extended-regexp --only-matching --regexp="[0-9]\.[0-9][0-9]?[0-9]?(\.[0-9][0-9]?[0-9]?)?" || echo "0")
 
         if [[ "${softwareversion_array[@]}" =~ "$(grep --only-matching --regexp="^[0-9]" <<< "${version}")" ]]; then
             echo -e "\nSUPPORTED SOFTWARE VERSION DETECTED: ${version}\n"
@@ -164,7 +164,7 @@ if hash composer 2>/dev/null && hash drush 2>/dev/null && hash wp-cli 2>/dev/nul
 
     elif [ "${software}" = "silverstripe3" ]; then
 
-        version=$(cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && cat framework/silverstripe_version 2>/dev/null | grep --extended-regexp --only-matching --regexp="[0-9]\.[0-9][0-9]?[0-9]?(\.[0-9][0-9]?[0-9]?)?")
+        version=$(cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && cat framework/silverstripe_version 2>/dev/null | grep --extended-regexp --only-matching --regexp="[0-9]\.[0-9][0-9]?[0-9]?(\.[0-9][0-9]?[0-9]?)?" || echo "0")
 
         if [[ "${softwareversion_array[@]}" =~ "$(grep --only-matching --regexp="^[0-9]" <<< "${version}")" ]]; then
             echo -e "\nSUPPORTED SOFTWARE VERSION DETECTED: ${version}\n"
@@ -182,7 +182,7 @@ if hash composer 2>/dev/null && hash drush 2>/dev/null && hash wp-cli 2>/dev/nul
 
     elif [ "${software}" = "suitecrm7" ]; then
 
-        version=$(cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && cat suitecrm_version.php 2>/dev/null | grep "\$suitecrm_version" | grep --extended-regexp --only-matching --regexp="[0-9]\.[0-9][0-9]?[0-9]?(\.[0-9][0-9]?[0-9]?)?")
+        version=$(cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && cat suitecrm_version.php 2>/dev/null | grep "\$suitecrm_version" | grep --extended-regexp --only-matching --regexp="[0-9]\.[0-9][0-9]?[0-9]?(\.[0-9][0-9]?[0-9]?)?" || echo "0")
 
         if [[ "${softwareversion_array[@]}" =~ "$(grep --only-matching --regexp="^[0-9]" <<< "${version}")" ]]; then
             echo -e "\nSUPPORTED SOFTWARE VERSION DETECTED: ${version}\n"
@@ -199,7 +199,7 @@ if hash composer 2>/dev/null && hash drush 2>/dev/null && hash wp-cli 2>/dev/nul
 
     elif [ "${software}" = "wordpress" ]; then
 
-        version=$(cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && cat wp-includes/version.php 2>/dev/null | grep "\$wp_version" | grep --extended-regexp --only-matching --regexp="[0-9]\.[0-9][0-9]?[0-9]?(\.[0-9][0-9]?[0-9]?)?")
+        version=$(cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && cat wp-includes/version.php 2>/dev/null | grep "\$wp_version" | grep --extended-regexp --only-matching --regexp="[0-9]\.[0-9][0-9]?[0-9]?(\.[0-9][0-9]?[0-9]?)?" || echo "0")
 
         if [[ "${softwareversion_array[@]}" =~ "$(grep --only-matching --regexp="^[0-9]" <<< "${version}")" ]]; then
             echo -e "\nSUPPORTED SOFTWARE VERSION DETECTED: ${version}\n"
@@ -218,7 +218,7 @@ if hash composer 2>/dev/null && hash drush 2>/dev/null && hash wp-cli 2>/dev/nul
 
     elif [ "${software}" = "xenforo" ]; then
 
-        version=$(cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && cat library/XenForo/Application.php 2>/dev/null | grep "public static \$version =" | grep --extended-regexp --only-matching --regexp="[0-9]\.[0-9][0-9]?[0-9]?(\.[0-9][0-9]?[0-9]?)?")
+        version=$(cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && cat library/XenForo/Application.php 2>/dev/null | grep "public static \$version =" | grep --extended-regexp --only-matching --regexp="[0-9]\.[0-9][0-9]?[0-9]?(\.[0-9][0-9]?[0-9]?)?" || echo "0")
 
         if [[ "${softwareversion_array[@]}" =~ "$(grep --only-matching --regexp="^[0-9]" <<< "${version}")" ]]; then
             echo -e "\nSUPPORTED SOFTWARE VERSION DETECTED: ${version}\n"
@@ -233,7 +233,7 @@ if hash composer 2>/dev/null && hash drush 2>/dev/null && hash wp-cli 2>/dev/nul
 
     elif [ "${software}" = "zendframework2" ]; then
 
-        version=$(cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && cat vendor/zendframework/zendframework/library/Zend/Version/Version.php 2>/dev/null | grep "const VERSION =" | grep --extended-regexp --only-matching --regexp="[0-9]\.[0-9][0-9]?[0-9]?(\.[0-9][0-9]?[0-9]?)?")
+        version=$(cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && cat vendor/zendframework/zendframework/library/Zend/Version/Version.php 2>/dev/null | grep "const VERSION =" | grep --extended-regexp --only-matching --regexp="[0-9]\.[0-9][0-9]?[0-9]?(\.[0-9][0-9]?[0-9]?)?" || echo "0")
 
         if [[ "${softwareversion_array[@]}" =~ "$(grep --only-matching --regexp="^[0-9]" <<< "${version}")" ]]; then
             echo -e "\nSUPPORTED SOFTWARE VERSION DETECTED: ${version}\n"
