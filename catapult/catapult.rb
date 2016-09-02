@@ -879,7 +879,7 @@ module Catapult
                   elsif response.code.to_f.between?(500,600)
                     puts "   - The DigitalOcean API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
                   else
-                    puts "   - Successfully updated the kernel, moving on... (this may impact provisioning and automated deployments)"
+                    puts "   - Successfully updated the kernel, moving on..."
                   end
                 end
               end
