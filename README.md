@@ -655,7 +655,7 @@ The following options are available:
         * array of select environments ["test","qc","production"] to exclude from the `force_auth` option
 * `force_https:`
     * required: no
-    * `force_https: true`
+    * option: `force_https: true`
         * rewrites all http traffic to https
         * subdomains are not supported as limited by CloudFlare
         * causes an unsigned cert error in LocalDev
@@ -673,24 +673,24 @@ The following options are available:
         * manages software database backups and restores intelligently via git
         * manages software url references in database
         * manages software admin account integrity
-    * `software: codeigniter2`
-    * `software: codeigniter3`
-    * `software: drupal6`
-    * `software: drupal7`
-    * `software: expressionengine3`
-    * `software: joomla3`
-    * `software: laravel5`
-    * `software: mediawiki1`
-    * `software: moodle3`
-    * `software: silverstripe3`
-    * `software: suitecrm7`
-    * `software: wordpress`
-    * `software: xenforo`
-    * `software: zendframework2`
+    * option: `software: codeigniter2`
+    * option: `software: codeigniter3`
+    * option: `software: drupal6`
+    * option: `software: drupal7`
+    * option: `software: expressionengine3`
+    * option: `software: joomla3`
+    * option: `software: laravel5`
+    * option: `software: mediawiki1`
+    * option: `software: moodle3`
+    * option: `software: silverstripe3`
+    * option: `software: suitecrm7`
+    * option: `software: wordpress`
+    * option: `software: xenforo`
+    * option: `software: zendframework2`
 * `software_auto_update:`
     * required: no
     * dependency: `software:`
-    * example: `software_auto_update: true`
+    * option: `software_auto_update: true`
         * manages software core and pluggable component (plugins, modules, etc) updates to the latest compatible versions using the software's CLI tool
         * updates only occur in the `software_workflow` environment
         * not all `software` is supported, see [Software Updates and Fresh Installs](#software-updates-and-fresh-installs)
@@ -703,10 +703,10 @@ The following options are available:
 * `software_workflow:`
     * required: yes
     * dependency: `software:`
-    * `software_workflow: downstream`
+    * option: `software_workflow: downstream`
         * specifies Production as the source for the database and software file stores
         * this option is useful for maintaining a website
-    * `software_workflow: upstream`
+    * option: `software_workflow: upstream`
         * specifies Test as the source for the database and software file stores
         * this option is useful for launching a new website
         * PLEASE NOTE: affects the Production website instance - see [Release Management](#release-management)
