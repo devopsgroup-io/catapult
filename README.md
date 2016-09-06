@@ -704,12 +704,13 @@ The following options are available:
     * required: yes
     * dependency: `software:`
     * option: `software_workflow: downstream`
-        * specifies Production as the source for the database and software file stores
         * this option is useful for maintaining a website
+        * specifies the Production environment and the `master` branch as the source and automated save point for software files and database
+        * the `master` branch is automatically merged into the `develop` branch for convenience
     * option: `software_workflow: upstream`
-        * specifies Test as the source for the database and software file stores
-        * this option is useful for launching a new website
-        * PLEASE NOTE: affects the Production website instance - see [Release Management](#release-management)
+        * this option is useful for launching a new website or maintaining a regulated website
+        * specifies the Test environment and the `develop` branch as the source and automated save point for software files and database
+        * REMINDER: websites with this option will have its Production instance overwritten with software files and datbase from the `master` branch - see [Release Management](#release-management)
 * `webroot:`
     * required: no
     * example: `webroot: www/`
