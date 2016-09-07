@@ -38,6 +38,10 @@ elif [ "$software" = "drupal7" ]; then
     cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush -y updatedb
     cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush -y cache-clear all
 
+elif [ "$software" = "elgg1" ]; then
+
+    echo "nothing to perform, skipping..."
+
 elif [ "$software" = "expressionengine3" ]; then
 
     echo "nothing to perform, skipping..."
@@ -92,4 +96,4 @@ elif [ "$software" = "zendframework2" ]; then
 
 fi
 
-touch "/catapult/provisioners/redhat/logs/software_database_operations.$(catapult websites.apache.$5.domain).complete"
+touch "/catapult/provisioners/redhat/logs/software_operations_meta.$(catapult websites.apache.$5.domain).complete"

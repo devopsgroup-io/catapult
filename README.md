@@ -86,6 +86,7 @@ CodeIgniter 2                     | `codeigniter2`         | January 28, 2011   
 CodeIgniter 3                     | `codeigniter3`         | March 30, 2015     | 
 Drupal 6                          | `drupal6`              | February 13, 2008  | [February 24, 2016](https://www.drupal.org/drupal-6-eol)
 Drupal 7                          | `drupal7`              | January 5, 2011    |
+Elgg 1                            | `elgg1`                | August 20, 2008    |
 ExpressionEngine 3                | `expressionengine3`    | October 13, 2015   |
 Joomla 3                          | `joomla3`              | September 27, 2012 |
 Laravel 5.0.x                     | `laravel5`             | February 4, 2015   |
@@ -655,7 +656,7 @@ The following options are available:
         * array of select environments ["test","qc","production"] to exclude from the `force_auth` option
 * `force_https:`
     * required: no
-    * `force_https: true`
+    * option: `force_https: true`
         * rewrites all http traffic to https
         * subdomains are not supported as limited by CloudFlare
         * causes an unsigned cert error in LocalDev
@@ -669,28 +670,30 @@ The following options are available:
         * maintains software database config file
         * manages tracked and untracked software file stores intelligently via git and rsync
         * manages permissions of software file store containers
-        * manages software database operations
+        * manages software operations such as cron, garbage collection, and caches
+        * manages software database migrations
         * manages software database backups and restores intelligently via git
         * manages software url references in database
         * manages software admin account integrity
-    * `software: codeigniter2`
-    * `software: codeigniter3`
-    * `software: drupal6`
-    * `software: drupal7`
-    * `software: expressionengine3`
-    * `software: joomla3`
-    * `software: laravel5`
-    * `software: mediawiki1`
-    * `software: moodle3`
-    * `software: silverstripe3`
-    * `software: suitecrm7`
-    * `software: wordpress`
-    * `software: xenforo`
-    * `software: zendframework2`
+    * option: `software: codeigniter2`
+    * option: `software: codeigniter3`
+    * option: `software: drupal6`
+    * option: `software: drupal7`
+    * option: `software: elgg1`
+    * option: `software: expressionengine3`
+    * option: `software: joomla3`
+    * option: `software: laravel5`
+    * option: `software: mediawiki1`
+    * option: `software: moodle3`
+    * option: `software: silverstripe3`
+    * option: `software: suitecrm7`
+    * option: `software: wordpress`
+    * option: `software: xenforo`
+    * option: `software: zendframework2`
 * `software_auto_update:`
     * required: no
     * dependency: `software:`
-    * example: `software_auto_update: true`
+    * option: `software_auto_update: true`
         * manages software core and pluggable component (plugins, modules, etc) updates to the latest compatible versions using the software's CLI tool
         * updates only occur in the `software_workflow` environment
         * not all `software` is supported, see [Software Updates and Fresh Installs](#software-updates-and-fresh-installs)
@@ -703,13 +706,14 @@ The following options are available:
 * `software_workflow:`
     * required: yes
     * dependency: `software:`
-    * `software_workflow: downstream`
-        * specifies Production as the source for the database and software file stores
+    * option: `software_workflow: downstream`
         * this option is useful for maintaining a website
-    * `software_workflow: upstream`
-        * specifies Test as the source for the database and software file stores
-        * this option is useful for launching a new website
-        * PLEASE NOTE: affects the Production website instance - see [Release Management](#release-management)
+        * specifies the Production environment and the `master` branch as the source and automated save point for software files and database
+        * the `master` branch is automatically merged into the `develop` branch for convenience
+    * option: `software_workflow: upstream`
+        * this option is useful for launching a new website or maintaining a regulated website
+        * specifies the Test environment and the `develop` branch as the source and automated save point for software files and database
+        * REMINDER: websites with this option will have its Production instance overwritten with software files and datbase from the `master` branch - see [Release Management](#release-management)
 * `webroot:`
     * required: no
     * example: `webroot: www/`
@@ -738,11 +742,12 @@ Software | `software_auto_update` Support | Install Approach | Install Notes
 `codeigniter3`      | [:x:](http://www.codeigniter.com/user_guide/installation/upgrading.html) |          |
 `drupal6`           | :white_check_mark:                                                       | Drush    | `drush dl drupal-6`
 `drupal7`           | :white_check_mark:                                                       | Drush    | `drush dl drupal-7`
-`expressionengine3` | [:x:](ttps://docs.expressionengine.com/latest/installation/update.html)  | Download |
+`elgg1`             | [:x:](http://learn.elgg.org/en/2.0/admin/upgrading.html)                 | Fork     | Follow the installation [Overview](http://learn.elgg.org/en/2.0/intro/install.html). Catapult requires the `dataroot` directory to be within the webroot, it's pertinant to create a `.gitignore` to ignore and `.htaccess` to deny access to this directory.
+`expressionengine3` | [:x:](https://docs.expressionengine.com/latest/installation/update.html) | Download |
 `joomla3`           | [:x:](https://docs.joomla.org/J3.x:Updating_from_an_existing_version)    | Fork     |
 `laravel5`          | [:x:](https://www.laravel.com/docs/master/upgrade)                       | Composer | Follow the [Composer Create-Project](https://laravel.com/docs/5.0/installation) documentation.
 `mediawiki1`        | [:x:](https://www.mediawiki.org/wiki/Manual:Upgrading)                   | Fork     |
-`moodle3`           | :white_check_mark:                                                       | Fork     | Catapult requires the `moodledata` directory to be within the webroot, it's pertinant to create a `.gitignore` and `.htaccess` file for this directory.
+`moodle3`           | :white_check_mark:                                                       | Fork     | Catapult requires the `moodledata` directory to be within the webroot, it's pertinant to create a `.gitignore` to ignore and `.htaccess` to deny access to this directory.
 `silverstripe3`     | [:x:](https://docs.silverstripe.org/en/3.4/upgrading/)                   | Composer | Follow the [Installing and Upgrading with Composer](https://docs.silverstripe.org/en/3.4/getting_started/composer/). During a fresh install, the database config file `mysite/_config.php` will need to be given 0777 permissions.
 `suitecrm7`         | [:x:](https://suitecrm.com/wiki/index.php/Upgrade)                       | Fork     |
 `wordpress`         | :white_check_mark:                                                       | Fork     |
@@ -761,6 +766,7 @@ Software | Approach | Documentation
 `codeigniter3`      |                      |
 `drupal6`           | `.htaccess`          | https://www.drupal.org/node/150215
 `drupal7`           | `.htaccess`          | https://www.drupal.org/node/150215
+`elgg1`             |                      |
 `expressionengine3` |                      |
 `joomla3`           |                      |
 `laravel5`          |                      |
@@ -782,6 +788,7 @@ Software | Tool | Command | Documentation
 `codeigniter3`      | Migrations      | `php index.php migrate`                                | https://www.codeigniter.com/user_guide/libraries/migration.html
 `drupal6`           | Drush           | `drush updatedb -y`                                    | https://www.drupal.org/node/150215
 `drupal7`           | Drush           | `drush updatedb -y`                                    | https://www.drupal.org/node/150215
+`elgg1`             |                 |                                                        |
 `expressionengine3` |                 |                                                        |
 `joomla3`           |                 |                                                        |
 `laravel5`          | Migrations      | `php artisan migrate`                                  | https://laravel.com/docs/5.0/migrations
