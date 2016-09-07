@@ -81,6 +81,21 @@ if hash composer 2>/dev/null && hash drush 2>/dev/null && hash wp-cli 2>/dev/nul
             echo -e "\nSUPPORTED SOFTWARE NOT DETECTED\n"
         fi
 
+    elif [ "${software}" = "elgg1" ]; then
+
+        version=$(cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && cat composer.json 2>/dev/null | grep "\"version\":" | grep --extended-regexp --only-matching --regexp="[0-9]\.[0-9][0-9]?[0-9]?(\.[0-9][0-9]?[0-9]?)?" || echo "0")
+
+        if [[ "${softwareversion_array[@]}" =~ "$(grep --only-matching --regexp="^[0-9]" <<< "${version}")" ]]; then
+            echo -e "\nSUPPORTED SOFTWARE VERSION DETECTED: ${version}\n"
+
+            if [ "${software_auto_update}" = "true" ]; then
+                : #no-op
+            fi
+
+        else
+            echo -e "\nSUPPORTED SOFTWARE NOT DETECTED\n"
+        fi
+
     elif [ "${software}" = "expressionengine3" ]; then
 
         version=$(cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && cat system/ee/legacy/libraries/Core.php 2>/dev/null | grep "define('APP_VER'" | grep --extended-regexp --only-matching --regexp="[0-9]\.[0-9][0-9]?[0-9]?(\.[0-9][0-9]?[0-9]?)?" || echo "0")
@@ -255,8 +270,34 @@ if hash composer 2>/dev/null && hash drush 2>/dev/null && hash wp-cli 2>/dev/nul
 
 else
 
-    echo -e "\t* software tools have yet to be installed, skipping..."
+    echo -e "> software tools have yet to be installed, skipping..."
 
 fi
 
-touch "/catapult/provisioners/redhat/logs/software_auto_update.$(catapult websites.apache.$5.domain).complete"
+# set directory permissions of software file store containers
+if [ -z "$(provisioners_array software.apache.${software}.file_store_containers)" ]; then
+    echo "this software has no file store containers, skipping..."
+else
+    cat "/catapult/provisioners/provisioners.yml" | shyaml get-values-0 software.apache.$(catapult websites.apache.$5.software).file_store_containers |
+    while read -r -d $'\0' file_store_container; do
+
+        file_store_container="/var/www/repositories/apache/${domain}/${webroot}${softwareroot}${file_store_container}"
+        echo -e "software file store container: ${file_store_container}"
+
+        # if the file store container does not exist, create it
+        if [ ! -d "${file_store_container}" ]; then
+            echo -e "- file store container does not exist, creating..."
+            sudo mkdir --parents "${file_store_container}"
+        fi
+
+        # set the file store container permissions
+        echo -e "- setting directory permissions..."
+        if [ "$1" != "dev" ]; then
+            sudo chown -R apache "${file_store_container}"
+        fi
+        sudo chmod -R 0700 "${file_store_container}"
+    done
+
+fi
+
+touch "/catapult/provisioners/redhat/logs/software_operations_file.$(catapult websites.apache.$5.domain).complete"

@@ -217,6 +217,7 @@ while IFS='' read -r -d '' key; do
                          || [ "${software}" = "codeigniter3" ] \
                          || [ "${software}" = "drupal6" ] \
                          || [ "${software}" = "drupal7" ] \
+                         || [ "${software}" = "elgg1" ] \
                          || [ "${software}" = "expressionengine3" ] \
                          || [ "${software}" = "joomla3" ] \
                          || [ "${software}" = "laravel5" ] \
@@ -280,6 +281,15 @@ while IFS='' read -r -d '' key; do
                 ON DUPLICATE KEY UPDATE rid='3';
             "
 
+        elif [[ "${software}" = "elgg1" ]]; then
+
+            echo -e "\t* resetting ${software} admin password..."
+            mysql --defaults-extra-file=$dbconf ${1}_${domainvaliddbname} -e "
+                INSERT INTO ${software_dbprefix}users_entity (username, password_hash, email, banned, admin)
+                VALUES ('admin', MD5('$(catapult environments.${1}.software.admin_password)'), '$(catapult company.email)', 'no', 'yes')
+                ON DUPLICATE KEY UPDATE username='admin', password_hash=MD5('$(catapult environments.${1}.software.admin_password)'), email='$(catapult company.email)', banned='no', admin='yes';
+            "
+
         elif [[ "${software}" = "joomla3" ]]; then
 
             echo -e "\t* resetting ${software} admin password..."
@@ -328,8 +338,8 @@ while IFS='' read -r -d '' key; do
 
             echo -e "\t* resetting ${software} admin password..."
             mysql --defaults-extra-file=$dbconf ${1}_${domainvaliddbname} -e "
-                INSERT INTO users (id, user_name, user_hash, is_admin)
-                VALUES ('1', 'admin', MD5('$(catapult environments.${1}.software.wordpress.admin_password)'), '1')
+                INSERT INTO ${software_dbprefix}users (id, user_name, user_hash, is_admin)
+                VALUES ('1', 'admin', MD5('$(catapult environments.${1}.software.admin_password)'), '1')
                 ON DUPLICATE KEY UPDATE user_name='admin', user_hash=MD5('$(catapult environments.${1}.software.admin_password)'), is_admin='1';
             "
 

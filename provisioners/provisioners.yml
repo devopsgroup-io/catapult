@@ -2,74 +2,74 @@
 redhat:
     modules:
         apache:
-          description: "Installs and configures Apache HTTP daemon."
+          description: "Manages Apache HTTP daemon."
           multithreading: false
         apache_vhosts_clean:
           description: "Removes virtual hosts for websites."
           multithreading: false
         apache_vhosts:
-          description: "Configures virtual hosts for websites."
+          description: "Manages virtual hosts for websites."
           multithreading: false
         cloudflare_cache:
-          description: "Clears CloudFlare zone cache for websites."
+          description: "Manages CloudFlare zone cache for websites."
           multithreading: true
         cloudflare_dns:
-          description: "Configures CloudfFlare DNS A records for websites."
+          description: "Manages CloudfFlare DNS A records for websites."
           multithreading: true
         cloudflare_zones:
-          description: "Configures CloudfFlare zones for websites."
+          description: "Manages CloudfFlare zones for websites."
           multithreading: true
         git:
-          description: "Clones Git repositories for websites."
+          description: "Manages Git repositories for websites."
           multithreading: true
         git_clean:
           description: "Removes Git repositories for websites."
           multithreading: false
         iptables:
-          description: "Configures firewall via IPTables to only allow necessary traffic."
+          description: "Manages a strict firewall to only allow necessary traffic."
           multithreading: false
         mysql:
-          description: "Installs and configures MariaDB server, then configures databases for websites with software."
+          description: "Manages MariaDB server and databases for websites with software."
           multithreading: false
         newrelic_apm_php:
-          description: "Installs and configures New Relic APM PHP daemon."
+          description: "Manages New Relic APM PHP daemon."
           multithreading: false
         newrelic_synthetics:
-          description: "Configures New Relic Synthetics monitors for websites."
+          description: "Manages New Relic Synthetics monitors for websites."
           multithreading: true
         newrelic_sysmon:
-          description: "Installs and configures New Relic System Monitor daemon."
+          description: "Manages New Relic System Monitor daemon."
           multithreading: false
         php:
-          description: "Installs and updates PHP and PHP modules."
+          description: "Manages PHP and PHP modules."
           multithreading: false
         rsync:
-          description: "Copies software file stores contingent on the software_workflow for websites with software."
-          multithreading: true
-        software_auto_update:
-          description: "Performs automatic software updates."
+          description: "Manages software file stores for websites with software."
           multithreading: true
         software_config:
-          description: "Creates software database configuration files and sets software file store container directory permissions for websites with software."
+          description: "Manages software database configuration files."
           multithreading: true
-        software_database_operations:
-          description: "Performs software operations for websites with software."
+        software_operations_file:
+          description: "Manages software file operations, including: automatic software updates and file store permissions for websites with software."
+          multithreading: true
+        software_operations_meta:
+          description: "Manages software meta operations, including: cron, garbage collection, caches, and migrations for websites with software."
           multithreading: true
         software_tools:
-          description: "Installs and configures software CLI tools."
+          description: "Manages software CLI tools."
           multithreading: false
         system:
-          description: "Installs and configures initial system requirements."
+          description: "Manages system requirements."
           multithreading: false
         time:
-          description: "Installs and configures NTP daemon based on the company timezone."
+          description: "Manages NTP daemon based on the company timezone."
           multithreading: false
     servers:
         redhat:
           apache:
-            modules: ["time","system","iptables","newrelic_sysmon","git_clean","software_auto_update","git","rsync","software_config","php","software_tools","apache","apache_vhosts_clean","apache_vhosts","newrelic_apm_php","cloudflare_zones","cloudflare_dns"]
+            modules: ["time","system","iptables","newrelic_sysmon","git_clean","software_config","software_operations_file","git","rsync","php","software_tools","apache","apache_vhosts_clean","apache_vhosts","newrelic_apm_php","cloudflare_zones","cloudflare_dns"]
           mysql:
-            modules: ["time","system","iptables","newrelic_sysmon","git_clean","git","rsync","software_config","php","software_tools","software_database_operations","mysql","cloudflare_cache","newrelic_synthetics"]
+            modules: ["time","system","iptables","newrelic_sysmon","git_clean","software_config","git","rsync","php","software_tools","software_operations_meta","mysql","cloudflare_cache","newrelic_synthetics"]
 windows:
 
 software:
@@ -102,6 +102,12 @@ software:
         file_store_containers: ["sites/default"]
         file_stores: ["sites/default/files"]
         version: [7]
+      elgg1:
+        repo: "https://github.com/Elgg/Elgg.git"
+        branch: "1.12"
+        database_config_file: "engine/settings.php"
+        file_store_containers: ["elggdata"]
+        version: [1]
       expressionengine3:
         repo: PRIVATE
         database_config_file: "system/user/config/config.php"

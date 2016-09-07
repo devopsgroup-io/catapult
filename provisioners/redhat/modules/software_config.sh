@@ -105,6 +105,24 @@ elif [ "${software}" = "drupal7" ]; then
         /catapult/provisioners/redhat/installers/software/${software}/settings.php > "${file}"
     sudo chmod 0444 "${file}"
 
+elif [ "${software}" = "elgg1" ]; then
+
+    file="/var/www/repositories/apache/${domain}/${webroot}${softwareroot}${database_config_file}"
+    echo -e "generating ${software} ${file}..."
+    if [ -f "${file}" ]; then
+        sudo chmod 0777 "${file}"
+    else
+        mkdir --parents $(dirname "${file}")
+    fi
+    sed --expression="s/{{dbuser}}/${mysql_user}/g" \
+        --expression="s/{{dbpassword}}/${mysql_user_password}/g" \
+        --expression="s/{{dbname}}/${1}_${domainvaliddbname}/g" \
+        --expression="s/{{dbhost}}/${redhat_mysql_ip}/g" \
+        --expression="s/{{dbprefix}}/${software_dbprefix}/g" \
+        --expression="s/{{dataroot}}/\\/var\\/www\\/repositories\\/apache\\/${domain}\\/${webroot}dataroot/g" \
+        /catapult/provisioners/redhat/installers/software/${software}/settings.php > "${file}"
+    sudo chmod 0444 "${file}"
+
 elif [ "${software}" = "expressionengine3" ]; then
 
     # https://docs.expressionengine.com/latest/general/system_configuration_overrides.html
@@ -286,32 +304,6 @@ elif [ "${software}" = "zendframework2" ]; then
         --expression="s/'password'\s=>\s''/'password' => '${mysql_user_password}'/g" \
         /catapult/provisioners/redhat/installers/software/${software}/global.php > "${file}"
     sudo chmod 0444 "${file}"
-
-fi
-
-# set directory permissions of software file store containers
-if [ -z "$(provisioners_array software.apache.${software}.file_store_containers)" ]; then
-    echo "this software has no file store containers"
-else
-    cat "/catapult/provisioners/provisioners.yml" | shyaml get-values-0 software.apache.$(catapult websites.apache.$5.software).file_store_containers |
-    while read -r -d $'\0' file_store_container; do
-
-        file_store_container="/var/www/repositories/apache/${domain}/${webroot}${softwareroot}${file_store_container}"
-        echo -e "software file store container: ${file_store_container}"
-
-        # if the file store container does not exist, create it
-        if [ ! -d "${file_store_container}" ]; then
-            echo -e "- file store container does not exist, creating..."
-            sudo mkdir --parents "${file_store_container}"
-        fi
-
-        # set the file store container permissions
-        echo -e "- setting directory permissions..."
-        if [ "$1" != "dev" ]; then
-            sudo chown -R apache "${file_store_container}"
-        fi
-        sudo chmod -R 0700 "${file_store_container}"
-    done
 
 fi
 

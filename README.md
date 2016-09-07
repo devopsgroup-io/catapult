@@ -86,6 +86,7 @@ CodeIgniter 2                     | `codeigniter2`         | January 28, 2011   
 CodeIgniter 3                     | `codeigniter3`         | March 30, 2015     | 
 Drupal 6                          | `drupal6`              | February 13, 2008  | [February 24, 2016](https://www.drupal.org/drupal-6-eol)
 Drupal 7                          | `drupal7`              | January 5, 2011    |
+Elgg 1                            | `elgg1`                | August 20, 2008    |
 ExpressionEngine 3                | `expressionengine3`    | October 13, 2015   |
 Joomla 3                          | `joomla3`              | September 27, 2012 |
 Laravel 5.0.x                     | `laravel5`             | February 4, 2015   |
@@ -669,7 +670,8 @@ The following options are available:
         * maintains software database config file
         * manages tracked and untracked software file stores intelligently via git and rsync
         * manages permissions of software file store containers
-        * manages software database operations
+        * manages software operations such as cron, garbage collection, and caches
+        * manages software database migrations
         * manages software database backups and restores intelligently via git
         * manages software url references in database
         * manages software admin account integrity
@@ -677,6 +679,7 @@ The following options are available:
     * option: `software: codeigniter3`
     * option: `software: drupal6`
     * option: `software: drupal7`
+    * option: `software: elgg1`
     * option: `software: expressionengine3`
     * option: `software: joomla3`
     * option: `software: laravel5`
@@ -739,11 +742,12 @@ Software | `software_auto_update` Support | Install Approach | Install Notes
 `codeigniter3`      | [:x:](http://www.codeigniter.com/user_guide/installation/upgrading.html) |          |
 `drupal6`           | :white_check_mark:                                                       | Drush    | `drush dl drupal-6`
 `drupal7`           | :white_check_mark:                                                       | Drush    | `drush dl drupal-7`
-`expressionengine3` | [:x:](ttps://docs.expressionengine.com/latest/installation/update.html)  | Download |
+`elgg1`             | [:x:](http://learn.elgg.org/en/2.0/admin/upgrading.html)                 | Fork     | Follow the installation [Overview](http://learn.elgg.org/en/2.0/intro/install.html). Catapult requires the `dataroot` directory to be within the webroot, it's pertinant to create a `.gitignore` to ignore and `.htaccess` to deny access to this directory.
+`expressionengine3` | [:x:](https://docs.expressionengine.com/latest/installation/update.html) | Download |
 `joomla3`           | [:x:](https://docs.joomla.org/J3.x:Updating_from_an_existing_version)    | Fork     |
 `laravel5`          | [:x:](https://www.laravel.com/docs/master/upgrade)                       | Composer | Follow the [Composer Create-Project](https://laravel.com/docs/5.0/installation) documentation.
 `mediawiki1`        | [:x:](https://www.mediawiki.org/wiki/Manual:Upgrading)                   | Fork     |
-`moodle3`           | :white_check_mark:                                                       | Fork     | Catapult requires the `moodledata` directory to be within the webroot, it's pertinant to create a `.gitignore` and `.htaccess` file for this directory.
+`moodle3`           | :white_check_mark:                                                       | Fork     | Catapult requires the `moodledata` directory to be within the webroot, it's pertinant to create a `.gitignore` to ignore and `.htaccess` to deny access to this directory.
 `silverstripe3`     | [:x:](https://docs.silverstripe.org/en/3.4/upgrading/)                   | Composer | Follow the [Installing and Upgrading with Composer](https://docs.silverstripe.org/en/3.4/getting_started/composer/). During a fresh install, the database config file `mysite/_config.php` will need to be given 0777 permissions.
 `suitecrm7`         | [:x:](https://suitecrm.com/wiki/index.php/Upgrade)                       | Fork     |
 `wordpress`         | :white_check_mark:                                                       | Fork     |
@@ -762,6 +766,7 @@ Software | Approach | Documentation
 `codeigniter3`      |                      |
 `drupal6`           | `.htaccess`          | https://www.drupal.org/node/150215
 `drupal7`           | `.htaccess`          | https://www.drupal.org/node/150215
+`elgg1`             |                      |
 `expressionengine3` |                      |
 `joomla3`           |                      |
 `laravel5`          |                      |
@@ -783,6 +788,7 @@ Software | Tool | Command | Documentation
 `codeigniter3`      | Migrations      | `php index.php migrate`                                | https://www.codeigniter.com/user_guide/libraries/migration.html
 `drupal6`           | Drush           | `drush updatedb -y`                                    | https://www.drupal.org/node/150215
 `drupal7`           | Drush           | `drush updatedb -y`                                    | https://www.drupal.org/node/150215
+`elgg1`             |                 |                                                        |
 `expressionengine3` |                 |                                                        |
 `joomla3`           |                 |                                                        |
 `laravel5`          | Migrations      | `php artisan migrate`                                  | https://laravel.com/docs/5.0/migrations
