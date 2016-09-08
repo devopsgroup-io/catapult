@@ -106,7 +106,7 @@ software:
         repo: "https://github.com/Elgg/Elgg.git"
         branch: "1.12"
         database_config_file: "engine/settings.php"
-        file_store_containers: ["elggdata"]
+        file_store_containers: ["dataroot"]
         version: [1]
       expressionengine3:
         repo: PRIVATE
