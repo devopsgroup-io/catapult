@@ -71,8 +71,8 @@ if ($($args[0].Text.Length) -gt 4) {
 }
 # set hostname, 
 if ($($args[3]) -eq "iis") {
-    if ($env:computername.ToLower() -ne "$($hostname)-win") {
-        Rename-Computer -Force -NewName "$($hostname)-win"
+    if ($env:computername.ToLower() -ne "$($hostname)") {
+        Rename-Computer -Force -NewName "$($hostname)"
     }
 } elseif (($args[3]) -eq "mssql") {
     if ($env:computername.ToLower() -ne "$($hostname)-mssql") {
@@ -81,6 +81,14 @@ if ($($args[3]) -eq "iis") {
 }
 # echo datetimezone
 echo $env:computername
+
+
+echo "`n`n==> Configuring system page file"
+# let windows manage our page file for us for now
+wmic computersystem set AutomaticManagedPageFile=TRUE
+echo "Allocated: $(get-wmiobject win32_pagefileusage | % {$_.allocatedbasesize})MB"
+echo "Current: $(get-wmiobject win32_pagefileusage | % {$_.currentusage})MB"
+echo "Peak: $(get-wmiobject win32_pagefileusage | % {$_.peakusage})MB"
 
 
 echo "`n`n==> Importing PSWindowsUpdate"
