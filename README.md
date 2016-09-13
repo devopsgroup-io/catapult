@@ -547,7 +547,7 @@ Once the Web and Database Servers are up and running, it's then time to configur
 
 Catapult follows Gitflow for its **infrastructure configuration** *and* **website development** model - each environment runs a specific branch and changesets are introduced into each environment by pull requests from one branch to the next.
 
-<img src="https://www.atlassian.com/git/images/tutorials/collaborating/comparing-workflows/gitflow-workflow/05.svg" alt="Gitflow" width="600">
+<img src="https://cdn.rawgit.com/devopsgroup-io/catapult/master/catapult/installers/images/catapult_release_management.png" alt="Catapult Release Management">
 <sup>[1](#references)</sup>
 
 
