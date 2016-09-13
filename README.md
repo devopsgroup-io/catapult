@@ -69,10 +69,10 @@ Catapult leverages the following technologies and technology services to impleme
     * Automated Deployments - Bamboo
     * Build Server - Amazon Web Services (AWS)
 * **Monitoring**
-    * Server Resources and Uptime - New Relic Servers
-    * Application - New Relic APM
-    * Browser - New Relic Browsers
-    * Website Uptime - New Relic Synthetics
+    * Server Resources - New Relic Servers
+    * Application Performance - New Relic APM
+    * Browser Performance - New Relic Browsers
+    * Website Availability - New Relic Synthetics
 
 
 
