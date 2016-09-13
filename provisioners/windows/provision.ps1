@@ -62,6 +62,27 @@ get-date
 $([System.TimeZone]::CurrentTimeZone.StandardName)
 
 
+echo "`n`n==> Configuring hostname"
+# set the base hostname limited by the 15 character limit (UGH)
+if ($($args[0].Text.Length) -gt 4) {
+    $hostname = "$($args[0].Substring(0,4))-win"
+} else {
+    $hostname = "$($args[0])-win"
+}
+# set hostname, 
+if ($($args[3]) -eq "iis") {
+    if ($env:computername.ToLower() -ne "$($hostname)-win") {
+        Rename-Computer -Force -NewName "$($hostname)-win"
+    }
+} elseif (($args[3]) -eq "mssql") {
+    if ($env:computername.ToLower() -ne "$($hostname)-mssql") {
+        Rename-Computer -Force -NewName "$($hostname)-mssql"
+    }
+}
+# echo datetimezone
+echo $env:computername
+
+
 echo "`n`n==> Importing PSWindowsUpdate"
 Remove-Item "C:\Windows\System32\WindowsPowerShell\v1.0\Modules\PSWindowsUpdate" -Force -Recurse
 Add-Type -AssemblyName System.IO.Compression.FileSystem

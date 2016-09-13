@@ -41,7 +41,7 @@ hostnamectl set-hostname "" --pretty
 if ([ "${4}" = "apache" ]); then
     hostnamectl set-hostname "$(catapult company.name | tr '[:upper:]' '[:lower:]')-${1}-redhat"
 elif ([ "${4}" = "mysql" ]); then
-    hostnamectl set-hostname "$(catapult company.name | tr '[:upper:]' '[:lower:]')-${1}-redhat-${4}"
+    hostnamectl set-hostname "$(catapult company.name | tr '[:upper:]' '[:lower:]')-${1}-redhat-mysql"
 fi
 
 
