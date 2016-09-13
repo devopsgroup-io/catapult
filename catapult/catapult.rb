@@ -450,6 +450,10 @@ module Catapult
     if @configuration["company"]["name"] == nil
       catapult_exception("Please set [\"company\"][\"name\"] in secrets/configuration.yml")
     end
+    if @configuration["company"]["name"].length > 39
+      # this is determined by the 63 dot notation limit for linux hostnames (substracting -production-redhat-mysql)
+      catapult_exception("The maximum amount of characters is 39 for [\"company\"][\"name\"] in secrets/configuration.yml")
+    end
     if @configuration["company"]["email"] == nil
       catapult_exception("Please set [\"company\"][\"email\"] in secrets/configuration.yml")
     end
