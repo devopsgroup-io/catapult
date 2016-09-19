@@ -11,11 +11,19 @@ sudo yum install -y php-cli
 # set the timezone
 sed -i -e "s#\;date\.timezone.*#date.timezone = \"$(catapult company.timezone_redhat)\"#g" /etc/php.ini
 # increase the upload_max_filesize
-sed -i -e "s#\upload_max_filesize.*#upload_max_filesize = 10M#g" /etc/php.ini
+sed -i -e "s#^upload_max_filesize.*#upload_max_filesize = 10M#g" /etc/php.ini
 # hide x-powered-by
-sed -i -e "s#\expose_php.*#expose_php = Off#g" /etc/php.ini
+sed -i -e "s#^expose_php.*#expose_php = Off#g" /etc/php.ini
 # increase php memory limit for tools like composer
-sed -i -e "s#\memory_limit.*#memory_limit = 256M#g" /etc/php.ini
+sed -i -e "s#^memory_limit.*#memory_limit = 256M#g" /etc/php.ini
+# display errors on screen using the default recommendations for development and production
+if [ "$1" = "dev" ]; then
+    sed -i -e "s#^display_errors.*#display_errors = On#g" /etc/php.ini
+    sed -i -e "s#^error_reporting.*#error_reporting = E_ALL#g" /etc/php.ini
+else
+    sed -i -e "s#^display_errors.*#display_errors = Off#g" /etc/php.ini
+    sed -i -e "s#^error_reporting.*#error_reporting = E_ALL \& \~E_DEPRECATED \& \~E_STRICT#g" /etc/php.ini
+fi
 
 # bundled extensions
 # These extensions are bundled with PHP.
