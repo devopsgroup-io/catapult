@@ -1081,7 +1081,6 @@ Catapult is making the conference tour! We plan to attend the following conferen
 Catapult will also be seen throughout local meetups in the Philadelphia and Greater Philadelphia area! Get a chance to meet the team and engage at a personal level.
 
 * [Technical.ly Philly](http://www.meetup.com/Technically-Philly/) 6k+ technologists
-* [Princeton Tech](http://www.meetup.com/Princeton-Tech/) 4.5k+ technologists
 * [Tech in Motion Philly](http://www.meetup.com/TechinMotionPhilly/) 4k+ technologists
 * [Philadelphia WordPress Meetup Group](http://www.meetup.com/philadelphia-wordpress-meetup-group/) 1.5k+ technologists
 * [Philly DevOps](http://www.meetup.com/PhillyDevOps/) 1k+ technologists
