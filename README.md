@@ -674,7 +674,7 @@ The following options are available:
         * manages software database migrations
         * manages software database backups and restores intelligently via git
         * manages software url references in database
-        * manages software admin account integrity
+        * manages software admininistrator account integrity
     * option: `software: codeigniter2`
     * option: `software: codeigniter3`
     * option: `software: drupal6`
