@@ -8,10 +8,17 @@ redhat_ip="$(echo "${configuration}" | shyaml get-value environments.$1.servers.
 redhat_mysql_ip="$(echo "${configuration}" | shyaml get-value environments.$1.servers.redhat_mysql.ip)"
 company_email="$(echo "${configuration}" | shyaml get-value company.email)"
 
+# renew self-signed key/cert
+sh /etc/ssl/certs/renew-dummy-cert /etc/ssl/certs/httpd-dummy-cert.key.cert
+
+# support letsencrypt
+sudo mkdir --parents /var/www/dehydrated
+
 # create a vhost per website
 echo "${configuration}" | shyaml get-values-0 websites.apache |
 while IFS='' read -r -d '' key; do
 
+    # define variables
     domain=$(echo "$key" | grep -w "domain" | cut -d ":" -f 2 | tr -d " ")
     domain_environment=$(echo "$key" | grep -w "domain" | cut -d ":" -f 2 | tr -d " ")
     if [ "$1" != "production" ]; then
@@ -31,6 +38,11 @@ while IFS='' read -r -d '' key; do
     software_dbprefix=$(echo "$key" | grep -w "software_dbprefix" | cut -d ":" -f 2 | tr -d " ")
     software_workflow=$(echo "$key" | grep -w "software_workflow" | cut -d ":" -f 2 | tr -d " ")
     webroot=$(echo "$key" | grep -w "webroot" | cut -d ":" -f 2 | tr -d " ")
+
+    # generate letsencrypt certificates for upstream
+    if ([ "$1" != "dev" ]); then
+        bash /catapult/provisioners/redhat/installers/dehydrated/dehydrated --cron --domain "${domain_environment}" --domain "www.${domain_environment}"
+    fi
 
     # configure vhost
     if [ "$1" = "production" ]; then
@@ -82,6 +94,21 @@ while IFS='' read -r -d '' key; do
         # never force_auth in dev
         force_auth_value=""
     fi
+    # handle ssl certificates
+    if ([ "$1" != "dev" ]) && ([ -f /catapult/provisioners/redhat/installers/dehydrated/certs/${domain_environment}/cert.pem ]); then
+        # letsencrypt upstream
+        ssl_certificates="
+        SSLCertificateFile /catapult/provisioners/redhat/installers/dehydrated/certs/${domain_environment}/cert.pem
+        SSLCertificateKeyFile /catapult/provisioners/redhat/installers/dehydrated/certs/${domain_environment}/privkey.pem
+        SSLCertificateChainFile /catapult/provisioners/redhat/installers/dehydrated/certs/${domain_environment}/chain.pem
+        "
+    else
+        # self-signed in localdev or if we do not have a letsencrypt cert
+        ssl_certificates="
+        SSLCertificateFile /etc/ssl/certs/httpd-dummy-cert.key.cert
+        SSLCertificateKeyFile /etc/ssl/certs/httpd-dummy-cert.key.cert
+        "
+    fi
     # handle the force_https option
     if [ "${force_https}" = true ]; then
         force_https_value="
@@ -110,8 +137,8 @@ while IFS='' read -r -d '' key; do
         ErrorLog /var/log/httpd/${domain_environment}/error_log
         CustomLog /var/log/httpd/${domain_environment}/access_log combined
         LogLevel warn
-        $force_auth_value
-        $force_https_value
+        ${force_auth_value}
+        ${force_https_value}
     </VirtualHost> 
 
     <IfModule mod_ssl.c>
@@ -150,10 +177,10 @@ while IFS='' read -r -d '' key; do
             # help old browsers
             BrowserMatch "MSIE [2-5]" nokeepalive ssl-unclean-shutdown downgrade-1.0 force-response-1.0
             
-            # set the server certificate
-            SSLCertificateFile /etc/ssl/certs/httpd-dummy-cert.key.cert
-            SSLCertificateKeyFile /etc/ssl/certs/httpd-dummy-cert.key.cert
+            # set the ssl certificates
+            ${ssl_certificates}
             
+            # force httpd basic auth if configured
             ${force_auth_value}
             
         </VirtualHost>
@@ -175,6 +202,16 @@ while IFS='' read -r -d '' key; do
         Deny From All
     </Directory>
 
+    # accomodate letsencrypt
+    Alias /.well-known/acme-challenge /var/www/dehydrated
+    <Directory /var/www/dehydrated>
+        Options None
+        AllowOverride None
+        <IfModule mod_authz_core.c>
+            Require all granted
+        </IfModule>
+    </Directory>
+
 EOF
 
     # if the vhost has not been linked, link the vhost
@@ -183,6 +220,7 @@ EOF
     fi
 
 done
+
 # reload apache
 sudo systemctl reload httpd.service
 sudo systemctl status httpd.service
