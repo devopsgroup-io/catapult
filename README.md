@@ -49,11 +49,10 @@ security@devopsgroup.io and not by creating a GitHub issue.
 
 ## Platform Overview ##
 
-Catapult leverages the following technologies and technology services to implement key components of DevOps.
+Catapult orchestrates the following technologies and technology services to implement key components of DevOps.
 
-* **Configuration Management**
-    * Catapult
-    * Encryption - GnuPG
+* **Security Management**
+    * Configuration Secrets - GnuPG Encryption
 * **Source Code Management**
     * Catapult - Git (via GitHub)
     * Websites - Git (via GitHub or Bitbucket)
@@ -61,7 +60,7 @@ Catapult leverages the following technologies and technology services to impleme
     * Vagrant
 * **Development Virtualization**
     * VirtualBox
-* **Cloud Hosting**
+* **Cloud Virtualization**
     * DigitalOcean
 * **DNS Management**
     * CloudFlare
@@ -131,7 +130,7 @@ Dashboard - Control                           | CLI                            |
 Dashboard - Monitor                           | Web                            | Web                           | Web
 Managed Public Git Website Repository Support | GitHub & Bitbucket             | :x:                           | :x:
 Managed DNS                                   | CloudFlare                     | :x:                           | :x:
-Managed Free HTTPS/SSL                        | CloudFlare                     | :x:                           | :x:
+Managed Free HTTPS/SSL                        | CloudFlare/Let's Encrypt       | :x:                           | :x:
 Managed Server Monitoring                     | New Relic                      | :x:                           | Proprietary
 Managed Application Error Logs                | New Relic                      | Proprietary                   | Proprietary
 Managed Application Performance Monitoring    | New Relic                      | :x:                           | :x:
@@ -987,7 +986,7 @@ GitHub            | Repository hosting                       | [:question:](http
 
 ## HTTPS and SSL Certificates ##
 
-Catapult manages free HTTPS compliments of Cloudflare, however, depending on your compliance needs you may need to purchase SSL certificates unique to your orginazation. Once you're aware of your compliance responsiblity, you can then make a decision for purchasing and implementing SSL certificates. Catapult will soon incorporate the ability to add custom SSL certificates.
+Catapult manages free HTTPS compliments of Cloudflare and Let's Encrypt, however, depending on your compliance needs you may need to purchase SSL certificates unique to your orginazation. Once you're aware of your compliance responsiblity, you can then make a decision for purchasing and implementing SSL certificates. Catapult will soon incorporate the ability to add custom SSL certificates.
 
 Feature                                        | Domain Validation (DV certificates)                                                          | Organization Validation (OV certificates)                                                   | Extended Validation (EV certificates)
 -----------------------------------------------|----------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------
