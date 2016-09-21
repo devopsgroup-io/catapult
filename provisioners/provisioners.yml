@@ -8,7 +8,7 @@ redhat:
           description: "Removes virtual hosts for websites."
           multithreading: false
         apache_vhosts:
-          description: "Manages virtual hosts for websites."
+          description: "Manages HTTP and HTTPS virtual hosts and SSL certificates for websites."
           multithreading: false
         cloudflare_cache:
           description: "Manages CloudFlare zone cache for websites."
