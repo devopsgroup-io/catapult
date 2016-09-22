@@ -78,14 +78,14 @@ software:
         repo: "https://github.com/bcit-ci/CodeIgniter.git"
         branch: "2.2-stable"
         database_config_file: "application/config/database.php"
-        file_store_containers: ["application/logs","uploads"]
+        file_store_containers: ["application/cache","application/logs","uploads"]
         file_stores: ["uploads"]
         version: [2]
       codeigniter3:
         repo: "https://github.com/bcit-ci/CodeIgniter.git"
         branch: "3.0-stable"
         database_config_file: "application/config/database.php"
-        file_store_containers: ["application/logs","uploads"]
+        file_store_containers: ["application/cache","application/logs","uploads"]
         file_stores: ["uploads"]
         version: [3]
       drupal6:
