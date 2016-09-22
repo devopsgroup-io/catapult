@@ -56,7 +56,7 @@ Vagrant.configure("2") do |config|
       override.vm.box = "digital_ocean"
       override.vm.box_url = "https://github.com/smdahlen/vagrant-digitalocean/raw/master/box/digital_ocean.box"
       provider.token = Catapult::Command.configuration["company"]["digitalocean_personal_access_token"]
-      provider.image = "19798572"
+      provider.image = "centos-7-x64"
       provider.region = "nyc3"
       provider.size = "#{Catapult::Command.configuration["environments"]["test"]["servers"]["redhat"]["slug"]}"
       provider.ipv6 = true
@@ -74,7 +74,7 @@ Vagrant.configure("2") do |config|
       override.vm.box = "digital_ocean"
       override.vm.box_url = "https://github.com/smdahlen/vagrant-digitalocean/raw/master/box/digital_ocean.box"
       provider.token = Catapult::Command.configuration["company"]["digitalocean_personal_access_token"]
-      provider.image = "19798572"
+      provider.image = "centos-7-x64"
       provider.region = "nyc3"
       provider.size = "#{Catapult::Command.configuration["environments"]["test"]["servers"]["redhat_mysql"]["slug"]}"
       provider.ipv6 = true
@@ -94,7 +94,7 @@ Vagrant.configure("2") do |config|
       override.vm.box = "digital_ocean"
       override.vm.box_url = "https://github.com/smdahlen/vagrant-digitalocean/raw/master/box/digital_ocean.box"
       provider.token = Catapult::Command.configuration["company"]["digitalocean_personal_access_token"]
-      provider.image = "19798572"
+      provider.image = "centos-7-x64"
       provider.region = "nyc3"
       provider.size = "#{Catapult::Command.configuration["environments"]["qc"]["servers"]["redhat"]["slug"]}"
       provider.ipv6 = true
@@ -112,7 +112,7 @@ Vagrant.configure("2") do |config|
       override.vm.box = "digital_ocean"
       override.vm.box_url = "https://github.com/smdahlen/vagrant-digitalocean/raw/master/box/digital_ocean.box"
       provider.token = Catapult::Command.configuration["company"]["digitalocean_personal_access_token"]
-      provider.image = "19798572"
+      provider.image = "centos-7-x64"
       provider.region = "nyc3"
       provider.size = "#{Catapult::Command.configuration["environments"]["qc"]["servers"]["redhat_mysql"]["slug"]}"
       provider.ipv6 = true
@@ -132,7 +132,7 @@ Vagrant.configure("2") do |config|
       override.vm.box = "digital_ocean"
       override.vm.box_url = "https://github.com/smdahlen/vagrant-digitalocean/raw/master/box/digital_ocean.box"
       provider.token = Catapult::Command.configuration["company"]["digitalocean_personal_access_token"]
-      provider.image = "19798572"
+      provider.image = "centos-7-x64"
       provider.region = "nyc3"
       provider.size = "#{Catapult::Command.configuration["environments"]["production"]["servers"]["redhat"]["slug"]}"
       provider.ipv6 = true
@@ -150,7 +150,7 @@ Vagrant.configure("2") do |config|
       override.vm.box = "digital_ocean"
       override.vm.box_url = "https://github.com/smdahlen/vagrant-digitalocean/raw/master/box/digital_ocean.box"
       provider.token = Catapult::Command.configuration["company"]["digitalocean_personal_access_token"]
-      provider.image = "19798572"
+      provider.image = "centos-7-x64"
       provider.region = "nyc3"
       provider.size = "#{Catapult::Command.configuration["environments"]["production"]["servers"]["redhat_mysql"]["slug"]}"
       provider.ipv6 = true

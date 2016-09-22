@@ -3,6 +3,10 @@ source "/catapult/provisioners/redhat/modules/catapult.sh"
 
 
 echo -e "\n> system authentication configuration"
+# install sshd
+sudo yum install -y sshd
+sudo systemctl enable sshd.service
+sudo systemctl start sshd.service
 # only allow authentication via ssh key pair
 # assist this number - There were 34877 failed login attempts since the last successful login.
 echo -e "$(lastb | head -n -2 | wc -l) failed login attempts"
@@ -10,11 +14,11 @@ echo -e "$(last | head -n -2 | wc -l) successful login attempts"
 sudo last
 sed -i -e "/PasswordAuthentication/d" /etc/ssh/sshd_config
 if ! grep -q "PasswordAuthentication no" "/etc/ssh/sshd_config"; then
-   sudo bash -c 'echo "PasswordAuthentication no" >> /etc/ssh/sshd_config'
+   sudo bash -c 'echo -e "\nPasswordAuthentication no" >> /etc/ssh/sshd_config'
 fi
 sed -i -e "/PubkeyAuthentication/d" /etc/ssh/sshd_config
 if ! grep -q "PubkeyAuthentication yes" "/etc/ssh/sshd_config"; then
-   sudo bash -c 'echo "PubkeyAuthentication yes" >> /etc/ssh/sshd_config'
+   sudo bash -c 'echo -e "\nPubkeyAuthentication yes" >> /etc/ssh/sshd_config'
 fi
 sudo systemctl reload sshd.service
 
@@ -99,7 +103,7 @@ fi
 
 # add the swap /swapfile to startup
 if [[ ! ${swap_volumes[*]} =~ "/swapfile" ]]; then
-    sudo bash -c 'echo "/swapfile swap    swap    defaults    0   0" >> /etc/fstab'
+    sudo bash -c 'echo -e "\n/swapfile swap    swap    defaults    0   0" >> /etc/fstab'
 fi
 
 # output the resulting swap
