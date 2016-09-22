@@ -55,6 +55,14 @@ for domain in "${domains[@]}"; do
             dns_record_status=$(echo "${dns_record}" | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
             dns_record=$(echo "${dns_record}" | sed -e 's/HTTPSTATUS\:.*//g')
 
+            # calculate the amount of subdomains to then use as a determination between being cloudflare proxied or not in order to support SSL (cloudflare only supports one subdomain level)
+            IFS=. read -a domain_levels <<< "${domain_dns_record}"
+            if [ ${#domain_levels[@]} -gt 3 ]; then
+                cloudflare_proxied="false"
+            else
+                cloudflare_proxied="true"
+            fi
+
             # check for a curl error
             if [[ ! "${valid_http_response_codes[@]}" =~ "${dns_record_status}" ]]; then
                 echo -e "[${dns_record_status}] there was a problem with the cloudflare api request - please visit https://www.cloudflarestatus.com to see if there is a problem"
@@ -64,7 +72,7 @@ for domain in "${domains[@]}"; do
                 --header "X-Auth-Email: $(catapult company.cloudflare_email)" \
                 --header "X-Auth-Key: $(catapult company.cloudflare_api_key)" \
                 --header "Content-Type: application/json" \
-                --data "{\"type\":\"A\",\"name\":\"${domain_dns_record}\",\"content\":\"$(catapult environments.$1.servers.redhat.ip)\",\"ttl\":1,\"proxied\":true}")
+                --data "{\"type\":\"A\",\"name\":\"${domain_dns_record}\",\"content\":\"$(catapult environments.$1.servers.redhat.ip)\",\"ttl\":1,\"proxied\":${cloudflare_proxied}}")
                 dns_record_status=$(echo "${dns_record}" | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
                 dns_record=$(echo "${dns_record}" | sed -e 's/HTTPSTATUS\:.*//g')
             # update dns a record
@@ -74,7 +82,7 @@ for domain in "${domains[@]}"; do
                 --header "X-Auth-Email: $(catapult company.cloudflare_email)" \
                 --header "X-Auth-Key: $(catapult company.cloudflare_api_key)" \
                 --header "Content-Type: application/json" \
-                --data "{\"id\":\"${dns_record_id}\",\"type\":\"A\",\"name\":\"${domain_dns_record}\",\"content\":\"$(catapult environments.$1.servers.redhat.ip)\",\"ttl\":1,\"proxied\":true}")
+                --data "{\"id\":\"${dns_record_id}\",\"type\":\"A\",\"name\":\"${domain_dns_record}\",\"content\":\"$(catapult environments.$1.servers.redhat.ip)\",\"ttl\":1,\"proxied\":${cloudflare_proxied}}")
                 dns_record_status=$(echo "${dns_record}" | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
                 dns_record=$(echo "${dns_record}" | sed -e 's/HTTPSTATUS\:.*//g')
             fi
