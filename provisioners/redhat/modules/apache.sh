@@ -54,6 +54,12 @@ if [ ! -e /var/www/repositories/apache/_default_ ]; then
     sudo ln -s /catapult/repositories/apache/_default_ /var/www/repositories/apache/
 fi
 
+# renew self-signed key/cert
+sh /etc/ssl/certs/renew-dummy-cert /etc/ssl/certs/httpd-dummy-cert.key.cert
+
+# support letsencrypt
+sudo mkdir --parents /var/www/dehydrated
+
 # 80/443: create vhosts
 sudo cat > /etc/httpd/sites-enabled/_default_.conf << EOF
 <VirtualHost *:80>
@@ -67,6 +73,16 @@ sudo cat > /etc/httpd/sites-enabled/_default_.conf << EOF
         SSLCertificateKeyFile /etc/ssl/certs/httpd-dummy-cert.key.cert
     </VirtualHost>
 </IfModule>
+# accomodate letsencrypt
+Alias /.well-known/acme-challenge /var/www/dehydrated
+<Directory /var/www/dehydrated>
+    AllowOverride None
+    Options None
+    <IfModule mod_authz_core.c>
+        Satisfy Any
+        Allow from all
+    </IfModule>
+</Directory>
 EOF
 
 # configure log rotation for apache

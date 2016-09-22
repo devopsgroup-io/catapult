@@ -8,12 +8,6 @@ redhat_ip="$(echo "${configuration}" | shyaml get-value environments.$1.servers.
 redhat_mysql_ip="$(echo "${configuration}" | shyaml get-value environments.$1.servers.redhat_mysql.ip)"
 company_email="$(echo "${configuration}" | shyaml get-value company.email)"
 
-# renew self-signed key/cert
-sh /etc/ssl/certs/renew-dummy-cert /etc/ssl/certs/httpd-dummy-cert.key.cert
-
-# support letsencrypt
-sudo mkdir --parents /var/www/dehydrated
-
 # create a vhost per website
 echo "${configuration}" | shyaml get-values-0 websites.apache |
 while IFS='' read -r -d '' key; do
@@ -41,15 +35,12 @@ while IFS='' read -r -d '' key; do
 
     # generate letsencrypt certificates for upstream
     if ([ "$1" != "dev" ]); then
-        bash /catapult/provisioners/redhat/installers/dehydrated/dehydrated --cron --domain "${domain_environment}" --domain "www.${domain_environment}"
+        bash /catapult/provisioners/redhat/installers/dehydrated/dehydrated --cron --domain "${domain_environment}" --domain "www.${domain_environment}" 2>&1
     fi
 
     # configure vhost
-    if [ "$1" = "production" ]; then
-        echo -e "\t * configuring vhost for ${domain_root}"
-    else
-        echo -e "\t * configuring vhost for ${1}.${domain_root}"
-    fi
+    echo -e "Configuring vhost for ${domain_environment}"
+
     sudo mkdir --parents /var/log/httpd/${domain_environment}
     sudo touch /var/log/httpd/${domain_environment}/access_log
     sudo touch /var/log/httpd/${domain_environment}/error_log
@@ -67,7 +58,7 @@ while IFS='' read -r -d '' key; do
             if ([[ "${force_auth_excludes[@]}" =~ "$1" ]]); then
                 force_auth_value=""
             else
-                sudo htpasswd -b -c /etc/httpd/sites-enabled/${domain_environment}.htpasswd ${force_auth} ${force_auth} 2>&1 | sed "s/^/\t\t/"
+                sudo htpasswd -b -c /etc/httpd/sites-enabled/${domain_environment}.htpasswd ${force_auth} ${force_auth} 2>&1
                 force_auth_value="
                     <Location />
                         # Force HTTP authentication
@@ -79,7 +70,7 @@ while IFS='' read -r -d '' key; do
                 "
             fi
         else
-            sudo htpasswd -b -c /etc/httpd/sites-enabled/${domain_environment}.htpasswd ${force_auth} ${force_auth} 2>&1 | sed "s/^/\t\t/"
+            sudo htpasswd -b -c /etc/httpd/sites-enabled/${domain_environment}.htpasswd ${force_auth} ${force_auth} 2>&1
             force_auth_value="
                 <Location />
                     # Force HTTP authentication
@@ -200,16 +191,6 @@ while IFS='' read -r -d '' key; do
     <Directory "/var/www/repositories/apache/${domain}/${webroot}_sql">
         Order Deny,Allow
         Deny From All
-    </Directory>
-
-    # accomodate letsencrypt
-    Alias /.well-known/acme-challenge /var/www/dehydrated
-    <Directory /var/www/dehydrated>
-        Options None
-        AllowOverride None
-        <IfModule mod_authz_core.c>
-            Require all granted
-        </IfModule>
     </Directory>
 
 EOF
