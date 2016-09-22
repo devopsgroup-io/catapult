@@ -35,12 +35,15 @@ while IFS='' read -r -d '' key; do
 
     # generate letsencrypt certificates for upstream
     if ([ "$1" != "dev" ]); then
-        bash /catapult/provisioners/redhat/installers/dehydrated/dehydrated --cron --domain "${domain_environment}" --domain "www.${domain_environment}" 2>&1
+        if [ -z "${domain_tld_override}" ]; then
+            bash /catapult/provisioners/redhat/installers/dehydrated/dehydrated --cron --domain "${domain_environment}" --domain "www.${domain_environment}" 2>&1
+        else
+            bash /catapult/provisioners/redhat/installers/dehydrated/dehydrated --cron --domain "${domain_environment}.${domain_tld_override}" --domain "www.${domain_environment}.${domain_tld_override}" 2>&1
+        fi
     fi
 
     # configure vhost
     echo -e "Configuring vhost for ${domain_environment}"
-
     sudo mkdir --parents /var/log/httpd/${domain_environment}
     sudo touch /var/log/httpd/${domain_environment}/access_log
     sudo touch /var/log/httpd/${domain_environment}/error_log
@@ -88,11 +91,19 @@ while IFS='' read -r -d '' key; do
     # handle ssl certificates
     if ([ "$1" != "dev" ]) && ([ -f /catapult/provisioners/redhat/installers/dehydrated/certs/${domain_environment}/cert.pem ]); then
         # letsencrypt upstream
-        ssl_certificates="
-        SSLCertificateFile /catapult/provisioners/redhat/installers/dehydrated/certs/${domain_environment}/cert.pem
-        SSLCertificateKeyFile /catapult/provisioners/redhat/installers/dehydrated/certs/${domain_environment}/privkey.pem
-        SSLCertificateChainFile /catapult/provisioners/redhat/installers/dehydrated/certs/${domain_environment}/chain.pem
-        "
+        if [ -z "${domain_tld_override}" ]; then
+            ssl_certificates="
+            SSLCertificateFile /catapult/provisioners/redhat/installers/dehydrated/certs/${domain_environment}/cert.pem
+            SSLCertificateKeyFile /catapult/provisioners/redhat/installers/dehydrated/certs/${domain_environment}/privkey.pem
+            SSLCertificateChainFile /catapult/provisioners/redhat/installers/dehydrated/certs/${domain_environment}/chain.pem
+            "
+        else
+            ssl_certificates="
+            SSLCertificateFile /catapult/provisioners/redhat/installers/dehydrated/certs/${domain_environment}.${domain_tld_override}/cert.pem
+            SSLCertificateKeyFile /catapult/provisioners/redhat/installers/dehydrated/certs/${domain_environment}.${domain_tld_override}/privkey.pem
+            SSLCertificateChainFile /catapult/provisioners/redhat/installers/dehydrated/certs/${domain_environment}.${domain_tld_override}/chain.pem
+            "
+        fi
     else
         # self-signed in localdev or if we do not have a letsencrypt cert
         ssl_certificates="
