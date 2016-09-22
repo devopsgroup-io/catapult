@@ -862,7 +862,6 @@ module Catapult
               puts " * DigitalOcean droplet #{@configuration["company"]["name"].downcase}-#{environment}-#{server.gsub("_","-")} has been found."
               puts "   - [status] #{droplet["status"]} [memory] #{droplet["size"]["memory"]} [vcpus] #{droplet["size"]["vcpus"]} [disk] #{droplet["size"]["disk"]} [$/month] $#{droplet["size"]["price_monthly"]}"
               puts "   - [created] #{droplet["created_at"]} [slug] #{droplet["size"]["slug"]} [region] #{droplet["region"]["name"]}"
-              puts "   - [kernel] #{droplet["kernel"]["name"]}"
               puts "   - [ipv4_public] #{droplet_ip["ip_address"]} [ipv4_private] #{droplet_ip_private["ip_address"]}"
               # make sure the droplet has the correct kernel, if not, update it
               if "#{droplet["kernel"]["id"]}" != "7516"
@@ -886,6 +885,8 @@ module Catapult
                     puts "   - Successfully updated the kernel, moving on..."
                   end
                 end
+              else
+                puts "   - [kernel] #{droplet["kernel"]["name"]}"
               end
               # get public ip address and write to secrets/configuration.yml
               unless @configuration["environments"]["#{environment}"]["servers"]["#{server}"]["ip"] == droplet_ip["ip_address"]
