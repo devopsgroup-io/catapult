@@ -71,12 +71,12 @@ sudo yum install -y geoip-devel
 sudo pecl install geoip-1.1.0
 echo autodetect | sudo pecl upgrade geoip
 # http://dev.maxmind.com/geoip/legacy/geolite/
-sudo wget --quiet --read-timeout=10 --tries=5 --output-document=/usr/share/GeoIP/GeoIP.dat.gz  http://geolite.maxmind.com/download/geoip/database/GeoLiteCountry/GeoIP.dat.gz
-sudo gunzip --force /usr/share/GeoIP/GeoIP.dat.gz
-sudo wget --quiet --read-timeout=10 --tries=5 --output-document=/usr/share/GeoIP/GeoIPCity.dat.gz  http://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz
-sudo gunzip --force /usr/share/GeoIP/GeoIPCity.dat.gz
-sudo wget --quiet --read-timeout=10 --tries=5 --output-document=/usr/share/GeoIP/GeoIPASNum.dat.gz  http://download.maxmind.com/download/geoip/database/asnum/GeoIPASNum.dat.gz
-sudo gunzip --force /usr/share/GeoIP/GeoIPASNum.dat.gz
+curl --silent --show-error --connect-timeout 10 --max-time 20 --retry 5 --output "/usr/share/GeoIP/GeoIP.dat.gz" --request GET "http://geolite.maxmind.com/download/geoip/database/GeoLiteCountry/GeoIP.dat.gz"
+sudo gunzip --force "/usr/share/GeoIP/GeoIP.dat.gz"
+curl --silent --show-error --connect-timeout 10 --max-time 20 --retry 5 --output "/usr/share/GeoIP/GeoIPCity.dat.gz" --request GET "http://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz"
+sudo gunzip --force "/usr/share/GeoIP/GeoIPCity.dat.gz"
+curl --silent --show-error --connect-timeout 10 --max-time 20 --retry 5 --output "/usr/share/GeoIP/GeoIPASNum.dat.gz" --request GET "http://download.maxmind.com/download/geoip/database/asnum/GeoIPASNum.dat.gz"
+sudo gunzip --force "/usr/share/GeoIP/GeoIPASNum.dat.gz"
 #################
 # pecl extension: uploadprogress
 # http://pecl.php.net/package/uploadprogress
