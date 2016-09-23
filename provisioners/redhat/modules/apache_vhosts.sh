@@ -147,6 +147,7 @@ while IFS='' read -r -d '' key; do
             ServerAdmin ${company_email}
             ServerName ${domain_environment}
             ServerAlias www.${domain_environment}
+            $domain_tld_override_alias_additions
             DocumentRoot /var/www/repositories/apache/${domain}/${webroot}
             ErrorLog /var/log/httpd/${domain_environment}/error_log
             CustomLog /var/log/httpd/${domain_environment}/access_log combined
