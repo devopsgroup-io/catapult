@@ -59,7 +59,7 @@ sudo pip install --upgrade pip
 sudo pip install shyaml --upgrade
 
 # run server provision
-if [ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-values-0 redhat.servers.redhat.$4.modules) ]; then
+if [ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-values-0 redhat.servers.$4.modules) ]; then
     provisionstart=$(date +%s)
     echo -e "\n\n\n==> PROVISION: ${4}"
     # decrypt configuration
@@ -83,7 +83,7 @@ if [ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-values-0 redha
     fi
 
     # loop through each required module
-    cat "/catapult/provisioners/provisioners.yml" | shyaml get-values-0 redhat.servers.redhat.$4.modules |
+    cat "/catapult/provisioners/provisioners.yml" | shyaml get-values-0 redhat.servers.$4.modules |
     while read -r -d $'\0' module; do
         # cleanup leftover utility files
         for file in /catapult/provisioners/redhat/logs/${module}.*.log; do
@@ -168,14 +168,15 @@ if [ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-values-0 redha
         done
     done
 
-    provisionend=$(date +%s)
-    provisiontotal=$(date -d@$(($provisionend - $provisionstart)) -u +%H:%M:%S)
     # remove configuration
     source "/catapult/provisioners/redhat/modules/catapult_clean.sh"
+    
+    provisionend=$(date +%s)
+    provisiontotal=$(date -d@$(($provisionend - $provisionstart)) -u +%H:%M:%S)
     echo -e "\n\n\n==> PROVISION: ${4}"
     echo -e "==> FINISH: $(date)" | tee -a /catapult/provisioners/redhat/logs/$4.log
     echo -e "==> DURATION: ${provisiontotal} total time" | tee -a /catapult/provisioners/redhat/logs/$4.log
 else
-    "Error: Cannot detect the server type."
+    echo -e "Error: Cannot detect the server type."
     exit 1
 fi

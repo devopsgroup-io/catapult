@@ -1,177 +1,188 @@
 ---
 redhat:
-    modules:
-        apache:
-          description: "Manages Apache HTTP daemon."
-          multithreading: false
-        apache_vhosts_clean:
-          description: "Removes virtual hosts for websites."
-          multithreading: false
-        apache_vhosts:
-          description: "Manages HTTP and HTTPS virtual hosts and SSL certificates for websites."
-          multithreading: false
-        cloudflare_cache:
-          description: "Manages CloudFlare zone cache for websites."
-          multithreading: true
-        cloudflare_dns:
-          description: "Manages CloudfFlare DNS A records for websites."
-          multithreading: true
-        cloudflare_zones:
-          description: "Manages CloudfFlare zones for websites."
-          multithreading: true
-        git:
-          description: "Manages Git repositories for websites."
-          multithreading: true
-        git_clean:
-          description: "Removes Git repositories for websites."
-          multithreading: false
-        iptables:
-          description: "Manages a strict firewall to only allow necessary traffic."
-          multithreading: false
-        mysql:
-          description: "Manages MariaDB server and databases for websites with software."
-          multithreading: false
-        newrelic_apm_php:
-          description: "Manages New Relic APM PHP daemon."
-          multithreading: false
-        newrelic_synthetics:
-          description: "Manages New Relic Synthetics monitors for websites."
-          multithreading: true
-        newrelic_sysmon:
-          description: "Manages New Relic System Monitor daemon."
-          multithreading: false
-        php:
-          description: "Manages PHP and PHP modules."
-          multithreading: false
-        rsync:
-          description: "Manages software file stores for websites with software."
-          multithreading: true
-        software_config:
-          description: "Manages software database configuration files."
-          multithreading: true
-        software_operations_file:
-          description: "Manages software file operations, including: automatic software updates and file store permissions for websites with software."
-          multithreading: true
-        software_operations_meta:
-          description: "Manages software meta operations, including: cron, garbage collection, caches, and migrations for websites with software."
-          multithreading: true
-        software_tools:
-          description: "Manages software CLI tools."
-          multithreading: false
-        system:
-          description: "Manages system requirements."
-          multithreading: false
-        time:
-          description: "Manages NTP daemon based on the company timezone."
-          multithreading: false
-    servers:
-        redhat:
-          apache:
-            modules: ["time","system","iptables","newrelic_sysmon","git_clean","software_operations_file","git","software_config","rsync","php","software_tools","apache","apache_vhosts_clean","apache_vhosts","newrelic_apm_php","cloudflare_zones","cloudflare_dns"]
-          mysql:
-            modules: ["time","system","iptables","newrelic_sysmon","git_clean","git","software_config","rsync","php","software_tools","software_operations_meta","mysql","cloudflare_cache","newrelic_synthetics"]
+  modules:
+    apache:
+      description: "Manages Apache HTTP daemon."
+      multithreading: false
+    apache_vhosts_clean:
+      description: "Removes virtual hosts for websites."
+      multithreading: false
+    apache_vhosts:
+      description: "Manages HTTP and HTTPS virtual hosts and SSL certificates for websites."
+      multithreading: false
+    cloudflare_cache:
+      description: "Manages CloudFlare zone cache for websites."
+      multithreading: true
+    cloudflare_dns:
+      description: "Manages CloudfFlare DNS A records for websites."
+      multithreading: true
+    cloudflare_zones:
+      description: "Manages CloudfFlare zones for websites."
+      multithreading: true
+    git:
+      description: "Manages Git repositories for websites."
+      multithreading: true
+    git_clean:
+      description: "Removes Git repositories for websites."
+      multithreading: false
+    iptables:
+      description: "Manages a strict firewall to only allow necessary traffic."
+      multithreading: false
+    mysql:
+      description: "Manages MariaDB server and databases for websites with software."
+      multithreading: false
+    newrelic_apm_php:
+      description: "Manages New Relic APM PHP daemon."
+      multithreading: false
+    newrelic_synthetics:
+      description: "Manages New Relic Synthetics monitors for websites."
+      multithreading: true
+    newrelic_sysmon:
+      description: "Manages New Relic System Monitor daemon."
+      multithreading: false
+    php:
+      description: "Manages PHP and PHP modules."
+      multithreading: false
+    rsync:
+      description: "Manages software file stores for websites with software."
+      multithreading: true
+    software_config:
+      description: "Manages software database configuration files."
+      multithreading: true
+    software_operations_file:
+      description: "Manages software file operations, including: automatic software updates and file store permissions for websites with software."
+      multithreading: true
+    software_operations_meta:
+      description: "Manages software meta operations, including: cron, garbage collection, caches, and migrations for websites with software."
+      multithreading: true
+    software_tools:
+      description: "Manages software CLI tools."
+      multithreading: false
+    system:
+      description: "Manages system requirements."
+      multithreading: false
+    time:
+      description: "Manages NTP daemon based on the company timezone."
+      multithreading: false
+  servers:
+    apache:
+      modules: ["time","system","iptables","newrelic_sysmon","git_clean","software_operations_file","git","software_config","rsync","php","software_tools","apache","apache_vhosts_clean","apache_vhosts","newrelic_apm_php","cloudflare_zones","cloudflare_dns"]
+    mysql:
+      modules: ["time","system","iptables","newrelic_sysmon","git_clean","git","software_config","rsync","php","software_tools","software_operations_meta","mysql","cloudflare_cache","newrelic_synthetics"]
 windows:
+  modules:
+    iis:
+      description: "Manages the IIS service and virtual hosts for websites."
+    time:
+      description: "Manages NTP service based on the company timezone."
+    system:
+      description: "Manages system requirements."
+  servers:
+    iis:
+      modules: ["time","system","iis"]
+    mssql:
+      modules: ["time","system"]
 
 software:
-    apache:
-      codeigniter2:
-        repo: "https://github.com/bcit-ci/CodeIgniter.git"
-        branch: "2.2-stable"
-        database_config_file: "application/config/database.php"
-        file_store_containers: ["application/cache","application/logs","uploads"]
-        file_stores: ["uploads"]
-        version: [2]
-      codeigniter3:
-        repo: "https://github.com/bcit-ci/CodeIgniter.git"
-        branch: "3.0-stable"
-        database_config_file: "application/config/database.php"
-        file_store_containers: ["application/cache","application/logs","uploads"]
-        file_stores: ["uploads"]
-        version: [3]
-      drupal6:
-        repo: "https://git.drupal.org/project/drupal.git"
-        branch: "6.x"
-        database_config_file: "sites/default/settings.php"
-        file_store_containers: ["sites/default"]
-        file_stores: ["sites/default/files"]
-        version: [6]
-      drupal7:
-        repo: "https://git.drupal.org/project/drupal.git"
-        branch: "7.x"
-        database_config_file: "sites/default/settings.php"
-        file_store_containers: ["sites/default"]
-        file_stores: ["sites/default/files"]
-        version: [7]
-      elgg1:
-        repo: "https://github.com/Elgg/Elgg.git"
-        branch: "1.12"
-        database_config_file: "engine/settings.php"
-        file_store_containers: ["dataroot"]
-        version: [1]
-      expressionengine3:
-        repo: PRIVATE
-        database_config_file: "system/user/config/config.php"
-        file_store_containers: ["system/user/cache","system/user/templates","images/avatars","images/captchas","images/member_photos","images/pm_attachments","images/signature_attachments","images/uploads"]
-        version: [3]
-      joomla3:
-        repo: "https://github.com/joomla/joomla-cms.git"
-        branch: "3.6.x"
-        database_config_file: "configuration.php"
-        file_store_containers: ["administrator/cache","cache","logs","tmp"]
-        version: [3]
-      laravel5:
-        repo: "https://github.com/laravel/laravel.git"
-        tag: "v5.0.22"
-        database_config_file: "config/database.php"
-        file_store_containers: ["bootstrap/cache","resources","storage"]
-        file_stores: ["resources","storage"]
-        softwareroot: "../"
-        version: [5]
-      mediawiki1:
-        repo: "https://github.com/wikimedia/mediawiki.git"
-        branch: "REL1_25"
-        database_config_file: "LocalSettings.php"
-        file_store_containers: ["images"]
-        file_stores: ["images"]
-        version: [3]
-      moodle3:
-        repo: "https://github.com/moodle/moodle.git"
-        branch: "MOODLE_30_STABLE"
-        file_store_containers: ["moodledata"]
-        file_stores: ["moodledata/filedir"]
-        database_config_file: "config.php"
-        version: [3]
-      silverstripe3:
-        repo: "https://github.com/silverstripe/silverstripe-installer"
-        branch: "3.3"
-        database_config_file: "mysite/_config.php"
-        file_store_containers: ["assets"]
-        file_stores: ["assets/Uploads"]
-        version: [3]
-      suitecrm7:
-        repo: "https://github.com/salesagility/SuiteCRM.git"
-        branch: "7.5.x"
-        database_config_file: "config_override.php"
-        file_store_containers: ["cache","custom","data","modules","upload","themes","tmp"]
-        file_stores: ["uploads"]
-        version: [7]
-      wordpress:
-        repo: "https://github.com/WordPress/WordPress.git"
-        branch: "4.5-branch"
-        database_config_file: "wp-config.php"
-        file_store_containers: ["wp-content"]
-        file_stores: ["wp-content/uploads"]
-        version: [3,4]
-      xenforo:
-        repo: PRIVATE
-        database_config_file: "sites/default/settings.php"
-        file_store_containers: ["data","internal_data"]
-        file_stores: ["data","internal_data"]
-        version: [1]
-      zendframework2:
-        repo: "https://github.com/zendframework/zendframework.git"
-        tag: "release-2.4.10"
-        database_config_file: "config/autoload/global.php"
-        softwareroot: "../"
-        version: [2]
-    iis:
+  apache:
+    codeigniter2:
+      repo: "https://github.com/bcit-ci/CodeIgniter.git"
+      branch: "2.2-stable"
+      database_config_file: "application/config/database.php"
+      file_store_containers: ["application/cache","application/logs","uploads"]
+      file_stores: ["uploads"]
+      version: [2]
+    codeigniter3:
+      repo: "https://github.com/bcit-ci/CodeIgniter.git"
+      branch: "3.0-stable"
+      database_config_file: "application/config/database.php"
+      file_store_containers: ["application/cache","application/logs","uploads"]
+      file_stores: ["uploads"]
+      version: [3]
+    drupal6:
+      repo: "https://git.drupal.org/project/drupal.git"
+      branch: "6.x"
+      database_config_file: "sites/default/settings.php"
+      file_store_containers: ["sites/default"]
+      file_stores: ["sites/default/files"]
+      version: [6]
+    drupal7:
+      repo: "https://git.drupal.org/project/drupal.git"
+      branch: "7.x"
+      database_config_file: "sites/default/settings.php"
+      file_store_containers: ["sites/default"]
+      file_stores: ["sites/default/files"]
+      version: [7]
+    elgg1:
+      repo: "https://github.com/Elgg/Elgg.git"
+      branch: "1.12"
+      database_config_file: "engine/settings.php"
+      file_store_containers: ["dataroot"]
+      version: [1]
+    expressionengine3:
+      repo: PRIVATE
+      database_config_file: "system/user/config/config.php"
+      file_store_containers: ["system/user/cache","system/user/templates","images/avatars","images/captchas","images/member_photos","images/pm_attachments","images/signature_attachments","images/uploads"]
+      version: [3]
+    joomla3:
+      repo: "https://github.com/joomla/joomla-cms.git"
+      branch: "3.6.x"
+      database_config_file: "configuration.php"
+      file_store_containers: ["administrator/cache","cache","logs","tmp"]
+      version: [3]
+    laravel5:
+      repo: "https://github.com/laravel/laravel.git"
+      tag: "v5.0.22"
+      database_config_file: "config/database.php"
+      file_store_containers: ["bootstrap/cache","resources","storage"]
+      file_stores: ["resources","storage"]
+      softwareroot: "../"
+      version: [5]
+    mediawiki1:
+      repo: "https://github.com/wikimedia/mediawiki.git"
+      branch: "REL1_25"
+      database_config_file: "LocalSettings.php"
+      file_store_containers: ["images"]
+      file_stores: ["images"]
+      version: [3]
+    moodle3:
+      repo: "https://github.com/moodle/moodle.git"
+      branch: "MOODLE_30_STABLE"
+      file_store_containers: ["moodledata"]
+      file_stores: ["moodledata/filedir"]
+      database_config_file: "config.php"
+      version: [3]
+    silverstripe3:
+      repo: "https://github.com/silverstripe/silverstripe-installer"
+      branch: "3.3"
+      database_config_file: "mysite/_config.php"
+      file_store_containers: ["assets"]
+      file_stores: ["assets/Uploads"]
+      version: [3]
+    suitecrm7:
+      repo: "https://github.com/salesagility/SuiteCRM.git"
+      branch: "7.5.x"
+      database_config_file: "config_override.php"
+      file_store_containers: ["cache","custom","data","modules","upload","themes","tmp"]
+      file_stores: ["uploads"]
+      version: [7]
+    wordpress:
+      repo: "https://github.com/WordPress/WordPress.git"
+      branch: "4.5-branch"
+      database_config_file: "wp-config.php"
+      file_store_containers: ["wp-content"]
+      file_stores: ["wp-content/uploads"]
+      version: [3,4]
+    xenforo:
+      repo: PRIVATE
+      database_config_file: "sites/default/settings.php"
+      file_store_containers: ["data","internal_data"]
+      file_stores: ["data","internal_data"]
+      version: [1]
+    zendframework2:
+      repo: "https://github.com/zendframework/zendframework.git"
+      tag: "release-2.4.10"
+      database_config_file: "config/autoload/global.php"
+      softwareroot: "../"
+      version: [2]
+  iis:
