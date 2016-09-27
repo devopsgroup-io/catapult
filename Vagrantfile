@@ -189,6 +189,24 @@ Vagrant.configure("2") do |config|
     # configure the provisioner
     config.vm.provision "shell", path: "provisioners/windows/provision.ps1", args: ["dev","#{Catapult::Command.repo}","#{Catapult::Command.configuration_user["settings"]["gpg_key"]}","iis"], run: "always"
   end
+  config.vm.define "#{Catapult::Command.configuration["company"]["name"].downcase}-dev-windows-mssql" do |config|
+    config.vm.box = "opentable/win-2012r2-standard-amd64-nocm"
+    config.vm.network "private_network", ip: Catapult::Command.configuration["environments"]["dev"]["servers"]["windows_mssql"]["ip"]
+    config.vm.provider :virtualbox do |provider|
+      provider.memory = 512
+      provider.cpus = 1
+    end
+    # windows specific configuration
+    config.vm.guest = :windows
+    config.vm.boot_timeout = 60 * 7
+    #config.ssh.insert_key = false
+    config.vm.communicator = "winrm"
+    # disable the default vagrant share
+    config.vm.synced_folder ".", "/vagrant", disabled: true
+    config.vm.synced_folder ".", "/catapult"
+    # configure the provisioner
+    config.vm.provision "shell", path: "provisioners/windows/provision.ps1", args: ["dev","#{Catapult::Command.repo}","#{Catapult::Command.configuration_user["settings"]["gpg_key"]}","mssql"], run: "always"
+  end
 
   # test => windows
   config.vm.define "#{Catapult::Command.configuration["company"]["name"].downcase}-test-windows" do |config|

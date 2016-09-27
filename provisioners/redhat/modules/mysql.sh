@@ -6,14 +6,14 @@ sudo systemctl enable mariadb.service
 sudo systemctl start mariadb.service
 
 # configure mysql conf so user/pass isn't logged in shell history or memory
-sudo cat > "/catapult/provisioners/redhat/installers/${1}.cnf" << EOF
+sudo cat > "/catapult/provisioners/redhat/installers/temp/${1}.cnf" << EOF
 [client]
 host = "localhost"
 user = "root"
 password = "$(catapult environments.${1}.servers.redhat_mysql.mysql.root_password)"
 EOF
 # set a variable to the .cnf
-dbconf="/catapult/provisioners/redhat/installers/${1}.cnf"
+dbconf="/catapult/provisioners/redhat/installers/temp/${1}.cnf"
 
 # only set root password on fresh install of mysql
 if mysqladmin --defaults-extra-file=$dbconf ping 2>&1 | grep -q "failed"; then
@@ -359,4 +359,4 @@ while IFS='' read -r -d '' key; do
 done
 
 # remove .cnf file after usage
-rm --force /catapult/provisioners/redhat/installers/${1}.cnf
+rm --force /catapult/provisioners/redhat/installers/temp/${1}.cnf

@@ -36,30 +36,59 @@ Add-Type -AssemblyName System.IO.Compression.FileSystem
 [System.IO.Compression.ZipFile]::ExtractToDirectory("c:\catapult\provisioners\windows\installers\PSWindowsUpdate.zip", "C:\Windows\System32\WindowsPowerShell\v1.0\Modules")
 Import-Module PSWindowsUpdate
 if (Get-Module -ListAvailable -Name PSWindowsUpdate) {
-    echo "PSWindowsUpdate loaded"
+    echo "- PSWindowsUpdate loaded"
     echo (Get-Module PSWindowsUpdate) | Format-Table -Property Version
 } else {
-    echo "PSWindowsUpdate failed to load"
+    echo "- PSWindowsUpdate failed to load"
 }
 #Set-ExecutionPolicy RemoteSigned
 
 
-echo "`n=> Installing Windows Updates (This may take a while...)"
-# install latest updates
-Get-WUInstall -WindowsUpdate -AcceptAll -IgnoreReboot
-echo "A reboot (LocalDev: vagrant reload) may be required after windows updates"
-# @todo check for reboot status
+echo "`n=> Downloading .NET 3.5..."
+if (-not(test-path -path "c:\catapult\provisioners\windows\installers\temp\dotnetfx35.exe")) {
+    $url = "https://download.microsoft.com/download/2/0/E/20E90413-712F-438C-988E-FDAA79A8AC3D/dotnetfx35.exe"
+    $output = "c:\catapult\provisioners\windows\installers\temp\dotnetfx35.exe"
+    $start_time = Get-Date
+    (New-Object System.Net.WebClient).DownloadFile($url, $output)
+    Write-Output "Time taken: $((Get-Date).Subtract($start_time).Seconds) second(s)"
+} else {
+    echo "- Installer exists, skipping download..."
+}
+
+
+echo "`n=> Installing .NET 3.5 (This may take a while...)"
+if (-not(test-path -path "c:\windows\Microsoft.NET\Framework64\v3.5\")) {
+    Install-WindowsFeature Net-Framework-Core -source "c:\catapult\provisioners\windows\installers\temp\dotnetfx35.exe"
+} else {
+    echo "- Installed, skipping..."
+}
+
+
+echo "`n=> Downloading .NET 4.0..."
+if (-not(test-path -path "c:\catapult\provisioners\windows\installers\temp\dotNetFx40_Full_x86_x64.exe")) {
+    $url = "http://download.microsoft.com/download/9/5/A/95A9616B-7A37-4AF6-BC36-D6EA96C8DAAE/dotNetFx40_Full_x86_x64.exe"
+    $output = "c:\catapult\provisioners\windows\installers\temp\dotNetFx40_Full_x86_x64.exe"
+    $start_time = Get-Date
+    (New-Object System.Net.WebClient).DownloadFile($url, $output)
+    Write-Output "Time taken: $((Get-Date).Subtract($start_time).Seconds) second(s)"
+} else {
+    echo "- Installer exists, skipping download..."
+}
 
 
 echo "`n=> Installing .NET 4.0 (This may take a while...)"
 if (-not(test-path -path "c:\windows\Microsoft.NET\Framework64\v4.0.30319\")) {
-    # ((new-object net.webclient).DownloadFile("http://download.microsoft.com/download/9/5/A/95A9616B-7A37-4AF6-BC36-D6EA96C8DAAE/dotNetFx40_Full_x86_x64.exe","c:\tmp\dotNetFx40_Full_x86_x64.exe"))
-    start-process -filepath "c:\catapult\provisioners\windows\installers\dotNetFx40_Full_x86_x64.exe" -argumentlist "/q /norestart /log c:\catapult\provisioners\windows\logs\dotNetFx40_Full_x86_x64.exe.log" -Wait -RedirectStandardOutput $provision -RedirectStandardError $provisionError
+    start-process -filepath "c:\catapult\provisioners\windows\installers\temp\dotNetFx40_Full_x86_x64.exe" -argumentlist "/q /norestart /log c:\catapult\provisioners\windows\logs\dotNetFx40_Full_x86_x64.exe.log" -Wait -RedirectStandardOutput $provision -RedirectStandardError $provisionError
     echo "Restarting Windows..."
     echo "Please invoke 'vagrant provision' when it's back up"
     restart-computer -force
     exit 0
+} else {
+    echo "- Installed, skipping..."
 }
+
+
+echo "`n=> Installed .NET versions"
 Get-ChildItem 'HKLM:\SOFTWARE\Microsoft\NET Framework Setup\NDP' -recurse |
 Get-ItemProperty -name Version,Release -EA 0 |
 Where { $_.PSChildName -match '^(?!S)\p{L}'} |
@@ -73,4 +102,12 @@ if (-not(test-path -path "c:\Program Files\Microsoft\Web Platform Installer\Webp
     start-process -filepath msiexec -argumentlist "/i ""c:\catapult\provisioners\windows\installers\WebPlatformInstaller_amd64_en-US.msi"" /q ALLUSERS=1 REBOOT=ReallySuppress" -Wait -RedirectStandardOutput $provision -RedirectStandardError $provisionError
     get-content $provision
     get-content $provisionError
+} else {
+    echo "- Installed, skipping..."
 }
+
+
+echo "`n=> Checking for Windows Updates (This may take a while...)"
+# install latest updates
+Get-WUInstall -WindowsUpdate -AcceptAll -IgnoreReboot
+# @todo check for reboot status
