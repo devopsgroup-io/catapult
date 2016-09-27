@@ -73,6 +73,8 @@ windows:
   modules:
     iis:
       description: "Manages the IIS service and virtual hosts for websites."
+    mssql:
+      description: "Manages SQL Server and databases for websites with software."
     time:
       description: "Manages NTP service based on the company timezone."
     system:
@@ -81,7 +83,7 @@ windows:
     iis:
       modules: ["time","system","iis"]
     mssql:
-      modules: ["time","system"]
+      modules: ["time","system","mssql"]
 
 software:
   apache:
