@@ -813,7 +813,7 @@ Software | Tool | Command | Documentation
 Oracle SQL Developer is the recommended tool, to connect to and work with, databases. It is free, commercially supported, cross-platform, and supports multiple database types.
 
 * **Download and install** [Oracle SQL Developer](http://www.oracle.com/technetwork/developer-tools/sql-developer/downloads/index.html), some platforms require the [Java SE Development Kit](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
-* **Install third party JDBC drivers**: Oracle SQL Developer uses JDBC, via a .jar file, to connect to different database types. To install a new JDBC connector, download the respective .jar file then from Oracle SQL Developer > Preferences > Third Party JDBC Drivers, click Add Entry.<sup>[4](#references)</sup>
+* **Install third party JDBC drivers**: Oracle SQL Developer uses JDBC, via a .jar file, to connect to different database types. To install a new JDBC connector, download the respective .jar file then from Oracle SQL Developer > Preferences > Database > Third Party JDBC Drivers, click Add Entry.<sup>[4](#references)</sup>
     * **MySQL** http://dev.mysql.com/downloads/connector/j/5.0.html
         * For convenience, you may also use `~/catapult/installers/mysql-connector-java-5.0.8-bin.jar`
     * **MSSQL** https://sourceforge.net/projects/jtds/files/jtds/
