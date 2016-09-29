@@ -201,6 +201,7 @@ Vagrant.configure("2") do |config|
     config.vm.boot_timeout = 60 * 7
     #config.ssh.insert_key = false
     config.vm.communicator = "winrm"
+    config.vm.network "forwarded_port", guest: 3389, host: Catapult::Command.configuration["environments"]["dev"]["servers"]["windows_mssql"]["port_3389"]
     # disable the default vagrant share
     config.vm.synced_folder ".", "/vagrant", disabled: true
     config.vm.synced_folder ".", "/catapult"
