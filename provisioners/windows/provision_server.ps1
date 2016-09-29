@@ -70,8 +70,8 @@ if ($configuration_provisioners.windows.servers.$($args[3]).modules) {
         $start = get-date
         echo "`n`n`n==> MODULE: $module"
         echo ("==> DESCRIPTION: {0}" -f $configuration_provisioners.windows.modules.$($module).description)
-        
-        powershell -file "c:\catapult\provisioners\windows\modules\$module.ps1"
+
+        powershell -file "c:\catapult\provisioners\windows\modules\$module.ps1" $args[0] $args[1] $args[2] $args[3]
 
         $end = get-date
         echo "==> MODULE: $module"
