@@ -117,7 +117,7 @@ while IFS='' read -r -d '' key; do
         # !https rather than =http to match when X-Forwarded-Proto is not set
         RewriteEngine On
         RewriteCond %{HTTP:X-Forwarded-Proto} !https
-        RewriteRule ^(.*)$ https://${domain_environment}\$1  [R=301,L]
+        RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
         "
         force_https_hsts="Header always set Strict-Transport-Security \"max-age=15768000\""
     else
