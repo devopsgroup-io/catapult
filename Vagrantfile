@@ -199,7 +199,6 @@ Vagrant.configure("2") do |config|
     # windows specific configuration
     config.vm.guest = :windows
     config.vm.boot_timeout = 60 * 7
-    #config.ssh.insert_key = false
     config.vm.communicator = "winrm"
     config.vm.network "forwarded_port", guest: 3389, host: Catapult::Command.configuration["environments"]["dev"]["servers"]["windows_mssql"]["port_3389"]
     # disable the default vagrant share
@@ -218,14 +217,45 @@ Vagrant.configure("2") do |config|
       override.vm.box_url = "https://github.com/mitchellh/vagrant-aws/raw/master/dummy.box"
       provider.access_key_id = Catapult::Command.configuration["company"]["aws_access_key"]
       provider.secret_access_key = Catapult::Command.configuration["company"]["aws_secret_key"]
-      provider.ami = "ami-40f0d32a"
+      provider.ami = "ami-ee7805f9"
       provider.region = "us-east-1"
       provider.instance_type = "t2.micro"
+      provider.user_data = File.read("provisioners/windows/kickstart.txt").gsub(/{{password}}/, Catapult::Command.configuration["environments"]["test"]["servers"]["windows"]["admin_password"])
     end
+    # windows specific configuration
+    config.vm.guest = :windows
+    config.vm.boot_timeout = 60 * 7
+    config.vm.communicator = "winrm"
+    config.winrm.username = "Administrator"
+    config.winrm.password = Catapult::Command.configuration["environments"]["test"]["servers"]["windows"]["admin_password"]
     # disable the default vagrant share
     config.vm.synced_folder ".", "/vagrant", disabled: true
     # configure the provisioner
-    config.vm.provision "shell", path: "provisioners/windows/provision.ps1", args: ["test","#{Catapult::Command.repo}","#{Catapult::Command.configuration_user["settings"]["gpg_key"]}","iis"], run: "always"
+    config.vm.provision "shell", path: "provisioners/windows/provision.ps1", args: ["test","#{Catapult::Command.repo}","#{Catapult::Command.configuration_user["settings"]["gpg_key"]}","iis"]
+  end
+  config.vm.define "#{Catapult::Command.configuration["company"]["name"].downcase}-test-windows-mssql" do |config|
+    config.vm.provider :aws do |provider,override|
+      provider.keypair_name = "Catapult"
+      override.ssh.private_key_path = "secrets/id_rsa"
+      override.vm.box = "aws"
+      override.vm.box_url = "https://github.com/mitchellh/vagrant-aws/raw/master/dummy.box"
+      provider.access_key_id = Catapult::Command.configuration["company"]["aws_access_key"]
+      provider.secret_access_key = Catapult::Command.configuration["company"]["aws_secret_key"]
+      provider.ami = "ami-ee7805f9"
+      provider.region = "us-east-1"
+      provider.instance_type = "t2.micro"
+      provider.user_data = File.read("provisioners/windows/kickstart.txt").gsub(/{{password}}/, Catapult::Command.configuration["environments"]["test"]["servers"]["windows_mssql"]["admin_password"])
+    end
+    # windows specific configuration
+    config.vm.guest = :windows
+    config.vm.boot_timeout = 60 * 7
+    config.vm.communicator = "winrm"
+    config.winrm.username = "Administrator"
+    config.winrm.password = Catapult::Command.configuration["environments"]["test"]["servers"]["windows_mssql"]["admin_password"]
+    # disable the default vagrant share
+    config.vm.synced_folder ".", "/vagrant", disabled: true
+    # configure the provisioner
+    config.vm.provision "shell", path: "provisioners/windows/provision.ps1", args: ["test","#{Catapult::Command.repo}","#{Catapult::Command.configuration_user["settings"]["gpg_key"]}","mssql"]
   end
 
 end

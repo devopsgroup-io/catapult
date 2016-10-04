@@ -845,7 +845,7 @@ module Catapult
     # loop through each environment
     @configuration["environments"].each do |environment,data|
 
-      # validate servers
+      # validate digitalocean servers
       unless "#{environment}" == "dev" || @api_digitalocean == nil
 
         @configuration["environments"]["#{environment}"]["servers"].each do |server,data|
@@ -924,36 +924,119 @@ module Catapult
       
       end
       # if environment passwords do not exist, create them
-      unless @configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["mysql"]["user_password"]
-        @configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["mysql"]["user_password"] = SecureRandom.urlsafe_base64(16)
+      # ["servers"]["windows"]["admin_password"]
+      if !defined?(@configuration["environments"]["#{environment}"]["servers"]["windows"]["admin_password"]) || (@configuration["environments"]["#{environment}"]["servers"]["windows"]["admin_password"].nil?)
+        if !defined?(@configuration["environments"]["#{environment}"]["servers"]["windows"]["admin_password"])
+          @configuration["environments"]["#{environment}"]["servers"].merge! ({"windows" => {"admin_password" => ""}})
+        else
+          @configuration["environments"]["#{environment}"]["servers"].merge ({"windows" => {"admin_password" => ""}})
+        end
+        if "#{environment}" == "dev"
+          @configuration["environments"]["#{environment}"]["servers"]["windows"]["admin_password"] = "vagrant"
+        else
+          @configuration["environments"]["#{environment}"]["servers"]["windows"]["admin_password"] = SecureRandom.urlsafe_base64(16)
+        end
         `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml --decrypt secrets/configuration.yml.gpg`
         File.open('secrets/configuration.yml', 'w') {|f| f.write configuration.to_yaml }
         `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml.gpg --armor --cipher-algo AES256 --symmetric secrets/configuration.yml`
       end
-      unless @configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["mysql"]["root_password"]
-        @configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["mysql"]["root_password"] = SecureRandom.urlsafe_base64(16)
+      # ["servers"]["windows_mssql"]["admin_password"]
+      if !defined?(@configuration["environments"]["#{environment}"]["servers"]["windows_mssql"]["admin_password"]) || (@configuration["environments"]["#{environment}"]["servers"]["windows_mssql"]["admin_password"].nil?)
+        if !defined?(@configuration["environments"]["#{environment}"]["servers"]["windows_mssql"]["admin_password"])
+          @configuration["environments"]["#{environment}"]["servers"].merge! ({"windows_mssql" => {"admin_password" => ""}})
+        else
+          @configuration["environments"]["#{environment}"]["servers"].merge ({"windows_mssql" => {"admin_password" => ""}})
+        end
+        if "#{environment}" == "dev"
+          @configuration["environments"]["#{environment}"]["servers"]["windows_mssql"]["admin_password"] = "vagrant"
+        else
+          @configuration["environments"]["#{environment}"]["servers"]["windows_mssql"]["admin_password"] = SecureRandom.urlsafe_base64(16)
+        end
         `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml --decrypt secrets/configuration.yml.gpg`
         File.open('secrets/configuration.yml', 'w') {|f| f.write configuration.to_yaml }
         `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml.gpg --armor --cipher-algo AES256 --symmetric secrets/configuration.yml`
       end
-      unless @configuration["environments"]["#{environment}"]["software"]["admin_password"]
-        @configuration["environments"]["#{environment}"]["software"]["admin_password"] = SecureRandom.urlsafe_base64(16)
+      # ["servers"]["redhat_mysql"]["user_password"]
+      if !defined?(@configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["mysql"]["user_password"]) || (@configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["mysql"]["user_password"].nil?)
+        if !defined?(@configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["mysql"]["user_password"])
+          @configuration["environments"]["#{environment}"]["servers"].merge! ({"redhat_mysql" => {"mysql" => {"user_password" => ""}}})
+        else
+          @configuration["environments"]["#{environment}"]["servers"].merge ({"redhat_mysql" => {"mysql" => {"user_password" => ""}}})
+        end
+        if "#{environment}" == "dev"
+          @configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["mysql"]["user_password"] = "password"
+        else
+          @configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["mysql"]["user_password"] = SecureRandom.urlsafe_base64(16)
+        end
         `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml --decrypt secrets/configuration.yml.gpg`
         File.open('secrets/configuration.yml', 'w') {|f| f.write configuration.to_yaml }
         `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml.gpg --armor --cipher-algo AES256 --symmetric secrets/configuration.yml`
       end
-      unless @configuration["environments"]["#{environment}"]["software"]["drupal"]["admin_password"]
-        @configuration["environments"]["#{environment}"]["software"]["drupal"]["admin_password"] = SecureRandom.urlsafe_base64(16)
+      # ["servers"]["redhat_mysql"]["root_password"]
+      if !defined?(@configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["mysql"]["root_password"]) || (@configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["mysql"]["root_password"].nil?)
+        if !defined?(@configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["mysql"]["root_password"])
+          @configuration["environments"]["#{environment}"]["servers"].merge! ({"redhat_mysql" => {"mysql" => {"root_password" => ""}}})
+        else
+          @configuration["environments"]["#{environment}"]["servers"].merge ({"redhat_mysql" => {"mysql" => {"root_password" => ""}}})
+        end
+        if "#{environment}" == "dev"
+          @configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["mysql"]["root_password"] = "password"
+        else
+          @configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["mysql"]["root_password"] = SecureRandom.urlsafe_base64(16)
+        end
         `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml --decrypt secrets/configuration.yml.gpg`
         File.open('secrets/configuration.yml', 'w') {|f| f.write configuration.to_yaml }
         `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml.gpg --armor --cipher-algo AES256 --symmetric secrets/configuration.yml`
       end
-      unless @configuration["environments"]["#{environment}"]["software"]["wordpress"]["admin_password"]
-        @configuration["environments"]["#{environment}"]["software"]["wordpress"]["admin_password"] = SecureRandom.urlsafe_base64(16)
+      # ["software"]["admin_password"]
+      if !defined?(@configuration["environments"]["#{environment}"]["software"]["admin_password"]) || (@configuration["environments"]["#{environment}"]["software"]["admin_password"].nil?)
+        if !defined?(@configuration["environments"]["#{environment}"]["software"]["admin_password"])
+          @configuration["environments"]["#{environment}"]["software"].merge! ({"admin_password" => ""})
+        else
+          @configuration["environments"]["#{environment}"]["software"].merge ({"admin_password" => ""})
+        end
+        if "#{environment}" == "dev"
+          @configuration["environments"]["#{environment}"]["software"]["admin_password"] = "password"
+        else
+          @configuration["environments"]["#{environment}"]["software"]["admin_password"] = SecureRandom.urlsafe_base64(16)
+        end
         `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml --decrypt secrets/configuration.yml.gpg`
         File.open('secrets/configuration.yml', 'w') {|f| f.write configuration.to_yaml }
         `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml.gpg --armor --cipher-algo AES256 --symmetric secrets/configuration.yml`
       end
+      # ["software"]["drupal"]["admin_password"]
+      if !defined?(@configuration["environments"]["#{environment}"]["software"]["drupal"]["admin_password"]) || (@configuration["environments"]["#{environment}"]["software"]["drupal"]["admin_password"].nil?)
+        if !defined?(@configuration["environments"]["#{environment}"]["software"]["drupal"]["admin_password"])
+          @configuration["environments"]["#{environment}"]["software"].merge! ({"drupal" => {"admin_password" => ""}})
+        else
+          @configuration["environments"]["#{environment}"]["software"].merge ({"drupal" => {"admin_password" => ""}})
+        end
+        if "#{environment}" == "dev"
+          @configuration["environments"]["#{environment}"]["software"]["drupal"]["admin_password"] = "password"
+        else
+          @configuration["environments"]["#{environment}"]["software"]["drupal"]["admin_password"] = SecureRandom.urlsafe_base64(16)
+        end
+        `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml --decrypt secrets/configuration.yml.gpg`
+        File.open('secrets/configuration.yml', 'w') {|f| f.write configuration.to_yaml }
+        `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml.gpg --armor --cipher-algo AES256 --symmetric secrets/configuration.yml`
+      end
+      # ["software"]["wordpress"]["admin_password"]
+      if !defined?(@configuration["environments"]["#{environment}"]["software"]["wordpress"]["admin_password"]) || (@configuration["environments"]["#{environment}"]["software"]["wordpress"]["admin_password"].nil?)
+        if !defined?(@configuration["environments"]["#{environment}"]["software"]["wordpress"]["admin_password"])
+          @configuration["environments"]["#{environment}"]["software"].merge! ({"wordpress" => {"admin_password" => ""}})
+        else
+          @configuration["environments"]["#{environment}"]["software"].merge ({"wordpress" => {"admin_password" => ""}})
+        end
+        if "#{environment}" == "dev"
+          @configuration["environments"]["#{environment}"]["software"]["wordpress"]["admin_password"] = "password"
+        else
+          @configuration["environments"]["#{environment}"]["software"]["wordpress"]["admin_password"] = SecureRandom.urlsafe_base64(16)
+        end
+        `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml --decrypt secrets/configuration.yml.gpg`
+        File.open('secrets/configuration.yml', 'w') {|f| f.write configuration.to_yaml }
+        `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml.gpg --armor --cipher-algo AES256 --symmetric secrets/configuration.yml`
+      end
+
     end
 
 
