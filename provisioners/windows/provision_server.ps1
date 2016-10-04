@@ -33,17 +33,6 @@ if (-not(test-path -path "c:\catapult\secrets\configuration.yml.gpg")) {
 }
 
 
-echo "`n=> Installing Git"
-if (-not(test-path -path "c:\Program Files (x86)\Git\bin\git.exe")) {
-    start-process -filepath "c:\catapult\provisioners\windows\installers\Git-1.9.5-preview20141217.exe" -argumentlist "/SP- /NORESTART /VERYSILENT /SUPPRESSMSGBOXES /SAVEINF=c:\catapult\provisioners\windows\logs\git-settings.txt /LOG=c:\catapult\provisioners\windows\logs\Git-1.9.5-preview20141217.exe.log" -Wait -RedirectStandardOutput $provision -RedirectStandardError $provisionError
-    get-content $provision
-    get-content $provisionError
-}
-start-process -filepath "c:\Program Files (x86)\Git\bin\git.exe" -argumentlist "--version" -Wait -RedirectStandardOutput $provision -RedirectStandardError $provisionError
-get-content $provision
-get-content $provisionError
-
-
 # get configuration of provisioners
 $configuration_provisioners = get-yaml -fromfile (resolve-path c:\catapult\provisioners\provisioners.yml)
 

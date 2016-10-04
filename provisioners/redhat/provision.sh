@@ -49,7 +49,7 @@ if [ $1 != "dev" ]; then
         cd /catapult && sudo git fetch
         cd /catapult && sudo git pull
     else
-        sudo git clone --recursive -b ${branch} $2 /catapult
+        sudo git clone --recursive --branch ${branch} $2 /catapult
     fi
 else
     if ! [ -e "/catapult/secrets/configuration.yml.gpg" ]; then
