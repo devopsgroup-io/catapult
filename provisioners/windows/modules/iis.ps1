@@ -42,17 +42,17 @@ if (-not($configuration.websites.iis)) {
 } else {
 
     # initialize id_rsa
-    new-item "c:\Program Files (x86)\Git\.ssh\id_rsa" -type file -force
-    get-content "c:\catapult\secrets\id_rsa" | add-content "c:\Program Files (x86)\Git\.ssh\id_rsa"
+    new-item "c:\Program Files\Git\.ssh\id_rsa" -type file -force
+    get-content "c:\catapult\secrets\id_rsa" | add-content "c:\Program Files\Git\.ssh\id_rsa"
 
     # initialize known_hosts
-    new-item "c:\Program Files (x86)\Git\.ssh\known_hosts" -type file -force
+    new-item "c:\Program Files\Git\.ssh\known_hosts" -type file -force
     # ssh-keyscan bitbucket.org for a maximum of 10 tries
     for ($i=0; $i -le 10; $i++) {
-        start-process -filepath "c:\Program Files (x86)\Git\bin\ssh-keyscan.exe" -argumentlist ("-4 -T 10 bitbucket.org") -Wait -RedirectStandardOutput $provision -RedirectStandardError $provisionError
+        start-process -filepath "c:\Program Files\Git\usr\bin\ssh-keyscan.exe" -argumentlist ("-4 -T 10 bitbucket.org") -Wait -RedirectStandardOutput $provision -RedirectStandardError $provisionError
         if ((get-content $provision) -match "bitbucket\.org") {
             echo "ssh-keyscan for bitbucket.org successful"
-            get-content $provision | add-content "c:\Program Files (x86)\Git\.ssh\known_hosts"
+            get-content $provision | add-content "c:\Program Files\Git\.ssh\known_hosts"
             break
         } else {
             echo "ssh-keyscan for bitbucket.org failed, retrying!"
@@ -60,10 +60,10 @@ if (-not($configuration.websites.iis)) {
     }
     # ssh-keyscan github.com for a maximum of 10 tries
     for ($i=0; $i -le 10; $i++) {
-        start-process -filepath "c:\Program Files (x86)\Git\bin\ssh-keyscan.exe" -argumentlist ("-4 -T 10 github.com") -Wait -RedirectStandardOutput $provision -RedirectStandardError $provisionError
+        start-process -filepath "c:\Program Files\Git\usr\bin\ssh-keyscan.exe" -argumentlist ("-4 -T 10 github.com") -Wait -RedirectStandardOutput $provision -RedirectStandardError $provisionError
         if ((get-content $provision) -match "github\.com") {
             echo "ssh-keyscan for github.com successful"
-            get-content $provision | add-content "c:\Program Files (x86)\Git\.ssh\known_hosts"
+            get-content $provision | add-content "c:\Program Files\Git\.ssh\known_hosts"
             break
         } else {
             echo "ssh-keyscan for github.com failed, retrying!"
