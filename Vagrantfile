@@ -220,6 +220,9 @@ Vagrant.configure("2") do |config|
       provider.ami = "ami-ee7805f9"
       provider.region = "us-east-1"
       provider.instance_type = "t2.micro"
+      provider.tags = {
+        "Name" => "#{Catapult::Command.configuration["company"]["name"].downcase}-test-windows"
+      }
       provider.user_data = File.read("provisioners/windows/kickstart.txt").gsub(/{{password}}/, Catapult::Command.configuration["environments"]["test"]["servers"]["windows"]["admin_password"])
     end
     # windows specific configuration
@@ -244,6 +247,9 @@ Vagrant.configure("2") do |config|
       provider.ami = "ami-ee7805f9"
       provider.region = "us-east-1"
       provider.instance_type = "t2.micro"
+      provider.tags = {
+        "Name" => "#{Catapult::Command.configuration["company"]["name"].downcase}-test-windows-mssql"
+      }
       provider.user_data = File.read("provisioners/windows/kickstart.txt").gsub(/{{password}}/, Catapult::Command.configuration["environments"]["test"]["servers"]["windows_mssql"]["admin_password"])
     end
     # windows specific configuration
