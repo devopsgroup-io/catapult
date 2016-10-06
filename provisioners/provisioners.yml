@@ -75,15 +75,17 @@ windows:
       description: "Manages the IIS service and virtual hosts for websites."
     mssql:
       description: "Manages SQL Server and databases for websites with software."
+    newrelic_sysmon:
+      description: "Manages New Relic System Monitor service."
     time:
       description: "Manages NTP service based on the company timezone."
     system:
       description: "Manages system requirements."
   servers:
     iis:
-      modules: ["time","system","iis"]
+      modules: ["time","system","newrelic_sysmon","iis"]
     mssql:
-      modules: ["time","system","mssql"]
+      modules: ["time","system","newrelic_sysmon","mssql"]
 
 software:
   apache:
