@@ -8,7 +8,7 @@ if ($($args[0].Text.Length) -gt 4) {
 } else {
     $hostname = "$($args[0])-win"
 }
-# set hostname, 
+# set hostname
 if ($($args[3]) -eq "iis") {
     if ($env:computername.ToLower() -ne "$($hostname)") {
         Rename-Computer -Force -NewName "$($hostname)"
@@ -18,7 +18,7 @@ if ($($args[3]) -eq "iis") {
         Rename-Computer -Force -NewName "$($hostname)-mssql"
     }
 }
-# echo datetimezone
+# echo hostname
 echo $env:computername
 
 
@@ -99,7 +99,7 @@ echo "`n=> Installing Web Platform Installer (This may take a while...)"
 # http://www.iis.net/learn/install/web-platform-installer/web-platform-installer-v4-command-line-webpicmdexe-rtw-release
 if (-not(test-path -path "c:\Program Files\Microsoft\Web Platform Installer\WebpiCmd-x64.exe")) {
     # https://github.com/fdcastel/psunattended/blob/master/PSUnattended.ps1
-    start-process -filepath msiexec -argumentlist "/i ""c:\catapult\provisioners\windows\installers\WebPlatformInstaller_amd64_en-US.msi"" /q ALLUSERS=1 REBOOT=ReallySuppress" -Wait -RedirectStandardOutput $provision -RedirectStandardError $provisionError
+    start-process -filepath msiexec -argumentlist "/i c:\catapult\provisioners\windows\installers\WebPlatformInstaller_amd64_en-US.msi /q ALLUSERS=1 REBOOT=ReallySuppress" -Wait -RedirectStandardOutput $provision -RedirectStandardError $provisionError
     get-content $provision
     get-content $provisionError
 } else {
