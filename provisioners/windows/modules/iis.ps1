@@ -34,6 +34,15 @@ if (Get-Module -ListAvailable -Name webadministration) {
 }
 
 
+echo "`n=> Configuring IIS"
+# display errors on screen using the default recommendations for development and production
+if (($($args[0]) -eq "dev") {
+    Set-WebConfigurationProperty -filter "System.WebServer/httpErrors" -PSPath "MACHINE/WEBROOT/APPHOST" -Name "errorMode" -Value "Detailed"
+} else {
+    Set-WebConfigurationProperty -filter "System.WebServer/httpErrors" -PSPath "MACHINE/WEBROOT/APPHOST" -Name "errorMode" -Value "DetailedLocalOnly"
+}
+
+
 echo "`n=> Configuring git repositories (This may take a while...)"
 if (-not($configuration.websites.iis)) {
 
