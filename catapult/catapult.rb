@@ -978,7 +978,9 @@ module Catapult
             else
               instance = nil
               @api_aws.search("reservationSet item instancesSet").each do |key|
-                if key.at("item tagSet item value").text == "#{@configuration["company"]["name"].downcase}-#{environment}-#{server.gsub("_","-")}"
+                if key.at("item tagSet item value").text == nil
+                  instance = nil
+                elsif key.at("item tagSet item value").text == "#{@configuration["company"]["name"].downcase}-#{environment}-#{server.gsub("_","-")}"
                   instance = key
                 end
               end
