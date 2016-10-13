@@ -36,10 +36,26 @@ if (Get-Module -ListAvailable -Name webadministration) {
 
 echo "`n=> Configuring IIS"
 # display errors on screen using the default recommendations for development and production
-if (($($args[0]) -eq "dev") {
-    Set-WebConfigurationProperty -filter "System.WebServer/httpErrors" -PSPath "MACHINE/WEBROOT/APPHOST" -Name "errorMode" -Value "Detailed"
+if ($($args[0]) -eq "dev") {
+    set-webconfigurationproperty -filter "system.webserver/httperrors" -pspath "MACHINE/WEBROOT/APPHOST" -name "errorMode" -value "Detailed"
 } else {
-    Set-WebConfigurationProperty -filter "System.WebServer/httpErrors" -PSPath "MACHINE/WEBROOT/APPHOST" -Name "errorMode" -Value "DetailedLocalOnly"
+    set-webconfigurationproperty -filter "system.webserver/httperrors" -pspath "MACHINE/WEBROOT/APPHOST" -name "errorMode" -value "DetailedLocalOnly"
+}
+# remove revealing headers
+$headers = @{ 
+    "RESPONSE_X-AspNet-Version" = "ASP.NET";
+    "RESPONSE_X-AspNetMvc-Version" = "ASP.NET";
+    "RESPONSE_X-Powered-By" = "ASP.NET";
+    "RESPONSE_SERVER" = "Microsoft-IIS";
+}
+foreach ($header in $headers.GetEnumerator()) {
+    if (-not(get-webconfigurationproperty -pspath "iis:\" -filter "system.webServer/rewrite/outboundrules/rule[@name='$($header.Name)']" -name ".")) {
+        add-webconfigurationproperty -pspath "iis:\" -filter "system.webServer/rewrite/outboundrules" -name "." -value @{name=$($header.Name)}
+    }
+    set-webconfigurationproperty -pspath "iis:\" -filter "system.webServer/rewrite/outboundRules/rule[@name='$($header.Name)']/match" -name "serverVariable" -value "$($header.Name)"
+    set-webconfigurationproperty -pspath "iis:\" -filter "system.webServer/rewrite/outboundRules/rule[@name='$($header.Name)']/match" -name "pattern" -value ".*"
+    set-webconfigurationproperty -pspath "iis:\" -filter "system.webServer/rewrite/outboundRules/rule[@name='$($header.Name)']/action" -name "type" -value "Rewrite"
+    set-webconfigurationproperty -pspath "iis:\" -filter "system.webServer/rewrite/outboundRules/rule[@name='$($header.Name)']/action" -name "value" -value "$($header.Value)"
 }
 
 
@@ -51,17 +67,17 @@ if (-not($configuration.websites.iis)) {
 } else {
 
     # initialize id_rsa
-    new-item "c:\Program Files\Git\.ssh\id_rsa" -type file -force
-    get-content "c:\catapult\secrets\id_rsa" | add-content "c:\Program Files\Git\.ssh\id_rsa"
+    new-item "$home\.ssh\id_rsa" -type file -force
+    get-content "c:\catapult\secrets\id_rsa" | add-content "$home\.ssh\id_rsa"
 
     # initialize known_hosts
-    new-item "c:\Program Files\Git\.ssh\known_hosts" -type file -force
+    new-item "$home\.ssh\known_hosts" -type file -force
     # ssh-keyscan bitbucket.org for a maximum of 10 tries
     for ($i=0; $i -le 10; $i++) {
         start-process -filepath "c:\Program Files\Git\usr\bin\ssh-keyscan.exe" -argumentlist ("-4 -T 10 bitbucket.org") -Wait -RedirectStandardOutput $provision -RedirectStandardError $provisionError
         if ((get-content $provision) -match "bitbucket\.org") {
             echo "ssh-keyscan for bitbucket.org successful"
-            get-content $provision | add-content "c:\Program Files\Git\.ssh\known_hosts"
+            get-content $provision | add-content "$home\.ssh\known_hosts"
             break
         } else {
             echo "ssh-keyscan for bitbucket.org failed, retrying!"
@@ -72,7 +88,7 @@ if (-not($configuration.websites.iis)) {
         start-process -filepath "c:\Program Files\Git\usr\bin\ssh-keyscan.exe" -argumentlist ("-4 -T 10 github.com") -Wait -RedirectStandardOutput $provision -RedirectStandardError $provisionError
         if ((get-content $provision) -match "github\.com") {
             echo "ssh-keyscan for github.com successful"
-            get-content $provision | add-content "c:\Program Files\Git\.ssh\known_hosts"
+            get-content $provision | add-content "$home\.ssh\known_hosts"
             break
         } else {
             echo "ssh-keyscan for github.com failed, retrying!"
@@ -208,8 +224,9 @@ if (-not($configuration.websites.iis)) {
         new-webbinding -name ("$($args[0]).{0}" -f $instance.domain) -hostheader ("www.$($args[0]).{0}" -f $instance.domain) -port 443 -protocol https -sslflags 1
 
         # set website user account
-        set-itemproperty ("$($args[0]).{0}" -f $instance.domain) -name username -value "$env:username"
-        set-itemproperty ("$($args[0]).{0}" -f $instance.domain) -name password -value "$env:username"
+        # https://www.iis.net/learn/manage/configuring-security/application-pool-identities
+        #set-itemproperty -pspath ("MACHINE/WEBROOT/APPHOST/$($args[0]).{0}" -f $instance.domain) -name username -value "$env:username"
+        #set-itemproperty -pspath ("MACHINE/WEBROOT/APPHOST/$($args[0]).{0}" -f $instance.domain) -name password -value "$env:username"
     }
 
     echo "`n=> Creating SSL Bindings"
