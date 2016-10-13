@@ -71,6 +71,10 @@ redhat:
       modules: ["time","system","iptables","newrelic_sysmon","git_clean","git","software_config","rsync","php","software_tools","software_operations_meta","mysql","cloudflare_cache","newrelic_synthetics"]
 windows:
   modules:
+    git:
+      description: "Manages Git repositories for websites."
+    git_clean:
+      description: "Removes Git repositories for websites."
     iis:
       description: "Manages the IIS service and virtual hosts for websites."
     mssql:
@@ -83,9 +87,9 @@ windows:
       description: "Manages system requirements."
   servers:
     iis:
-      modules: ["time","system","newrelic_sysmon","iis"]
+      modules: ["time","system","newrelic_sysmon","git_clean","git","iis"]
     mssql:
-      modules: ["time","system","newrelic_sysmon","mssql"]
+      modules: ["time","system","newrelic_sysmon","git_clean","git","mssql"]
 
 software:
   apache:
