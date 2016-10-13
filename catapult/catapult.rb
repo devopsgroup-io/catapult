@@ -994,6 +994,10 @@ module Catapult
             # id
             if instance != nil
               row.push(instance.at("item instanceId").text.ljust(11))
+              # vagrant-aws is broken, so let's write out the id of the EC2 instance ourselves
+              path = ".vagrant/machines/#{@configuration["company"]["name"].downcase}-#{environment}-#{server.gsub("_","-")}/aws"
+              FileUtils.mkpath("#{path}") unless File.exists?("#{path}")
+              File.write("#{path}/id", instance.at("item instanceId").text)
             end
             # size
             if instance != nil
