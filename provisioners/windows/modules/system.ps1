@@ -107,6 +107,36 @@ if (-not(test-path -path "c:\Program Files\Microsoft\Web Platform Installer\Webp
 }
 
 
+echo "`n=> Configuring SSH"
+# initialize id_rsa
+new-item "$home\.ssh\id_rsa" -type file -force
+get-content "c:\catapult\secrets\id_rsa" | add-content "$home\.ssh\id_rsa"
+# initialize known_hosts
+new-item "$home\.ssh\known_hosts" -type file -force
+# ssh-keyscan bitbucket.org for a maximum of 10 tries
+for ($i=0; $i -le 10; $i++) {
+    start-process -filepath "c:\Program Files\Git\usr\bin\ssh-keyscan.exe" -argumentlist ("-4 -T 10 bitbucket.org") -Wait -RedirectStandardOutput $provision -RedirectStandardError $provisionError
+    if ((get-content $provision) -match "bitbucket\.org") {
+        echo "ssh-keyscan for bitbucket.org successful"
+        get-content $provision | add-content "$home\.ssh\known_hosts"
+        break
+    } else {
+        echo "ssh-keyscan for bitbucket.org failed, retrying!"
+    }
+}
+# ssh-keyscan github.com for a maximum of 10 tries
+for ($i=0; $i -le 10; $i++) {
+    start-process -filepath "c:\Program Files\Git\usr\bin\ssh-keyscan.exe" -argumentlist ("-4 -T 10 github.com") -Wait -RedirectStandardOutput $provision -RedirectStandardError $provisionError
+    if ((get-content $provision) -match "github\.com") {
+        echo "ssh-keyscan for github.com successful"
+        get-content $provision | add-content "$home\.ssh\known_hosts"
+        break
+    } else {
+        echo "ssh-keyscan for github.com failed, retrying!"
+    }
+}
+
+
 echo "`n=> Checking for Windows Updates (This may take a while...)"
 # install latest updates
 Get-WUInstall -WindowsUpdate -AcceptAll -IgnoreReboot
