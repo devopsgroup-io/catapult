@@ -35,6 +35,7 @@ module Catapult
     require "json"
     require "net/ssh"
     require "net/http"
+    require "nokogiri"
     require "open-uri"
     require "openssl"
     require "resolv"
@@ -498,179 +499,13 @@ module Catapult
             unless @api_digitalocean_account_key_name
               catapult_exception("Could not find the SSH Key named \"Vagrant\" in DigitalOcean, please follow the Services Setup for DigitalOcean at https://github.com/devopsgroup-io/catapult#services-setup")
             else
-              puts "   - Found the ssh public key \"Vagrant\""
+              puts "   - Found the DigitalOcean SSH Key \"Vagrant\""
             end
             unless @api_digitalocean_account_key_public_key
-              catapult_exception("The SSH Key named \"Vagrant\" in DigitalOcean does not match your Catapult instance's SSH Key at \"secrets/id_rsa.pub\", please follow the Services Setup for DigitalOcean at https://github.com/devopsgroup-io/catapult#services-setup")
+              catapult_exception("The DigitalOcean SSH Key \"Vagrant\" does not match your secrets/id_rsa.pub ssh public key, please follow the Services Setup for DigitalOcean at https://github.com/devopsgroup-io/catapult#services-setup")
             else
-              puts "   - The ssh public key \"Vagrant\" matches your secrets/id_rsa.pub ssh public key"
+              puts "   - The DigitalOcean SSH Key \"Vagrant\" matches your secrets/id_rsa.pub ssh public key"
             end
-          end
-        end
-      end
-    end
-    # https://confluence.atlassian.com/display/BITBUCKET/Version+1
-    if @configuration["company"]["bitbucket_username"] == nil || @configuration["company"]["bitbucket_password"] == nil
-      catapult_exception("Please set [\"company\"][\"bitbucket_username\"] and [\"company\"][\"bitbucket_password\"] in secrets/configuration.yml")
-    else
-      uri = URI("https://api.bitbucket.org/1.0/user")
-      Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
-        request = Net::HTTP::Get.new uri.request_uri
-        request.basic_auth "#{@configuration["company"]["bitbucket_username"]}", "#{@configuration["company"]["bitbucket_password"]}"
-        response = http.request request
-        if response.code.to_f.between?(399,499)
-          catapult_exception("#{response.code} The Bitbucket API could not authenticate, please verify [\"company\"][\"bitbucket_username\"] and [\"company\"][\"bitbucket_password\"].")
-        elsif response.code.to_f.between?(500,600)
-          puts "   - The Bitbucket API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
-        else
-          puts " * Bitbucket API authenticated successfully."
-          @api_bitbucket = JSON.parse(response.body)
-          # verify bitbucket user's catapult ssh key
-          uri = URI("https://api.bitbucket.org/1.0/users/#{@configuration["company"]["bitbucket_username"]}/ssh-keys")
-          Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
-            request = Net::HTTP::Get.new uri.request_uri
-            request.basic_auth "#{@configuration["company"]["bitbucket_username"]}", "#{@configuration["company"]["bitbucket_password"]}"
-            response = http.request request # Net::HTTPResponse object
-            @api_bitbucket_ssh_keys = JSON.parse(response.body)
-            @api_bitbucket_ssh_keys_title = false
-            @api_bitbucket_ssh_keys_key = false
-            unless response.code.to_f.between?(399,600)
-              @api_bitbucket_ssh_keys.each do |key|
-                if key["label"] == "Catapult"
-                  @api_bitbucket_ssh_keys_title = true
-                  if "#{key["key"].match(/(\w*-\w*\s\S*)/)}" == "#{File.read("secrets/id_rsa.pub").match(/(\w*-\w*\s\S*)/)}"
-                    @api_bitbucket_ssh_keys_key = true
-                  end
-                end
-              end
-            end
-            unless @api_bitbucket_ssh_keys_title
-              catapult_exception("Could not find the SSH Key named \"Catapult\" for your Bitbucket user #{@configuration["company"]["bitbucket_username"]}, please follow Provision Websites at https://github.com/devopsgroup-io/catapult#provision-websites")
-            else
-              puts "   - Found the ssh public key \"Catapult\" for your Bitbucket user #{@configuration["company"]["bitbucket_username"]}"
-            end
-            unless @api_bitbucket_ssh_keys_key
-              catapult_exception("The SSH Key named \"Catapult\" in Bitbucket does not match your Catapult instance's SSH Key at \"secrets/id_rsa.pub\", please follow Provision Websites at https://github.com/devopsgroup-io/catapult#provision-websites")
-            else
-              puts "   - The ssh public key \"Catapult\" matches your secrets/id_rsa.pub ssh public key"
-            end
-          end
-        end
-      end
-    end
-    # https://developer.github.com/v3/
-    if @configuration["company"]["github_username"] == nil || @configuration["company"]["github_password"] == nil
-      catapult_exception("Please set [\"company\"][\"github_username\"] and [\"company\"][\"github_password\"] in secrets/configuration.yml")
-    else
-      uri = URI("https://api.github.com/user")
-      Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
-        request = Net::HTTP::Get.new uri.request_uri
-        request.basic_auth "#{@configuration["company"]["github_username"]}", "#{@configuration["company"]["github_password"]}"
-        response = http.request request
-        if response.code.to_f.between?(399,499)
-          catapult_exception("#{response.code} The GitHub API could not authenticate, please verify [\"company\"][\"github_username\"] and [\"company\"][\"github_password\"].")
-        elsif response.code.to_f.between?(500,600)
-          puts "   - The GitHub API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
-        else
-          puts " * GitHub API authenticated successfully."
-          @api_github = JSON.parse(response.body)
-          # verify github user's catapult ssh key
-          uri = URI("https://api.github.com/user/keys")
-          Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
-            request = Net::HTTP::Get.new uri.request_uri
-            request.basic_auth "#{@configuration["company"]["github_username"]}", "#{@configuration["company"]["github_password"]}"
-            response = http.request request # Net::HTTPResponse object
-            @api_github_ssh_keys = JSON.parse(response.body)
-            @api_github_ssh_keys_title = false
-            @api_github_ssh_keys_key = false
-            unless response.code.to_f.between?(399,600)
-              @api_github_ssh_keys.each do |key|
-                if key["title"] == "Catapult"
-                  @api_github_ssh_keys_title = true
-                  if "#{key["key"].match(/(\w*-\w*\s\S*)/)}" == "#{File.read("secrets/id_rsa.pub").match(/(\w*-\w*\s\S*)/)}"
-                    @api_github_ssh_keys_key = true
-                  end
-                end
-              end
-            end
-            unless @api_github_ssh_keys_title
-              catapult_exception("Could not find the SSH Key named \"Catapult\" for your GitHub user #{@configuration["company"]["github_username"]}, please follow Provision Websites at https://github.com/devopsgroup-io/catapult#provision-websites")
-            else
-              puts "   - Found the ssh public key \"Catapult\" for your GitHub user #{@configuration["company"]["github_username"]}"
-            end
-            unless @api_github_ssh_keys_key
-              catapult_exception("The SSH Key named \"Catapult\" in GitHub does not match your Catapult instance's SSH Key at \"secrets/id_rsa.pub\", please follow Provision Websites at https://github.com/devopsgroup-io/catapult#provision-websites")
-            else
-              puts "   - The ssh public key \"Catapult\" matches your secrets/id_rsa.pub ssh public key"
-            end
-          end
-        end
-      end
-    end
-    # https://docs.atlassian.com/bamboo/REST/
-    if @configuration["company"]["bamboo_base_url"] == nil || @configuration["company"]["bamboo_username"] == nil || @configuration["company"]["bamboo_password"] == nil
-      catapult_exception("Please set [\"company\"][\"bamboo_base_url\"] and [\"company\"][\"bamboo_username\"] and [\"company\"][\"bamboo_password\"] in secrets/configuration.yml")
-    else
-      uri = URI("#{@configuration["company"]["bamboo_base_url"]}rest/api/latest/project.json?os_authType=basic")
-      Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
-        request = Net::HTTP::Get.new uri.request_uri
-        request.basic_auth "#{@configuration["company"]["bamboo_username"]}", "#{@configuration["company"]["bamboo_password"]}"
-        response = http.request request
-        if response.code.to_f.between?(399,499)
-          catapult_exception("#{response.code} The Bamboo API could not authenticate, please verify [\"company\"][\"bamboo_base_url\"] and [\"company\"][\"bamboo_username\"] and [\"company\"][\"bamboo_password\"].")
-        elsif response.code.to_f.between?(500,600)
-          puts "   - The Bamboo API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
-        else
-          puts " * Bamboo API authenticated successfully."
-          @api_bamboo = JSON.parse(response.body)
-          api_bamboo_project_key = @api_bamboo["projects"]["project"].find { |element| element["key"] == "CAT" }
-          unless api_bamboo_project_key
-            catapult_exception("Could not find the project key \"CAT\" in Bamboo, please follow the Services Setup for Bamboo at https://github.com/devopsgroup-io/catapult#services-setup")
-          end
-          api_bamboo_project_name = @api_bamboo["projects"]["project"].find { |element| element["name"] == "Catapult" }
-          unless api_bamboo_project_name
-            catapult_exception("Could not find the project name \"Catapult\" in Bamboo, please follow the Services Setup for Bamboo at https://github.com/devopsgroup-io/catapult#services-setup")
-          else
-            puts "   - Found the project key \"CAT\""
-          end
-        end
-        uri = URI("#{@configuration["company"]["bamboo_base_url"]}rest/api/latest/result/CAT-TEST.json?os_authType=basic")
-        Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
-          request = Net::HTTP::Get.new uri.request_uri
-          request.basic_auth "#{@configuration["company"]["bamboo_username"]}", "#{@configuration["company"]["bamboo_password"]}"
-          response = http.request request
-          if response.code.to_f.between?(399,499)
-            catapult_exception("Could not find the plan key \"TEST\" in Bamboo, please follow the Services Setup for Bamboo at https://github.com/devopsgroup-io/catapult#services-setup")
-          elsif response.code.to_f.between?(500,600)
-            puts "   - The Bamboo API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
-          else
-            puts "   - Found the plan key \"TEST\""
-          end
-        end
-        uri = URI("#{@configuration["company"]["bamboo_base_url"]}rest/api/latest/result/CAT-QC.json?os_authType=basic")
-        Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
-          request = Net::HTTP::Get.new uri.request_uri
-          request.basic_auth "#{@configuration["company"]["bamboo_username"]}", "#{@configuration["company"]["bamboo_password"]}"
-          response = http.request request
-          if response.code.to_f.between?(399,499)
-            catapult_exception("Could not find the plan key \"QC\" in Bamboo, please follow the Services Setup for Bamboo at https://github.com/devopsgroup-io/catapult#services-setup")
-          elsif response.code.to_f.between?(500,600)
-            puts "   - The Bamboo API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
-          else
-            puts "   - Found the plan key \"QC\""
-          end
-        end
-        uri = URI("#{@configuration["company"]["bamboo_base_url"]}rest/api/latest/result/CAT-PROD.json?os_authType=basic")
-        Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
-          request = Net::HTTP::Get.new uri.request_uri
-          request.basic_auth "#{@configuration["company"]["bamboo_username"]}", "#{@configuration["company"]["bamboo_password"]}"
-          response = http.request request
-          if response.code.to_f.between?(399,499)
-            catapult_exception("Could not find the plan key \"PROD\" in Bamboo, please follow the Services Setup for Bamboo at https://github.com/devopsgroup-io/catapult#services-setup")
-          elsif response.code.to_f.between?(500,600)
-            puts "   - The Bamboo API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
-          else
-            puts "   - Found the plan key \"PROD\""
           end
         end
       end
@@ -686,7 +521,7 @@ module Catapult
       host = 'ec2.amazonaws.com'
       region = 'us-east-1'
       endpoint = 'https://ec2.amazonaws.com'
-      request_parameters = 'Action=DescribeRegions&Version=2013-10-15'
+      request_parameters = 'Action=DescribeKeyPairs&Version=2013-10-15'
       # Key derivation functions. See:
       # http://docs.aws.amazon.com/general/latest/gr/signature-v4-examples.html#signature-v4-examples-python
       def Command::getSignatureKey(key, dateStamp, regionName, serviceName)
@@ -748,17 +583,206 @@ module Catapult
         request = Net::HTTP::Get.new uri.request_uri
         request.add_field "Authorization", "#{authorization_header}"
         request.add_field "x-amz-date", "#{amzdate}"
-        request.add_field "content-type", "application/json" #@todo this doesn't seem to work
+        request.add_field "content-type", "application/json"
         response = http.request request
         if response.code.to_f.between?(399,499)
           catapult_exception("#{response.code} The AWS API could not authenticate, please verify [\"company\"][\"aws_access_key\"] and [\"company\"][\"aws_secret_key\"].")
         elsif response.code.to_f.between?(500,600)
-          puts "   - The AWS API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
+          puts " * AWS API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
         else
           puts " * AWS API authenticated successfully."
+          api_aws_account_keys = Nokogiri::XML.parse(response.body)
+          @api_aws_account_key_name = false
+          @api_aws_account_key_public_key = false
+          api_aws_account_keys.xpath("//xmlns:item").each do |key|
+            if key.css('keyName').text == "Catapult"
+              @api_aws_account_key_name = true
+              # calculate the MD5 fingerprint from the binary (der) of the computed public key
+              key_private = OpenSSL::PKey::RSA.new(File.read("secrets/id_rsa"))
+              key_fingerprint = OpenSSL::Digest::MD5.hexdigest(key_private.public_key.to_der).scan(/../).join(':')
+              if "#{key.css('keyFingerprint').text}" == "#{key_fingerprint}"
+                @api_aws_account_key_public_key = true
+              end
+            end
+          end
+          unless @api_aws_account_key_name
+            catapult_exception("Could not find the EC2 Key Pair named \"Catapult\" in AWS, please follow the Services Setup for AWS at https://github.com/devopsgroup-io/catapult#services-setup")
+          else
+            puts "   - Found the AWS EC2 Key Pair \"Catapult\""
+          end
+          unless @api_aws_account_key_public_key
+            catapult_exception("The AWS EC2 Key Pair \"Catapult\" MD5 fingerprint does not match your secrets/id_rsa.pub ssh public key MD5 fingerprint, please follow the Services Setup for AWS at https://github.com/devopsgroup-io/catapult#services-setup")
+          else
+            puts "   - The AWS EC2 Key Pair \"Catapult\" MD5 fingerprint matches your secrets/id_rsa.pub ssh public key MD5 fingerprint"
+          end
         end
       end
-
+    end
+    # https://confluence.atlassian.com/display/BITBUCKET/Version+1
+    if @configuration["company"]["bitbucket_username"] == nil || @configuration["company"]["bitbucket_password"] == nil
+      catapult_exception("Please set [\"company\"][\"bitbucket_username\"] and [\"company\"][\"bitbucket_password\"] in secrets/configuration.yml")
+    else
+      uri = URI("https://api.bitbucket.org/1.0/user")
+      Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
+        request = Net::HTTP::Get.new uri.request_uri
+        request.basic_auth "#{@configuration["company"]["bitbucket_username"]}", "#{@configuration["company"]["bitbucket_password"]}"
+        response = http.request request
+        if response.code.to_f.between?(399,499)
+          catapult_exception("#{response.code} The Bitbucket API could not authenticate, please verify [\"company\"][\"bitbucket_username\"] and [\"company\"][\"bitbucket_password\"].")
+        elsif response.code.to_f.between?(500,600)
+          puts " * Bitbucket API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
+        else
+          puts " * Bitbucket API authenticated successfully."
+          @api_bitbucket = JSON.parse(response.body)
+          # verify bitbucket user's catapult ssh key
+          uri = URI("https://api.bitbucket.org/1.0/users/#{@configuration["company"]["bitbucket_username"]}/ssh-keys")
+          Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
+            request = Net::HTTP::Get.new uri.request_uri
+            request.basic_auth "#{@configuration["company"]["bitbucket_username"]}", "#{@configuration["company"]["bitbucket_password"]}"
+            response = http.request request # Net::HTTPResponse object
+            @api_bitbucket_ssh_keys = JSON.parse(response.body)
+            @api_bitbucket_ssh_keys_title = false
+            @api_bitbucket_ssh_keys_key = false
+            unless response.code.to_f.between?(399,600)
+              @api_bitbucket_ssh_keys.each do |key|
+                if key["label"] == "Catapult"
+                  @api_bitbucket_ssh_keys_title = true
+                  if "#{key["key"].match(/(\w*-\w*\s\S*)/)}" == "#{File.read("secrets/id_rsa.pub").match(/(\w*-\w*\s\S*)/)}"
+                    @api_bitbucket_ssh_keys_key = true
+                  end
+                end
+              end
+            end
+            unless @api_bitbucket_ssh_keys_title
+              catapult_exception("Could not find the SSH Key named \"Catapult\" for your Bitbucket user #{@configuration["company"]["bitbucket_username"]}, please follow Provision Websites at https://github.com/devopsgroup-io/catapult#provision-websites")
+            else
+              puts "   - Found the ssh public key \"Catapult\" for your Bitbucket user #{@configuration["company"]["bitbucket_username"]}"
+            end
+            unless @api_bitbucket_ssh_keys_key
+              catapult_exception("The SSH Key named \"Catapult\" in Bitbucket does not match your Catapult instance's SSH Key at \"secrets/id_rsa.pub\", please follow Provision Websites at https://github.com/devopsgroup-io/catapult#provision-websites")
+            else
+              puts "   - The ssh public key \"Catapult\" matches your secrets/id_rsa.pub ssh public key"
+            end
+          end
+        end
+      end
+    end
+    # https://developer.github.com/v3/
+    if @configuration["company"]["github_username"] == nil || @configuration["company"]["github_password"] == nil
+      catapult_exception("Please set [\"company\"][\"github_username\"] and [\"company\"][\"github_password\"] in secrets/configuration.yml")
+    else
+      uri = URI("https://api.github.com/user")
+      Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
+        request = Net::HTTP::Get.new uri.request_uri
+        request.basic_auth "#{@configuration["company"]["github_username"]}", "#{@configuration["company"]["github_password"]}"
+        response = http.request request
+        if response.code.to_f.between?(399,499)
+          catapult_exception("#{response.code} The GitHub API could not authenticate, please verify [\"company\"][\"github_username\"] and [\"company\"][\"github_password\"].")
+        elsif response.code.to_f.between?(500,600)
+          puts " * GitHub API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
+        else
+          puts " * GitHub API authenticated successfully."
+          @api_github = JSON.parse(response.body)
+          # verify github user's catapult ssh key
+          uri = URI("https://api.github.com/user/keys")
+          Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
+            request = Net::HTTP::Get.new uri.request_uri
+            request.basic_auth "#{@configuration["company"]["github_username"]}", "#{@configuration["company"]["github_password"]}"
+            response = http.request request # Net::HTTPResponse object
+            @api_github_ssh_keys = JSON.parse(response.body)
+            @api_github_ssh_keys_title = false
+            @api_github_ssh_keys_key = false
+            unless response.code.to_f.between?(399,600)
+              @api_github_ssh_keys.each do |key|
+                if key["title"] == "Catapult"
+                  @api_github_ssh_keys_title = true
+                  if "#{key["key"].match(/(\w*-\w*\s\S*)/)}" == "#{File.read("secrets/id_rsa.pub").match(/(\w*-\w*\s\S*)/)}"
+                    @api_github_ssh_keys_key = true
+                  end
+                end
+              end
+            end
+            unless @api_github_ssh_keys_title
+              catapult_exception("Could not find the SSH Key named \"Catapult\" for your GitHub user #{@configuration["company"]["github_username"]}, please follow Provision Websites at https://github.com/devopsgroup-io/catapult#provision-websites")
+            else
+              puts "   - Found the ssh public key \"Catapult\" for your GitHub user #{@configuration["company"]["github_username"]}"
+            end
+            unless @api_github_ssh_keys_key
+              catapult_exception("The SSH Key named \"Catapult\" in GitHub does not match your Catapult instance's SSH Key at \"secrets/id_rsa.pub\", please follow Provision Websites at https://github.com/devopsgroup-io/catapult#provision-websites")
+            else
+              puts "   - The ssh public key \"Catapult\" matches your secrets/id_rsa.pub ssh public key"
+            end
+          end
+        end
+      end
+    end
+    # https://docs.atlassian.com/bamboo/REST/
+    if @configuration["company"]["bamboo_base_url"] == nil || @configuration["company"]["bamboo_username"] == nil || @configuration["company"]["bamboo_password"] == nil
+      catapult_exception("Please set [\"company\"][\"bamboo_base_url\"] and [\"company\"][\"bamboo_username\"] and [\"company\"][\"bamboo_password\"] in secrets/configuration.yml")
+    else
+      uri = URI("#{@configuration["company"]["bamboo_base_url"]}rest/api/latest/project.json?os_authType=basic")
+      Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
+        request = Net::HTTP::Get.new uri.request_uri
+        request.basic_auth "#{@configuration["company"]["bamboo_username"]}", "#{@configuration["company"]["bamboo_password"]}"
+        response = http.request request
+        if response.code.to_f.between?(399,499)
+          catapult_exception("#{response.code} The Bamboo API could not authenticate, please verify [\"company\"][\"bamboo_base_url\"] and [\"company\"][\"bamboo_username\"] and [\"company\"][\"bamboo_password\"].")
+        elsif response.code.to_f.between?(500,600)
+          puts " * Bamboo API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
+        else
+          puts " * Bamboo API authenticated successfully."
+          @api_bamboo = JSON.parse(response.body)
+          api_bamboo_project_key = @api_bamboo["projects"]["project"].find { |element| element["key"] == "CAT" }
+          unless api_bamboo_project_key
+            catapult_exception("Could not find the project key \"CAT\" in Bamboo, please follow the Services Setup for Bamboo at https://github.com/devopsgroup-io/catapult#services-setup")
+          end
+          api_bamboo_project_name = @api_bamboo["projects"]["project"].find { |element| element["name"] == "Catapult" }
+          unless api_bamboo_project_name
+            catapult_exception("Could not find the project name \"Catapult\" in Bamboo, please follow the Services Setup for Bamboo at https://github.com/devopsgroup-io/catapult#services-setup")
+          else
+            puts "   - Found the project key \"CAT\""
+          end
+        end
+        uri = URI("#{@configuration["company"]["bamboo_base_url"]}rest/api/latest/result/CAT-TEST.json?os_authType=basic")
+        Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
+          request = Net::HTTP::Get.new uri.request_uri
+          request.basic_auth "#{@configuration["company"]["bamboo_username"]}", "#{@configuration["company"]["bamboo_password"]}"
+          response = http.request request
+          if response.code.to_f.between?(399,499)
+            catapult_exception("Could not find the plan key \"TEST\" in Bamboo, please follow the Services Setup for Bamboo at https://github.com/devopsgroup-io/catapult#services-setup")
+          elsif response.code.to_f.between?(500,600)
+            puts "   - The Bamboo API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
+          else
+            puts "   - Found the plan key \"TEST\""
+          end
+        end
+        uri = URI("#{@configuration["company"]["bamboo_base_url"]}rest/api/latest/result/CAT-QC.json?os_authType=basic")
+        Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
+          request = Net::HTTP::Get.new uri.request_uri
+          request.basic_auth "#{@configuration["company"]["bamboo_username"]}", "#{@configuration["company"]["bamboo_password"]}"
+          response = http.request request
+          if response.code.to_f.between?(399,499)
+            catapult_exception("Could not find the plan key \"QC\" in Bamboo, please follow the Services Setup for Bamboo at https://github.com/devopsgroup-io/catapult#services-setup")
+          elsif response.code.to_f.between?(500,600)
+            puts "   - The Bamboo API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
+          else
+            puts "   - Found the plan key \"QC\""
+          end
+        end
+        uri = URI("#{@configuration["company"]["bamboo_base_url"]}rest/api/latest/result/CAT-PROD.json?os_authType=basic")
+        Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
+          request = Net::HTTP::Get.new uri.request_uri
+          request.basic_auth "#{@configuration["company"]["bamboo_username"]}", "#{@configuration["company"]["bamboo_password"]}"
+          response = http.request request
+          if response.code.to_f.between?(399,499)
+            catapult_exception("Could not find the plan key \"PROD\" in Bamboo, please follow the Services Setup for Bamboo at https://github.com/devopsgroup-io/catapult#services-setup")
+          elsif response.code.to_f.between?(500,600)
+            puts "   - The Bamboo API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
+          else
+            puts "   - Found the plan key \"PROD\""
+          end
+        end
+      end
     end
     # https://api.cloudflare.com/
     if @configuration["company"]["cloudflare_api_key"] == nil || @configuration["company"]["cloudflare_email"] == nil
@@ -773,7 +797,7 @@ module Catapult
         if response.code.to_f.between?(399,499)
           catapult_exception("#{response.code} The CloudFlare API could not authenticate, please verify [\"company\"][\"cloudflare_api_key\"] and [\"company\"][\"cloudflare_email\"].")
         elsif response.code.to_f.between?(500,600)
-          puts "   - The CloudFlare API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
+          puts " * CloudFlare API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
         else
           puts " * CloudFlare API authenticated successfully."
           @api_cloudflare = JSON.parse(response.body)
@@ -792,7 +816,7 @@ module Catapult
         if response.code.to_f.between?(399,499)
           catapult_exception("#{response.code} The New Relic API could not authenticate, please verify [\"company\"][\"newrelic_api_key\"] and [\"company\"][\"newrelic_license_key\"].")
         elsif response.code.to_f.between?(500,600)
-          puts "   - The New Relic API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
+          puts " * New Relic API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
         else
           puts " * New Relic API authenticated successfully."
           @api_cloudflare = JSON.parse(response.body)
@@ -812,7 +836,7 @@ module Catapult
           puts " * New Relic Admin API could not authenticate (Synthetics tests will not be created).".color(Colors::YELLOW)
           #catapult_exception("#{response.code} The New Relic Admin API could not authenticate, please verify [\"company\"][\"newrelic_admin_api_key\"].")
         elsif response.code.to_f.between?(500,600)
-          puts "   - The New Relic Admin API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
+          puts " * New Relic Admin API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
         else
           puts " * New Relic Admin API authenticated successfully."
           @api_cloudflare = JSON.parse(response.body)
