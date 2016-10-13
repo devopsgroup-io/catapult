@@ -96,6 +96,13 @@ echo "`n=> Creating application pools"
 foreach ($instance in $configuration.websites.iis) {
     new-item ("IIS:\AppPools\$($args[0]).{0}" -f $instance.domain)
     set-itemproperty ("IIS:\AppPools\$($args[0]).{0}" -f $instance.domain) managedRuntimeVersion v4.0
+
+    # grant application pool user permissions to website directory
+    $acl = Get-Acl -Path ("c:\inetpub\repositories\iis\{0}\{1}" -f $instance.domain,$instance.webroot)
+    $perm = ("IIS AppPool\$($args[0]).{0}" -f $instance.domain), 'Read,Modify', 'ContainerInherit, ObjectInherit', 'None', 'Allow' 
+    $rule = New-Object -TypeName System.Security.AccessControl.FileSystemAccessRule -ArgumentList $perm
+    $acl.SetAccessRule($rule) 
+    $acl | Set-Acl -Path ("c:\inetpub\repositories\iis\{0}\{1}" -f $instance.domain,$instance.webroot)
 }
 
 echo "`n=> Creating websites"
@@ -115,11 +122,6 @@ foreach ($instance in $configuration.websites.iis) {
 
     # 443:www
     new-webbinding -name ("$($args[0]).{0}" -f $instance.domain) -hostheader ("www.$($args[0]).{0}" -f $instance.domain) -port 443 -protocol https -sslflags 1
-
-    # set website user account
-    # https://www.iis.net/learn/manage/configuring-security/application-pool-identities
-    #set-itemproperty -pspath ("MACHINE/WEBROOT/APPHOST/$($args[0]).{0}" -f $instance.domain) -name username -value "$env:username"
-    #set-itemproperty -pspath ("MACHINE/WEBROOT/APPHOST/$($args[0]).{0}" -f $instance.domain) -name password -value "$env:username"
 }
 
 echo "`n=> Creating SSL Bindings"
