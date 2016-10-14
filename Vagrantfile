@@ -224,6 +224,7 @@ Vagrant.configure("2") do |config|
         "Name" => "#{Catapult::Command.configuration["company"]["name"].downcase}-test-windows"
       }
       provider.user_data = File.read("provisioners/windows/kickstart.txt").gsub(/{{password}}/, Catapult::Command.configuration["environments"]["test"]["servers"]["windows"]["admin_password"])
+      provider.elastic_ip = true
     end
     # windows specific configuration
     config.vm.guest = :windows
@@ -251,6 +252,7 @@ Vagrant.configure("2") do |config|
         "Name" => "#{Catapult::Command.configuration["company"]["name"].downcase}-test-windows-mssql"
       }
       provider.user_data = File.read("provisioners/windows/kickstart.txt").gsub(/{{password}}/, Catapult::Command.configuration["environments"]["test"]["servers"]["windows_mssql"]["admin_password"])
+      provider.elastic_ip = true
     end
     # windows specific configuration
     config.vm.guest = :windows

@@ -979,10 +979,16 @@ module Catapult
             else
               instance = nil
               @api_aws.search("reservationSet item instancesSet").each do |key|
+                # names, or tags, are not required, so check for nil first
                 if key.at("item tagSet item value").text == nil
                   instance = nil
                 elsif key.at("item tagSet item value").text == "#{@configuration["company"]["name"].downcase}-#{environment}-#{server.gsub("_","-")}"
-                  instance = key
+                  # any other status than running can not be trusted
+                  if key.at("item instanceState name").text == "running"
+                    instance = key
+                  else
+                    instance = nil
+                  end
                 end
               end
             end
@@ -990,7 +996,7 @@ module Catapult
             if instance != nil
               row.push(instance.at("item instanceState name").text.ljust(12))
             else
-              row.push("not created".ljust(12))
+              row.push("not running".ljust(12))
             end
             # id
             if instance != nil
@@ -1059,12 +1065,16 @@ module Catapult
               droplet = nil
             else
               droplet = @api_digitalocean["droplets"].find { |element| element['name'] == "#{@configuration["company"]["name"].downcase}-#{environment}-#{server.gsub("_","-")}" }
+              if "#{droplet["status"]}" != "active"
+                # any other status than active can not be trusted
+                droplet = nil
+              end
             end
             # state
             if droplet != nil
               row.push("#{droplet["status"]}".ljust(12))
             else
-              row.push("not created".ljust(12))
+              row.push("not running".ljust(12))
             end
             # id
             if droplet != nil
