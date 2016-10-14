@@ -841,6 +841,12 @@ module Catapult
 
     # validate @configuration["environments"]
     puts "\nVerification of configuration[\"environments\"]:".color(Colors::WHITE)
+    # get virualbox machines
+    if File.exist?(File.expand_path("~/.vagrant.d/data/machine-index/index"))
+      @api_virtualbox = JSON.parse(File.read(File.expand_path("~/.vagrant.d/data/machine-index/index")))
+    else
+      @api_virtualbox = nil
+    end
     # get digitalocean droplets
     uri = URI("https://api.digitalocean.com/v2/droplets")
     Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
@@ -850,7 +856,8 @@ module Catapult
       if response.code.to_f.between?(399,499)
         catapult_exception("#{response.code} The DigitalOcean API could not authenticate, please verify [\"company\"][\"digitalocean_personal_access_token\"].")
       elsif response.code.to_f.between?(500,600)
-        puts "   - The DigitalOcean API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
+        @api_digitalocean = nil
+        puts " * The DigitalOcean API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
       else
         @api_digitalocean = JSON.parse(response.body)
       end
@@ -864,7 +871,7 @@ module Catapult
       if response.code.to_f.between?(399,499)
         catapult_exception("#{response.code} The DigitalOcean API could not authenticate, please verify [\"company\"][\"digitalocean_personal_access_token\"].")
       elsif response.code.to_f.between?(500,600)
-        puts "   - The DigitalOcean API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
+        puts " * The DigitalOcean API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
       else
         api_digitalocean_sizes = JSON.parse(response.body)
         @api_digitalocean_slugs = Array.new
@@ -947,6 +954,7 @@ module Catapult
       if response.code.to_f.between?(399,499)
         catapult_exception("#{response.code} The AWS API could not authenticate, please verify [\"company\"][\"aws_access_key\"] and [\"company\"][\"aws_secret_key\"].")
       elsif response.code.to_f.between?(500,600)
+        @api_aws = nil
         puts " * AWS API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
       else
         @api_aws = Nokogiri::XML.parse(response.body)
@@ -955,219 +963,259 @@ module Catapult
     # loop through each environment
     @configuration["environments"].each do |environment,data|
 
-      # validate upstream servers
-      unless "#{environment}" == "dev"
-
-        puts "\n[#{environment}]"
-        puts "[machine]".ljust(45) + "[provider]".ljust(14) + "[state]".ljust(13) + "[id]".ljust(12) + "[type]".ljust(10) + "[ipv4_public]".ljust(17) + "[ipv4_private]".ljust(17)
-        puts "\n"
+      puts "\n[#{environment}]"
+      puts "[machine]".ljust(45) + "[provider]".ljust(14) + "[state]".ljust(13) + "[id]".ljust(12) + "[type]".ljust(13) + "[ipv4_public]".ljust(17) + "[ipv4_private]".ljust(17)
+      puts "\n"
+      
+      @configuration["environments"]["#{environment}"]["servers"].each do |server,data|
         
-        @configuration["environments"]["#{environment}"]["servers"].each do |server,data|
-          
-          # start new row
-          row = Array.new
-          # machine
-          row.push(" * #{@configuration["company"]["name"].downcase}-#{environment}-#{server.gsub("_","-")}".slice!(0, 44).ljust(44))
-          # aws
-          if "#{server}".start_with?("windows")
-            # provider
-            row.push("aws".ljust(13))
-            # find the instance
-            if @api_aws == nil
-              # this means there are no instances
-              instance = nil
-            else
-              instance = nil
-              @api_aws.search("reservationSet item instancesSet").each do |key|
-                # names, or tags, are not required, so check for nil first
-                if key.at("item tagSet item value") == nil
+        # start new row
+        row = Array.new
+        # machine
+        row.push(" * #{@configuration["company"]["name"].downcase}-#{environment}-#{server.gsub("_","-")}".slice!(0, 44).ljust(44))
+
+        # virtualbox
+        if "#{environment}" == "dev"
+          # provider
+          row.push("virtualbox".ljust(13))
+          # find the machine (@todo this is using Vagrant's global-status cache file and is not reliable)
+          if @api_virtualbox == nil
+            # this means there are no machines
+            machine = nil
+          else
+            machine = nil
+            @api_virtualbox["machines"].each do |key|
+              if "#{key[1]["name"]}" == "#{@configuration["company"]["name"].downcase}-#{environment}-#{server.gsub("_","-")}"
+                if "#{key[1]["state"]}" == "running"
+                  machine = key
+                else
+                  machine = nil
+                end
+              end
+            end
+          end
+          # state
+          if machine != nil
+            row.push("#{machine[1]["state"]}".ljust(12))
+          else
+            row.push("not running".ljust(12))
+          end
+          # id
+          if machine != nil
+            # vagrant ids are fairly long, so these will be trimmed, but @todo useful?
+            row.push("#{machine[0]}".slice!(0, 11).ljust(11))
+          else
+            row.push("".ljust(11))
+          end
+          #type
+          row.push("1core/512mb".ljust(12))
+          # ipv4_public
+          row.push("".ljust(16))
+          # ipv4_private
+          if !defined?(@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["ip"]) || (@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["ip"].nil?)
+            catapult_exception("Please set [\"environments\"][\"#{environment}\"][\"servers\"][\"#{server}\"][\"ip\"] in secrets/configuration.yml")
+          else
+            row.push(@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["ip"].ljust(16))
+          end
+        end
+        # aws
+        if "#{environment}" != "dev" && "#{server}".start_with?("windows")
+          # provider
+          row.push("aws".ljust(13))
+          # find the instance
+          if @api_aws == nil
+            # this means there are no instances
+            instance = nil
+          else
+            instance = nil
+            @api_aws.search("reservationSet item instancesSet").each do |key|
+              # names, or tags, are not required, so check for nil first
+              if key.at("item tagSet item value") == nil
+                instance = nil
+              elsif key.at("item tagSet item value").text == "#{@configuration["company"]["name"].downcase}-#{environment}-#{server.gsub("_","-")}"
+                # any other status than running can not be trusted
+                if key.at("item instanceState name").text == "running"
+                  instance = key
+                else
                   instance = nil
-                elsif key.at("item tagSet item value").text == "#{@configuration["company"]["name"].downcase}-#{environment}-#{server.gsub("_","-")}"
-                  # any other status than running can not be trusted
-                  if key.at("item instanceState name").text == "running"
-                    instance = key
-                  else
-                    instance = nil
-                  end
                 end
-              end
-            end
-            # state
-            if instance != nil
-              row.push(instance.at("item instanceState name").text.ljust(12))
-            else
-              row.push("not running".ljust(12))
-            end
-            # id
-            if instance != nil
-              row.push(instance.at("item instanceId").text.ljust(11))
-              # vagrant-aws is broken, so let's write out the id of the EC2 instance ourselves
-              path = ".vagrant/machines/#{@configuration["company"]["name"].downcase}-#{environment}-#{server.gsub("_","-")}/aws"
-              FileUtils.mkpath("#{path}") unless File.exists?("#{path}")
-              File.write("#{path}/id", instance.at("item instanceId").text)
-            end
-            # type
-            if instance != nil
-              row.push(instance.at("item instanceType").text.ljust(9))
-              # write type to secrets/configuration.yml
-              if !defined?(@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["type"]) || (@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["type"].nil?) || (@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["type"] != instance.at("item instanceType").text)
-                if !defined?(@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["type"])
-                  @configuration["environments"]["#{environment}"]["servers"]["#{server}"].merge! ({"type" => ""})
-                else
-                  @configuration["environments"]["#{environment}"]["servers"]["#{server}"].merge ({"type" => ""})
-                end
-                @configuration["environments"]["#{environment}"]["servers"]["#{server}"]["type"] = instance.at("item instanceType").text
-                `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml --decrypt secrets/configuration.yml.gpg`
-                File.open('secrets/configuration.yml', 'w') {|f| f.write configuration.to_yaml }
-                `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml.gpg --armor --cipher-algo AES256 --symmetric secrets/configuration.yml`
-              end
-            end
-            # ipv4_public
-            if instance != nil
-              row.push(instance.at("item ipAddress").text.ljust(16))
-              # write public ip address to secrets/configuration.yml
-              if !defined?(@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["ip"]) || (@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["ip"].nil?) || (@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["ip"] != instance.at("item ipAddress").text)
-                if !defined?(@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["ip"])
-                  @configuration["environments"]["#{environment}"]["servers"]["#{server}"].merge! ({"ip" => ""})
-                else
-                  @configuration["environments"]["#{environment}"]["servers"]["#{server}"].merge ({"ip" => ""})
-                end
-                @configuration["environments"]["#{environment}"]["servers"]["#{server}"]["ip"] = instance.at("item ipAddress").text
-                `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml --decrypt secrets/configuration.yml.gpg`
-                File.open('secrets/configuration.yml', 'w') {|f| f.write configuration.to_yaml }
-                `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml.gpg --armor --cipher-algo AES256 --symmetric secrets/configuration.yml`
-              end
-            end
-            # ipv4_private
-            if instance != nil
-              row.push(instance.at("item privateIpAddress").text.ljust(16))
-              # write private ip address to secrets/configuration.yml
-              if !defined?(@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["ip_private"]) || (@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["ip_private"].nil?) || (@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["ip_private"] != instance.at("item privateIpAddress").text)
-                if !defined?(@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["ip_private"])
-                  @configuration["environments"]["#{environment}"]["servers"]["#{server}"].merge! ({"ip" => ""})
-                else
-                  @configuration["environments"]["#{environment}"]["servers"]["#{server}"].merge ({"ip_private" => ""})
-                end
-                @configuration["environments"]["#{environment}"]["servers"]["#{server}"]["ip_private"] = instance.at("item privateIpAddress").text
-                `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml --decrypt secrets/configuration.yml.gpg`
-                File.open('secrets/configuration.yml', 'w') {|f| f.write configuration.to_yaml }
-                `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml.gpg --armor --cipher-algo AES256 --symmetric secrets/configuration.yml`
               end
             end
           end
-          # digitalocean
-          if "#{server}".start_with?("redhat")
-            # provider
-            row.push("digitalocean".ljust(13))
-            # find the droplet
-            if @api_digitalocean == nil
-              # this means there are no droplets
+          # state
+          if instance != nil
+            row.push(instance.at("item instanceState name").text.ljust(12))
+          else
+            row.push("not running".ljust(12))
+          end
+          # id
+          if instance != nil
+            row.push(instance.at("item instanceId").text.ljust(11))
+            # vagrant-aws is broken, so let's write out the id of the EC2 instance ourselves
+            path = ".vagrant/machines/#{@configuration["company"]["name"].downcase}-#{environment}-#{server.gsub("_","-")}/aws"
+            FileUtils.mkpath("#{path}") unless File.exists?("#{path}")
+            File.write("#{path}/id", instance.at("item instanceId").text)
+          end
+          # type
+          if instance != nil
+            row.push(instance.at("item instanceType").text.ljust(12))
+            # write type to secrets/configuration.yml
+            if !defined?(@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["type"]) || (@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["type"].nil?) || (@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["type"] != instance.at("item instanceType").text)
+              if !defined?(@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["type"])
+                @configuration["environments"]["#{environment}"]["servers"]["#{server}"].merge! ({"type" => ""})
+              else
+                @configuration["environments"]["#{environment}"]["servers"]["#{server}"].merge ({"type" => ""})
+              end
+              @configuration["environments"]["#{environment}"]["servers"]["#{server}"]["type"] = instance.at("item instanceType").text
+              `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml --decrypt secrets/configuration.yml.gpg`
+              File.open('secrets/configuration.yml', 'w') {|f| f.write configuration.to_yaml }
+              `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml.gpg --armor --cipher-algo AES256 --symmetric secrets/configuration.yml`
+            end
+          end
+          # ipv4_public
+          if instance != nil
+            row.push(instance.at("item ipAddress").text.ljust(16))
+            # write public ip address to secrets/configuration.yml
+            if !defined?(@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["ip"]) || (@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["ip"].nil?) || (@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["ip"] != instance.at("item ipAddress").text)
+              if !defined?(@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["ip"])
+                @configuration["environments"]["#{environment}"]["servers"]["#{server}"].merge! ({"ip" => ""})
+              else
+                @configuration["environments"]["#{environment}"]["servers"]["#{server}"].merge ({"ip" => ""})
+              end
+              @configuration["environments"]["#{environment}"]["servers"]["#{server}"]["ip"] = instance.at("item ipAddress").text
+              `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml --decrypt secrets/configuration.yml.gpg`
+              File.open('secrets/configuration.yml', 'w') {|f| f.write configuration.to_yaml }
+              `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml.gpg --armor --cipher-algo AES256 --symmetric secrets/configuration.yml`
+            end
+          end
+          # ipv4_private
+          if instance != nil
+            row.push(instance.at("item privateIpAddress").text.ljust(16))
+            # write private ip address to secrets/configuration.yml
+            if !defined?(@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["ip_private"]) || (@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["ip_private"].nil?) || (@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["ip_private"] != instance.at("item privateIpAddress").text)
+              if !defined?(@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["ip_private"])
+                @configuration["environments"]["#{environment}"]["servers"]["#{server}"].merge! ({"ip" => ""})
+              else
+                @configuration["environments"]["#{environment}"]["servers"]["#{server}"].merge ({"ip_private" => ""})
+              end
+              @configuration["environments"]["#{environment}"]["servers"]["#{server}"]["ip_private"] = instance.at("item privateIpAddress").text
+              `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml --decrypt secrets/configuration.yml.gpg`
+              File.open('secrets/configuration.yml', 'w') {|f| f.write configuration.to_yaml }
+              `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml.gpg --armor --cipher-algo AES256 --symmetric secrets/configuration.yml`
+            end
+          end
+        end
+        # digitalocean
+        if "#{environment}" != "dev" && "#{server}".start_with?("redhat")
+          # provider
+          row.push("digitalocean".ljust(13))
+          # find the droplet
+          if @api_digitalocean == nil
+            # this means there are no droplets
+            droplet = nil
+          else
+            droplet = @api_digitalocean["droplets"].find { |element| element['name'] == "#{@configuration["company"]["name"].downcase}-#{environment}-#{server.gsub("_","-")}" }
+            if "#{droplet["status"]}" != "active"
+              # any other status than active can not be trusted
               droplet = nil
-            else
-              droplet = @api_digitalocean["droplets"].find { |element| element['name'] == "#{@configuration["company"]["name"].downcase}-#{environment}-#{server.gsub("_","-")}" }
-              if "#{droplet["status"]}" != "active"
-                # any other status than active can not be trusted
-                droplet = nil
-              end
             end
-            # state
-            if droplet != nil
-              row.push("#{droplet["status"]}".ljust(12))
-            else
-              row.push("not running".ljust(12))
-            end
-            # id
-            if droplet != nil
-              row.push("#{droplet["id"]}".ljust(11))
-            end
-            # type
-            if droplet != nil
-              row.push("#{droplet["size"]["slug"]}".ljust(9))
-              # write slug to secrets/configuration.yml
-              if !defined?(@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["slug"]) || (@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["slug"].nil?) || (@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["slug"] != droplet["size"]["slug"])
-                if !defined?(@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["slug"])
-                  @configuration["environments"]["#{environment}"]["servers"]["#{server}"].merge! ({"slug" => ""})
-                else
-                  @configuration["environments"]["#{environment}"]["servers"]["#{server}"].merge ({"slug" => ""})
-                end
-                @configuration["environments"]["#{environment}"]["servers"]["#{server}"]["slug"] = droplet["size"]["slug"]
-                `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml --decrypt secrets/configuration.yml.gpg`
-                File.open('secrets/configuration.yml', 'w') {|f| f.write configuration.to_yaml }
-                `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml.gpg --armor --cipher-algo AES256 --symmetric secrets/configuration.yml`
-              end
-            end
-            if @configuration["environments"]["#{environment}"]["servers"]["#{server}"]["slug"] == nil
-              catapult_exception("There is an error in your secrets/configuration.yml file.\nThe slug (DigitalOcean droplet size) for #{environment} => servers => redhat is empty and the droplet has not been created. Please choose from the following (see DigitalOcean.com for pricing):\n#{@api_digitalocean_slugs}")
-            end
-            if not @api_digitalocean_slugs.include?("#{@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["slug"]}")
-              catapult_exception("There is an error in your secrets/configuration.yml file.\nThe slug (DigitalOcean droplet size) for #{environment} => servers => redhat is invalid and the droplet has not been created. Please choose from the following (see DigitalOcean.com for pricing):\n#{@api_digitalocean_slugs}")
-            end
-            # ipv4_public
-            if droplet != nil
-              droplet_ip = droplet["networks"]["v4"].find { |element| element["type"] == "public" }
-              row.push("#{droplet_ip["ip_address"]}".ljust(16))
-              # write public ip address to secrets/configuration.yml
-              if !defined?(@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["ip"]) || (@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["ip"].nil?) || (@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["ip"] != droplet_ip["ip_address"])
-                if !defined?(@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["ip"])
-                  @configuration["environments"]["#{environment}"]["servers"]["#{server}"].merge! ({"ip" => ""})
-                else
-                  @configuration["environments"]["#{environment}"]["servers"]["#{server}"].merge ({"ip" => ""})
-                end
-                @configuration["environments"]["#{environment}"]["servers"]["#{server}"]["ip"] = droplet_ip["ip_address"]
-                `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml --decrypt secrets/configuration.yml.gpg`
-                File.open('secrets/configuration.yml', 'w') {|f| f.write configuration.to_yaml }
-                `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml.gpg --armor --cipher-algo AES256 --symmetric secrets/configuration.yml`
-              end
-            end
-            # ipv4_private
-            if droplet != nil
-              droplet_ip_private = droplet["networks"]["v4"].find { |element| element["type"] == "private" }
-              row.push("#{droplet_ip_private["ip_address"]}".ljust(16))
-              # write private ip address to secrets/configuration.yml
-              if !defined?(@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["ip_private"]) || (@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["ip_private"].nil?) || (@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["ip_private"] != droplet_ip_private["ip_address"])
-                if !defined?(@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["ip_private"])
-                  @configuration["environments"]["#{environment}"]["servers"]["#{server}"].merge! ({"ip" => ""})
-                else
-                  @configuration["environments"]["#{environment}"]["servers"]["#{server}"].merge ({"ip_private" => ""})
-                end
-                @configuration["environments"]["#{environment}"]["servers"]["#{server}"]["ip_private"] = droplet_ip_private["ip_address"]
-                `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml --decrypt secrets/configuration.yml.gpg`
-                File.open('secrets/configuration.yml', 'w') {|f| f.write configuration.to_yaml }
-                `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml.gpg --armor --cipher-algo AES256 --symmetric secrets/configuration.yml`
-              end
-            end
-            # kernel
-            if droplet != nil
-              # make sure the droplet has the correct kernel, if not, update it
-              if defined?(droplet["kernel"]["id"]).! || (defined?(droplet["kernel"]["id"]) && "#{droplet["kernel"]["id"]}" != "7516")
-                puts "   - The Kernel version must be updated to DigitalOcean GrubLoader v0.2, performing now...".color(Colors::YELLOW)
-                uri = URI("https://api.digitalocean.com/v2/droplets/#{droplet["id"]}/actions")
-                Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
-                  request = Net::HTTP::Post.new uri.request_uri
-                  request.add_field "Authorization", "Bearer #{@configuration["company"]["digitalocean_personal_access_token"]}"
-                  request.add_field "Content-Type", "application/json"
-                  request.body = ""\
-                    "{"\
-                      "\"type\":\"change_kernel\","\
-                      "\"kernel\":7516"\
-                    "}"
-                  response = http.request request
-                  if response.code.to_f.between?(399,499)
-                    catapult_exception("#{response.code} The DigitalOcean API could not authenticate, please verify [\"company\"][\"digitalocean_personal_access_token\"].")
-                  elsif response.code.to_f.between?(500,600)
-                    puts "   - The DigitalOcean API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
-                  else
-                    puts "   - Successfully updated the kernel, moving on..."
-                  end
-                end
-              end
-            end
-
           end
-
-          puts row.join(" ")
+          # state
+          if droplet != nil
+            row.push("#{droplet["status"]}".ljust(12))
+          else
+            row.push("not running".ljust(12))
+          end
+          # id
+          if droplet != nil
+            row.push("#{droplet["id"]}".ljust(11))
+          end
+          # type
+          if droplet != nil
+            row.push("#{droplet["size"]["slug"]}".ljust(12))
+            # write slug to secrets/configuration.yml
+            if !defined?(@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["slug"]) || (@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["slug"].nil?) || (@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["slug"] != droplet["size"]["slug"])
+              if !defined?(@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["slug"])
+                @configuration["environments"]["#{environment}"]["servers"]["#{server}"].merge! ({"slug" => ""})
+              else
+                @configuration["environments"]["#{environment}"]["servers"]["#{server}"].merge ({"slug" => ""})
+              end
+              @configuration["environments"]["#{environment}"]["servers"]["#{server}"]["slug"] = droplet["size"]["slug"]
+              `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml --decrypt secrets/configuration.yml.gpg`
+              File.open('secrets/configuration.yml', 'w') {|f| f.write configuration.to_yaml }
+              `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml.gpg --armor --cipher-algo AES256 --symmetric secrets/configuration.yml`
+            end
+          end
+          if @configuration["environments"]["#{environment}"]["servers"]["#{server}"]["slug"] == nil
+            catapult_exception("There is an error in your secrets/configuration.yml file.\nThe slug (DigitalOcean droplet size) for #{environment} => servers => redhat is empty and the droplet has not been created. Please choose from the following (see DigitalOcean.com for pricing):\n#{@api_digitalocean_slugs}")
+          end
+          if not @api_digitalocean_slugs.include?("#{@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["slug"]}")
+            catapult_exception("There is an error in your secrets/configuration.yml file.\nThe slug (DigitalOcean droplet size) for #{environment} => servers => redhat is invalid and the droplet has not been created. Please choose from the following (see DigitalOcean.com for pricing):\n#{@api_digitalocean_slugs}")
+          end
+          # ipv4_public
+          if droplet != nil
+            droplet_ip = droplet["networks"]["v4"].find { |element| element["type"] == "public" }
+            row.push("#{droplet_ip["ip_address"]}".ljust(16))
+            # write public ip address to secrets/configuration.yml
+            if !defined?(@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["ip"]) || (@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["ip"].nil?) || (@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["ip"] != droplet_ip["ip_address"])
+              if !defined?(@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["ip"])
+                @configuration["environments"]["#{environment}"]["servers"]["#{server}"].merge! ({"ip" => ""})
+              else
+                @configuration["environments"]["#{environment}"]["servers"]["#{server}"].merge ({"ip" => ""})
+              end
+              @configuration["environments"]["#{environment}"]["servers"]["#{server}"]["ip"] = droplet_ip["ip_address"]
+              `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml --decrypt secrets/configuration.yml.gpg`
+              File.open('secrets/configuration.yml', 'w') {|f| f.write configuration.to_yaml }
+              `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml.gpg --armor --cipher-algo AES256 --symmetric secrets/configuration.yml`
+            end
+          end
+          # ipv4_private
+          if droplet != nil
+            droplet_ip_private = droplet["networks"]["v4"].find { |element| element["type"] == "private" }
+            row.push("#{droplet_ip_private["ip_address"]}".ljust(16))
+            # write private ip address to secrets/configuration.yml
+            if !defined?(@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["ip_private"]) || (@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["ip_private"].nil?) || (@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["ip_private"] != droplet_ip_private["ip_address"])
+              if !defined?(@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["ip_private"])
+                @configuration["environments"]["#{environment}"]["servers"]["#{server}"].merge! ({"ip" => ""})
+              else
+                @configuration["environments"]["#{environment}"]["servers"]["#{server}"].merge ({"ip_private" => ""})
+              end
+              @configuration["environments"]["#{environment}"]["servers"]["#{server}"]["ip_private"] = droplet_ip_private["ip_address"]
+              `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml --decrypt secrets/configuration.yml.gpg`
+              File.open('secrets/configuration.yml', 'w') {|f| f.write configuration.to_yaml }
+              `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml.gpg --armor --cipher-algo AES256 --symmetric secrets/configuration.yml`
+            end
+          end
+          # kernel
+          if droplet != nil
+            # make sure the droplet has the correct kernel, if not, update it
+            if defined?(droplet["kernel"]["id"]).! || (defined?(droplet["kernel"]["id"]) && "#{droplet["kernel"]["id"]}" != "7516")
+              puts "   - The Kernel version must be updated to DigitalOcean GrubLoader v0.2, performing now...".color(Colors::YELLOW)
+              uri = URI("https://api.digitalocean.com/v2/droplets/#{droplet["id"]}/actions")
+              Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
+                request = Net::HTTP::Post.new uri.request_uri
+                request.add_field "Authorization", "Bearer #{@configuration["company"]["digitalocean_personal_access_token"]}"
+                request.add_field "Content-Type", "application/json"
+                request.body = ""\
+                  "{"\
+                    "\"type\":\"change_kernel\","\
+                    "\"kernel\":7516"\
+                  "}"
+                response = http.request request
+                if response.code.to_f.between?(399,499)
+                  catapult_exception("#{response.code} The DigitalOcean API could not authenticate, please verify [\"company\"][\"digitalocean_personal_access_token\"].")
+                elsif response.code.to_f.between?(500,600)
+                  puts "   - The DigitalOcean API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
+                else
+                  puts "   - Successfully updated the kernel, moving on..."
+                end
+              end
+            end
+          end
 
         end
+
+        puts row.join(" ")
       
       end
       # if environment passwords do not exist, create them
