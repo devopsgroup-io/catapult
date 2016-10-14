@@ -840,7 +840,7 @@ module Catapult
 
 
     # validate @configuration["environments"]
-    puts "\nVerification of configuration[\"environments\"]:\n".color(Colors::WHITE)
+    puts "\nVerification of configuration[\"environments\"]:".color(Colors::WHITE)
     # get digitalocean droplets
     uri = URI("https://api.digitalocean.com/v2/droplets")
     Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
@@ -958,9 +958,10 @@ module Catapult
       # validate upstream servers
       unless "#{environment}" == "dev"
 
-        puts "[#{environment}]"
-        puts "[machine]".ljust(45) + "[provider]".ljust(14) + "[state]".ljust(13) + "[id]".ljust(12) + "[size]".ljust(10) + "[ipv4_public]".ljust(17) + "[ipv4_private]".ljust(17)
-
+        puts "\n[#{environment}]"
+        puts "[machine]".ljust(45) + "[provider]".ljust(14) + "[state]".ljust(13) + "[id]".ljust(12) + "[type]".ljust(10) + "[ipv4_public]".ljust(17) + "[ipv4_private]".ljust(17)
+        puts "\n"
+        
         @configuration["environments"]["#{environment}"]["servers"].each do |server,data|
           
           # start new row
@@ -999,17 +1000,53 @@ module Catapult
               FileUtils.mkpath("#{path}") unless File.exists?("#{path}")
               File.write("#{path}/id", instance.at("item instanceId").text)
             end
-            # size
+            # type
             if instance != nil
               row.push(instance.at("item instanceType").text.ljust(9))
+              # write type to secrets/configuration.yml
+              if !defined?(@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["type"]) || (@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["type"].nil?) || (@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["type"] != instance.at("item instanceType").text)
+                if !defined?(@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["type"])
+                  @configuration["environments"]["#{environment}"]["servers"]["#{server}"].merge! ({"type" => ""})
+                else
+                  @configuration["environments"]["#{environment}"]["servers"]["#{server}"].merge ({"type" => ""})
+                end
+                @configuration["environments"]["#{environment}"]["servers"]["#{server}"]["type"] = instance.at("item instanceType").text
+                `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml --decrypt secrets/configuration.yml.gpg`
+                File.open('secrets/configuration.yml', 'w') {|f| f.write configuration.to_yaml }
+                `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml.gpg --armor --cipher-algo AES256 --symmetric secrets/configuration.yml`
+              end
             end
             # ipv4_public
             if instance != nil
               row.push(instance.at("item ipAddress").text.ljust(16))
+              # write public ip address to secrets/configuration.yml
+              if !defined?(@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["ip"]) || (@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["ip"].nil?) || (@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["ip"] != instance.at("item ipAddress").text)
+                if !defined?(@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["ip"])
+                  @configuration["environments"]["#{environment}"]["servers"]["#{server}"].merge! ({"ip" => ""})
+                else
+                  @configuration["environments"]["#{environment}"]["servers"]["#{server}"].merge ({"ip" => ""})
+                end
+                @configuration["environments"]["#{environment}"]["servers"]["#{server}"]["ip"] = instance.at("item ipAddress").text
+                `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml --decrypt secrets/configuration.yml.gpg`
+                File.open('secrets/configuration.yml', 'w') {|f| f.write configuration.to_yaml }
+                `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml.gpg --armor --cipher-algo AES256 --symmetric secrets/configuration.yml`
+              end
             end
             # ipv4_private
             if instance != nil
               row.push(instance.at("item privateIpAddress").text.ljust(16))
+              # write private ip address to secrets/configuration.yml
+              if !defined?(@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["ip_private"]) || (@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["ip_private"].nil?) || (@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["ip_private"] != instance.at("item privateIpAddress").text)
+                if !defined?(@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["ip_private"])
+                  @configuration["environments"]["#{environment}"]["servers"]["#{server}"].merge! ({"ip" => ""})
+                else
+                  @configuration["environments"]["#{environment}"]["servers"]["#{server}"].merge ({"ip_private" => ""})
+                end
+                @configuration["environments"]["#{environment}"]["servers"]["#{server}"]["ip_private"] = instance.at("item privateIpAddress").text
+                `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml --decrypt secrets/configuration.yml.gpg`
+                File.open('secrets/configuration.yml', 'w') {|f| f.write configuration.to_yaml }
+                `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml.gpg --armor --cipher-algo AES256 --symmetric secrets/configuration.yml`
+              end
             end
           end
           # digitalocean
@@ -1033,11 +1070,16 @@ module Catapult
             if droplet != nil
               row.push("#{droplet["id"]}".ljust(11))
             end
-            # size
+            # type
             if droplet != nil
               row.push("#{droplet["size"]["slug"]}".ljust(9))
-              # get slug and write to secrets/configuration.yml
-              unless @configuration["environments"]["#{environment}"]["servers"]["#{server}"]["slug"] == droplet["size"]["slug"]
+              # write slug to secrets/configuration.yml
+              if !defined?(@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["slug"]) || (@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["slug"].nil?) || (@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["slug"] != droplet["size"]["slug"])
+                if !defined?(@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["slug"])
+                  @configuration["environments"]["#{environment}"]["servers"]["#{server}"].merge! ({"slug" => ""})
+                else
+                  @configuration["environments"]["#{environment}"]["servers"]["#{server}"].merge ({"slug" => ""})
+                end
                 @configuration["environments"]["#{environment}"]["servers"]["#{server}"]["slug"] = droplet["size"]["slug"]
                 `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml --decrypt secrets/configuration.yml.gpg`
                 File.open('secrets/configuration.yml', 'w') {|f| f.write configuration.to_yaml }
@@ -1054,9 +1096,14 @@ module Catapult
             if droplet != nil
               droplet_ip = droplet["networks"]["v4"].find { |element| element["type"] == "public" }
               row.push("#{droplet_ip["ip_address"]}".ljust(16))
-              # get public ip address and write to secrets/configuration.yml
-              unless @configuration["environments"]["#{environment}"]["servers"]["#{server}"]["ip"] == droplet_ip["ip_address"]
-                @configuration["environments"]["#{environment}"]["servers"]["#{server}"]["ip"] = "#{droplet_ip["ip_address"]}"
+              # write public ip address to secrets/configuration.yml
+              if !defined?(@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["ip"]) || (@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["ip"].nil?) || (@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["ip"] != droplet_ip["ip_address"])
+                if !defined?(@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["ip"])
+                  @configuration["environments"]["#{environment}"]["servers"]["#{server}"].merge! ({"ip" => ""})
+                else
+                  @configuration["environments"]["#{environment}"]["servers"]["#{server}"].merge ({"ip" => ""})
+                end
+                @configuration["environments"]["#{environment}"]["servers"]["#{server}"]["ip"] = droplet_ip["ip_address"]
                 `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml --decrypt secrets/configuration.yml.gpg`
                 File.open('secrets/configuration.yml', 'w') {|f| f.write configuration.to_yaml }
                 `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml.gpg --armor --cipher-algo AES256 --symmetric secrets/configuration.yml`
@@ -1066,9 +1113,14 @@ module Catapult
             if droplet != nil
               droplet_ip_private = droplet["networks"]["v4"].find { |element| element["type"] == "private" }
               row.push("#{droplet_ip_private["ip_address"]}".ljust(16))
-              # get private ip address and write to secrets/configuration.yml
-              unless @configuration["environments"]["#{environment}"]["servers"]["#{server}"]["ip_private"] == droplet_ip_private["ip_address"]
-                @configuration["environments"]["#{environment}"]["servers"]["#{server}"]["ip_private"] = "#{droplet_ip_private["ip_address"]}"
+              # write private ip address to secrets/configuration.yml
+              if !defined?(@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["ip_private"]) || (@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["ip_private"].nil?) || (@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["ip_private"] != droplet_ip_private["ip_address"])
+                if !defined?(@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["ip_private"])
+                  @configuration["environments"]["#{environment}"]["servers"]["#{server}"].merge! ({"ip" => ""})
+                else
+                  @configuration["environments"]["#{environment}"]["servers"]["#{server}"].merge ({"ip_private" => ""})
+                end
+                @configuration["environments"]["#{environment}"]["servers"]["#{server}"]["ip_private"] = droplet_ip_private["ip_address"]
                 `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml --decrypt secrets/configuration.yml.gpg`
                 File.open('secrets/configuration.yml', 'w') {|f| f.write configuration.to_yaml }
                 `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml.gpg --armor --cipher-algo AES256 --symmetric secrets/configuration.yml`

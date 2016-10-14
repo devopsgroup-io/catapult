@@ -58,7 +58,7 @@ Vagrant.configure("2") do |config|
       provider.token = Catapult::Command.configuration["company"]["digitalocean_personal_access_token"]
       provider.image = "centos-7-x64"
       provider.region = "nyc3"
-      provider.size = "#{Catapult::Command.configuration["environments"]["test"]["servers"]["redhat"]["slug"]}"
+      provider.size = "#{Catapult::Command.configuration["environments"]["test"]["servers"]["redhat"]["slug"]}" || "512mb"
       provider.ipv6 = true
       provider.private_networking = true
       provider.backups_enabled = true
@@ -76,7 +76,7 @@ Vagrant.configure("2") do |config|
       provider.token = Catapult::Command.configuration["company"]["digitalocean_personal_access_token"]
       provider.image = "centos-7-x64"
       provider.region = "nyc3"
-      provider.size = "#{Catapult::Command.configuration["environments"]["test"]["servers"]["redhat_mysql"]["slug"]}"
+      provider.size = "#{Catapult::Command.configuration["environments"]["test"]["servers"]["redhat_mysql"]["slug"]}" || "512mb"
       provider.ipv6 = true
       provider.private_networking = true
       provider.backups_enabled = true
@@ -96,7 +96,7 @@ Vagrant.configure("2") do |config|
       provider.token = Catapult::Command.configuration["company"]["digitalocean_personal_access_token"]
       provider.image = "centos-7-x64"
       provider.region = "nyc3"
-      provider.size = "#{Catapult::Command.configuration["environments"]["qc"]["servers"]["redhat"]["slug"]}"
+      provider.size = "#{Catapult::Command.configuration["environments"]["qc"]["servers"]["redhat"]["slug"]}" || "512mb"
       provider.ipv6 = true
       provider.private_networking = true
       provider.backups_enabled = true
@@ -114,7 +114,7 @@ Vagrant.configure("2") do |config|
       provider.token = Catapult::Command.configuration["company"]["digitalocean_personal_access_token"]
       provider.image = "centos-7-x64"
       provider.region = "nyc3"
-      provider.size = "#{Catapult::Command.configuration["environments"]["qc"]["servers"]["redhat_mysql"]["slug"]}"
+      provider.size = "#{Catapult::Command.configuration["environments"]["qc"]["servers"]["redhat_mysql"]["slug"]}" || "512mb"
       provider.ipv6 = true
       provider.private_networking = true
       provider.backups_enabled = true
@@ -134,7 +134,7 @@ Vagrant.configure("2") do |config|
       provider.token = Catapult::Command.configuration["company"]["digitalocean_personal_access_token"]
       provider.image = "centos-7-x64"
       provider.region = "nyc3"
-      provider.size = "#{Catapult::Command.configuration["environments"]["production"]["servers"]["redhat"]["slug"]}"
+      provider.size = "#{Catapult::Command.configuration["environments"]["production"]["servers"]["redhat"]["slug"]}" || "512mb"
       provider.ipv6 = true
       provider.private_networking = true
       provider.backups_enabled = true
@@ -152,7 +152,7 @@ Vagrant.configure("2") do |config|
       provider.token = Catapult::Command.configuration["company"]["digitalocean_personal_access_token"]
       provider.image = "centos-7-x64"
       provider.region = "nyc3"
-      provider.size = "#{Catapult::Command.configuration["environments"]["production"]["servers"]["redhat_mysql"]["slug"]}"
+      provider.size = "#{Catapult::Command.configuration["environments"]["production"]["servers"]["redhat_mysql"]["slug"]}" || "512mb"
       provider.ipv6 = true
       provider.private_networking = true
       provider.backups_enabled = true
@@ -219,7 +219,7 @@ Vagrant.configure("2") do |config|
       provider.secret_access_key = Catapult::Command.configuration["company"]["aws_secret_key"]
       provider.ami = "ami-ee7805f9"
       provider.region = "us-east-1"
-      provider.instance_type = "t2.micro"
+      provider.instance_type = "#{Catapult::Command.configuration["environments"]["test"]["servers"]["windows"]["type"]}" || "t2.micro"
       provider.tags = {
         "Name" => "#{Catapult::Command.configuration["company"]["name"].downcase}-test-windows"
       }
@@ -246,7 +246,7 @@ Vagrant.configure("2") do |config|
       provider.secret_access_key = Catapult::Command.configuration["company"]["aws_secret_key"]
       provider.ami = "ami-ee7805f9"
       provider.region = "us-east-1"
-      provider.instance_type = "t2.micro"
+      provider.instance_type = "#{Catapult::Command.configuration["environments"]["test"]["servers"]["windows_mssql"]["type"]}" || "t2.micro"
       provider.tags = {
         "Name" => "#{Catapult::Command.configuration["company"]["name"].downcase}-test-windows-mssql"
       }
