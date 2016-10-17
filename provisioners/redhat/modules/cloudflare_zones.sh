@@ -1,12 +1,18 @@
 source "/catapult/provisioners/redhat/modules/catapult.sh"
 
-domains=()
 
+# domain
 domain=$(catapult websites.apache.$5.domain)
-domains+=("${domain}")
 
+# domain_tld_override
 domain_tld_override=$(catapult websites.apache.$5.domain_tld_override)
-if [ ! -z "${domain_tld_override}" ]; then
+
+# create an array of domains
+domains=()
+if [ -z "${domain_tld_override}" ]; then
+    domains+=("${domain}")
+else
+    domains+=("${domain}")
     domains+=("${domain}.${domain_tld_override}")
 fi
 

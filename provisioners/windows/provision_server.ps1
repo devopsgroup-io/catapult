@@ -53,14 +53,36 @@ if ($configuration_provisioners.windows.servers.$($args[3]).modules) {
     start-process -filepath "c:\Program Files (x86)\GNU\GnuPG\gpg2.exe" -argumentlist "--verbose --batch --yes --passphrase $($args[2]) --output c:\catapult\secrets\id_rsa.pub --decrypt c:\catapult\secrets\id_rsa.pub.gpg" -Wait -RedirectStandardOutput $provision -RedirectStandardError $provisionError
     get-content $provision
     get-content $provisionError
+    $configuration = get-yaml -fromfile (resolve-path c:\catapult\secrets\configuration.yml)
 
     # loop through each required module
     foreach ($module in $configuration_provisioners.windows.servers.$($args[3]).modules) {
         $start = get-date
         echo "`n`n`n==> MODULE: $module"
         echo ("==> DESCRIPTION: {0}" -f $configuration_provisioners.windows.modules.$($module).description)
+        echo ("==> MULTITHREADING: {0}" -f $configuration_provisioners.windows.modules.$($module).multithreading)
 
-        powershell -file "c:\catapult\provisioners\windows\modules\$module.ps1" $args[0] $args[1] $args[2] $args[3]
+        # invoke multithreading module in parallel
+        # @todo this is not multithreading (remove the -Wait), will require mimicing the bash logic
+        if ($configuration_provisioners.windows.modules.$($module).multithreading -eq "true") {
+            # create a website index to pass to each sub-process
+            $website_index = 0
+            foreach ($instance in $configuration.websites.iis) {
+                echo ("=> domain: $($instance.domain)")
+                echo ("=> domain_tld_override: $($instance.domain_tld_override)")
+                echo ("=> software: $($instance.software)")
+                echo ("=> software_auto_update: $($instance.software_auto_update)")
+                echo ("=> software_dbprefix: $($instance.software_dbprefix)")
+                echo ("=> software_workflow: $($instance.software_workflow)")
+                start-process powershell -argumentlist "-file c:\catapult\provisioners\windows\modules\$module.ps1", $args[0], $args[1], $args[2], $args[3], $website_index -Wait -RedirectStandardOutput $provision -RedirectStandardError $provisionError
+                get-content $provision
+                get-content $provisionError
+                $website_index = $website_index + 1
+            }
+        # invoke standard module in series
+        } else {
+            powershell -file "c:\catapult\provisioners\windows\modules\$module.ps1" $args[0] $args[1] $args[2] $args[3]
+        }
 
         $end = get-date
         echo "==> MODULE: $module"
