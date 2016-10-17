@@ -113,15 +113,23 @@ foreach ($instance in $configuration.websites.iis) {
     }
     # 80
     new-website -name ("$($args[0]).{0}" -f $instance.domain) -hostheader ("$($args[0]).{0}" -f $instance.domain) -port 80 -physicalpath ("c:\inetpub\repositories\iis\{0}\{1}" -f $instance.domain,$instance.webroot) -applicationpool ("$($args[0]).{0}" -f $instance.domain) -force
-
     # 80:www
     new-webbinding -name ("$($args[0]).{0}" -f $instance.domain) -hostheader ("www.$($args[0]).{0}" -f $instance.domain) -port 80
-
     # 443
     new-webbinding -name ("$($args[0]).{0}" -f $instance.domain) -hostheader ("$($args[0]).{0}" -f $instance.domain) -port 443 -protocol https -sslflags 1
-
     # 443:www
     new-webbinding -name ("$($args[0]).{0}" -f $instance.domain) -hostheader ("www.$($args[0]).{0}" -f $instance.domain) -port 443 -protocol https -sslflags 1
+    # add listeners for domain_tld_override if applicable
+    if ($instance.domain_tld_override) {
+        # 80
+        new-webbinding -name ("$($args[0]).{0}" -f $instance.domain) -hostheader ("$($args[0]).{0}.{1}" -f $instance.domain,$instance.domain_tld_override) -port 80
+        # 80:www
+        new-webbinding -name ("$($args[0]).{0}" -f $instance.domain) -hostheader ("www.$($args[0]).{0}.{1}" -f $instance.domain,$instance.domain_tld_override) -port 80
+        # 443
+        new-webbinding -name ("$($args[0]).{0}" -f $instance.domain) -hostheader ("$($args[0]).{0}.{1}" -f $instance.domain,$instance.domain_tld_override) -port 443 -protocol https -sslflags 1
+        # 443:www
+        new-webbinding -name ("$($args[0]).{0}" -f $instance.domain) -hostheader ("www.$($args[0]).{0}.{1}" -f $instance.domain,$instance.domain_tld_override) -port 443 -protocol https -sslflags 1
+    }
 }
 
 echo "`n=> Creating SSL Bindings"
