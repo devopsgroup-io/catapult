@@ -34,7 +34,7 @@ foreach ($domain in $domains) {
     # try and create the zone and let cloudflare handle if it already exists
     $data = @{
         "name" = "$($domain_levels[-2]).$($domain_levels[-1])";
-        "jumpstart" = "false"
+        "jumpstart" = ([System.Convert]::ToBoolean("false"))
     }
     $headers = @{
         "X-Auth-Email" = $configuration.company.cloudflare_email;

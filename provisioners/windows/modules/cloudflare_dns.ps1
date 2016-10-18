@@ -112,17 +112,17 @@ foreach ($domain in $domains) {
                         "type" = "A";
                         "name" = "$($domain_dns_record)";
                         "content" = "$($configuration.environments.$($args[0]).servers.windows.ip)";
-                        "ttl" = "1";
-                        "proxied" = "$($cloudflare_proxied)";
+                        "ttl" = 1;
+                        "proxied" = ([System.Convert]::ToBoolean($cloudflare_proxied));
                     }
                     $headers = @{
                         "X-Auth-Email" = $configuration.company.cloudflare_email;
                         "X-Auth-Key" = $configuration.company.cloudflare_api_key;
                     }
                     try {
-                        $result = invoke-webrequest -Method Post -Uri "https://api.cloudflare.com/client/v4/zones/$($cloudflare_zone_id)/dns_records?type=A&name=$($domain_dns_record)" `
+                        $result = invoke-webrequest -Method Post -Uri "https://api.cloudflare.com/client/v4/zones/$($cloudflare_zone_id)/dns_records" `
                             -ContentType "application/json" `
-                            -Headers $headers
+                            -Headers $headers `
                             -Body (ConvertTo-Json $data)
                         $dns_record = $result.Content
                         $dns_record_status = $result.StatusCode
@@ -142,8 +142,8 @@ foreach ($domain in $domains) {
                         "type" = "A";
                         "name" = "$($domain_dns_record)";
                         "content" = "$($configuration.environments.$($args[0]).servers.windows.ip)";
-                        "ttl" = "1";
-                        "proxied" = "$($cloudflare_proxied)";
+                        "ttl" = 1;
+                        "proxied" = ([System.Convert]::ToBoolean($cloudflare_proxied));
                     }
                     $headers = @{
                         "X-Auth-Email" = $configuration.company.cloudflare_email;
@@ -152,7 +152,7 @@ foreach ($domain in $domains) {
                     try {
                         $result = invoke-webrequest -Method Put -Uri "https://api.cloudflare.com/client/v4/zones/$($cloudflare_zone_id)/dns_records/$($dns_record_id)" `
                             -ContentType "application/json" `
-                            -Headers $headers
+                            -Headers $headers `
                             -Body (ConvertTo-Json $data)
                         $dns_record = $result.Content
                         $dns_record_status = $result.StatusCode
