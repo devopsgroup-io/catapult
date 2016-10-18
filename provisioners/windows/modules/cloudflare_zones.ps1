@@ -41,11 +41,12 @@ foreach ($domain in $domains) {
         "X-Auth-Key" = $configuration.company.cloudflare_api_key;
     }
     try {
-        $cloudflare_zone = invoke-webrequest -Method Post -Uri "https://api.cloudflare.com/client/v4/zones" `
+        $result = invoke-webrequest -Method Post -Uri "https://api.cloudflare.com/client/v4/zones" `
             -ContentType "application/json" `
             -Headers $headers `
             -Body (ConvertTo-Json $data)
-        $cloudflare_zone_status = $cloudflare_zone.StatusCode
+        $cloudflare_zone = $result.Content
+        $cloudflare_zone_status = $result.StatusCode
     } catch {
         $result = $_.Exception.Response.GetResponseStream()
         $reader = New-Object System.IO.StreamReader($result)
