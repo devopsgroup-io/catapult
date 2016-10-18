@@ -71,6 +71,9 @@ redhat:
       modules: ["time","system","iptables","newrelic_sysmon","git_clean","git","software_config","rsync","php","software_tools","software_operations_meta","mysql","cloudflare_cache","newrelic_synthetics"]
 windows:
   modules:
+    cloudflare_dns:
+      description: "Manages CloudfFlare DNS A records for websites."
+      multithreading: true
     cloudflare_zones:
       description: "Manages CloudfFlare zones for websites."
       multithreading: true
@@ -90,7 +93,7 @@ windows:
       description: "Manages system requirements."
   servers:
     iis:
-      modules: ["time","system","newrelic_sysmon","git_clean","git","iis","cloudflare_zones"]
+      modules: ["time","system","newrelic_sysmon","git_clean","git","iis","cloudflare_zones","cloudflare_dns"]
     mssql:
       modules: ["time","system","newrelic_sysmon","git_clean","git","mssql"]
 

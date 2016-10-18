@@ -1,12 +1,18 @@
 source "/catapult/provisioners/redhat/modules/catapult.sh"
 
-domains=()
 
+# domain
 domain=$(catapult websites.apache.$5.domain)
-domains+=("${domain}")
 
+# domain_tld_override
 domain_tld_override=$(catapult websites.apache.$5.domain_tld_override)
-if [ ! -z "${domain_tld_override}" ]; then
+
+# create an array of domains
+domains=()
+if [ -z "${domain_tld_override}" ]; then
+    domains+=("${domain}")
+else
+    domains+=("${domain}")
     domains+=("${domain}.${domain_tld_override}")
 fi
 
@@ -29,9 +35,9 @@ for domain in "${domains[@]}"; do
     if [[ ! "${valid_http_response_codes[@]}" =~ "${cloudflare_zone_status}" ]]; then
         echo -e "[${cloudflare_zone_status}] there was a problem with the cloudflare api request - please visit https://www.cloudflarestatus.com to see if there is a problem"
     elif [ "$(echo "${cloudflare_zone}" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["result"]')" == "[]" ]; then
-        echo "[${domain}] cloudflare zone does not exist"
+        echo "[${domain_levels[-2]}.${domain_levels[-1]}] cloudflare zone does not exist"
     else
-
+        echo "[${domain_levels[-2]}.${domain_levels[-1]}] cloudflare zone exists, managing dns records..."
         # create an array of dns records
         domain_dns_records=()
         if [ "${1}" == "production" ]; then
@@ -63,37 +69,39 @@ for domain in "${domains[@]}"; do
                 cloudflare_proxied="true"
             fi
 
-            # check for a curl error
+            # create or update the dns a record
             if [[ ! "${valid_http_response_codes[@]}" =~ "${dns_record_status}" ]]; then
                 echo -e "[${dns_record_status}] there was a problem with the cloudflare api request - please visit https://www.cloudflarestatus.com to see if there is a problem"
-            # create dns a record
-            elif [ "$(echo "${dns_record}" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["result"]')" == "[]" ]; then
-                dns_record=$(curl --silent --show-error  --connect-timeout 30 --max-time 60 --write-out "HTTPSTATUS:%{http_code}" --request POST "https://api.cloudflare.com/client/v4/zones/${cloudflare_zone_id}/dns_records" \
-                --header "X-Auth-Email: $(catapult company.cloudflare_email)" \
-                --header "X-Auth-Key: $(catapult company.cloudflare_api_key)" \
-                --header "Content-Type: application/json" \
-                --data "{\"type\":\"A\",\"name\":\"${domain_dns_record}\",\"content\":\"$(catapult environments.$1.servers.redhat.ip)\",\"ttl\":1,\"proxied\":${cloudflare_proxied}}")
-                dns_record_status=$(echo "${dns_record}" | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
-                dns_record=$(echo "${dns_record}" | sed -e 's/HTTPSTATUS\:.*//g')
-            # update dns a record
             else
-                dns_record_id=$(echo "${dns_record}" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["result"][0]["id"]')
-                dns_record=$(curl --silent --show-error  --connect-timeout 30 --max-time 60 --write-out "HTTPSTATUS:%{http_code}" --request PUT "https://api.cloudflare.com/client/v4/zones/${cloudflare_zone_id}/dns_records/${dns_record_id}" \
-                --header "X-Auth-Email: $(catapult company.cloudflare_email)" \
-                --header "X-Auth-Key: $(catapult company.cloudflare_api_key)" \
-                --header "Content-Type: application/json" \
-                --data "{\"id\":\"${dns_record_id}\",\"type\":\"A\",\"name\":\"${domain_dns_record}\",\"content\":\"$(catapult environments.$1.servers.redhat.ip)\",\"ttl\":1,\"proxied\":${cloudflare_proxied}}")
-                dns_record_status=$(echo "${dns_record}" | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
-                dns_record=$(echo "${dns_record}" | sed -e 's/HTTPSTATUS\:.*//g')
-            fi
+                # create dns a record
+                if [ "$(echo "${dns_record}" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["result"]')" == "[]" ]; then
+                    dns_record=$(curl --silent --show-error  --connect-timeout 30 --max-time 60 --write-out "HTTPSTATUS:%{http_code}" --request POST "https://api.cloudflare.com/client/v4/zones/${cloudflare_zone_id}/dns_records" \
+                    --header "X-Auth-Email: $(catapult company.cloudflare_email)" \
+                    --header "X-Auth-Key: $(catapult company.cloudflare_api_key)" \
+                    --header "Content-Type: application/json" \
+                    --data "{\"type\":\"A\",\"name\":\"${domain_dns_record}\",\"content\":\"$(catapult environments.$1.servers.redhat.ip)\",\"ttl\":1,\"proxied\":${cloudflare_proxied}}")
+                    dns_record_status=$(echo "${dns_record}" | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
+                    dns_record=$(echo "${dns_record}" | sed -e 's/HTTPSTATUS\:.*//g')
+                # update dns a record
+                else
+                    dns_record_id=$(echo "${dns_record}" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["result"][0]["id"]')
+                    dns_record=$(curl --silent --show-error  --connect-timeout 30 --max-time 60 --write-out "HTTPSTATUS:%{http_code}" --request PUT "https://api.cloudflare.com/client/v4/zones/${cloudflare_zone_id}/dns_records/${dns_record_id}" \
+                    --header "X-Auth-Email: $(catapult company.cloudflare_email)" \
+                    --header "X-Auth-Key: $(catapult company.cloudflare_api_key)" \
+                    --header "Content-Type: application/json" \
+                    --data "{\"id\":\"${dns_record_id}\",\"type\":\"A\",\"name\":\"${domain_dns_record}\",\"content\":\"$(catapult environments.$1.servers.redhat.ip)\",\"ttl\":1,\"proxied\":${cloudflare_proxied}}")
+                    dns_record_status=$(echo "${dns_record}" | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
+                    dns_record=$(echo "${dns_record}" | sed -e 's/HTTPSTATUS\:.*//g')
+                fi
+                # output the result
+                if [[ ! "${valid_http_response_codes[@]}" =~ "${dns_record_status}" ]]; then
+                    echo -e "[${dns_record_status}] there was a problem with the cloudflare api request - please visit https://www.cloudflarestatus.com to see if there is a problem"
+                elif [ "$(echo "${dns_record}" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["success"]')" == "False" ]; then
+                    echo "[${domain_dns_record}] $(echo ${dns_record} | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["errors"][0]["message"]')"
+                else
+                    echo "[${domain_dns_record}] successfully set dns a record"
+                fi
 
-            # output the result
-            if [[ ! "${valid_http_response_codes[@]}" =~ "${dns_record_status}" ]]; then
-                echo -e "[${dns_record_status}] there was a problem with the cloudflare api request - please visit https://www.cloudflarestatus.com to see if there is a problem"
-            elif [ "$(echo "${dns_record}" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["success"]')" == "False" ]; then
-                echo "[${domain_dns_record}] $(echo ${dns_record} | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["errors"][0]["message"]')"
-            else
-                echo "[${domain_dns_record}] successfully set dns a record"
             fi
 
         done
