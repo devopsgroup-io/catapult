@@ -1,6 +1,33 @@
 . "c:\catapult\provisioners\windows\modules\catapult.ps1"
 
 
+echo "`n=> Getting Windows license status"
+Get-CimInstance -ClassName SoftwareLicensingProduct | where PartialProductKey | select `
+    Name,
+    Description,
+    @{Name='GenuineStatus';Exp={
+        switch ($_.GenuineStatus)
+        {
+            0 {'Non-Genuine'}
+            1 {'Genuine'}
+            Default {'Undetected'}
+        }
+    }},
+    @{Name='LicenseStatus';Exp={
+        # https://msdn.microsoft.com/en-us/library/cc534596%28v=vs.85%29.aspx
+        switch ($_.LicenseStatus) {
+            0 {'Unlicensed'}
+            1 {'licensed'}
+            2 {'OOBGrace'}
+            3 {'OOTGrace'}
+            4 {'NonGenuineGrace'}
+            5 {'Notification'}
+            6 {'ExtendedGrace'}
+            Default {'Undetected'}
+        }
+    }} | Format-List
+
+
 echo "`n=> Configuring security policy"
 # remove the PasswordComplexity settting to allow for user accounts to be created for iis and the force_auth option
 # we'll require our own, 10 character, 20 maximum password
