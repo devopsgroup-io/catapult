@@ -1027,17 +1027,20 @@ module Catapult
             # this means there are no instances
             instance = nil
           else
-            instance = nil
             @api_aws.search("reservationSet item instancesSet").each do |key|
+              # default value
+              instance = nil
               # names, or tags, are not required, so check for nil first
               if key.at("item tagSet item value") == nil
-                instance = nil
+                next
               elsif key.at("item tagSet item value").text == "#{@configuration["company"]["name"].downcase}-#{environment}-#{server.gsub("_","-")}"
                 # any other status than running can not be trusted
                 if key.at("item instanceState name").text == "running"
                   instance = key
+                  break
                 else
                   instance = nil
+                  break
                 end
               end
             end
