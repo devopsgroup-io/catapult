@@ -41,7 +41,9 @@ echo "Peak: $(get-wmiobject win32_pagefileusage | % {$_.peakusage})MB"
 
 
 echo "`n=> Importing PSWindowsUpdate"
-Remove-Item "C:\Windows\System32\WindowsPowerShell\v1.0\Modules\PSWindowsUpdate" -Force -Recurse
+if (test-path -path "C:\Windows\System32\WindowsPowerShell\v1.0\Modules\PSWindowsUpdate") {
+    Remove-Item "C:\Windows\System32\WindowsPowerShell\v1.0\Modules\PSWindowsUpdate" -Force -Recurse
+}
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 [System.IO.Compression.ZipFile]::ExtractToDirectory("c:\catapult\provisioners\windows\installers\PSWindowsUpdate.zip", "C:\Windows\System32\WindowsPowerShell\v1.0\Modules")
 Import-Module PSWindowsUpdate
@@ -150,4 +152,3 @@ for ($i=0; $i -le 10; $i++) {
 echo "`n=> Checking for Windows Updates (This may take a while...)"
 # install latest updates
 Get-WUInstall -WindowsUpdate -AcceptAll -IgnoreReboot
-# @todo check for reboot status

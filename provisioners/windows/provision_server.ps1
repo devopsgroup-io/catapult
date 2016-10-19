@@ -57,8 +57,20 @@ if ($configuration_provisioners.windows.servers.$($args[3]).modules) {
 
     # loop through each required module
     foreach ($module in $configuration_provisioners.windows.servers.$($args[3]).modules) {
+
         $start = get-date
         echo "`n`n`n==> MODULE: $module"
+        # check for reboot status between modules
+        # required to ensure all dependencies are in place for later software installs
+        $RegistryKey = [Microsoft.Win32.RegistryKey]::OpenRemoteBaseKey([Microsoft.Win32.RegistryHive]"LocalMachine",$Computer) 
+        $RegistrySubKey = $RegistryKey.OpenSubKey("SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\") 
+        $RegistrySubKeyNames = $RegistrySubKey.GetSubKeyNames() 
+        if ($RegistrySubKeyNames -contains "RebootRequired") {
+            echo "==> REBOOT REQUIRED STATUS: [REQUIRED] Windows Update requires a reboot of this machine. Please do so and run the provisioner again to continue..."
+            exit 1
+        } else {
+            echo "==> REBOOT REQUIRED STATUS: [NOT REQUIRED] Continuing..."
+        }
         echo ("==> DESCRIPTION: {0}" -f $configuration_provisioners.windows.modules.$($module).description)
         echo ("==> MULTITHREADING: {0}" -f $configuration_provisioners.windows.modules.$($module).multithreading)
 
