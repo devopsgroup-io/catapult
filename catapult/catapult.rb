@@ -1375,16 +1375,30 @@ module Catapult
               end
             end
           end
+          # validate force_auth
+          unless instance["force_auth"] == nil
+            if instance["force_auth"].length < 10 || instance["force_auth"].length > 20
+              catapult_exception("There is an error in your secrets/configuration.yml file.\nThe force_auth for websites => #{service} => domain => #{instance["domain"]} must be 10 to 20 characters in length.")
+            end
+            if not instance["force_auth"] =~ /^[0-9a-zA-Z]*$/
+              catapult_exception("There is an error in your secrets/configuration.yml file.\nThe force_auth for websites => #{service} => domain => #{instance["domain"]} must only contain numbers, lowercase letters, and uppercase letters.")
+            end
+          end
           # validate force_auth_exclude
           unless instance["force_auth_exclude"] == nil
+            # this can only be used with force_auth
+            if instance["force_auth"] == nil
+              catapult_exception("There is an error in your secrets/configuration.yml file.\nThe force_auth_exclude for websites => #{service} => domain => #{instance["domain"]} requires force_auth to be set.")
+            end
+            # only test, qc, and production are valid values
             @force_auth_exclude_valid_values = true
             instance["force_auth_exclude"].each do |value|
-              if not ["test","qc","production"].include?("#{value}")
+              if not ["dev","test","qc","production"].include?("#{value}")
                 @force_auth_exclude_valid_values = false
               end
             end
             unless @force_auth_exclude_valid_values
-              catapult_exception("There is an error in your secrets/configuration.yml file.\nThe force_auth_exclude for websites => #{service} => domain => #{instance["domain"]} is invalid, it must only include one, some, or all of the following [\"test\",\"qc\",\"production\"].")
+              catapult_exception("There is an error in your secrets/configuration.yml file.\nThe force_auth_exclude for websites => #{service} => domain => #{instance["domain"]} is invalid, it must only include one, some, or all of the following [\"dev\",\"test\",\"qc\",\"production\"].")
             end
           end
           # validate force_https

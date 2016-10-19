@@ -55,7 +55,7 @@ while IFS='' read -r -d '' key; do
         ServerAlias www.${domain_environment}.${domain_tld_override}"
     fi
     # handle the force_auth option
-    if ([ ! -z "${force_auth}" ]) && ([ "$1" = "test" ] || [ "$1" = "qc" ] || [ "$1" = "production" ]); then
+    if ([ ! -z "${force_auth}" ]); then
         if ([ ! -z "${force_auth_exclude}" ]); then
             force_auth_excludes=( $(echo "${key}" | shyaml get-values force_auth_exclude) )
             if ([[ "${force_auth_excludes[@]}" =~ "$1" ]]); then
