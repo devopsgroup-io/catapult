@@ -1,6 +1,16 @@
 . "c:\catapult\provisioners\windows\modules\catapult.ps1"
 
 
+echo "`n=> Configuring security policy"
+# remove the PasswordComplexity settting to allow for user accounts to be created for iis and the force_auth option
+# we'll require our own, 10 character, 20 maximum password
+$security_policy = "c:\catapult\provisioners\windows\installers\temp\security_policy.cfg"
+secedit /export /cfg $security_policy
+(gc $security_policy).replace("PasswordComplexity = 1", "PasswordComplexity = 0") | Out-File $security_policy
+secedit /configure /db c:\windows\security\local.sdb /cfg $security_policy /areas SECURITYPOLICY
+rm -force $security_policy -confirm:$false
+
+
 echo "`n=> Configuring hostname"
 # set the base hostname limited by the 15 character limit (UGH)
 if ($($args[0].Text.Length) -gt 4) {

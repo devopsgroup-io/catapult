@@ -649,13 +649,13 @@ The following options are available:
 * `force_auth:`
     * required: no
     * example: `force_auth: letmein`
-        * forces [HTTP basic authentication](https://en.wikipedia.org/wiki/Basic_access_authentication) in Test, QC, and Production (see `force_auth_exclude`)
+        * forces [HTTP basic authentication](https://en.wikipedia.org/wiki/Basic_access_authentication) in LocalDev, Test, QC, and Production (see `force_auth_exclude`)
         * `letmein` is both the username and password
 * `force_auth_exclude:`
     * required: no
     * dependency: `force_auth:`
     * example: `force_auth_exclude: ["production"]`
-        * array of select environments ["test","qc","production"] to exclude from the `force_auth` option
+        * array of select environments ["dev","test","qc","production"] to exclude from the `force_auth` option
 * `force_https:`
     * required: no
     * option: `force_https: true`

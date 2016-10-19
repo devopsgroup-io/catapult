@@ -35,12 +35,6 @@ if (Get-Module -ListAvailable -Name webadministration) {
 
 
 echo "`n=> Configuring IIS"
-# display errors on screen using the default recommendations for development and production
-if ($($args[0]) -eq "dev") {
-    set-webconfigurationproperty -filter "system.webserver/httperrors" -pspath "MACHINE/WEBROOT/APPHOST" -name "errorMode" -value "Detailed"
-} else {
-    set-webconfigurationproperty -filter "system.webserver/httperrors" -pspath "MACHINE/WEBROOT/APPHOST" -name "errorMode" -value "DetailedLocalOnly"
-}
 # remove revealing headers
 $headers = @{ 
     "RESPONSE_X-AspNet-Version" = "ASP.NET";
@@ -56,6 +50,26 @@ foreach ($header in $headers.GetEnumerator()) {
     set-webconfigurationproperty -pspath "iis:\" -filter "system.webServer/rewrite/outboundRules/rule[@name='$($header.Name)']/match" -name "pattern" -value ".*"
     set-webconfigurationproperty -pspath "iis:\" -filter "system.webServer/rewrite/outboundRules/rule[@name='$($header.Name)']/action" -name "type" -value "Rewrite"
     set-webconfigurationproperty -pspath "iis:\" -filter "system.webServer/rewrite/outboundRules/rule[@name='$($header.Name)']/action" -name "value" -value "$($header.Value)"
+}
+# display errors on screen using the default recommendations for development and production
+if ($($args[0]) -eq "dev") {
+    set-webconfigurationproperty -filter "system.webserver/httperrors" -pspath "MACHINE/WEBROOT/APPHOST" -name "errorMode" -value "Detailed"
+} else {
+    set-webconfigurationproperty -filter "system.webserver/httperrors" -pspath "MACHINE/WEBROOT/APPHOST" -name "errorMode" -value "DetailedLocalOnly"
+}
+# create IIS_AUTH group for IIS basic auth users
+$connection = [ADSI]("WinNT://$env:COMPUTERNAME")
+if (-not($connection.children | where { $_.schemaClassName -eq "group" } | where { $_.Name -eq "IIS_AUTH" })) {
+    $group = $connection.create("group", "IIS_AUTH")
+    $group.setinfo()
+    $group.description = "Group used by IIS basic authentication users."
+    $group.setinfo()
+}
+# remove all users in the IIS_AUTH group
+$group = $connection.Children.Find("IIS_AUTH", "group")
+$group.psbase.invoke('members')  | ForEach {
+  $user = $_.GetType().InvokeMember("Name","GetProperty",$Null,$_,$Null)
+  $connection.delete("user", $user) 
 }
 
 
@@ -94,12 +108,17 @@ if (get-childitem -path IIS:\AppPools | where-object {$_.Name -ne "DefaultAppPoo
 
 echo "`n=> Creating application pools"
 foreach ($instance in $configuration.websites.iis) {
-    new-item ("IIS:\AppPools\$($args[0]).{0}" -f $instance.domain)
-    set-itemproperty ("IIS:\AppPools\$($args[0]).{0}" -f $instance.domain) managedRuntimeVersion v4.0
+    if ($($args[0]) -eq "production") {
+        $domain = ("{0}" -f $instance.domain)
+    } else {
+        $domain = ("$($args[0]).{0}" -f $instance.domain)
+    }
+    new-item ("IIS:\AppPools\{0}" -f $domain)
+    set-itemproperty ("IIS:\AppPools\{0}" -f $domain) managedRuntimeVersion v4.0
 
     # grant application pool user permissions to website directory
     $acl = Get-Acl -Path ("c:\inetpub\repositories\iis\{0}\{1}" -f $instance.domain,$instance.webroot)
-    $perm = ("IIS AppPool\$($args[0]).{0}" -f $instance.domain), 'Read,Modify', 'ContainerInherit, ObjectInherit', 'None', 'Allow' 
+    $perm = ("IIS AppPool\{0}" -f $domain), 'Read,Modify', 'ContainerInherit, ObjectInherit', 'None', 'Allow' 
     $rule = New-Object -TypeName System.Security.AccessControl.FileSystemAccessRule -ArgumentList $perm
     $acl.SetAccessRule($rule) 
     $acl | Set-Acl -Path ("c:\inetpub\repositories\iis\{0}\{1}" -f $instance.domain,$instance.webroot)
@@ -107,36 +126,62 @@ foreach ($instance in $configuration.websites.iis) {
 
 echo "`n=> Creating websites"
 foreach ($instance in $configuration.websites.iis) {
-    $domain = ("$($args[0]).{0}" -f $instance.domain)
+    if ($($args[0]) -eq "production") {
+        $domain = ("{0}" -f $instance.domain)
+    } else {
+        $domain = ("$($args[0]).{0}" -f $instance.domain)
+    }
     if ($instance.webroot) {
         $instance.webroot = $instance.webroot.Replace("/","\")
     }
     # 80
-    new-website -name ("$($args[0]).{0}" -f $instance.domain) -hostheader ("$($args[0]).{0}" -f $instance.domain) -port 80 -physicalpath ("c:\inetpub\repositories\iis\{0}\{1}" -f $instance.domain,$instance.webroot) -applicationpool ("$($args[0]).{0}" -f $instance.domain) -force
+    new-website -name ("{0}" -f $domain) -hostheader ("{0}" -f $domain) -port 80 -physicalpath ("c:\inetpub\repositories\iis\{0}\{1}" -f $instance.domain,$instance.webroot) -applicationpool ("{0}" -f $domain) -force
     # 80:www
-    new-webbinding -name ("$($args[0]).{0}" -f $instance.domain) -hostheader ("www.$($args[0]).{0}" -f $instance.domain) -port 80
+    new-webbinding -name ("{0}" -f $domain) -hostheader ("www.{0}" -f $domain) -port 80
     # 443
-    new-webbinding -name ("$($args[0]).{0}" -f $instance.domain) -hostheader ("$($args[0]).{0}" -f $instance.domain) -port 443 -protocol https -sslflags 1
+    new-webbinding -name ("{0}" -f $domain) -hostheader ("{0}" -f $domain) -port 443 -protocol https -sslflags 1
     # 443:www
-    new-webbinding -name ("$($args[0]).{0}" -f $instance.domain) -hostheader ("www.$($args[0]).{0}" -f $instance.domain) -port 443 -protocol https -sslflags 1
+    new-webbinding -name ("{0}" -f $domain) -hostheader ("www.{0}" -f $domain) -port 443 -protocol https -sslflags 1
     # add listeners for domain_tld_override if applicable
     if ($instance.domain_tld_override) {
         # 80
-        new-webbinding -name ("$($args[0]).{0}" -f $instance.domain) -hostheader ("$($args[0]).{0}.{1}" -f $instance.domain,$instance.domain_tld_override) -port 80
+        new-webbinding -name ("{0}" -f $domain) -hostheader ("{0}.{1}" -f $domain,$instance.domain_tld_override) -port 80
         # 80:www
-        new-webbinding -name ("$($args[0]).{0}" -f $instance.domain) -hostheader ("www.$($args[0]).{0}.{1}" -f $instance.domain,$instance.domain_tld_override) -port 80
+        new-webbinding -name ("{0}" -f $domain) -hostheader ("www.{0}.{1}" -f $domain,$instance.domain_tld_override) -port 80
         # 443
-        new-webbinding -name ("$($args[0]).{0}" -f $instance.domain) -hostheader ("$($args[0]).{0}.{1}" -f $instance.domain,$instance.domain_tld_override) -port 443 -protocol https -sslflags 1
+        new-webbinding -name ("{0}" -f $domain) -hostheader ("{0}.{1}" -f $domain,$instance.domain_tld_override) -port 443 -protocol https -sslflags 1
         # 443:www
-        new-webbinding -name ("$($args[0]).{0}" -f $instance.domain) -hostheader ("www.$($args[0]).{0}.{1}" -f $instance.domain,$instance.domain_tld_override) -port 443 -protocol https -sslflags 1
+        new-webbinding -name ("{0}" -f $domain) -hostheader ("www.{0}.{1}" -f $domain,$instance.domain_tld_override) -port 443 -protocol https -sslflags 1
+    }
+    # manage http basic authentication
+    if (($instance.force_auth) -and (-not($instance.force_auth_exclude -contains $($args[0])))) {
+        $connection = [ADSI]("WinNT://$env:COMPUTERNAME")
+        $user = $connection.create("user", $instance.force_auth)
+        $user.SetPassword($instance.force_auth)
+        $user.SetInfo()
+        $user.FullName = $instance.force_auth
+        $user.SetInfo()
+        $user.UserFlags = 64 + 65536 # ADS_UF_PASSWD_CANT_CHANGE + ADS_UF_DONT_EXPIRE_PASSWD
+        $user.SetInfo()
+        $group = $connection.Children.Find("IIS_AUTH", "group")
+        $group.Add("WinNT://$($env:COMPUTERNAME)/$($instance.force_auth)")
+        set-webconfigurationproperty -filter "system.webServer/security/authentication/anonymousAuthentication" -pspath "IIS:\" -location ("{0}" -f $domain) -name Enabled -value False
+        set-webconfigurationproperty -filter "system.webServer/security/authentication/basicAuthentication" -pspath "IIS:\" -location ("{0}" -f $domain) -name Enabled -value True
+    } else {
+        set-webconfigurationproperty -filter "system.webServer/security/authentication/anonymousAuthentication" -pspath "IIS:\" -location ("{0}" -f $domain) -name Enabled -value True
+        set-webconfigurationproperty -filter "system.webServer/security/authentication/basicAuthentication" -pspath "IIS:\" -location ("{0}" -f $domain) -name Enabled -value False
     }
 }
 
 echo "`n=> Creating SSL Bindings"
 foreach ($instance in $configuration.websites.iis) {
-    $domain = ("$($args[0]).{0}" -f $instance.domain)
+    if ($($args[0]) -eq "production") {
+        $domain = ("{0}" -f $instance.domain)
+    } else {
+        $domain = ("$($args[0]).{0}" -f $instance.domain)
+    }
     # create self-signed cert
-    $certificate = New-SelfSignedCertificate -DnsName ("$($args[0]).{0}" -f $instance.domain) -CertStoreLocation "cert:\LocalMachine\My"
+    $certificate = New-SelfSignedCertificate -DnsName ("{0}" -f $domain) -CertStoreLocation "cert:\LocalMachine\My"
     # bind self-signed cert to 443
     new-item -path "IIS:\SslBindings\!443!$domain" -value $certificate -sslflags 1 -force
 }
@@ -146,5 +191,5 @@ if (get-childitem -path IIS:\Sites) {
     get-childitem -path IIS:\Sites | foreach { start-website $_.Name; }
 }
 foreach ($instance in $configuration.websites.iis) {
-    echo ("http://$($args[0]).{0}" -f $instance.domain)
+    echo ("http://{0}" -f $domain)
 }
