@@ -16,10 +16,13 @@ if (-not(test-path -path "c:\catapult\provisioners\windows\installers\temp\SQLEX
 echo "`n=> Installing SQL Server 2014 Express Edition..."
 if (-not(test-path -path "c:\Program Files\Microsoft SQL Server\MSSQL12.MSSQLSERVER\MSSQL\")) {
     # https://msdn.microsoft.com/en-us/library/ms144259(v=sql.120).aspx
-    start-process -filepath "c:\catapult\provisioners\windows\installers\temp\SQLEXPRWT_x64_ENU.exe" -argumentlist "/ACTION=install /IACCEPTSQLSERVERLICENSETERMS /ENU /FEATURES=SQL /INSTANCENAME=MSSQLSERVER /Q" -Wait -RedirectStandardOutput $provision -RedirectStandardError $provisionError
+    start-process -filepath "c:\catapult\provisioners\windows\installers\temp\SQLEXPRWT_x64_ENU.exe" -argumentlist "/ACTION=install /IACCEPTSQLSERVERLICENSETERMS /FEATURES=SQL /INSTANCENAME=MSSQLSERVER /Q /SECURITYMODE=SQL /SAPWD=password" -Wait -RedirectStandardOutput $provision -RedirectStandardError $provisionError
     get-content $provision
     get-content $provisionError
-    get-content "c:\Program Files\Microsoft SQL Server\120\Setup Bootstrap\Log\Summary.txt"
+    $directory_latest = Get-ChildItem -Path "c:\Program Files\Microsoft SQL Server\120\Setup Bootstrap\Log" | Sort-Object LastAccessTime -Descending | Select-Object -First 1
+    $summary_latest = Get-ChildItem "c:\Program Files\Microsoft SQL Server\120\Setup Bootstrap\Log\$directory_latest" | Where-Object {$_.Name -match "^[Summary]"} | Sort-Object LastAccessTime -Descending | Select-Object -First 1
+    get-content "c:\Program Files\Microsoft SQL Server\120\Setup Bootstrap\Log\$directory_latest\$summary_latest"
+    #get-content "c:\Program Files\Microsoft SQL Server\120\Setup Bootstrap\Log\Summary.txt"
 } else {
     echo "- Installed, skipping..."
 }
@@ -30,13 +33,13 @@ Import-Module "sqlps"
 $smo = 'Microsoft.SqlServer.Management.Smo.'
 $wmi = new-object ($smo + 'Wmi.ManagedComputer').
 # List the object properties, including the instance names.
-$Wmi
+$wmi
 # Enable the TCP protocol on the default instance.
 $uri = "ManagedComputer[@Name='" + (get-item env:\computername).Value + "']/ServerInstance[@Name='MSSQLSERVER']/ServerProtocol[@Name='Tcp']"
-$Tcp = $wmi.GetSmoObject($uri)
-$Tcp.IsEnabled = $true
-$Tcp.Alter()
-$Tcp
+$tcp = $wmi.GetSmoObject($uri)
+$tcp.IsEnabled = $true
+$tcp.Alter()
+$tcp
 
 
 echo "`n=> Configuring firewall for SQL Server..."

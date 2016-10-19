@@ -16,6 +16,7 @@ if (Get-Module -ListAvailable -Name servermanager) {
     echo "servermanager failed to load"
 }
 
+
 echo "`n=> Installing web-webserver (This may take a while...)"
 add-windowsfeature web-webserver -includeallsubfeature -logpath c:\catapult\provisioners\windows\logs\add-windowsfeature_web-webserver.log
 
@@ -90,6 +91,7 @@ if (get-childitem -path IIS:\SslBindings) {
     }
 }
 
+
 echo "`n=> Removing websites"
 if (get-childitem -path IIS:\Sites | where-object {$_.Name -ne "Default Web Site"}) {
     $websites = get-childitem -path IIS:\Sites | where-object {$_.Name -ne "Default Web Site"}
@@ -98,6 +100,7 @@ if (get-childitem -path IIS:\Sites | where-object {$_.Name -ne "Default Web Site
     }
 }
 
+
 echo "`n=> Removing application pools"
 if (get-childitem -path IIS:\AppPools | where-object {$_.Name -ne "DefaultAppPool"}) {
     $apppools = get-childitem -path IIS:\AppPools | where-object {$_.Name -ne "DefaultAppPool"}
@@ -105,6 +108,7 @@ if (get-childitem -path IIS:\AppPools | where-object {$_.Name -ne "DefaultAppPoo
         remove-item ("IIS:\AppPools\{0}" -f $apppool.Name) -recurse
     }
 }
+
 
 echo "`n=> Creating application pools"
 foreach ($instance in $configuration.websites.iis) {
@@ -123,6 +127,7 @@ foreach ($instance in $configuration.websites.iis) {
     $acl.SetAccessRule($rule) 
     $acl | Set-Acl -Path ("c:\inetpub\repositories\iis\{0}\{1}" -f $instance.domain,$instance.webroot)
 }
+
 
 echo "`n=> Creating websites"
 foreach ($instance in $configuration.websites.iis) {
@@ -155,23 +160,27 @@ foreach ($instance in $configuration.websites.iis) {
     }
     # manage http basic authentication
     if (($instance.force_auth) -and (-not($instance.force_auth_exclude -contains $($args[0])))) {
+        # only create the IIS_AUTH user if it does not yet exist (websites can have same force_auth value and user/pass are made the same)
         $connection = [ADSI]("WinNT://$env:COMPUTERNAME")
-        $user = $connection.create("user", $instance.force_auth)
-        $user.SetPassword($instance.force_auth)
-        $user.SetInfo()
-        $user.FullName = $instance.force_auth
-        $user.SetInfo()
-        $user.UserFlags = 64 + 65536 # ADS_UF_PASSWD_CANT_CHANGE + ADS_UF_DONT_EXPIRE_PASSWD
-        $user.SetInfo()
-        $group = $connection.Children.Find("IIS_AUTH", "group")
-        $group.Add("WinNT://$($env:COMPUTERNAME)/$($instance.force_auth)")
-        set-webconfigurationproperty -filter "system.webServer/security/authentication/anonymousAuthentication" -pspath "IIS:\" -location ("{0}" -f $domain) -name Enabled -value False
-        set-webconfigurationproperty -filter "system.webServer/security/authentication/basicAuthentication" -pspath "IIS:\" -location ("{0}" -f $domain) -name Enabled -value True
+        if (-not($connection.children | where { $_.schemaClassName -eq "user" } | where { $_.Name -eq $instance.force_auth })) {
+            $user = $connection.create("user", $instance.force_auth)
+            $user.SetPassword($instance.force_auth)
+            $user.SetInfo()
+            $user.FullName = $instance.force_auth
+            $user.SetInfo()
+            $user.UserFlags = 64 + 65536 # ADS_UF_PASSWD_CANT_CHANGE + ADS_UF_DONT_EXPIRE_PASSWD
+            $user.SetInfo()
+            $group = $connection.Children.Find("IIS_AUTH", "group")
+            $group.Add("WinNT://$($env:COMPUTERNAME)/$($instance.force_auth)")
+            set-webconfigurationproperty -filter "system.webServer/security/authentication/anonymousAuthentication" -pspath "IIS:\" -location ("{0}" -f $domain) -name Enabled -value False
+            set-webconfigurationproperty -filter "system.webServer/security/authentication/basicAuthentication" -pspath "IIS:\" -location ("{0}" -f $domain) -name Enabled -value True
+        }
     } else {
         set-webconfigurationproperty -filter "system.webServer/security/authentication/anonymousAuthentication" -pspath "IIS:\" -location ("{0}" -f $domain) -name Enabled -value True
         set-webconfigurationproperty -filter "system.webServer/security/authentication/basicAuthentication" -pspath "IIS:\" -location ("{0}" -f $domain) -name Enabled -value False
     }
 }
+
 
 echo "`n=> Creating SSL Bindings"
 foreach ($instance in $configuration.websites.iis) {
@@ -185,6 +194,7 @@ foreach ($instance in $configuration.websites.iis) {
     # bind self-signed cert to 443
     new-item -path "IIS:\SslBindings\!443!$domain" -value $certificate -sslflags 1 -force
 }
+
 
 echo "`n=> Starting websites"
 if (get-childitem -path IIS:\Sites) {
