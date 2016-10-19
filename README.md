@@ -29,11 +29,11 @@ Catapult defines a best-practice infrastructure so you don't have to - it also a
 
 * Catapult is an open source, complete, and distributed architecture
 * Catapult only orchestrates - it is not required to run your infrastructure
-* Catapult uses platform native shell scripting rather than configuration management tools such as Chef, Puppet, Salt
-* Catapult overlays seamlessly with Scrum methodology
+* Catapult uses platform native shell scripting rather than configuration management tools such as Chef, Puppet, or Salt
 * Catapult features Gitflow workflow while enforcing exactly matching, branch-driven environments
-* Catapult features a unique workflow model - upstream or downstream
-* Catapult is highly cost effective
+* Catapult features a unique software workflow model - upstream or downstream
+* Catapult overlays seamlessly with Scrum methodology
+* Catapult is very cost effective
 
 *Go ahead, give* **Catapult** *a* **shot**.
 
@@ -41,15 +41,13 @@ Catapult defines a best-practice infrastructure so you don't have to - it also a
 
 ## Security Disclosure ##
 
-Security is very important to us. If you have any issue regarding security, 
-please disclose the information responsibly by sending an email to 
-security@devopsgroup.io and not by creating a GitHub issue.
+Security is very important to us. If you have any issue regarding security, please disclose the information responsibly by sending an email to security@devopsgroup.io and not by creating a GitHub issue.
 
 
 
 ## Platform Overview ##
 
-Catapult orchestrates the following technologies and technology services to implement key components of DevOps.
+Catapult orchestrates the following key components of DevOps to provide you with a full-featured infrastructure. Implementing both a Red Hat stack for PHP software and a Windows stack for .NET software.
 
 * **Security Management**
     * Configuration Secrets - GnuPG Encryption
@@ -58,16 +56,15 @@ Catapult orchestrates the following technologies and technology services to impl
     * Websites - Git (via GitHub or Bitbucket)
 * **Environment Management**
     * Vagrant
-* **Development Virtualization**
-    * VirtualBox
-* **Cloud Virtualization**
-    * DigitalOcean
+* **Environment Virtualization**
+    * VirtualBox - Local (Red Hat and Windows)
+    * DigitalOcean - Cloud (Red Hat)
+    * AWS - Cloud (Windows)
 * **DNS Management**
     * CloudFlare
 * **Continuous Integration**
     * Automated Deployments - Bamboo
-    * Build Server - Amazon Web Services (AWS)
-* **Monitoring**
+* **Monitoring and Performance**
     * Server Resources - New Relic Servers
     * Application Performance - New Relic APM
     * Browser Performance - New Relic Browsers
@@ -77,10 +74,10 @@ Catapult orchestrates the following technologies and technology services to impl
 
 ## Supported Software ##
 
-Catapult supports and intelligently manages the following software chosen from trending usage statistics from [BuiltWith](https://trends.builtwith.com/cms) and align with the [CentOS 7 trunk](http://mirror.centos.org/centos/7/os/x86_64/Packages/):
+Catapult intelligently manages the following software that has been chosen from trending usage statistics from [BuiltWith](https://trends.builtwith.com/cms) and align with the [CentOS 7 trunk](http://mirror.centos.org/centos/7/os/x86_64/Packages/):
 
-Software | Catapult Key | Released | End-of-Life
----------|--------------|----------|------------
+Software | [Key](#websites) | Released | End-of-Life
+---------|------------------|----------|------------
 CodeIgniter 2                     | `codeigniter2`         | January 28, 2011   | [October 31, 2015](http://forum.codeigniter.com/thread-61357.html)
 CodeIgniter 3                     | `codeigniter3`         | March 30, 2015     | 
 Drupal 6                          | `drupal6`              | February 13, 2008  | [February 24, 2016](https://www.drupal.org/drupal-6-eol)
@@ -111,7 +108,8 @@ Platform Feature | Catapult | Pantheon | Acquia
 -----------------|----------|----------|--------
 Source                                        | Open                           | Closed                        | Closed
 Subscription Feature Set                      | Bundled                        | Separated                     | Separated
-Supported Software                            | Numerous                       | 2                             | 1
+Supported PHP Software                        | 15                             | 2                             | 1
+Supported .NET Software                       | TBA                            | :x:                           | :x:
 Minimum Bundled<br>Monthly Cost               | $40                            | $400                          | $134
 Websites per Instance/Subscription            | Unlimited                      | 1                             | 1
 Managed Workflow                              | Git Flow                       | :x:                           | :x:
@@ -200,9 +198,9 @@ Catapult requires a [Developer Setup](#developer-setup), [Instance Setup](#insta
 
 Catapult is controlled via Vagrant and the command line of a developer's workstation - below is a list of required software that will need to be installed.
 
-* OS X workstations: 100% compatabile and tested
-* Linux workstations: 100% compatabile and tested
-* Windows workstations: Currently limited support
+* OS X workstations: Compatible and supported
+* Linux workstations: Compatible and supported
+* Windows workstations: Limited testing and support
 
 1. **Vagrant**
     * **Using OS X?**
