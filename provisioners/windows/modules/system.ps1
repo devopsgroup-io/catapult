@@ -150,5 +150,19 @@ for ($i=0; $i -le 10; $i++) {
 
 
 echo "`n=> Checking for Windows Updates (This may take a while...)"
+# configure windows update settings
+$windows_update_settings = (new-object -com "Microsoft.Update.AutoUpdate").Settings
+# 1 - Never check for updates
+# 2 - Check for updates but let me choose whether to download and install them
+# 3 - Download updates but let me choose whether to install them
+# 4 - Install updates automatically
+$windows_update_settings.NotificationLevel=3
+$windows_update_settings.ScheduledInstallationDay=0
+$windows_update_settings.ScheduledInstallationTime=3
+$windows_update_settings.IncludeRecommendedUpdates=$true
+$windows_update_settings.NonAdministratorsElevated=$true
+$windows_update_settings.FeaturedUpdatesEnabled=$true
+$windows_update_settings.save()
+$windows_update_settings
 # install latest updates
 Get-WUInstall -WindowsUpdate -AcceptAll -IgnoreReboot
