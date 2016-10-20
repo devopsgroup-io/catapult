@@ -57,13 +57,19 @@ Catapult orchestrates the following key components of DevOps to provide you with
 * **Environment Management**
     * Vagrant
 * **Environment Virtualization**
-    * VirtualBox - Local (Red Hat and Windows)
-    * DigitalOcean - Cloud (Red Hat)
-    * AWS - Cloud (Windows)
+    * **Local**
+        * VirtualBox - Red Hat and Windows
+    * **Cloud**
+        * DigitalOcean - Red Hat
+        * AWS - Windows
 * **DNS Management**
-    * CloudFlare
+    * **Local**
+        * vagrant-hostmanager
+    * **Cloud**
+        * CloudFlare
 * **Continuous Integration**
-    * Automated Deployments - Bamboo
+    * **Cloud**
+        * Automated Deployments - Bamboo
 * **Monitoring and Performance**
     * Server Resources - New Relic Servers
     * Application Performance - New Relic APM
