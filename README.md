@@ -49,6 +49,8 @@ Security is very important to us. If you have any issue regarding security, plea
 
 Catapult orchestrates the following key components of DevOps to provide you with a full-featured infrastructure. Implementing both a Red Hat stack for PHP software and a Windows stack for .NET software.
 
+<img src="https://cdn.rawgit.com/devopsgroup-io/catapult/master/catapult/installers/images/catapult_platform_topology.png" alt="Catapult Platform Topology">
+
 * **Security Management**
     * Configuration Secrets - GnuPG Encryption
 * **Source Code Management**
