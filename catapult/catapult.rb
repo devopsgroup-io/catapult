@@ -60,9 +60,6 @@ module Catapult
         puts "\n"
         puts "Please correct the error then re-run your vagrant command."
         puts "See https://github.com/devopsgroup-io/catapult for more information."
-        if File.exist?('.lock')
-          File.delete('.lock')
-        end
         exit 1
       end
     end
@@ -130,8 +127,15 @@ module Catapult
 
 
     # locking in order to prevent multiple executions occurring at once (e.g. competing command line and Bamboo executions)
-    if File.exist?('.lock')
-      catapult_exception("The .lock file is present in this directory. This indicates that another process, such as provisioning, may be under way in another session or that a process ended unexpectedly. Once verifying that no conflict exists, remove the .lock file and try again.")
+    begin
+      Timeout::timeout(60) do
+        while File.exist?('.lock')
+           puts "Waiting for another Catapult process to finish so that we can safely continue...".color(Colors::YELLOW)
+           sleep 5
+        end
+      end
+    rescue Timeout::Error
+      catapult_exception("Wating took longer than expected. The .lock file is present in this directory. This indicates that another Catapult process may have hung or ended unexpectedly. Once verifying that no conflict exists, remove the .lock file and try again.")
     end
     FileUtils.touch('.lock')
 
