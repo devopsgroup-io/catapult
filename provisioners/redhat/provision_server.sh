@@ -1,3 +1,11 @@
+#!/usr/bin/env bash
+# variables inbound from provisioner args
+# $1 => environment
+# $2 => repository
+# $3 => gpg key
+# $4 => instance
+
+
 # resources function
 function resources() {
     module="${1}"
@@ -62,8 +70,15 @@ sudo pip install shyaml --upgrade
 if [ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-values-0 redhat.servers.$4.modules) ]; then
     provisionstart=$(date +%s)
     echo -e "\n\n\n==> PROVISION: ${4}"
-    # decrypt configuration
-    source "/catapult/provisioners/redhat/modules/catapult_decrypt.sh"
+
+    # decrypt secrets
+    gpg --verbose --batch --yes --passphrase ${3} --output /catapult/secrets/configuration.yml --decrypt /catapult/secrets/configuration.yml.gpg
+    gpg --verbose --batch --yes --passphrase ${3} --output /catapult/secrets/id_rsa --decrypt /catapult/secrets/id_rsa.gpg
+    gpg --verbose --batch --yes --passphrase ${3} --output /catapult/secrets/id_rsa.pub --decrypt /catapult/secrets/id_rsa.pub.gpg
+    chmod 700 /catapult/secrets/configuration.yml
+    chmod 700 /catapult/secrets/id_rsa
+    chmod 700 /catapult/secrets/id_rsa.pub
+
     # get configuration
     source "/catapult/provisioners/redhat/modules/catapult.sh"
 
@@ -171,8 +186,12 @@ if [ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-values-0 redha
         done
     done
 
-    # remove configuration
-    source "/catapult/provisioners/redhat/modules/catapult_clean.sh"
+    # remove secrets
+    if [ $1 != "dev" ]; then
+        sudo rm /catapult/secrets/configuration.yml
+        sudo rm /catapult/secrets/id_rsa
+        sudo rm /catapult/secrets/id_rsa.pub
+    fi
     
     provisionend=$(date +%s)
     provisiontotal=$(date -d@$(($provisionend - $provisionstart)) -u +%H:%M:%S)

@@ -1,7 +1,4 @@
 #!/usr/bin/env bash
-
-
-
 # variables inbound from provisioner args
 # $1 => environment
 # $2 => repository

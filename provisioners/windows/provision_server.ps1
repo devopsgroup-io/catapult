@@ -5,6 +5,7 @@
 # $($args[3]) => instance
 
 
+
 # global
 $provisionError = "c:\catapult\provisioners\windows\logs\provisionError.log"
 $provision = "c:\catapult\provisioners\windows\logs\provision.log"
@@ -43,7 +44,7 @@ if ($configuration_provisioners.windows.servers.$($args[3]).modules) {
     $provisionstart = get-date
     echo "`n`n`n==> PROVISION: $($args[3])"
 
-    # decrypt configuration
+    # decrypt secrets
     start-process -filepath "c:\Program Files (x86)\GNU\GnuPG\gpg2.exe" -argumentlist "--verbose --batch --yes --passphrase $($args[2]) --output c:\catapult\secrets\configuration.yml --decrypt c:\catapult\secrets\configuration.yml.gpg" -Wait -RedirectStandardOutput $provision -RedirectStandardError $provisionError
     get-content $provision
     get-content $provisionError
@@ -99,10 +100,12 @@ if ($configuration_provisioners.windows.servers.$($args[3]).modules) {
         echo ("==> DURATION: {0} seconds" -f [math]::floor((New-TimeSpan -Start $start -End $end).TotalSeconds))
     }
 
-    # remove configuration
-    remove-item "c:\catapult\secrets\configuration.yml"
-    remove-item "c:\catapult\secrets\id_rsa"
-    remove-item "c:\catapult\secrets\id_rsa.pub"
+    # remove secrets
+    if (-not($($args[0]) -eq "dev")) {
+        remove-item "c:\catapult\secrets\configuration.yml"
+        remove-item "c:\catapult\secrets\id_rsa"
+        remove-item "c:\catapult\secrets\id_rsa.pub"
+    }
 
     $provisionend = Get-Date
     echo "`n`n`n==> PROVISION: $($args[3])"
