@@ -135,7 +135,7 @@ module Catapult
         end
       end
     rescue Timeout::Error
-      catapult_exception("Wating took longer than expected. The .lock file is present in this directory. This indicates that another Catapult process may have hung or ended unexpectedly. Once verifying that no conflict exists, remove the .lock file and try again.")
+      catapult_exception("Wating took longer than expected. The .lock file is present in this directory, indicating that another Catapult process may have hung or ended unexpectedly. Once verifying that no conflict exists, remove the .lock file and try again.")
     end
     FileUtils.touch('.lock')
 

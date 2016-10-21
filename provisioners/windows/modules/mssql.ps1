@@ -44,15 +44,25 @@ if (-not(test-path -path "c:\Program Files\Microsoft SQL Server\MSSQL12.SQLEXPRE
 }
 
 
+echo "`n=> Managing SQL Server Databases..."
+[System.Reflection.Assembly]::LoadWithPartialName("Microsoft.SqlServer.Smo") | Out-Null
+$server = new-object ("Microsoft.SqlServer.Management.Smo.Server") -ArgumentList "localhost"
+foreach ($instance in $configuration.websites.iis) {
+    $domainvaliddbname = ("{0}_{1}" -f $($args[0]), $instance.domain -replace "\.","_")
+    $database = New-Object Microsoft.SqlServer.Management.Smo.Database($server, $domainvaliddbname)
+    $database.Create()
+}
+
+foreach ($database in $server.databases) {
+    echo $database.name
+}
+
+
 echo "`n=> Enabling TCP/IP for SQL Server..."
-Import-Module "sqlps"
-$smo = 'Microsoft.SqlServer.Management.Smo.'
-$wmi = new-object ($smo + 'Wmi.ManagedComputer').
-# List the object properties, including the instance names.
-$wmi
-# Enable the TCP protocol on the default instance.
-$uri = "ManagedComputer[@Name='" + (get-item env:\computername).Value + "']/ServerInstance[@Name='SQLEXPRESS']/ServerProtocol[@Name='Tcp']"
-$tcp = $wmi.GetSmoObject($uri)
+import-module "sqlps"
+[System.Reflection.Assembly]::LoadWithPartialName("Microsoft.SqlServer.Smo.Wmi") | Out-Null
+$server = new-object ('Microsoft.SqlServer.Management.Smo.Wmi.ManagedComputer') -ArgumentList "localhost"
+$tcp = $server.GetSmoObject("ManagedComputer[@Name='localhost']/ServerInstance[@Name='SQLEXPRESS']/ServerProtocol[@Name='Tcp']")
 $tcp.IsEnabled = $true
 $tcp.Alter()
 $tcp
@@ -62,6 +72,7 @@ echo "`n=> Configuring firewall for SQL Server..."
 if (-not(Get-NetFirewallRule -DisplayName "SQL Server")) {
     New-NetFirewallRule -DisplayName "SQL Server" -Direction Inbound -Protocol TCP -LocalPort "1433" -Action Allow
 }
+Get-NetFirewallRule -DisplayName "SQL Server"
 
 
 echo "`n=> Restarting SQL Server..."
