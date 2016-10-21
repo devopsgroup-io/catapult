@@ -1310,7 +1310,7 @@ module Catapult
           @configuration["environments"]["#{environment}"]["servers"]["windows_mssql"]["mssql"].merge ({"sa_password" => ""})
         end
         if "#{environment}" == "dev"
-          @configuration["environments"]["#{environment}"]["servers"]["windows_mssql"]["mssql"]["sa_password"] = "password"
+          @configuration["environments"]["#{environment}"]["servers"]["windows_mssql"]["mssql"]["sa_password"] = "drowssap"
         else
           @configuration["environments"]["#{environment}"]["servers"]["windows_mssql"]["mssql"]["sa_password"] = SecureRandom.urlsafe_base64(16)
         end

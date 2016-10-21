@@ -38,6 +38,7 @@ if (-not(test-path -path "c:\Program Files\Microsoft SQL Server\MSSQL12.SQLEXPRE
     # the installer requires a cool down period to allow for garbage cleanup, services to start, etc
     echo "- Mandatory 30 second post-install cool down period, please wait..."
     start-sleep -s 30
+    start-service 'MSSQL$SQLEXPRESS'
 } else {
     echo "- Installed, skipping..."
 }
@@ -64,4 +65,4 @@ if (-not(Get-NetFirewallRule -DisplayName "SQL Server")) {
 
 
 echo "`n=> Restarting SQL Server..."
-Restart-Service 'MSSQL$SQLEXPRESS' -Force
+restart-service 'MSSQL$SQLEXPRESS' -Force
