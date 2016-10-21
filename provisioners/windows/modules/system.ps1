@@ -179,23 +179,26 @@ for ($i=0; $i -le 10; $i++) {
 echo "`n=> Running Disk Cleanup (This may take a while)..."
 # disk cleanup is packaged with the desktop-experience feature
 install-windowsfeature Desktop-Experience
-# http://support.microsoft.com/kb/253597
-$disk_space_before = (Get-WmiObject win32_logicaldisk -filter "DeviceID='C:'" | select Freespace).FreeSpace/1GB
-# set StateFlags0012 setting for each item in Windows 8.1 disk cleanup utility
-$volumeCaches = Get-ChildItem "HKLM:\Software\Microsoft\Windows\CurrentVersion\Explorer\VolumeCaches"
-foreach ($key in $volumeCaches) {
-    New-ItemProperty -Path "$($key.PSPath)" -Name StateFlags0099 -Value 2 -Type DWORD -Force | Out-Null
+# desktop-experience requires a reboot to install
+if (test-path -path "$env:SystemRoot\System32\cleanmgr.exe") {
+    # http://support.microsoft.com/kb/253597
+    $disk_space_before = (Get-WmiObject win32_logicaldisk -filter "DeviceID='C:'" | select Freespace).FreeSpace/1GB
+    # set StateFlags0012 setting for each item in Windows 8.1 disk cleanup utility
+    $volumeCaches = Get-ChildItem "HKLM:\Software\Microsoft\Windows\CurrentVersion\Explorer\VolumeCaches"
+    foreach ($key in $volumeCaches) {
+        New-ItemProperty -Path "$($key.PSPath)" -Name StateFlags0099 -Value 2 -Type DWORD -Force | Out-Null
+    }
+    # run disk cleanup
+    start-process -Wait "$env:SystemRoot\System32\cleanmgr.exe" -ArgumentList "/sagerun:99"
+    # delete the keys
+    $volumeCaches = Get-ChildItem "HKLM:\Software\Microsoft\Windows\CurrentVersion\Explorer\VolumeCaches"
+    foreach ($key in $volumeCaches) {
+        Remove-ItemProperty -Path "$($key.PSPath)" -Name StateFlags0099 -Force | Out-Null
+    }
+    $disk_space_after = (Get-WmiObject win32_logicaldisk -filter "DeviceID='C:'" | select Freespace).FreeSpace/1GB
+    "Free Space Before: {0} GB" -f [math]::round($disk_space_before,2)
+    "Free Space After: {0} GB" -f [math]::round($disk_space_after,2)
 }
-# run disk cleanup
-start-process -Wait "$env:SystemRoot\System32\cleanmgr.exe" -ArgumentList "/sagerun:99"
-# delete the keys
-$volumeCaches = Get-ChildItem "HKLM:\Software\Microsoft\Windows\CurrentVersion\Explorer\VolumeCaches"
-foreach ($key in $volumeCaches) {
-    Remove-ItemProperty -Path "$($key.PSPath)" -Name StateFlags0099 -Force | Out-Null
-}
-$disk_space_after = (Get-WmiObject win32_logicaldisk -filter "DeviceID='C:'" | select Freespace).FreeSpace/1GB
-"Free Space Before: {0} GB" -f [math]::round($disk_space_before,2)
-"Free Space After: {0} GB" -f [math]::round($disk_space_after,2)
 
 
 echo "`n=> Checking for Windows Updates (This may take a while)..."
