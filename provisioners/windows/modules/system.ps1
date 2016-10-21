@@ -97,7 +97,7 @@ if (-not(test-path -path "c:\catapult\provisioners\windows\installers\temp\dotne
 
 echo "`n=> Installing .NET 3.5..."
 if (-not(test-path -path "c:\windows\Microsoft.NET\Framework64\v3.5\")) {
-    Install-WindowsFeature Net-Framework-Core -source "c:\catapult\provisioners\windows\installers\temp\dotnetfx35.exe"
+    install-windowsfeature Net-Framework-Core -source "c:\catapult\provisioners\windows\installers\temp\dotnetfx35.exe"
 } else {
     echo "- Installed, skipping..."
 }
@@ -174,6 +174,28 @@ for ($i=0; $i -le 10; $i++) {
         echo "ssh-keyscan for github.com failed, retrying!"
     }
 }
+
+
+echo "`n=> Running Disk Cleanup (This may take a while)..."
+# disk cleanup is packaged with the desktop-experience feature
+install-windowsfeature Desktop-Experience
+# http://support.microsoft.com/kb/253597
+$disk_space_before = (Get-WmiObject win32_logicaldisk -filter "DeviceID='C:'" | select Freespace).FreeSpace/1GB
+# set StateFlags0012 setting for each item in Windows 8.1 disk cleanup utility
+$volumeCaches = Get-ChildItem "HKLM:\Software\Microsoft\Windows\CurrentVersion\Explorer\VolumeCaches"
+foreach ($key in $volumeCaches) {
+    New-ItemProperty -Path "$($key.PSPath)" -Name StateFlags0099 -Value 2 -Type DWORD -Force | Out-Null
+}
+# run disk cleanup
+start-process -Wait "$env:SystemRoot\System32\cleanmgr.exe" -ArgumentList "/sagerun:99"
+# delete the keys
+$volumeCaches = Get-ChildItem "HKLM:\Software\Microsoft\Windows\CurrentVersion\Explorer\VolumeCaches"
+foreach ($key in $volumeCaches) {
+    Remove-ItemProperty -Path "$($key.PSPath)" -Name StateFlags0099 -Force | Out-Null
+}
+$disk_space_after = (Get-WmiObject win32_logicaldisk -filter "DeviceID='C:'" | select Freespace).FreeSpace/1GB
+"Free Space Before: {0} GB" -f [math]::round($disk_space_before,2)
+"Free Space After: {0} GB" -f [math]::round($disk_space_after,2)
 
 
 echo "`n=> Checking for Windows Updates (This may take a while)..."
