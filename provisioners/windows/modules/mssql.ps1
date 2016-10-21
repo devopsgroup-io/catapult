@@ -29,7 +29,7 @@ if (-not(test-path -path "c:\Program Files\Microsoft SQL Server\MSSQL12.SQLEXPRE
     # https://msdn.microsoft.com/en-us/library/dd239405(v=sql.120).aspx
     # setup parameters
     # https://msdn.microsoft.com/en-us/library/ms144259(v=sql.120).aspx
-    start-process -filepath "c:\catapult\provisioners\windows\installers\temp\SQLEXPRWT_x64_ENU\setup.exe" -argumentlist ("/IACCEPTSQLSERVERLICENSETERMS /SQLSYSADMINACCOUNTS={1} /SAPWD={0} /SQLSVCPASSWORD={0} /AGTSVCPASSWORD={0} /ASSVCPASSWORD={0} /ISSVCPASSWORD={0} /RSSVCPASSWORD={0} /ConfigurationFile=c:\catapult\provisioners\windows\installers\MicrosoftSQLServer\ConfigurationFile.ini" -f $configuration.environments.$($args[0]).servers.windows_mssql.mssql.sa_password,("$($hostname)\$($env:username)"))) -Wait -RedirectStandardOutput $provision -RedirectStandardError $provisionError
+    start-process -filepath "c:\catapult\provisioners\windows\installers\temp\SQLEXPRWT_x64_ENU\setup.exe" -argumentlist ("/IACCEPTSQLSERVERLICENSETERMS /SQLSYSADMINACCOUNTS={1} /SAPWD={0} /SQLSVCPASSWORD={0} /AGTSVCPASSWORD={0} /ASSVCPASSWORD={0} /ISSVCPASSWORD={0} /RSSVCPASSWORD={0} /ConfigurationFile=c:\catapult\provisioners\windows\installers\MicrosoftSQLServer\ConfigurationFile.ini" -f $configuration.environments.$($args[0]).servers.windows_mssql.mssql.sa_password,"$($hostname)\$($env:username)") -Wait -RedirectStandardOutput $provision -RedirectStandardError $provisionError
     get-content $provision
     get-content $provisionError
     $directory_latest = Get-ChildItem -Path "c:\Program Files\Microsoft SQL Server\120\Setup Bootstrap\Log" | Sort-Object LastAccessTime -Descending | Select-Object -First 1
