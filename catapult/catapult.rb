@@ -964,7 +964,11 @@ module Catapult
         @api_aws = Nokogiri::XML.parse(response.body)
       end
     end
-    # loop through each environment
+    # loop through each environment and provider
+    ######################################################################
+    # BE VERY CAREFUL WITH THE MERGE OPERATIONS                          #
+    # @todo step through hierarchy and create null values if not defined #
+    ######################################################################
     @configuration["environments"].each do |environment,data|
 
       puts "\n[#{environment}]"
@@ -1226,6 +1230,14 @@ module Catapult
       
       end
       # if environment passwords do not exist, create them
+      ######################################################################
+      # BE VERY CAREFUL WITH THE MERGE OPERATIONS                          #
+      # @todo step through hierarchy and create null values if not defined #
+      ######################################################################
+
+      #####################
+      # windows           #
+      #####################
       # ["servers"]["windows"]["admin_password"]
       if !defined?(@configuration["environments"]["#{environment}"]["servers"]["windows"]["admin_password"]) || (@configuration["environments"]["#{environment}"]["servers"]["windows"]["admin_password"].nil?)
         if !defined?(@configuration["environments"]["#{environment}"]["servers"]["windows"]["admin_password"])
@@ -1242,6 +1254,10 @@ module Catapult
         File.open('secrets/configuration.yml', 'w') {|f| f.write configuration.to_yaml }
         `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml.gpg --armor --cipher-algo AES256 --symmetric secrets/configuration.yml`
       end
+
+      #####################
+      # windows_mssql     #
+      #####################
       # ["servers"]["windows_mssql"]["admin_password"]
       if !defined?(@configuration["environments"]["#{environment}"]["servers"]["windows_mssql"]["admin_password"]) || (@configuration["environments"]["#{environment}"]["servers"]["windows_mssql"]["admin_password"].nil?)
         if !defined?(@configuration["environments"]["#{environment}"]["servers"]["windows_mssql"]["admin_password"])
@@ -1258,7 +1274,55 @@ module Catapult
         File.open('secrets/configuration.yml', 'w') {|f| f.write configuration.to_yaml }
         `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml.gpg --armor --cipher-algo AES256 --symmetric secrets/configuration.yml`
       end
-      # ["servers"]["redhat_mysql"]["user_password"]
+      # ["servers"]["windows_mssql"]["mssql"]["user"]
+      if !defined?(@configuration["environments"]["#{environment}"]["servers"]["windows_mssql"]["mssql"]["user"]) || (@configuration["environments"]["#{environment}"]["servers"]["windows_mssql"]["mssql"]["user"].nil?)
+        if !defined?(@configuration["environments"]["#{environment}"]["servers"]["windows_mssql"]["mssql"]["user"])
+          @configuration["environments"]["#{environment}"]["servers"]["windows_mssql"].merge! ({"mssql" => {"user" => ""}})
+        else
+          @configuration["environments"]["#{environment}"]["servers"]["windows_mssql"].merge ({"mssql" => {"user" => ""}})
+        end
+        @configuration["environments"]["#{environment}"]["servers"]["windows_mssql"]["mssql"]["user"] = "#{environment}"
+        `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml --decrypt secrets/configuration.yml.gpg`
+        File.open('secrets/configuration.yml', 'w') {|f| f.write configuration.to_yaml }
+        `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml.gpg --armor --cipher-algo AES256 --symmetric secrets/configuration.yml`
+      end
+      # ["servers"]["windows_mssql"]["mssql"]["user_password"]
+      if !defined?(@configuration["environments"]["#{environment}"]["servers"]["windows_mssql"]["mssql"]["user_password"]) || (@configuration["environments"]["#{environment}"]["servers"]["windows_mssql"]["mssql"]["user_password"].nil?)
+        if !defined?(@configuration["environments"]["#{environment}"]["servers"]["windows_mssql"]["mssql"]["user_password"])
+          @configuration["environments"]["#{environment}"]["servers"]["windows_mssql"]["mssql"].merge! ({"user_password" => ""})
+        else
+          @configuration["environments"]["#{environment}"]["servers"]["windows_mssql"]["mssql"].merge ({"user_password" => ""})
+        end
+        if "#{environment}" == "dev"
+          @configuration["environments"]["#{environment}"]["servers"]["windows_mssql"]["mssql"]["user_password"] = "password"
+        else
+          @configuration["environments"]["#{environment}"]["servers"]["windows_mssql"]["mssql"]["user_password"] = SecureRandom.urlsafe_base64(16)
+        end
+        `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml --decrypt secrets/configuration.yml.gpg`
+        File.open('secrets/configuration.yml', 'w') {|f| f.write configuration.to_yaml }
+        `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml.gpg --armor --cipher-algo AES256 --symmetric secrets/configuration.yml`
+      end
+      # ["servers"]["windows_mssql"]["mssql"]["sa_password"]
+      if !defined?(@configuration["environments"]["#{environment}"]["servers"]["windows_mssql"]["mssql"]["sa_password"]) || (@configuration["environments"]["#{environment}"]["servers"]["windows_mssql"]["mssql"]["sa_password"].nil?)
+        if !defined?(@configuration["environments"]["#{environment}"]["servers"]["windows_mssql"]["mssql"]["sa_password"])
+          @configuration["environments"]["#{environment}"]["servers"]["windows_mssql"]["mssql"].merge! ({"sa_password" => ""})
+        else
+          @configuration["environments"]["#{environment}"]["servers"]["windows_mssql"]["mssql"].merge ({"sa_password" => ""})
+        end
+        if "#{environment}" == "dev"
+          @configuration["environments"]["#{environment}"]["servers"]["windows_mssql"]["mssql"]["sa_password"] = "password"
+        else
+          @configuration["environments"]["#{environment}"]["servers"]["windows_mssql"]["mssql"]["sa_password"] = SecureRandom.urlsafe_base64(16)
+        end
+        `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml --decrypt secrets/configuration.yml.gpg`
+        File.open('secrets/configuration.yml', 'w') {|f| f.write configuration.to_yaml }
+        `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml.gpg --armor --cipher-algo AES256 --symmetric secrets/configuration.yml`
+      end
+
+      #####################
+      # redhat_mysql      #
+      #####################
+      # ["servers"]["redhat_mysql"]["mysql"]["user_password"]
       if !defined?(@configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["mysql"]["user_password"]) || (@configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["mysql"]["user_password"].nil?)
         if !defined?(@configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["mysql"]["user_password"])
           @configuration["environments"]["#{environment}"]["servers"].merge! ({"redhat_mysql" => {"mysql" => {"user_password" => ""}}})
@@ -1274,7 +1338,7 @@ module Catapult
         File.open('secrets/configuration.yml', 'w') {|f| f.write configuration.to_yaml }
         `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml.gpg --armor --cipher-algo AES256 --symmetric secrets/configuration.yml`
       end
-      # ["servers"]["redhat_mysql"]["root_password"]
+      # ["servers"]["redhat_mysql"]["mysql"]["root_password"]
       if !defined?(@configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["mysql"]["root_password"]) || (@configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["mysql"]["root_password"].nil?)
         if !defined?(@configuration["environments"]["#{environment}"]["servers"]["redhat_mysql"]["mysql"]["root_password"])
           @configuration["environments"]["#{environment}"]["servers"].merge! ({"redhat_mysql" => {"mysql" => {"root_password" => ""}}})
@@ -1290,6 +1354,10 @@ module Catapult
         File.open('secrets/configuration.yml', 'w') {|f| f.write configuration.to_yaml }
         `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml.gpg --armor --cipher-algo AES256 --symmetric secrets/configuration.yml`
       end
+
+      #####################
+      # software          #
+      #####################
       # ["software"]["admin_password"]
       if !defined?(@configuration["environments"]["#{environment}"]["software"]["admin_password"]) || (@configuration["environments"]["#{environment}"]["software"]["admin_password"].nil?)
         if !defined?(@configuration["environments"]["#{environment}"]["software"]["admin_password"])

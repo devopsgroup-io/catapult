@@ -17,7 +17,7 @@ if (Get-Module -ListAvailable -Name servermanager) {
 }
 
 
-echo "`n=> Installing web-webserver (This may take a while...)"
+echo "`n=> Installing web-webserver (This may take a while)..."
 add-windowsfeature web-webserver -includeallsubfeature -logpath c:\catapult\provisioners\windows\logs\add-windowsfeature_web-webserver.log
 
 

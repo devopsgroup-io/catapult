@@ -1,7 +1,7 @@
 . "c:\catapult\provisioners\windows\modules\catapult.ps1"
 
 
-echo "`n=> Downloading SQL Server 2014 Express Edition..."
+echo "`n=> Downloading SQL Server 2014 Express Edition (This may take a while)..."
 if (-not(test-path -path "c:\catapult\provisioners\windows\installers\temp\SQLEXPRWT_x64_ENU.exe")) {
     $url = "https://download.microsoft.com/download/E/A/E/EAE6F7FC-767A-4038-A954-49B8B05D04EB/ExpressAndTools%2064BIT/SQLEXPRWT_x64_ENU.exe"
     $output = "c:\catapult\provisioners\windows\installers\temp\SQLEXPRWT_x64_ENU.exe"
@@ -13,16 +13,31 @@ if (-not(test-path -path "c:\catapult\provisioners\windows\installers\temp\SQLEX
 }
 
 
-echo "`n=> Installing SQL Server 2014 Express Edition..."
-if (-not(test-path -path "c:\Program Files\Microsoft SQL Server\MSSQL12.MSSQLSERVER\MSSQL\")) {
+echo "`n=> Extracting SQL Server 2014 Express Edition (This may take a while)..."
+if (-not(test-path -path "c:\catapult\provisioners\windows\installers\temp\SQLEXPRWT_x64_ENU\")) {
+    start-process -filepath "c:\catapult\provisioners\windows\installers\temp\SQLEXPRWT_x64_ENU.exe" -argumentlist "/Q /x:c:\catapult\provisioners\windows\installers\temp\SQLEXPRWT_x64_ENU" -Wait -RedirectStandardOutput $provision -RedirectStandardError $provisionError
+    get-content $provision
+    get-content $provisionError
+} else {
+    echo "- Installer extracted, skipping..."
+}
+
+
+echo "`n=> Installing SQL Server 2014 Express Edition (This may take a while)..."
+if (-not(test-path -path "c:\Program Files\Microsoft SQL Server\MSSQL12.SQLEXPRESS\MSSQL\")) {
+    # ini file setup
+    # https://msdn.microsoft.com/en-us/library/dd239405(v=sql.120).aspx
+    # setup parameters
     # https://msdn.microsoft.com/en-us/library/ms144259(v=sql.120).aspx
-    start-process -filepath "c:\catapult\provisioners\windows\installers\temp\SQLEXPRWT_x64_ENU.exe" -argumentlist "/ACTION=install /IACCEPTSQLSERVERLICENSETERMS /FEATURES=SQL /INSTANCENAME=MSSQLSERVER /Q /SECURITYMODE=SQL /SAPWD=password" -Wait -RedirectStandardOutput $provision -RedirectStandardError $provisionError
+    start-process -filepath "c:\catapult\provisioners\windows\installers\temp\SQLEXPRWT_x64_ENU\setup.exe" -argumentlist "/IACCEPTSQLSERVERLICENSETERMS /SAPWD=$($configuration.environments.$($args[0]).windows_mssql.mssql.sa_password) /SQLSVCPASSWORD=$($configuration.environments.$($args[0]).windows_mssql.mssql.sa_password) /AGTSVCPASSWORD=$($configuration.environments.$($args[0]).windows_mssql.mssql.sa_password) /ASSVCPASSWORD=$($configuration.environments.$($args[0]).windows_mssql.mssql.sa_password) /ISSVCPASSWORD=$($configuration.environments.$($args[0]).windows_mssql.mssql.sa_password) /RSSVCPASSWORD=$($configuration.environments.$($args[0]).windows_mssql.mssql.sa_password) /ConfigurationFile=c:\catapult\provisioners\windows\installers\MicrosoftSQLServer\ConfigurationFile.ini" -Wait -RedirectStandardOutput $provision -RedirectStandardError $provisionError
     get-content $provision
     get-content $provisionError
     $directory_latest = Get-ChildItem -Path "c:\Program Files\Microsoft SQL Server\120\Setup Bootstrap\Log" | Sort-Object LastAccessTime -Descending | Select-Object -First 1
-    $summary_latest = Get-ChildItem "c:\Program Files\Microsoft SQL Server\120\Setup Bootstrap\Log\$directory_latest" | Where-Object {$_.Name -match "^[Summary]"} | Sort-Object LastAccessTime -Descending | Select-Object -First 1
+    $summary_latest = Get-ChildItem "c:\Program Files\Microsoft SQL Server\120\Setup Bootstrap\Log\$directory_latest" | Where-Object {$_.Name -match "^Summary"} | Sort-Object LastAccessTime -Descending | Select-Object -First 1
     get-content "c:\Program Files\Microsoft SQL Server\120\Setup Bootstrap\Log\$directory_latest\$summary_latest"
-    #get-content "c:\Program Files\Microsoft SQL Server\120\Setup Bootstrap\Log\Summary.txt"
+    # the installer requires a cool down period to allow for garbage cleanup, services to start, etc
+    echo "- Mandatory 30 second post-install cool down period, please wait..."
+    start-sleep -s 30
 } else {
     echo "- Installed, skipping..."
 }
@@ -35,7 +50,7 @@ $wmi = new-object ($smo + 'Wmi.ManagedComputer').
 # List the object properties, including the instance names.
 $wmi
 # Enable the TCP protocol on the default instance.
-$uri = "ManagedComputer[@Name='" + (get-item env:\computername).Value + "']/ServerInstance[@Name='MSSQLSERVER']/ServerProtocol[@Name='Tcp']"
+$uri = "ManagedComputer[@Name='" + (get-item env:\computername).Value + "']/ServerInstance[@Name='SQLEXPRESS']/ServerProtocol[@Name='Tcp']"
 $tcp = $wmi.GetSmoObject($uri)
 $tcp.IsEnabled = $true
 $tcp.Alter()
@@ -49,4 +64,4 @@ if (-not(Get-NetFirewallRule -DisplayName "SQL Server")) {
 
 
 echo "`n=> Restarting SQL Server..."
-Restart-Service 'MSSQLSERVER' -Force
+Restart-Service 'MSSQL$SQLEXPRESS' -Force
