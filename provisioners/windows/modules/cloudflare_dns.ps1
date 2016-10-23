@@ -37,7 +37,7 @@ foreach ($domain in $domains) {
         "X-Auth-Key" = $configuration.company.cloudflare_api_key;
     }
     try {
-        $result = invoke-webrequest -Method Get -Uri "https://api.cloudflare.com/client/v4/zones?name=$($domain_levels[-2]).$($domain_levels[-1])" `
+        $result = invoke-webrequest -usebasicparsing -method Get -uri "https://api.cloudflare.com/client/v4/zones?name=$($domain_levels[-2]).$($domain_levels[-1])" `
             -ContentType "application/json" `
             -Headers $headers
         $cloudflare_zone = $result.Content
@@ -80,7 +80,7 @@ foreach ($domain in $domains) {
                 "X-Auth-Key" = $configuration.company.cloudflare_api_key;
             }
             try {
-                $result = invoke-webrequest -Method Get -Uri "https://api.cloudflare.com/client/v4/zones/$($cloudflare_zone_id)/dns_records?type=A&name=$($domain_dns_record)" `
+                $result = invoke-webrequest -usebasicparsing -method Get -uri "https://api.cloudflare.com/client/v4/zones/$($cloudflare_zone_id)/dns_records?type=A&name=$($domain_dns_record)" `
                     -ContentType "application/json" `
                     -Headers $headers
                 $dns_record = $result.Content
@@ -120,7 +120,7 @@ foreach ($domain in $domains) {
                         "X-Auth-Key" = $configuration.company.cloudflare_api_key;
                     }
                     try {
-                        $result = invoke-webrequest -Method Post -Uri "https://api.cloudflare.com/client/v4/zones/$($cloudflare_zone_id)/dns_records" `
+                        $result = invoke-webrequest -usebasicparsing -method Post -uri "https://api.cloudflare.com/client/v4/zones/$($cloudflare_zone_id)/dns_records" `
                             -ContentType "application/json" `
                             -Headers $headers `
                             -Body (ConvertTo-Json $data)
@@ -150,7 +150,7 @@ foreach ($domain in $domains) {
                         "X-Auth-Key" = $configuration.company.cloudflare_api_key;
                     }
                     try {
-                        $result = invoke-webrequest -Method Put -Uri "https://api.cloudflare.com/client/v4/zones/$($cloudflare_zone_id)/dns_records/$($dns_record_id)" `
+                        $result = invoke-webrequest -usebasicparsing -method Put -uri "https://api.cloudflare.com/client/v4/zones/$($cloudflare_zone_id)/dns_records/$($dns_record_id)" `
                             -ContentType "application/json" `
                             -Headers $headers `
                             -Body (ConvertTo-Json $data)

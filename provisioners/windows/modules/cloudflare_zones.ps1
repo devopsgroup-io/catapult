@@ -41,7 +41,7 @@ foreach ($domain in $domains) {
         "X-Auth-Key" = $configuration.company.cloudflare_api_key;
     }
     try {
-        $result = invoke-webrequest -Method Post -Uri "https://api.cloudflare.com/client/v4/zones" `
+        $result = invoke-webrequest -usebasicparsing -method Post -uri "https://api.cloudflare.com/client/v4/zones" `
             -ContentType "application/json" `
             -Headers $headers `
             -Body (ConvertTo-Json $data)
