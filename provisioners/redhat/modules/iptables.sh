@@ -69,6 +69,15 @@ if [ "${4}" == "apache" ]; then
         --match state\
         --state NEW,ESTABLISHED\
         --jump ACCEPT
+# allow incoming traffic for bamboo
+elif [ "${4}" == "bamboo" ]; then
+    sudo iptables\
+        --append INPUT\
+        --protocol tcp\
+        --dport 8805\
+        --match state\
+        --state NEW,ESTABLISHED\
+        --jump ACCEPT
 # allow incoming database traffic
 elif [ "${4}" == "mysql" ]; then
     if [ "${1}" == "dev"  ]; then

@@ -54,15 +54,23 @@ echo "=> REPOSITORY: $($args[1])"
 echo "=> GPG KEY: ************"
 echo "=> INSTANCE:$($args[3])"
 
-# get the catapult instance
-if (($($args[0]) -eq "dev") -OR ($($args[0]) -eq "test")) {
-    $branch = "develop"
+# define the branch
+if ($($args[0]) -eq "production") {
+    $branch = "master"
 } elseif ($($args[0]) -eq "qc") {
     $branch = "release"
-} elseif ($($args[0]) -eq "production") {
-    $branch = "master"
+} else {
+    $branch = "develop"
 }
-if ($($args[0]) -ne "dev") {
+# get the catapult instance
+if ($($args[0]) -eq "dev") {
+    if (-not(test-path -path "c:\catapult\secrets\configuration.yml.gpg")) {
+        echo "Cannot read from /catapult/secrets/configuration.yml.gpg, please vagrant reload the virtual machine."
+        exit 1
+    } else {
+        echo "Your Catapult instance is being synced from your host machine."
+    }
+} else {
     if (test-path -path "c:\catapult\.git") {
         start-process -filepath "c:\Program Files\Git\bin\git.exe" -argumentlist ("-C c:\catapult checkout {0}" -f $branch) -Wait -RedirectStandardOutput $provision -RedirectStandardError $provisionError
         get-content $provision
@@ -77,13 +85,6 @@ if ($($args[0]) -ne "dev") {
         start-process -filepath "c:\Program Files\Git\bin\git.exe" -argumentlist ("clone --recursive --branch {0} {1} c:\catapult" -f $branch,$($args[1])) -Wait -RedirectStandardOutput $provision -RedirectStandardError $provisionError
         get-content $provision
         get-content $provisionError
-    }
-} else {
-    if (-not(test-path -path "c:\catapult\secrets\configuration.yml.gpg")) {
-        echo "Cannot read from /catapult/secrets/configuration.yml.gpg, please vagrant reload the virtual machine."
-        exit 1
-    } else {
-        echo "Your Catapult instance is being synced from your host machine."
     }
 }
 
