@@ -32,28 +32,29 @@ echo -e "=> REPOSITORY: ${2}"
 echo -e "=> GPG KEY: ************"
 echo -e "=> INSTANCE: ${4}"
 
-# get the catapult instance
-if ([ $1 = "dev" ] || [ $1 = "test" ]); then
-    branch="develop"
+# define the branch
+if ([ $1 = "production" ]); then
+    branch="master"
 elif ([ $1 = "qc" ]); then
     branch="release"
-elif ([ $1 = "production" ]); then
-    branch="master"
+else
+    branch="develop"
 fi
-if [ $1 != "dev" ]; then
+# get the catapult instance
+if ([ $1 = "dev" ]); then
+    if ! [ -e "/catapult/secrets/configuration.yml.gpg" ]; then
+        echo -e "Cannot read from /catapult/secrets/configuration.yml.gpg, please vagrant reload the virtual machine."
+        exit 1
+    else
+        echo -e "Your Catapult instance is being synced from your host machine."
+    fi
+else
     if [ -d "/catapult/.git" ]; then
         cd /catapult && sudo git checkout ${branch}
         cd /catapult && sudo git fetch
         cd /catapult && sudo git pull
     else
         sudo git clone --recursive --branch ${branch} $2 /catapult
-    fi
-else
-    if ! [ -e "/catapult/secrets/configuration.yml.gpg" ]; then
-        echo -e "Cannot read from /catapult/secrets/configuration.yml.gpg, please vagrant reload the virtual machine."
-        exit 1
-    else
-        echo -e "Your Catapult instance is being synced from your host machine."
     fi
 fi
 

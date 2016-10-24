@@ -10,6 +10,9 @@ redhat:
     apache_vhosts:
       description: "Manages HTTP and HTTPS virtual hosts and SSL certificates for websites."
       multithreading: false
+    bamboo:
+      description: "Manages the Atlassian Bamboo Server instance."
+      multithreading: false
     cloudflare_cache:
       description: "Manages CloudFlare zone cache for websites."
       multithreading: true
@@ -67,6 +70,8 @@ redhat:
   servers:
     apache:
       modules: ["time","system","iptables","newrelic_sysmon","git_clean","software_operations_file","git","software_config","rsync","php","software_tools","apache","apache_vhosts_clean","apache_vhosts","newrelic_apm_php","cloudflare_zones","cloudflare_dns"]
+    bamboo:
+      modules: ["time","system","bamboo"]
     mysql:
       modules: ["time","system","iptables","newrelic_sysmon","git_clean","git","software_config","rsync","php","software_tools","software_operations_meta","mysql","cloudflare_cache","newrelic_synthetics"]
 windows:

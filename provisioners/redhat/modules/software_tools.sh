@@ -11,7 +11,7 @@ if [ ! -f /usr/bin/composer ]; then
     mkdir --parents /usr/local/src/composer
     cd /usr/local/src/composer
 
-    curl --silent --show-error --connect-timeout 5 --max-time 5 --retry 5 --url https://getcomposer.org/installer | php
+    curl --silent --show-error --connect-timeout 5 --max-time 5 --retry 5 --location --url https://getcomposer.org/installer | php
 
     ln -s /usr/local/src/composer/composer.phar /usr/bin/composer
 
@@ -46,7 +46,7 @@ if [ ! -f /usr/bin/wp-cli ]; then
     mkdir --parents /usr/local/src/wp-cli
     cd /usr/local/src/wp-cli
 
-    curl --silent --show-error --connect-timeout 5 --max-time 5 --output wp-cli.phar --retry 5 --url https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+    curl --silent --show-error --connect-timeout 5 --max-time 5 --output wp-cli.phar --retry 5 --location --url https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
     # wp-cli requires special permissions
     chmod +x wp-cli.phar
 

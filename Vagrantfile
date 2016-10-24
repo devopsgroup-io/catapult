@@ -13,6 +13,26 @@ Vagrant.configure("2") do |config|
   config.hostmanager.ignore_private_ip = false
   config.hostmanager.include_offline = true
 
+  # build => bamboo
+  config.vm.define "#{Catapult::Command.configuration["company"]["name"].downcase}-build" do |config|
+    config.vm.provider :digital_ocean do |provider,override|
+      override.ssh.private_key_path = "secrets/id_rsa"
+      override.vm.box = "digital_ocean"
+      override.vm.box_url = "https://github.com/smdahlen/vagrant-digitalocean/raw/master/box/digital_ocean.box"
+      provider.token = Catapult::Command.configuration["company"]["digitalocean_personal_access_token"]
+      provider.image = "centos-7-x64"
+      provider.region = "nyc3"
+      provider.size = "512mb"
+      provider.ipv6 = true
+      provider.private_networking = true
+      provider.backups_enabled = true
+    end
+    # disable the default vagrant share
+    config.vm.synced_folder ".", "/vagrant", disabled: true
+    # configure the provisioner
+    config.vm.provision "shell", path: "provisioners/redhat/provision.sh", args: ["build","#{Catapult::Command.repo}","#{Catapult::Command.configuration_user["settings"]["gpg_key"]}","bamboo"]
+  end
+
   # dev => redhat
   config.vm.define "#{Catapult::Command.configuration["company"]["name"].downcase}-dev-redhat" do |config|
     config.vm.box = "centos/7"
