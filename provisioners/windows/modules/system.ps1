@@ -176,6 +176,7 @@ for ($i=0; $i -le 10; $i++) {
 }
 
 
+<# @todo - this hangs more than it should, investigate
 echo "`n=> Running Disk Cleanup (This may take a while)..."
 # disk cleanup is packaged with the desktop-experience feature
 install-windowsfeature Desktop-Experience
@@ -199,6 +200,7 @@ if (test-path -path "$env:SystemRoot\System32\cleanmgr.exe") {
     "Free Space Before: {0} GB" -f [math]::round($disk_space_before,2)
     "Free Space After: {0} GB" -f [math]::round($disk_space_after,2)
 }
+#>
 
 
 echo "`n=> Checking for Windows Updates (This may take a while)..."
