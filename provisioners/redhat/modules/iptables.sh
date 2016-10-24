@@ -1,10 +1,5 @@
 source "/catapult/provisioners/redhat/modules/catapult.sh"
 
-if [ "${1}" == "dev" ]; then
-    redhat_ip="$(echo "${configuration}" | shyaml get-value environments.${1}.servers.redhat.ip)"
-else
-    redhat_ip="$(echo "${configuration}" | shyaml get-value environments.${1}.servers.redhat.ip_private)"
-fi
 
 # disable the baked in firewalld
 sudo systemctl stop firewalld
@@ -74,14 +69,28 @@ elif [ "${4}" == "bamboo" ]; then
     sudo iptables\
         --append INPUT\
         --protocol tcp\
+        --dport 80\
+        --match state\
+        --state NEW,ESTABLISHED\
+        --jump ACCEPT
+    sudo iptables\
+        --append INPUT\
+        --protocol tcp\
+        --dport 443\
+        --match state\
+        --state NEW,ESTABLISHED\
+        --jump ACCEPT
+    sudo iptables\
+        --append INPUT\
+        --protocol tcp\
         --dport 8805\
         --match state\
         --state NEW,ESTABLISHED\
         --jump ACCEPT
 # allow incoming database traffic
 elif [ "${4}" == "mysql" ]; then
+    # allow any connection from the developer workstation
     if [ "${1}" == "dev"  ]; then
-        # from developer machine
         sudo iptables\
             --append INPUT\
             --protocol tcp\
@@ -89,8 +98,9 @@ elif [ "${4}" == "mysql" ]; then
             --match state\
             --state NEW,ESTABLISHED\
             --jump ACCEPT
+    # restrict incoming connection only from redhat private interface
     else
-        # from the redhat server
+        redhat_ip="$(catapult environments.${1}.servers.redhat.ip_private)"
         sudo iptables\
             --append INPUT\
             --protocol tcp\
