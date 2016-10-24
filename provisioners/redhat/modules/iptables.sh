@@ -83,7 +83,7 @@ elif [ "${4}" == "bamboo" ]; then
     sudo iptables\
         --append INPUT\
         --protocol tcp\
-        --dport 8805\
+        --dport 8085\
         --match state\
         --state NEW,ESTABLISHED\
         --jump ACCEPT
