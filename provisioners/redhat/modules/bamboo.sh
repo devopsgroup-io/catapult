@@ -17,4 +17,8 @@ sudo cat > "/usr/local/src/bamboo/atlassian-bamboo-5.13.2/atlassian-bamboo/WEB-I
     bamboo.home=/usr/local/src/bamboo/atlassian-bamboo
 EOF
 
+# run bamboo as port 80
+sed --in-place 's/:8085//g' /usr/local/src/bamboo/atlassian-bamboo/xml-data/configuration/administration.xml
+sed --in-place 's/port="8085"/port="80"/g' /usr/local/src/bamboo/atlassian-bamboo-5.13.2/conf/server.xml
+
 bash /usr/local/src/bamboo/atlassian-bamboo-5.13.2/bin/start-bamboo.sh
