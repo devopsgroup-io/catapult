@@ -73,7 +73,7 @@ redhat:
     bamboo:
       modules: ["time","system","iptables","newrelic_sysmon","bamboo"]
     mysql:
-      modules: ["time","system","iptables","newrelic_sysmon","git_clean","git","software_config","rsync","php","software_tools","software_operations_meta","mysql","cloudflare_cache","newrelic_synthetics"]
+      modules: ["time","system","iptables","newrelic_sysmon","git_clean","git","software_config","rsync","php","software_tools","software_operations_meta","mysql","cloudflare_cache"]
 windows:
   modules:
     cloudflare_dns:
