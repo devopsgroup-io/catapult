@@ -185,7 +185,7 @@ Vagrant.configure("2") do |config|
 
   # dev => windows
   config.vm.define "#{Catapult::Command.configuration["company"]["name"].downcase}-dev-windows" do |config|
-    config.vm.box = "opentable/win-2012r2-standard-amd64-nocm"
+    config.vm.box = "devopsgroup-io/windows_server-2012r2-standard-amd64-nocm"
     config.vm.network "private_network", ip: Catapult::Command.configuration["environments"]["dev"]["servers"]["windows"]["ip"]
     config.vm.network "forwarded_port", guest: 80, host: Catapult::Command.configuration["environments"]["dev"]["servers"]["windows"]["port_80"]
     config.vm.provider :virtualbox do |provider|
@@ -210,7 +210,7 @@ Vagrant.configure("2") do |config|
     config.vm.provision "shell", path: "provisioners/windows/provision.ps1", args: ["dev","#{Catapult::Command.repo}","#{Catapult::Command.configuration_user["settings"]["gpg_key"]}","iis"], run: "always"
   end
   config.vm.define "#{Catapult::Command.configuration["company"]["name"].downcase}-dev-windows-mssql" do |config|
-    config.vm.box = "opentable/win-2012r2-standard-amd64-nocm"
+    config.vm.box = "devopsgroup-io/windows_server-2012r2-standard-amd64-nocm"
     config.vm.network "private_network", ip: Catapult::Command.configuration["environments"]["dev"]["servers"]["windows_mssql"]["ip"]
     config.vm.provider :virtualbox do |provider|
       provider.memory = 512
