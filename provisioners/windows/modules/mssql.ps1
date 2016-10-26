@@ -112,11 +112,13 @@ echo "`n=> Enabling TCP/IP for SQL Server..."
 # required to load by file for first provision, the path is not yet added
 import-module "C:\Program Files (x86)\Microsoft SQL Server\120\Tools\PowerShell\Modules\sqlps\Sqlps.ps1"
 [System.Reflection.Assembly]::LoadWithPartialName("Microsoft.SqlServer.Smo.Wmi") | Out-Null
+# http://blog.citrix24.com/configure-sql-express-to-accept-remote-connections/
 $server = new-object ('Microsoft.SqlServer.Management.Smo.Wmi.ManagedComputer') -ArgumentList "localhost"
 $tcp = $server.GetSmoObject("ManagedComputer[@Name='localhost']/ServerInstance[@Name='SQLEXPRESS']/ServerProtocol[@Name='Tcp']")
 $tcp.IsEnabled = $true
+$server.GetSmoObject("ManagedComputer[@Name='localhost']/ServerInstance[@Name='SQLEXPRESS']/ServerProtocol[@Name='Tcp']/IPAddress[@Name='IPAll']").IPAddressProperties[0].Value=""
+$server.GetSmoObject("ManagedComputer[@Name='localhost']/ServerInstance[@Name='SQLEXPRESS']/ServerProtocol[@Name='Tcp']/IPAddress[@Name='IPAll']").IPAddressProperties[1].Value="1433"
 $tcp.Alter()
-$tcp
 
 
 echo "`n=> Configuring firewall for SQL Server..."
