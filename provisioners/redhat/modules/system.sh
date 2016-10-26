@@ -175,6 +175,6 @@ sudo systemctl restart yum-cron.service
 
 echo -e "\n> system cron configuration"
 # configure a weekly job to reboot the system if necessary
-if [ ! -f /etc/cron.weekly/catapult-reboot.cron ]; then
-    sudo ln -s /catapult/provisioners/redhat/modules/system_reboot.sh /etc/cron.weekly/catapult-reboot.cron
+if [ ! -f /etc/cron.weekly/catapult-reboot ]; then
+    sudo ln -s /catapult/provisioners/redhat/modules/system_reboot.sh /etc/cron.weekly/catapult-reboot
 fi
