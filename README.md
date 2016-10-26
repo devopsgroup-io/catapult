@@ -327,7 +327,7 @@ Monitoring | New Relic Application (APM), Browser, Server, and \***Synthetics | 
 
 \* Depending on load, resources may need to be increased, starting at an additional [$5 per month per server](https://www.digitalocean.com/pricing/).
 
-\** New AWS customers receive 1-year free of micro services. Beyond this period, a few websites with builds running irregularly will generally incur over a couple dollars more per month.
+\** New AWS customers receive 1-year free of micro services. Beyond this period, an example of running nightly builds for all environments only incur $2-3 per month.
 
 \*** New Relic customers receive a trial "pro" period ranging from 14-days to 30-days, however, there is [no free tier beyond the trial](#partnerships)
 
