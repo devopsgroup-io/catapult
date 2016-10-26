@@ -59,17 +59,23 @@ if ($configuration_provisioners.windows.servers.$($args[3]).modules) {
     # loop through each required module
     foreach ($module in $configuration_provisioners.windows.servers.$($args[3]).modules) {
 
-        $start = get-date
-        echo "`n`n`n==> MODULE: $module"
         # check for reboot status between modules
-        # required to ensure all dependencies are in place for later software installs
+        # required for windows to properly install and update software
         $objSystemInfo = New-Object -ComObject "Microsoft.Update.SystemInfo"
         if ($objSystemInfo.RebootRequired) {
-            echo "==> REBOOT REQUIRED STATUS: [REQUIRED] Windows Update requires a reboot of this machine. Please do so and run the provisioner again to continue..."
+            echo "`n`n`n==> REBOOT REQUIRED STATUS: [REQUIRED] Windows Update requires a reboot of this machine. Please do so and run the provisioner again to continue..."
+            if ($($args[0]) -eq "dev") {
+                echo "Please run this command: vagrant reload <machine-name> --provision"
+            }
+            # require a reboot in every environment
             exit 1
         } else {
-            echo "==> REBOOT REQUIRED STATUS: [NOT REQUIRED] Continuing..."
+            echo "`n`n`n==> REBOOT REQUIRED STATUS: [NOT REQUIRED] Continuing..."
         }
+
+        # start the module
+        $start = get-date
+        echo ("==> MODULE: $module")
         echo ("==> DESCRIPTION: {0}" -f $configuration_provisioners.windows.modules.$($module).description)
         echo ("==> MULTITHREADING: {0}" -f $configuration_provisioners.windows.modules.$($module).multithreading)
 

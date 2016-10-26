@@ -100,6 +100,7 @@ if [ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-values-0 redha
     # loop through each required module
     cat "/catapult/provisioners/provisioners.yml" | shyaml get-values-0 redhat.servers.$4.modules |
     while read -r -d $'\0' module; do
+
         # cleanup leftover utility files
         for file in /catapult/provisioners/redhat/logs/${module}.*.log; do
             if [ -e "$file" ]; then
@@ -111,8 +112,26 @@ if [ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-values-0 redha
                 rm $file
             fi
         done
+
+        # check for reboot status between modules
+        # not required for red hat to properly install and update software
+        kernel_running=$(uname --release)
+        kernel_running="kernel-${kernel_running}"
+        kernel_staged=$(rpm --last --query kernel | head --lines 1 | awk '{print $1}')
+        if [ "${kernel_running}" != "${kernel_staged}" ]; then
+            echo -e "\n\n\n==> REBOOT REQUIRED STATUS: [RECOMMENDED] Red Hat kernel requires a reboot of this machine. The current running kernal is ${kernel_running} and the staged kernel is ${kernel_staged}."
+            if [ $1 = "dev" ]; then
+                echo -e "Please run this command: vagrant reload <machine-name> --provision"
+                # require a reboot in dev only
+                exit 1
+            fi
+        else
+            echo -e "\n\n\n==> REBOOT REQUIRED STATUS: [NOT REQUIRED] Continuing..."
+        fi
+
+        # start the module
         start=$(date +%s)
-        echo -e "\n\n\n==> MODULE: ${module}"
+        echo -e "==> MODULE: ${module}"
         echo -e "==> DESCRIPTION: $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-value redhat.modules.${module}.description)"
         echo -e "==> MULTITHREADING: $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-value redhat.modules.${module}.multithreading)"
         

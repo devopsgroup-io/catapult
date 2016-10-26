@@ -170,17 +170,3 @@ sudo sed --in-place --expression='/^apply_updates\s=/s|.*|apply_updates = yes|' 
 sudo sed --in-place --expression='/^emit_via\s=/s|.*|emit_via = None|' /etc/yum/yum-cron.conf
 # restart the service to re-read any new configuration
 sudo systemctl restart yum-cron.service
-
-
-
-echo -e "\n> system kernel configuration"
-kernel_running=$(uname --release)
-kernel_running="kernel-${kernel_running}"
-kernel_staged=$(rpm --last --query kernel | head --lines 1 | awk '{print $1}')
-echo -e "kernel running : ${kernel_running}"
-echo -e "kernel staged  : ${kernel_staged}"
-
-if [ "${kernel_running}" != "${kernel_staged}" ]; then
-    echo -e "REBOOT REQUIRED FOR KERNEL UPDATE"
-    echo -e "* please update to the DigitalOcean GrubLoader for upstream servers https://www.digitalocean.com/community/tutorials/how-to-update-a-digitalocean-server-s-kernel"
-fi
