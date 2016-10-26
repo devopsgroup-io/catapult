@@ -2,7 +2,7 @@
 
 
 $mssql_user = $configuration.environments.$($args[0]).servers.windows_mssql.mssql.user
-$mssql_user_password = $configuration.environments.$($args[0]).servers.windows_mssql.mssql.user.password
+$mssql_user_password = $configuration.environments.$($args[0]).servers.windows_mssql.mssql.user_password
 $mssql_sa_password = $configuration.environments.$($args[0]).servers.windows_mssql.mssql.sa_password
 
 
@@ -56,7 +56,8 @@ $server = new-object ("Microsoft.SqlServer.Management.Smo.Server") -ArgumentList
 # manage the sa mssql user
 $login = $server.Logins | ? {$_.Name -eq "sa"}
 $login.ChangePassword($mssql_sa_password)
-$login.PasswordPolicyEnforced = 1
+$login.PasswordPolicyEnforced = $false
+$login.PasswordExpirationEnabled = $false
 $login.Alter()
 $login.Refresh()
 # manage the environment mssql user
@@ -69,7 +70,8 @@ if ($server.Logins.name -notcontains $mssql_user) {
 }
 $login = $server.Logins | ? {$_.Name -eq $mssql_user}
 $login.ChangePassword($mssql_user_password)
-$login.PasswordPolicyEnforced = 1
+$login.PasswordPolicyEnforced = $false
+$login.PasswordExpirationEnabled = $false
 $login.Alter()
 $login.Refresh()
  
