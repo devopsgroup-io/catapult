@@ -114,34 +114,36 @@ The free market and competition is great - it pushes the envelope of innovation.
 
 Platform Feature | Catapult | Pantheon | Acquia
 -----------------|----------|----------|--------
-Source                                        | Open                           | Closed                        | Closed
-Subscription Feature Set                      | Bundled                        | Separated                     | Separated
-Supported PHP Software                        | 15                             | 2                             | 1
-Supported .NET Software                       | TBA                            | :x:                           | :x:
-Minimum Bundled<br>Monthly Cost               | $40                            | $400                          | $134
-Websites per Instance/Subscription            | Unlimited                      | 1                             | 1
-Managed Workflow                              | Git Flow                       | :x:                           | :x:
-Managed Workflow Model                        | Upstream or Downstream         | :x:                           | :x:
-Agile Methodology Focus                       | Scrum                          | :x:                           | :x:
-Managed Continuous Integration                | :white_check_mark:             | :x:                           | :x:
-Environments                                  | LocalDev, Test, QC, Production | Multidev, Dev, Test, Live     | Dev Desktop, Dev, Stage, Prod
-Exacting Configuration                        | :white_check_mark:             | :x:<sup>[2](#references)</sup>| :x:<sup>[3](#references)</sup>
-Approach                                      | Virtual Machine                | Container                     | Virtual Machine
-Data Center                                   | DigitalOcean and AWS           | Rackspace                     | AWS
-Scaling                                       | Vertical                       | Horizontal                    | Vertical
-Scaling Management                            | Manual                         | Automatic                     | Manual
-Development Environment                       | Unlimited Local                | 5 Cloud                       | Unlimited Local
-Development Environment Approach              | Exact                          | Exact                         | Similar
-Dashboard - Control                           | CLI                            | CLI & Web                     | CLI & Web
-Dashboard - Monitor                           | Web                            | Web                           | Web
-Managed Public Git Website Repository Support | GitHub & Bitbucket             | :x:                           | :x:
-Managed DNS                                   | CloudFlare                     | :x:                           | :x:
-Managed Free HTTPS/SSL                        | CloudFlare/Let's Encrypt       | :x:                           | :x:
-Managed Server Monitoring                     | New Relic                      | :x:                           | Proprietary
-Managed Application Error Logs                | New Relic                      | Proprietary                   | Proprietary
-Managed Application Performance Monitoring    | New Relic                      | :x:                           | :x:
-Managed Browser Performance Monitoring        | New Relic                      | :x:                           | :x:
-Managed Synthetic Monitoring                  | New Relic                      | :x:                           | :x:
+Source                                        | Open                                  | Closed                        | Closed
+Subscription Feature Set                      | Bundled                               | Separated                     | Separated
+Traditional Tooling (VMs & Shell)             | :white_check_mark:                    | :x:                           | :x:
+Multi-Platform (Linux & Windows)              | :white_check_mark:                    | :x:                           | :x:
+Supported PHP Software                        | 15                                    | 2                             | 1
+Supported .NET Software                       | TBA                                   | :x:                           | :x:
+Minimum Bundled<br>Monthly Cost               | $40                                   | $400                          | $134
+Websites per Instance/Subscription            | Unlimited                             | 1                             | 1
+Managed Workflow                              | Git Flow (branch-based environments)  | :x:                           | :x:
+Managed Software Workflow Model               | Upstream or Downstream                | :x:                           | :x:
+Agile Methodology Focus                       | Scrum                                 | :x:                           | :x:
+Managed Continuous Integration                | :white_check_mark:                    | :x:                           | :x:
+Environments                                  | LocalDev, Test, QC, Production        | Multidev, Dev, Test, Live     | Dev Desktop, Dev, Stage, Prod
+Exacting Configuration                        | :white_check_mark:                    | :x:<sup>[2](#references)</sup>| :x:<sup>[3](#references)</sup>
+Approach                                      | Virtual Machine                       | Container                     | Virtual Machine
+Data Center                                   | DigitalOcean and AWS                  | Rackspace                     | AWS
+Scaling                                       | Vertical                              | Horizontal                    | Vertical
+Scaling Management                            | Manual                                | Automatic                     | Manual
+Development Environment                       | Unlimited Local                       | 5 Cloud                       | Unlimited Local
+Development Environment Approach              | Exact                                 | Exact                         | Similar
+Dashboard - Control                           | CLI                                   | CLI & Web                     | CLI & Web
+Dashboard - Monitor                           | Web                                   | Web                           | Web
+Managed Public Git Website Repository Support | GitHub & Bitbucket                    | :x:                           | :x:
+Managed DNS                                   | CloudFlare                            | :x:                           | :x:
+Managed Free HTTPS/SSL                        | CloudFlare/Let's Encrypt              | :x:                           | :x:
+Managed Server Monitoring                     | New Relic                             | :x:                           | Proprietary
+Managed Application Error Logs                | New Relic                             | Proprietary                   | Proprietary
+Managed Application Performance Monitoring    | New Relic                             | :x:                           | :x:
+Managed Browser Performance Monitoring        | New Relic                             | :x:                           | :x:
+Managed Synthetic Monitoring                  | New Relic                             | :x:                           | :x:
 
 See an error or have a suggestion? Email competition@devopsgroup.io - we appreciate all feedback.
 
@@ -311,14 +313,17 @@ Catapult is designed with a distributed services model, below are the required t
 
 Service | Product | Use Case | Monthly Cost
 --------|---------|----------|-------------
-Cloud Hosting | DigitalOcean | 6 Web and Database Servers | \*$30+
+&dagger;Cloud Hosting: Red Hat (PHP) | DigitalOcean | 6 Web and Database Servers | \*$30+
+&dagger;Cloud Hosting: Windows (.NET) | Amazon Web Services (AWS) | 6 Web and Database Servers | \*$80+
 Source Code Repositories | Atlassian Bitbucket | Private Repositories | Free
 Source Code Repositories | GitHub | Public Repositories | Free
 Continuous Integration | Amazon Web Services (AWS) | Build Server | \**$0+
 Continuous Integration | Atlassian Bamboo | Deployment Management | $10
 DNS | CloudFlare | Cloud DNS | Free
 Monitoring | New Relic Application (APM), Browser, Server, and \***Synthetics | Performance and Infrastructure Monitoring | Free
-**Total** | | | $40+
+**Total** | | | &dagger;$40+
+
+&dagger; Only one platform (Red Hat or Windows) is required to have a full-featured infrastructure. Generally speaking, the industry standard Red Hat platform will be used.
 
 \* Depending on load, resources may need to be increased, starting at an additional [$5 per month per server](https://www.digitalocean.com/pricing/).
 
