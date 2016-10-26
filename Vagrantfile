@@ -189,7 +189,7 @@ Vagrant.configure("2") do |config|
     config.vm.network "private_network", ip: Catapult::Command.configuration["environments"]["dev"]["servers"]["windows"]["ip"]
     config.vm.network "forwarded_port", guest: 80, host: Catapult::Command.configuration["environments"]["dev"]["servers"]["windows"]["port_80"]
     config.vm.provider :virtualbox do |provider|
-      provider.memory = 512
+      provider.memory = 1024
       provider.cpus = 1
     end
     # windows specific configuration
@@ -213,7 +213,7 @@ Vagrant.configure("2") do |config|
     config.vm.box = "devopsgroup-io/windows_server-2012r2-standard-amd64-nocm"
     config.vm.network "private_network", ip: Catapult::Command.configuration["environments"]["dev"]["servers"]["windows_mssql"]["ip"]
     config.vm.provider :virtualbox do |provider|
-      provider.memory = 512
+      provider.memory = 1024
       provider.cpus = 1
     end
     # windows specific configuration
