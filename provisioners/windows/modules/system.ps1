@@ -234,3 +234,13 @@ Get-WUServiceManager
 # install latest updates
 echo "Checking for Microsoft Updates..."
 Get-WUInstall -MicrosoftUpdate -AcceptAll -IgnoreReboot
+
+
+echo "`n=> Configuring Task Scheduler..."
+# configure a weekly task to reboot the system if necessary
+$taskname = "REQUIRED REBOOT STATUS"
+if (-not(Get-ScheduledTask -TaskName $taskname -ErrorAction SilentlyContinue)) {
+    $action = New-ScheduledTaskAction -Execute "c:\catapult\provisioners\windows\modules\system_reboot.ps1"
+    $trigger = New-ScheduledTaskTrigger -Weekly -WeeksInterval 1 -DaysOfWeek Sunday -At 3am
+    Register-ScheduledTask -Action $action -Trigger $trigger -TaskName $taskname -User "System"
+}

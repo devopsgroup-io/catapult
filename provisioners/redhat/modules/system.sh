@@ -170,3 +170,11 @@ sudo sed --in-place --expression='/^apply_updates\s=/s|.*|apply_updates = yes|' 
 sudo sed --in-place --expression='/^emit_via\s=/s|.*|emit_via = None|' /etc/yum/yum-cron.conf
 # restart the service to re-read any new configuration
 sudo systemctl restart yum-cron.service
+
+
+
+echo -e "\n> system cron configuration"
+# configure a weekly job to reboot the system if necessary
+if [ ! -f /etc/cron.weekly/catapult-reboot.cron ]; then
+    sudo ln -s /catapult/provisioners/redhat/modules/system_reboot.sh /etc/cron.weekly/catapult-reboot.cron
+fi
