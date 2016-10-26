@@ -53,14 +53,14 @@ if (-not(test-path -path "c:\Program Files\Microsoft SQL Server\MSSQL12.SQLEXPRE
 echo "`n=> Managing SQL Server Logins..."
 [System.Reflection.Assembly]::LoadWithPartialName("Microsoft.SqlServer.Smo") | Out-Null
 $server = new-object ("Microsoft.SqlServer.Management.Smo.Server") -ArgumentList "localhost\SQLEXPRESS"
-# manage the sa mssql user
+# manage login of sa
 $login = $server.Logins | ? {$_.Name -eq "sa"}
 $login.ChangePassword($mssql_sa_password)
 $login.PasswordPolicyEnforced = $false
 $login.PasswordExpirationEnabled = $false
 $login.Alter()
 $login.Refresh()
-# manage the environment mssql user
+# manage login of environment mssql user
 if ($server.Logins.name -notcontains $mssql_user) {
     $login = new-object Microsoft.SqlServer.Management.Smo.Login($server, $mssql_user)
     $login.LoginType = [Microsoft.SqlServer.Management.Smo.LoginType]::SqlLogin
@@ -86,7 +86,7 @@ foreach ($instance in $configuration.websites.iis) {
         $database = new-object Microsoft.SqlServer.Management.Smo.Database($server, $domainvaliddbname)
         $database.Create()
     }
-    # manage the environment mssql user per database
+    # manage user of environment mssql user
     $database = $server.Databases[$domainvaliddbname];
     if ($database.Users.name -notcontains $mssql_user) {
         # Add user to database
@@ -94,6 +94,11 @@ foreach ($instance in $configuration.websites.iis) {
         $user.Login = $mssql_user
         $user.Create()
     }
+    # grant roles to environment mssql user
+    # see fancy chart of roles (note mssql version) https://msdn.microsoft.com/en-us/library/ms189121.aspx
+    $role = $database.Roles["db_ddladmin"]
+    $role.AddMember($mssql_user)
+    $role.Alter()
     $role = $database.Roles["db_datareader"]
     $role.AddMember($mssql_user)
     $role.Alter()
