@@ -54,5 +54,5 @@ if [ ! -f /usr/bin/wp-cli ]; then
 
 fi
 # update to latest wp-cli
-wp-cli --allow-root cli update
+wp-cli --allow-root cli update --yes
 wp-cli --allow-root cli version
