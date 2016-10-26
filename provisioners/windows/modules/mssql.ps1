@@ -109,7 +109,8 @@ foreach ($instance in $configuration.websites.iis) {
 
 
 echo "`n=> Enabling TCP/IP for SQL Server..."
-import-module "sqlps"
+# required to load by file for first provision, the path is not yet added
+import-module "C:\Program Files (x86)\Microsoft SQL Server\120\Tools\PowerShell\Modules\sqlps\Sqlps.ps1"
 [System.Reflection.Assembly]::LoadWithPartialName("Microsoft.SqlServer.Smo.Wmi") | Out-Null
 $server = new-object ('Microsoft.SqlServer.Management.Smo.Wmi.ManagedComputer') -ArgumentList "localhost"
 $tcp = $server.GetSmoObject("ManagedComputer[@Name='localhost']/ServerInstance[@Name='SQLEXPRESS']/ServerProtocol[@Name='Tcp']")
@@ -119,7 +120,7 @@ $tcp
 
 
 echo "`n=> Configuring firewall for SQL Server..."
-if (-not(Get-NetFirewallRule -DisplayName "SQL Server")) {
+if (-not(Get-NetFirewallRule -DisplayName "SQL Server" -ErrorAction SilentlyContinue)) {
     New-NetFirewallRule -DisplayName "SQL Server" -Direction Inbound -Protocol TCP -LocalPort "1433" -Action Allow
 }
 Get-NetFirewallRule -DisplayName "SQL Server"
