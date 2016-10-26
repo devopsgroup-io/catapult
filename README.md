@@ -180,6 +180,7 @@ See an error or have a suggestion? Email competition@devopsgroup.io - we appreci
     - [Performance Testing](#performance-testing)
         - [Website Concurrency Maximum](#website-concurrency-maximum)
         - [Interpreting Apache AB Results](#interpreting-apache-ab-results)
+    - [Maintenance Window](#maintenance-window)
     - [Disaster Recovery](#disaster-recovery)
         - [Server Rebuilding](#server-rebuilding) 
         - [Website Rollbacks](#website-rollbacks)
@@ -938,6 +939,12 @@ Percentage of the requests served within a certain time (ms)
   99%   7227
  100%   7325 (longest request)
 ````
+
+
+
+## Maintenance Window ##
+
+A maintenance window is scheduled for Sunday at 3 a.m. of the timezone that is defined within `~/secrets/configuration.yml` at the `timezone_redhat` and `timezone_windows` value of the [Company](#company) entry. During the maintanence window, if necessary, servers will be rebooted dependant upon kernel updates for Red Hat and Windows Updates for Windows.
 
 
 
