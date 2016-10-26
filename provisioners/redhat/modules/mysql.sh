@@ -76,8 +76,8 @@ done
 mysql --defaults-extra-file=$dbconf -e "FLUSH PRIVILEGES"
 
 # configure a cron task for database maintenance
-touch /etc/cron.daily/catapult-mysql.cron
-cat > "/etc/cron.daily/catapult-mysql.cron" << EOF
+touch /etc/cron.daily/catapult-mysql
+cat > "/etc/cron.daily/catapult-mysql" << EOF
 #!/bin/bash
 mysqlcheck -u maintenance --all-databases --auto-repair --optimize
 EOF
