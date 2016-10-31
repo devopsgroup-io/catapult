@@ -79,6 +79,24 @@ $login.Refresh()
 echo "`n=> Managing SQL Server Databases..."
 [System.Reflection.Assembly]::LoadWithPartialName("Microsoft.SqlServer.Smo") | Out-Null
 $server = new-object ("Microsoft.SqlServer.Management.Smo.Server") -ArgumentList "localhost\SQLEXPRESS"
+
+# create an array of domainvaliddbnames
+$domainvaliddbnames = @("master","model","msdb","tempdb")
+foreach ($instance in $configuration.websites.iis) {
+    $domainvaliddbname = ("{0}_{1}" -f $($args[0]), $instance.domain -replace "\.","_")
+    $domainvaliddbnames += $domainvaliddbname
+}
+# cleanup databases from domainvaliddbnames array
+foreach ($database in $server.Databases.name) {
+    if ($domainvaliddbnames -notcontains $database) {
+        echo "Removing the $($database) database as it does not exist in your configuration..."
+        $server.KillAllProcesses($database)
+        $database = $server.Databases[$database]
+        $database.Drop()
+    }
+}
+
+# create databases
 foreach ($instance in $configuration.websites.iis) {
     $domainvaliddbname = ("{0}_{1}" -f $($args[0]), $instance.domain -replace "\.","_")
     # manage the database

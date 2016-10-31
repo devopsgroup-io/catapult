@@ -40,7 +40,7 @@ done < <(echo "${configuration}" | shyaml get-values-0 websites.apache)
 # cleanup databases from domainvaliddbnames array
 for database in $(mysql --defaults-extra-file=$dbconf -e "show databases" | egrep -v "Database|mysql|information_schema|performance_schema"); do
     if ! [[ ${domainvaliddbnames[*]} =~ $database ]]; then
-        echo "Cleaning up websites that no longer exist..."
+        echo "Removing the ${database} database as it does not exist in your configuration..."
         mysql --defaults-extra-file=$dbconf -e "DROP DATABASE $database";
     fi
 done
