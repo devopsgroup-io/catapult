@@ -89,7 +89,7 @@ foreach ($instance in $configuration.websites.iis) {
     # manage user of environment mssql user
     $database = $server.Databases[$domainvaliddbname];
     if ($database.Users.name -notcontains $mssql_user) {
-        # Add user to database
+        # add user to database
         $user = New-Object ('Microsoft.SqlServer.Management.Smo.User') ($database, $mssql_user)
         $user.Login = $mssql_user
         $user.Create()
@@ -110,7 +110,12 @@ foreach ($instance in $configuration.websites.iis) {
 
 echo "`n=> Enabling TCP/IP for SQL Server..."
 # required to load by file for first provision, the path is not yet added
-import-module "C:\Program Files (x86)\Microsoft SQL Server\120\Tools\PowerShell\Modules\sqlps\Sqlps.ps1"
+if (Get-Module -ListAvailable -Name sqlps -ErrorAction SilentlyContinue) {
+    import-module sqlps
+} else {
+    $env:PSModulePath = $env:PSModulePath + ";C:\Program Files (x86)\Microsoft SQL Server\120\Tools\PowerShell\Modules"
+    import-module sqlps
+}
 [System.Reflection.Assembly]::LoadWithPartialName("Microsoft.SqlServer.Smo.Wmi") | Out-Null
 # http://blog.citrix24.com/configure-sql-express-to-accept-remote-connections/
 $server = new-object ('Microsoft.SqlServer.Management.Smo.Wmi.ManagedComputer') -ArgumentList "localhost"
