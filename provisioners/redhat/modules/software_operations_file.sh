@@ -274,30 +274,64 @@ else
 
 fi
 
-# set directory permissions of software file store containers
-if [ -z "$(provisioners_array software.apache.${software}.file_store_containers)" ]; then
-    echo "this software has no file store containers, skipping..."
-else
-    cat "/catapult/provisioners/provisioners.yml" | shyaml get-values-0 software.apache.$(catapult websites.apache.$5.software).file_store_containers |
-    while read -r -d $'\0' file_store_container; do
+# reference: https://www.drupal.org/node/244924#script-based-on-guidelines-given-above
 
-        file_store_container="/var/www/repositories/apache/${domain}/${webroot}${softwareroot}${file_store_container}"
-        echo -e "software file store container: ${file_store_container}"
+# set ownership of repository [directory]
+if [ "$1" != "dev" ]; then
+    chown root:root "/var/www/repositories/apache/${domain}"
+fi
 
-        # if the file store container does not exist, create it
-        if [ ! -d "${file_store_container}" ]; then
+# set ownership of software [directories and files]
+if [ "$1" != "dev" ]; then
+    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}"
+    chown -R root:apache .
+fi
+
+# set permissions of software [directories and files]
+cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}"
+find . -type d -exec chmod u=rwx,g=rx,o= '{}' \;
+find . -type f -exec chmod u=rw,g=r,o= '{}' \;
+
+# set permissions of software file store containers
+if [ ! -z "$(provisioners_array software.apache.${software}.file_store_containers)" ]; then
+    cat "/catapult/provisioners/provisioners.yml" | shyaml get-values-0 software.apache.$(catapult websites.apache.$5.software).file_store_containers | while read -r -d $'\0' file_store_container; do
+
+        # create the software file store container if it does not exist
+        if [ ! -d "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}${file_store_container}" ]; then
             echo -e "- file store container does not exist, creating..."
-            sudo mkdir --parents "${file_store_container}"
+            sudo mkdir --parents "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}${file_store_container}"
         fi
 
-        # set the file store container permissions
-        echo -e "- setting directory permissions..."
-        if [ "$1" != "dev" ]; then
-            sudo chown -R apache "${file_store_container}"
-        fi
-        sudo chmod -R 0700 "${file_store_container}"
+        # set permissions of file store container [directory]
+        chmod ug=rwx,o= "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}${file_store_container}"
+
+        # set permissions of contents of file store container [directories and files]
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}${file_store_container}"
+        find . -type d -exec chmod ug=rwx,o= '{}' \;
+        find . -type f -exec chmod ug=rw,o= '{}' \;
+
     done
+fi
 
+# set permissions of software file stores
+if [ ! -z "$(provisioners_array software.apache.${software}.file_stores)" ]; then
+    cat "/catapult/provisioners/provisioners.yml" | shyaml get-values-0 software.apache.$(catapult websites.apache.$5.software).file_stores | while read -r -d $'\0' file_store; do
+
+        # create the software file store if it does not exist
+        if [ ! -d "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}${file_store}" ]; then
+            echo -e "- file store container does not exist, creating..."
+            sudo mkdir --parents "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}${file_store}"
+        fi
+
+        # set permissions of file store [directory]
+        chmod ug=rwx,o= "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}${file_store}"
+
+        # set permissions of contents of file store [directories and files]
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}${file_store}"
+        find . -type d -exec chmod ug=rwx,o= '{}' \;
+        find . -type f -exec chmod ug=rw,o= '{}' \;
+
+    done
 fi
 
 touch "/catapult/provisioners/redhat/logs/software_operations_file.$(catapult websites.apache.$5.domain).complete"

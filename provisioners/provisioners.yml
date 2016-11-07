@@ -122,14 +122,12 @@ software:
       repo: "https://git.drupal.org/project/drupal.git"
       branch: "6.x"
       database_config_file: "sites/default/settings.php"
-      file_store_containers: ["sites/default"]
       file_stores: ["sites/default/files"]
       version: [6]
     drupal7:
       repo: "https://git.drupal.org/project/drupal.git"
       branch: "7.x"
       database_config_file: "sites/default/settings.php"
-      file_store_containers: ["sites/default"]
       file_stores: ["sites/default/files"]
       version: [7]
     elgg1:
