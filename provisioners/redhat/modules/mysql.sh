@@ -79,7 +79,7 @@ mysql --defaults-extra-file=$dbconf -e "FLUSH PRIVILEGES"
 touch /etc/cron.daily/catapult-mysql
 cat > "/etc/cron.daily/catapult-mysql.cron" << EOF
 #!/bin/bash
-/bin/mysqlcheck -u maintenance --all-databases --auto-repair --optimize
+/bin/mysqlcheck --user maintenance --all-databases --auto-repair --optimize
 EOF
 chmod 755 /etc/cron.daily/catapult-mysql.cron
 
