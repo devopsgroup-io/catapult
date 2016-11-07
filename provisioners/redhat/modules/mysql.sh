@@ -79,7 +79,7 @@ mysql --defaults-extra-file=$dbconf -e "FLUSH PRIVILEGES"
 touch /etc/cron.daily/catapult-mysql
 cat > "/etc/cron.daily/catapult-mysql.cron" << EOF
 #!/bin/bash
-mysqlcheck -u maintenance --all-databases --auto-repair --optimize
+/bin/mysqlcheck -u maintenance --all-databases --auto-repair --optimize
 EOF
 chmod 755 /etc/cron.daily/catapult-mysql.cron
 
@@ -112,7 +112,7 @@ while IFS='' read -r -d '' key; do
             # @todo this is intended so that a developer can commit a dump from active work in localdev then the process detect this and kick off the restore rather than dump workflow
             if ! [ -f /var/www/repositories/apache/${domain}/_sql/$(date +"%Y%m%d").sql ]; then
                 # create the _sql directory if it does not exist
-                mkdir -p "/var/www/repositories/apache/${domain}/_sql"
+                mkdir --parents "/var/www/repositories/apache/${domain}/_sql"
                 # dump the database
                 mysqldump --defaults-extra-file=$dbconf --single-transaction --quick ${1}_${domainvaliddbname} > /var/www/repositories/apache/${domain}/_sql/$(date +"%Y%m%d").sql
                 # ensure no more than 500mb or at least the one, newest, .sql file exists
