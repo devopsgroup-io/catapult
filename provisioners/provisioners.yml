@@ -22,6 +22,9 @@ redhat:
     cloudflare_zones:
       description: "Manages CloudfFlare zones for websites."
       multithreading: true
+    cron:
+      description: "Manages cron tasks."
+      multithreading: false
     git:
       description: "Manages Git repositories for websites."
       multithreading: true
@@ -69,11 +72,11 @@ redhat:
       multithreading: false
   servers:
     apache:
-      modules: ["time","system","iptables","newrelic_sysmon","git_clean","software_operations_file","git","software_config","rsync","php","software_tools","apache","apache_vhosts_clean","apache_vhosts","newrelic_apm_php","cloudflare_zones","cloudflare_dns"]
+      modules: ["time","system","iptables","newrelic_sysmon","cron","git_clean","software_operations_file","git","software_config","rsync","php","software_tools","apache","apache_vhosts_clean","apache_vhosts","newrelic_apm_php","cloudflare_zones","cloudflare_dns"]
     bamboo:
-      modules: ["time","system","iptables","newrelic_sysmon","bamboo"]
+      modules: ["time","system","iptables","newrelic_sysmon","cron","bamboo"]
     mysql:
-      modules: ["time","system","iptables","newrelic_sysmon","git_clean","git","software_config","rsync","php","software_tools","software_operations_meta","mysql","cloudflare_cache"]
+      modules: ["time","system","iptables","newrelic_sysmon","cron","git_clean","git","software_config","rsync","php","software_tools","software_operations_meta","mysql","cloudflare_cache"]
 windows:
   modules:
     cloudflare_dns:

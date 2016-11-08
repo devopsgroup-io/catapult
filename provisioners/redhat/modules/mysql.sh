@@ -75,15 +75,6 @@ done
 # flush privileges
 mysql --defaults-extra-file=$dbconf -e "FLUSH PRIVILEGES"
 
-# configure a cron task for database maintenance
-# ref: https://mariadb.com/kb/en/mariadb/mysqlcheck/
-touch /etc/cron.daily/catapult-mysql
-cat > "/etc/cron.daily/catapult-mysql.cron" << EOF
-#!/bin/bash
-/bin/mysqlcheck --user maintenance --all-databases --auto-repair --check-only-changed --optimize --silent
-EOF
-chmod 755 /etc/cron.daily/catapult-mysql.cron
-
 echo "${configuration}" | shyaml get-values-0 websites.apache |
 while IFS='' read -r -d '' key; do
 
