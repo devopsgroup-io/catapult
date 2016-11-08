@@ -43,6 +43,7 @@ if [ -d "/var/www/repositories/apache/${domain}/.git" ]; then
             && git config core.packedGitWindowSize 128m \
             && git config pack.deltaCacheSize 128m \
             && git config pack.packSizeLimit 128m \
+            && git config pack.threads 1 \
             && git config pack.windowMemory 128m
         # get the current branch
         branch_this=$(cd "/var/www/repositories/apache/${domain}" && git rev-parse --abbrev-ref HEAD)

@@ -28,6 +28,9 @@ foreach ($instance in $configuration.websites.iis) {
         start-process -filepath "c:\Program Files\Git\bin\git.exe" -argumentlist ("-C c:\inetpub\repositories\iis\{0} config pack.packSizeLimit 128m" -f $instance.domain) -Wait -RedirectStandardOutput $provision -RedirectStandardError $provisionError
         get-content $provision
         get-content $provisionError
+        start-process -filepath "c:\Program Files\Git\bin\git.exe" -argumentlist ("-C c:\inetpub\repositories\iis\{0} config pack.threads 1" -f $instance.domain) -Wait -RedirectStandardOutput $provision -RedirectStandardError $provisionError
+        get-content $provision
+        get-content $provisionError
         start-process -filepath "c:\Program Files\Git\bin\git.exe" -argumentlist ("-C c:\inetpub\repositories\iis\{0} config pack.windowMemory 128m" -f $instance.domain) -Wait -RedirectStandardOutput $provision -RedirectStandardError $provisionError
         get-content $provision
         get-content $provisionError
