@@ -50,11 +50,14 @@ if ([ $1 = "dev" ]); then
     fi
 else
     if [ -d "/catapult/.git" ]; then
-        cd /catapult && sudo git checkout ${branch}
-        cd /catapult && sudo git fetch
-        cd /catapult && sudo git pull
+        cd "/catapult" \
+            && sudo git reset --quiet --hard HEAD -- \
+            && sudo git checkout . \
+            && sudo git checkout ${branch} \
+            && sudo git fetch \
+            && sudo git pull
     else
-        sudo git clone --recursive --branch ${branch} $2 /catapult
+        sudo git clone --recursive --branch ${branch} $2 "/catapult"
     fi
 fi
 

@@ -283,14 +283,14 @@ fi
 
 # set ownership of software [directories and files]
 if [ "$1" != "dev" ]; then
-    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}"
-    chown -R root:apache .
+    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" \
+        && chown -R root:apache .
 fi
 
 # set permissions of software [directories and files]
-cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}"
-find . -type d -exec chmod u=rwx,g=rx,o= '{}' \;
-find . -type f -exec chmod u=rw,g=r,o= '{}' \;
+cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" \
+    && find . -type d -exec chmod u=rwx,g=rx,o= '{}' \; \
+    && find . -type f -exec chmod u=rw,g=r,o= '{}' \;
 
 # set permissions of software file store containers
 if [ ! -z "$(provisioners_array software.apache.${software}.file_store_containers)" ]; then
@@ -306,9 +306,9 @@ if [ ! -z "$(provisioners_array software.apache.${software}.file_store_container
         chmod ug=rwx,o= "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}${file_store_container}"
 
         # set permissions of contents of file store container [directories and files]
-        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}${file_store_container}"
-        find . -type d -exec chmod ug=rwx,o= '{}' \;
-        find . -type f -exec chmod ug=rw,o= '{}' \;
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}${file_store_container}" \
+            && find . -type d -exec chmod ug=rwx,o= '{}' \; \
+            && find . -type f -exec chmod ug=rw,o= '{}' \;
 
     done
 fi
@@ -327,9 +327,9 @@ if [ ! -z "$(provisioners_array software.apache.${software}.file_stores)" ]; the
         chmod ug=rwx,o= "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}${file_store}"
 
         # set permissions of contents of file store [directories and files]
-        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}${file_store}"
-        find . -type d -exec chmod ug=rwx,o= '{}' \;
-        find . -type f -exec chmod ug=rw,o= '{}' \;
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}${file_store}" \
+            && find . -type d -exec chmod ug=rwx,o= '{}' \; \
+            && find . -type f -exec chmod ug=rw,o= '{}' \;
 
     done
 fi

@@ -72,6 +72,12 @@ if ($($args[0]) -eq "dev") {
     }
 } else {
     if (test-path -path "c:\catapult\.git") {
+        start-process -filepath "c:\Program Files\Git\bin\git.exe" -argumentlist ("-C c:\catapult reset --quiet --hard HEAD --") -Wait -RedirectStandardOutput $provision -RedirectStandardError $provisionError
+        get-content $provision
+        get-content $provisionError
+        start-process -filepath "c:\Program Files\Git\bin\git.exe" -argumentlist ("-C c:\catapult checkout .") -Wait -RedirectStandardOutput $provision -RedirectStandardError $provisionError
+        get-content $provision
+        get-content $provisionError
         start-process -filepath "c:\Program Files\Git\bin\git.exe" -argumentlist ("-C c:\catapult checkout {0}" -f $branch) -Wait -RedirectStandardOutput $provision -RedirectStandardError $provisionError
         get-content $provision
         get-content $provisionError
