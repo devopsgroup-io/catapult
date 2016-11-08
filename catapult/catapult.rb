@@ -43,11 +43,17 @@ module Catapult
     require "yaml"
 
 
+    # define a unique lock file
+    lock_file_unique = SecureRandom.urlsafe_base64(8) + '.lock'
+
+
     # format errors
     def Command::catapult_exception(error)
       begin
         raise error
       rescue => exception
+        # remove the known unique lock file
+        FileUtils.rm(lock_file_unique)
         puts "\n\n"
         title = "Catapult Error:"
         length = title.size
@@ -126,18 +132,18 @@ module Catapult
     end
 
 
-    # locking in order to prevent multiple executions occurring at once (e.g. competing command line and Bamboo executions)
+    # manage a unique lock file to prevent multiple executions occurring at once to prevent operations such as git from causing havoc
     begin
       Timeout::timeout(60) do
-        while File.exist?('.lock')
+        while !Dir.glob('*.lock').empty?
            puts "Waiting for another Catapult process to finish so that we can safely continue...".color(Colors::YELLOW)
            sleep 5
         end
       end
     rescue Timeout::Error
-      catapult_exception("Wating took longer than expected. The .lock file is present in this directory, indicating that another Catapult process may have hung or ended unexpectedly. Once verifying that no conflict exists, remove the .lock file and try again.")
+      catapult_exception("Wating took longer than expected. A .lock file is present in this directory, indicating that another Catapult process may have hung or ended unexpectedly. Once verifying that no conflict exists, remove the .lock file and try again.")
     end
-    FileUtils.touch('.lock')
+    FileUtils.touch(lock_file_unique)
 
 
     # check for an internet connection
@@ -1411,8 +1417,8 @@ module Catapult
 
 
 
-    # remove lock file
-    File.delete('.lock')
+    # remove unique lock file
+    File.delete(lock_file_unique)
 
 
 
