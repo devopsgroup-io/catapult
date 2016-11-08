@@ -43,11 +43,35 @@ if (-not(test-path -path "c:\Program Files\Microsoft SQL Server\MSSQL12.SQLEXPRE
     # the installer requires a cool down period to allow for garbage cleanup, services to start, etc
     echo "- Mandatory 30 second post-install cool down period, please wait..."
     start-sleep -s 30
-    start-service 'MSSQL$SQLEXPRESS'
-    restart-service 'MSSQL$SQLEXPRESS' -Force
  } else {
      echo "- Installed, skipping..."
  }
+start-service 'MSSQL$SQLEXPRESS'
+
+
+echo "`n=> Enabling TCP/IP for SQL Server..."
+# required to load by file for first provision, the path is not yet added
+if (Get-Module -ListAvailable -Name sqlps -ErrorAction SilentlyContinue) {
+    import-module sqlps
+} else {
+    $env:PSModulePath = $env:PSModulePath + ";C:\Program Files (x86)\Microsoft SQL Server\120\Tools\PowerShell\Modules"
+    import-module sqlps
+}
+[System.Reflection.Assembly]::LoadWithPartialName("Microsoft.SqlServer.Smo.Wmi") | Out-Null
+# http://blog.citrix24.com/configure-sql-express-to-accept-remote-connections/
+$server = new-object ('Microsoft.SqlServer.Management.Smo.Wmi.ManagedComputer') -ArgumentList "localhost"
+$tcp = $server.GetSmoObject("ManagedComputer[@Name='localhost']/ServerInstance[@Name='SQLEXPRESS']/ServerProtocol[@Name='Tcp']")
+$tcp.IsEnabled = $true
+$server.GetSmoObject("ManagedComputer[@Name='localhost']/ServerInstance[@Name='SQLEXPRESS']/ServerProtocol[@Name='Tcp']/IPAddress[@Name='IPAll']").IPAddressProperties[0].Value=""
+$server.GetSmoObject("ManagedComputer[@Name='localhost']/ServerInstance[@Name='SQLEXPRESS']/ServerProtocol[@Name='Tcp']/IPAddress[@Name='IPAll']").IPAddressProperties[1].Value="1433"
+$tcp.Alter()
+
+
+echo "`n=> Configuring firewall for SQL Server..."
+if (-not(Get-NetFirewallRule -DisplayName "SQL Server" -ErrorAction SilentlyContinue)) {
+    New-NetFirewallRule -DisplayName "SQL Server" -Direction Inbound -Protocol TCP -LocalPort "1433" -Action Allow
+}
+Get-NetFirewallRule -DisplayName "SQL Server" | where-object {$_.PrimaryStatus}
  
  
 echo "`n=> Managing SQL Server Logins..."
@@ -90,22 +114,32 @@ foreach ($instance in $configuration.websites.iis) {
 foreach ($database in $server.Databases.name) {
     if ($domainvaliddbnames -notcontains $database) {
         echo "Removing the $($database) database as it does not exist in your configuration..."
-        $server.KillAllProcesses($database)
         $database = $server.Databases[$database]
+        $server.Databases["master"].ExecuteNonQuery("ALTER DATABASE $database SET SINGLE_USER WITH ROLLBACK IMMEDIATE", [Microsoft.SqlServer.Management.Common.ExecutionTypes]::Default)
+        $server.KillAllProcesses($database)
         $database.Drop()
     }
 }
 
 # create databases
 foreach ($instance in $configuration.websites.iis) {
+
     $domainvaliddbname = ("{0}_{1}" -f $($args[0]), $instance.domain -replace "\.","_")
+
+    if ($($args[0]) -eq "production") {
+        echo ("`nNOTICE: {1}" -f $($args[0]), $instance.domain)
+    } else {
+        echo ("`nNOTICE: {0}.{1}" -f $($args[0]), $instance.domain)
+    }
+
     # manage the database
     if ($server.Databases.name -notcontains $domainvaliddbname) {
         $database = new-object Microsoft.SqlServer.Management.Smo.Database($server, $domainvaliddbname)
         $database.Create()
     }
-    # manage user of environment mssql user
+    # get the database
     $database = $server.Databases[$domainvaliddbname];
+    # manage user of environment mssql user
     if ($database.Users.name -notcontains $mssql_user) {
         # add user to database
         $user = New-Object ('Microsoft.SqlServer.Management.Smo.User') ($database, $mssql_user)
@@ -123,33 +157,55 @@ foreach ($instance in $configuration.websites.iis) {
     $role = $database.Roles["db_datawriter"]
     $role.AddMember($mssql_user)
     $role.Alter()
+    # get database directory
+    $database_directory = ("c:\inetpub\repositories\iis\{0}\_sql" -f $instance.domain)
+    # get backups
+    if (-not(test-path -path $database_directory)) {
+        new-item -itemtype directory -force -path $database_directory
+    }
+    $database_file_newest = get-childitem $database_directory | where-object {$_.name -match "^[0-9]{8}\.sql$"} | sort-object -descending | select-object -First 1
+    echo $database_file_newest
+    foreach ($file in get-childitem $database_directory) {
+        if ($file -notlike "*.sql") {
+            echo "`t[invalid] [ ].sql [ ]YYYYMMDD.sql [ ]newest => $database_directory\$file.name"
+        } elseif ($file -notmatch "^[0-9]{8}.sql") {
+            echo "`t[invalid] [x].sql [ ]YYYYMMDD.sql [ ]newest => $database_directory\$file.name"
+        } elseif ($file.name -ne $database_file_newest.name) {
+            echo "`t[invalid] [x].sql [x]YYYYMMDD.sql [ ]newest => $database_directory\$file.name"
+        } else {
+            echo "`t[valid]   [x].sql [x]YYYYMMDD.sql [x]newest => $database_directory\$file.name"
+        }
+    }
+
+    # get tables
+    $database_table_count = ($database.tables).count
+
+    # manage database backup and restore
+    if ( `
+        ( ($($args[0]) -eq "dev") -and ($database_table_count -gt 0) -and (-not($database_file_newest)) ) `
+        -or ( ($($args[0]) -eq "test") -and ($database_table_count -gt 0) -and ($instance.software_workflow -eq "upstream") ) `
+        -or ( ($($args[0]) -eq "production") -and ($database_table_count -gt 0) -and ($instance.software_workflow -eq "downstream") ) `
+    ) {
+        echo "database backup..."
+        $date = get-date -format yyyyMMdd
+        Backup-SqlDatabase -ServerInstance $server.name -Database $database.name -BackupFile ("c:\inetpub\repositories\iis\{0}\_sql\{1}.sql" -f $instance.domain, $date)
+        # git add and commit the _sql folder changes
+        start-process -filepath "c:\Program Files\Git\bin\git.exe" -argumentlist ("-C c:\inetpub\repositories\iis\{0} add --all" -f $instance.domain) -Wait -RedirectStandardOutput $provision -RedirectStandardError $provisionError
+        get-content $provision
+        get-content $provisionError
+        start-process -filepath "c:\Program Files\Git\bin\git.exe" -argumentlist ("-C c:\inetpub\repositories\iis\{0} commit --message=""Catapult auto-commit {1}:{2}:software_database""" -f $instance.domain,$($args[0]),$instance.software_workflow) -Wait -RedirectStandardOutput $provision -RedirectStandardError $provisionError
+        get-content $provision
+        get-content $provisionError
+        start-process -filepath "c:\Program Files\Git\bin\git.exe" -argumentlist ("-C c:\inetpub\repositories\iis\{0} push origin {1}" -f $instance.domain,$configuration.environments.$($args[0]).branch) -Wait -RedirectStandardOutput $provision -RedirectStandardError $provisionError
+        get-content $provision
+        get-content $provisionError
+    } elseif ($database_file_newest) {
+        echo "database restore..."
+        $server.Databases["master"].ExecuteNonQuery("ALTER DATABASE $database SET SINGLE_USER WITH ROLLBACK IMMEDIATE", [Microsoft.SqlServer.Management.Common.ExecutionTypes]::Default)
+        $server.KillAllProcesses($database)
+        Restore-SqlDatabase -ServerInstance $server.name -Database $database.name -BackupFile ("c:\inetpub\repositories\iis\{0}\_sql\{1}" -f $instance.domain, $database_file_newest) -ReplaceDatabas
+    } else {
+        echo "nothing to do..."
+    }
+
 }
-
-
-echo "`n=> Enabling TCP/IP for SQL Server..."
-# required to load by file for first provision, the path is not yet added
-if (Get-Module -ListAvailable -Name sqlps -ErrorAction SilentlyContinue) {
-    import-module sqlps
-} else {
-    $env:PSModulePath = $env:PSModulePath + ";C:\Program Files (x86)\Microsoft SQL Server\120\Tools\PowerShell\Modules"
-    import-module sqlps
-}
-[System.Reflection.Assembly]::LoadWithPartialName("Microsoft.SqlServer.Smo.Wmi") | Out-Null
-# http://blog.citrix24.com/configure-sql-express-to-accept-remote-connections/
-$server = new-object ('Microsoft.SqlServer.Management.Smo.Wmi.ManagedComputer') -ArgumentList "localhost"
-$tcp = $server.GetSmoObject("ManagedComputer[@Name='localhost']/ServerInstance[@Name='SQLEXPRESS']/ServerProtocol[@Name='Tcp']")
-$tcp.IsEnabled = $true
-$server.GetSmoObject("ManagedComputer[@Name='localhost']/ServerInstance[@Name='SQLEXPRESS']/ServerProtocol[@Name='Tcp']/IPAddress[@Name='IPAll']").IPAddressProperties[0].Value=""
-$server.GetSmoObject("ManagedComputer[@Name='localhost']/ServerInstance[@Name='SQLEXPRESS']/ServerProtocol[@Name='Tcp']/IPAddress[@Name='IPAll']").IPAddressProperties[1].Value="1433"
-$tcp.Alter()
-
-
-echo "`n=> Configuring firewall for SQL Server..."
-if (-not(Get-NetFirewallRule -DisplayName "SQL Server" -ErrorAction SilentlyContinue)) {
-    New-NetFirewallRule -DisplayName "SQL Server" -Direction Inbound -Protocol TCP -LocalPort "1433" -Action Allow
-}
-Get-NetFirewallRule -DisplayName "SQL Server"
-
-
-echo "`n=> Restarting SQL Server..."
-restart-service 'MSSQL$SQLEXPRESS' -Force
