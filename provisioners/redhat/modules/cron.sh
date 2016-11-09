@@ -23,8 +23,10 @@ fi
 
 echo -e "\n> configuring weekly cron task: system reboot"
 touch "/etc/cron.weekly/catapult-reboot.cron"
-cat "/catapult/provisioners/redhat/modules/cron_reboot.sh" > "/etc/cron.daily/catapult-reboot.cron"
+cat "/catapult/provisioners/redhat/modules/cron_reboot.sh" > "/etc/cron.weekly/catapult-reboot.cron"
 chmod 755 "/etc/cron.weekly/catapult-reboot.cron"
+# remove daily task from previous implemenation
+rm -f "/etc/cron.daily/catapult-reboot.cron"
 
 
 
