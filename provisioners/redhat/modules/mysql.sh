@@ -298,8 +298,8 @@ while IFS='' read -r -d '' key; do
             echo -e "\t* resetting ${software} admin password..."
             mysql --defaults-extra-file=$dbconf ${1}_${domainvaliddbname} -e "
                 INSERT INTO ${software_dbprefix}user (user_id, user_name, user_email)
-                VALUES ('1', 'admin', '$(catapult company.email)')
-                ON DUPLICATE KEY UPDATE user_name='admin', user_email='$(catapult company.email)';
+                VALUES ('1', 'Admin', '$(catapult company.email)')
+                ON DUPLICATE KEY UPDATE user_name='Admin', user_email='$(catapult company.email)';
             "
             cd "/var/www/repositories/apache/${domain}/${webroot}" && php maintenance/changePassword.php --userid="1" --password="$(catapult environments.${1}.software.admin_password)"
             mysql --defaults-extra-file=$dbconf ${1}_${domainvaliddbname} -e "
