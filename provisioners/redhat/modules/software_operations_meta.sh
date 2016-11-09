@@ -29,12 +29,14 @@ elif [ "$software" = "codeigniter3" ]; then
 elif [ "$software" = "drupal6" ]; then
 
     cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush -y watchdog-delete all
+    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush -y core-cron
     cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush -y updatedb
     cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush -y cache-clear all
 
 elif [ "$software" = "drupal7" ]; then
 
     cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush -y watchdog-delete all
+    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush -y core-cron
     cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush -y updatedb
     cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush -y cache-clear all
 
