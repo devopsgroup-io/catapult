@@ -30,17 +30,20 @@ rm -f "/etc/cron.daily/catapult-reboot.cron"
 
 
 
-echo -e "=> anacron configuration"
+echo -e "\n> anacron configuration"
 cat /etc/anacrontab
 
-echo -e "=> cron hourly"
+echo -e "\n> cron hourly"
 ls /etc/cron.hourly/
 
-echo -e "=> cron daily"
+echo -e "\n> cron daily"
 ls /etc/cron.daily/
 
-echo -e "=> cron monthly"
+echo -e "\n> cron weekly"
+ls /etc/cron.weekly/
+
+echo -e "\n> cron monthly"
 ls /etc/cron.monthly/
 
-echo -e "=> cron log"
+echo -e "\n> cron log"
 tail /var/log/cron
