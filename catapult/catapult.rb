@@ -44,7 +44,7 @@ module Catapult
 
 
     # define a unique lock file
-    lock_file_unique = SecureRandom.urlsafe_base64(8) + '.lock'
+    @lock_file_unique = SecureRandom.urlsafe_base64(8) + '.lock'
 
 
     # format errors
@@ -53,7 +53,7 @@ module Catapult
         raise error
       rescue => exception
         # remove the known unique lock file
-        FileUtils.rm(lock_file_unique)
+        FileUtils.rm(@lock_file_unique)
         puts "\n\n"
         title = "Catapult Error:"
         length = title.size
@@ -143,7 +143,7 @@ module Catapult
     rescue Timeout::Error
       catapult_exception("Wating took longer than expected. A .lock file is present in this directory, indicating that another Catapult process may have hung or ended unexpectedly. Once verifying that no conflict exists, remove the .lock file and try again.")
     end
-    FileUtils.touch(lock_file_unique)
+    FileUtils.touch(@lock_file_unique)
 
 
     # check for an internet connection
@@ -1418,7 +1418,7 @@ module Catapult
 
 
     # remove unique lock file
-    File.delete(lock_file_unique)
+    File.delete(@lock_file_unique)
 
 
 
