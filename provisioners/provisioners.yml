@@ -160,7 +160,7 @@ software:
       version: [5]
     mediawiki1:
       repo: "https://github.com/wikimedia/mediawiki.git"
-      branch: "REL1_25"
+      branch: "REL1_26"
       database_config_file: "LocalSettings.php"
       file_store_containers: ["images"]
       file_stores: ["images"]

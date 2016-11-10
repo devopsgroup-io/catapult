@@ -154,7 +154,15 @@ if hash composer 2>/dev/null && hash drush 2>/dev/null && hash wp-cli 2>/dev/nul
 
             if [ "${software_auto_update}" = "true" ]; then
                 #@todo - automate the manual https://www.mediawiki.org/wiki/Manual:Upgrading
+                # v1.26 is the latest compatible with PHP v5.4 https://www.mediawiki.org/wiki/Compatibility#PHP
+                # there will need to be more work with this, upgrading from v1.25 to v1.26 requires to delete the LocalSettings.php and run through the setup and the skins do not seem to translate properly
+                #cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && curl --silent --show-error --connect-timeout 5 --output mediawiki.tar.gz --retry 5 --location --url https://github.com/wikimedia/mediawiki/archive/1.26.4.tar.gz
+                #cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && tar --exclude='images' --extract --file=mediawiki.tar.gz --no-same-owner --strip-components=1 --totals --ungzip
                 #cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && composer update
+                #cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && php maintenance/update.php
+                #cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && php maintenance/runJobs.php
+                #cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && php maintenance/rebuildall.php
+                #cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && rm -f mediawiki.tar.gz
                 : #no-op
             fi
 
