@@ -176,7 +176,7 @@ See an error or have a suggestion? Email competition@devopsgroup.io - we appreci
         - [Database Migrations](#database-migrations)
         - [Refreshing Databases](#refreshing-databases)
         - [Connecting to Databases](#connecting-to-databases)
-        - [Hotfixes](#hotfixes)
+        - [Production Hotfixes](#production-hotfixes)
     - [Performance Testing](#performance-testing)
         - [Website Concurrency Maximum](#website-concurrency-maximum)
         - [Interpreting Apache AB Results](#interpreting-apache-ab-results)
@@ -842,9 +842,9 @@ Oracle SQL Developer is the recommended tool, to connect to and work with, datab
         * Then add a New Connection with the respective environment's mysql user values in `~/secrets/configuration.yml`.
             * The hostname will be localhost since we are forwarding the port through our local SSH tunnel.
 
-### Hotfixes ###
+### Production Hotfixes ###
 
-Always weigh the risk of *not performing* a hotfix versus *performing* it, as hotfixes require going outside of the normal development and testing workflow. Performing a hotfix varies depending on the website's `software` type, `software_workflow` direction, and type of change (code or database).
+Always weigh the risk of *not performing* a production hotfix versus *performing* it, as production hotfixes require going outside of the normal development and testing workflow. Performing a production hotfix varies depending on the website's `software` type, `software_workflow` direction, and type of change (code or database).
 
 * `software_workflow: downstream`
     * **Code**
@@ -857,7 +857,7 @@ Always weigh the risk of *not performing* a hotfix versus *performing* it, as ho
         7. Provision any related LocalDev servers
     * **Database**
         * Login to the Production website and make the change
-            * (any database change that is beyond the direct capability of the `software` should not be taken out as a hotfix)
+            * (any database change that is beyond the direct capability of the `software` should not be taken out as a production hotfix)
 * `software_workflow: upstream`
     * **Code**
         1. In `~/configuration.yml`, temporarily set the environments -> dev -> branch key to `branch: master`, and do not commit the change
@@ -869,7 +869,7 @@ Always weigh the risk of *not performing* a hotfix versus *performing* it, as ho
         7. Provision any related LocalDev servers
     * **Database**
         1. Login to the Production *and* Test website and make the change
-            * (any database change that is beyond the direct capability of logging into the `software` and safely making the change, should not be taken out as a hotfix)
+            * (any database change that is beyond the direct capability of logging into the `software` and safely making the change, should not be taken out as a production hotfix)
         2. From LocalDev and the `develop` branch of the website's repository, commit a deletion of today's (if exists) SQL dump file from within the `~/sql` folder
             * (this ensures there is a known committed SQL dump of your change to the `develop` branch for when this branch is merged upstream)
         3. From LocalDev, temporarily checkout the `master` branch of the website's repository, make your change in the most recent SQL dump file from within the `~/sql` folder
