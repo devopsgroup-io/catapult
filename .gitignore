@@ -1,6 +1,7 @@
-secrets/configuration.yml
-secrets/configuration-user.yml
-secrets/id_rsa
-secrets/id_rsa.pub
-.vagrant
-.lock
+/*.lock
+/secrets/configuration.yml
+/secrets/configuration.yml.compare
+/secrets/configuration-user.yml
+/secrets/id_rsa
+/secrets/id_rsa.pub
+/.vagrant
