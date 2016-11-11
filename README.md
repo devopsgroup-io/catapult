@@ -165,6 +165,9 @@ See an error or have a suggestion? Email competition@devopsgroup.io - we appreci
     - [Provision Environments](#provision-environments)
     - [Configure Automated Deployments](#configure-automated-deployments)
 - [Release Management](#release-management)
+    - [Software Workflow](#software-workflow)
+        - [Downstream](#downstream)
+        - [Upstream](#upstream)
     - [Catapult Configuration](#catapult-configuration)
         - [Company](#company)
         - [Environments](#environments)
@@ -563,22 +566,37 @@ Catapult follows Gitflow for its **infrastructure configuration** *and* **websit
 <img src="https://cdn.rawgit.com/devopsgroup-io/catapult/master/catapult/installers/images/catapult_release_management.png" alt="Catapult Release Management">
 <sup>[1](#references)</sup>
 
-
-Environment | LocalDev | Test | QC | Production
+            | LocalDev | Test | QC | Production
 ------------|----------|------|----|-----------
 **Running Branch**                                       | *develop*                                                   | *develop*                                                                                                      | *release*                                                      | *master*
 **Deployments**                                          | Manually via `vagrant provision`                            | Automatically via Bamboo (new commits to **develop**)                                                          | Automatically via Bamboo (new commits to **release**)          | Manually via Bamboo
 **Testing Activities**                                   | Component Test                                              | Integration Test, System Test                                                                                  | Acceptance Test, Release Test                                  | Operational Qualification
 **Scrum Activity**                                       | Sprint Start: Development of User Stories                   | Daily Scrum                                                                                                    | Sprint Review                                                  | Sprint End: Accepted Product Release
 **Scrum Roles**                                          | Development Team                                            | Scrum Master, Development Team, Product Owner (optional)                                                       | Scrum Master, Development Team, Product Owner                  | Product Owner
+
+## Software Workflow ##
+
+Catapult enforces a unique solution to Release Management of a website, Software Workflow. Software Workflow offers two modes, downstream or upstream, creating a "golden environment".
+
+<img src="https://cdn.rawgit.com/devopsgroup-io/catapult/master/catapult/installers/images/catapult_software_workflow.png" alt="Catapult Software Workflow">
+
+### Downstream ###
+
+            | LocalDev | Test | QC | Production
+------------|----------|------|----|-----------
 **Downstream Software Workflow - Database**              | Restore from **develop** `~/_sql` folder of website repo    | Restore from **develop** `~/_sql` folder of website repo                                                       | Restore from **release** `~/_sql` folder of website repo       | Auto-commit one backup per day (up to 500MB or 1) to **master** `~/_sql` folder of website repo during deploy
 **Downstream Software Workflow - Untracked File Stores** | rsync file stores from **Production**                       | rsync file stores from **Production**                                                                          | rsync file stores from **Production**                          | Pull file stores from **master**
 **Downstream Software Workflow - Tracked File Stores**   | Pull file stores from **develop**                           | Pull file stores from **develop**                                                                              | Pull file stores from **release**                              | Auto-commit file stores (up to 750MB each) to **master** of website repo during deploy
+
+**NOTE:** Catapult will automatically pull **master** into **develop** when in the **Downstream Software Workflow** direction.
+
+### Upstream ###
+
+            | LocalDev | Test | QC | Production
+------------|----------|------|----|-----------
 **Upstream Software Workflow - Database**                | Restore from **develop** `~/_sql` folder of website repo    | Auto-commit one backup per day (up to 500MB or 1) to **develop** `~/_sql` folder of website repo during deploy | Restore from **release** `~/_sql` folder of website repo       | Restore from **master** `~/_sql` folder of website repo
 **Upstream Software Workflow - Untracked File Stores**   | rsync file stores from **Test**                             | Pull file stores from **develop**                                                                              | rsync file stores from **Test**                                | rsync file stores from **Test**
 **Upstream Software Workflow - Tracked File Stores**     | Pull file stores from **develop**                           | Auto-commit file stores (up to 750MB each) to **develop** of website repo during deploy                        | Pull file stores from **release**                              | Pull file stores from **master**
-
-**NOTE:** Catapult will automatically pull **master** into **develop** when in the **Downstream Software Workflow** direction.
 
 ## Catapult Configuration ##
 
