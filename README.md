@@ -588,7 +588,7 @@ Catapult enforces a unique solution to Release Management of a website, Software
 **Downstream Software Workflow - Untracked File Stores** | rsync file stores from **Production**                       | rsync file stores from **Production**                                                                          | rsync file stores from **Production**                          | Pull file stores from **master**
 **Downstream Software Workflow - Tracked File Stores**   | Pull file stores from **develop**                           | Pull file stores from **develop**                                                                              | Pull file stores from **release**                              | Auto-commit file stores (up to 750MB each) to **master** of website repo during deploy
 
-**NOTE:** Catapult will automatically pull **master** into **develop** when in the **Downstream Software Workflow** direction.
+**NOTE:** Catapult will automatically pull the **master** branch into the **develop** branch of a website's repository when in the **Downstream Software Workflow** direction.
 
 ### Upstream ###
 
