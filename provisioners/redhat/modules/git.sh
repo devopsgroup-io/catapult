@@ -108,7 +108,7 @@ if [ -d "/var/www/repositories/apache/${domain}/.git" ]; then
                 cd "/var/www/repositories/apache/${domain}" \
                     && git stash save --include-untracked
             fi
-            # hard reset (tracked), checkout all from HEAD, clean (untracked), checkout correct branch, then pull in latest
+            # hard reset (tracked), checkout all from HEAD, clean (untracked - we'll rsync later), checkout correct branch, then pull in latest
             cd "/var/www/repositories/apache/${domain}" \
                 && git reset --quiet --hard HEAD -- \
                 && git checkout . \

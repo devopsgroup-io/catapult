@@ -31,6 +31,9 @@ redhat:
     git_clean:
       description: "Removes Git repositories for websites."
       multithreading: false
+    git_permissions:
+      description: "Manages Git repository permissions for websites."
+      multithreading: true
     iptables:
       description: "Manages a strict firewall to only allow necessary traffic."
       multithreading: false
@@ -72,11 +75,11 @@ redhat:
       multithreading: false
   servers:
     apache:
-      modules: ["time","system","iptables","newrelic_sysmon","cron","git_clean","software_operations_file","git","software_config","rsync","php","software_tools","apache","apache_vhosts_clean","apache_vhosts","newrelic_apm_php","cloudflare_zones","cloudflare_dns"]
+      modules: ["time","system","iptables","newrelic_sysmon","cron","git_clean","software_operations_file","git","git_permissions","software_config","rsync","php","software_tools","apache","apache_vhosts_clean","apache_vhosts","newrelic_apm_php","cloudflare_zones","cloudflare_dns"]
     bamboo:
       modules: ["time","system","iptables","newrelic_sysmon","cron","bamboo"]
     mysql:
-      modules: ["time","system","iptables","newrelic_sysmon","cron","git_clean","git","software_config","rsync","php","software_tools","software_operations_meta","mysql","cloudflare_cache"]
+      modules: ["time","system","iptables","newrelic_sysmon","cron","git_clean","git","git_permissions","software_config","rsync","php","software_tools","software_operations_meta","mysql","cloudflare_cache"]
 windows:
   modules:
     cloudflare_dns:
