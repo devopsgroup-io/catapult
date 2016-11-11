@@ -404,13 +404,22 @@ module Catapult
                   @temp_configuration_encrypted["websites"]["#{service}"].each do |encrypted_instance|
                     # find a matching domain
                     if encrypted_instance["domain"] == decrypted_instance["domain"]
-                      # determine if there was a change to the software_workflow
-                      if encrypted_instance["software_workflow"] != decrypted_instance["software_workflow"]
-                        current_time = DateTime.now
-                        todays_date = current_time.strftime("%Y%m%d")
-                        todays_file = "repositories/#{service}/#{decrypted_instance["domain"]}/_sql/#{todays_date}.sql"
-                        unless File.exist?(todays_file)
-                          catapult_exception("There was a change in software_workflow direction for #{decrypted_instance["domain"]} from #{encrypted_instance["software_workflow"]} to #{decrypted_instance["software_workflow"]} and today's SQL backup does not exist (#{todays_file}). Please run a Production deployment followed by a Test and LocalDev deployment.")
+                      # accomodate new websites
+                      unless encrypted_instance["software_workflow"] == nil
+                        # determine if there was a change to the software_workflow
+                        if encrypted_instance["software_workflow"] != decrypted_instance["software_workflow"]
+                          current_time = DateTime.now
+                          todays_date = current_time.strftime("%Y%m%d")
+                          todays_file = "repositories/#{service}/#{decrypted_instance["domain"]}/_sql/#{todays_date}.sql"
+                          unless File.exist?(todays_file)
+                            # from downstream to upstream
+                            if decrypted_instance["software_workflow"] == "upstream"
+                              catapult_exception("There was a change in software_workflow direction for #{decrypted_instance["domain"]} from #{encrypted_instance["software_workflow"]} to #{decrypted_instance["software_workflow"]} and today's SQL backup does not exist (#{todays_file}). Please first run a Production then Test deployment followed by a LocalDev provision.")
+                            # from upstream to upstream
+                            elsif decrypted_instance["software_workflow"] == "downstream"
+                              catapult_exception("There was a change in software_workflow direction for #{decrypted_instance["domain"]} from #{encrypted_instance["software_workflow"]} to #{decrypted_instance["software_workflow"]} and today's SQL backup does not exist (#{todays_file}). Please first run a Test deployment followed by a LocalDev deployment.")
+                            end
+                          end
                         end
                       end
                     end
