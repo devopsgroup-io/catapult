@@ -53,7 +53,9 @@ module Catapult
         raise error
       rescue => exception
         # remove the known unique lock file
-        FileUtils.rm(@lock_file_unique)
+        if File.exist?(@lock_file_unique)
+          FileUtils.rm(@lock_file_unique)
+        end
         puts "\n\n"
         title = "Catapult Error:"
         length = title.size
