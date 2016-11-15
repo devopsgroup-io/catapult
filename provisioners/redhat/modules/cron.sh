@@ -1,35 +1,64 @@
 source "/catapult/provisioners/redhat/modules/catapult.sh"
 
 
-
+# create custom cron tasks
 if ([ "${4}" == "apache" ] || [ "${4}" == "mysql" ]); then
-    echo -e "\n> configuring daily cron task: git gc"
-    touch "/etc/cron.daily/catapult-git.cron"
-    cat "/catapult/provisioners/redhat/modules/cron_git.sh" > "/etc/cron.daily/catapult-git.cron"
-    chmod 755 "/etc/cron.daily/catapult-git.cron"
+    cat "/catapult/provisioners/redhat/modules/cron_git.sh" > "/etc/cron.weekly/catapult-git.cron"
 fi
-
-
 
 if [ "${4}" == "mysql" ]; then
-    echo -e "\n> configuring daily cron task: mysql check"
     # ref: https://mariadb.com/kb/en/mariadb/mysqlcheck/
-    touch "/etc/cron.daily/catapult-mysql.cron"
-    cat "/catapult/provisioners/redhat/modules/cron_mysql.sh" > "/etc/cron.daily/catapult-mysql.cron"
-    chmod 755 "/etc/cron.daily/catapult-mysql.cron"
-    # remove task from previous implemenation
-    rm -f "/etc/cron.daily/catapult-mysql"
+    cat "/catapult/provisioners/redhat/modules/cron_mysql.sh" > "/etc/cron.weekly/catapult-mysql.cron"
 fi
 
-
-
-echo -e "\n> configuring weekly cron task: system reboot"
-touch "/etc/cron.weekly/catapult-reboot.cron"
 cat "/catapult/provisioners/redhat/modules/cron_reboot.sh" > "/etc/cron.weekly/catapult-reboot.cron"
-chmod 755 "/etc/cron.weekly/catapult-reboot.cron"
-# remove task from previous implemenation
-rm -f "/etc/cron.daily/catapult-reboot.cron"
 
+
+# define cron tasks and be mindful of order
+hourly=("0anacron" "0yum-hourly.cron")
+daily=("0yum-daily.cron" "logrotate" "man-db.cron")
+weekly=("catapult-git.cron" "catapult-mysql.cron" "catapult-reboot.cron")
+monthly=()
+
+for file in /etc/cron.hourly/*; do
+    if ! [[ ${hourly[*]} =~ $(basename $file) ]]; then
+        echo "removing ${file}"
+        rm -rf $file
+    else
+        chown root:root $file
+        chmod 755 $file
+    fi
+done
+
+for file in /etc/cron.daily/*; do
+    if ! [[ ${daily[*]} =~ $(basename $file) ]]; then
+        echo "removing ${file}"
+        rm -rf $file
+    else
+        chown root:root $file
+        chmod 755 $file
+    fi
+done
+
+for file in /etc/cron.weekly/*; do
+    if ! [[ ${weekly[*]} =~ $(basename $file) ]]; then
+        echo "removing ${file}"
+        rm -rf $file
+    else
+        chown root:root $file
+        chmod 755 $file
+    fi
+done
+
+for file in /etc/cron.monthly/*; do
+    if ! [[ ${monthly[*]} =~ $(basename $file) ]]; then
+        echo "removing ${file}"
+        rm -rf $file
+    else
+        chown root:root $file
+        chmod 755 $file
+    fi
+done
 
 
 echo -e "\n> anacron configuration"
