@@ -345,11 +345,11 @@ module Catapult
     # bootstrap secrets/configuration-user.yml
     # generate secrets/configuration-user.yml file if it does not exist
     unless File.exist?("secrets/configuration-user.yml")
-      FileUtils.cp("secrets/configuration-user.yml.template", "secrets/configuration-user.yml")
+      FileUtils.cp("catapult/installers/templates/configuration-user.yml.template", "secrets/configuration-user.yml")
     end
-    # parse secrets/configuration-user.yml and secrets/configuration-user.yml.template file
+    # parse secrets/configuration-user.yml and catapult/installers/templates/configuration-user.yml.template file
     @configuration_user = YAML.load_file("secrets/configuration-user.yml")
-    @configuration_user_template = YAML.load_file("secrets/configuration-user.yml.template")
+    @configuration_user_template = YAML.load_file("catapult/installers/templates/configuration-user.yml.template")
     # check for required fields
     if @configuration_user["settings"]["gpg_key"] == nil || @configuration_user["settings"]["gpg_key"].match(/\s/) || @configuration_user["settings"]["gpg_key"].length < 20
       catapult_exception("Please set your team's gpg_key in secrets/configuration-user.yml - spaces are not permitted and must be at least 20 characters.")
@@ -380,7 +380,7 @@ module Catapult
       # bootstrap secrets/configuration.yml
       # initialize secrets/configuration.yml.gpg
       if File.zero?("secrets/configuration.yml.gpg")
-        `gpg --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml.gpg --armor --cipher-algo AES256 --symmetric secrets/configuration.yml.template`
+        `gpg --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml.gpg --armor --cipher-algo AES256 --symmetric catapult/installers/templates/configuration.yml.template`
       end
       if @configuration_user["settings"]["gpg_edit"]
         unless File.exist?("secrets/configuration.yml")
@@ -477,7 +477,7 @@ module Catapult
         `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/id_rsa.pub --decrypt secrets/id_rsa.pub.gpg`
       end
     end
-    # create objects from secrets/configuration.yml.gpg and secrets/configuration.yml.template
+    # decrypt secrets/configuration.yml.gpg, id_rsa.gpg, and id_rsa.pub.gpg
     @configuration = YAML.load(`gpg --verbose --batch --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --decrypt secrets/configuration.yml.gpg`)
     if $?.exitstatus > 0
       catapult_exception("Your configuration could not be decrypted, please confirm your team's gpg_key is correct in secrets/configuration-user.yml")
