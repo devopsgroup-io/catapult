@@ -37,8 +37,14 @@ while IFS='' read -r -d '' key; do
     if ([ "$1" != "dev" ]); then
         if [ -z "${domain_tld_override}" ]; then
             bash /catapult/provisioners/redhat/installers/dehydrated/dehydrated --cron --domain "${domain_environment}" --domain "www.${domain_environment}" 2>&1
+            sudo cat >> /catapult/provisioners/redhat/installers/dehydrated/domains.txt << EOF
+${domain_environment} www.${domain_environment}
+EOF
         else
             bash /catapult/provisioners/redhat/installers/dehydrated/dehydrated --cron --domain "${domain_environment}.${domain_tld_override}" --domain "www.${domain_environment}.${domain_tld_override}" 2>&1
+            sudo cat >> /catapult/provisioners/redhat/installers/dehydrated/domains.txt << EOF
+${domain_environment}.${domain_tld_override} www.${domain_environment}.${domain_tld_override}
+EOF
         fi
     fi
 

@@ -59,6 +59,8 @@ sh /etc/ssl/certs/renew-dummy-cert /etc/ssl/certs/httpd-dummy-cert.key.cert
 
 # support letsencrypt
 sudo mkdir --parents /var/www/dehydrated
+# initalize the domains.txt file for certificates cron job
+cat /dev/null > /catapult/provisioners/redhat/installers/dehydrated/domains.txt
 
 # 80/443: create vhosts
 sudo cat > /etc/httpd/sites-enabled/_default_.conf << EOF
