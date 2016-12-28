@@ -35,7 +35,7 @@ if [ "${force_https}" = "True" ]; then
 else
     domain_expanded_protocol="http:\\/\\/${domain_expanded}"
 fi
-domainvaliddbname=$(catapult websites.apache.$5.domain | tr "." "_")
+domainvaliddbname=$(catapult websites.apache.$5.domain | tr "." "_" | tr "-" "_")
 software=$(catapult websites.apache.$5.software)
 software_dbprefix=$(catapult websites.apache.$5.software_dbprefix)
 softwareroot=$(provisioners software.apache.${software}.softwareroot)
