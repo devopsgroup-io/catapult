@@ -34,7 +34,7 @@ mysql --defaults-extra-file=$dbconf -e "SET global max_allowed_packet=1024 * 102
 
 # create an array of domainvaliddbnames
 while IFS='' read -r -d '' key; do
-    domainvaliddbname=$(echo "$key" | grep -w "domain" | cut -d ":" -f 2 | tr -d " " | tr "." "_")
+    domainvaliddbname=$(echo "$key" | grep -w "domain" | cut -d ":" -f 2 | tr -d " " | tr "." "_" | tr "-" "_")
     domainvaliddbnames+=(${1}_${domainvaliddbname})
 done < <(echo "${configuration}" | shyaml get-values-0 websites.apache)
 # cleanup databases from domainvaliddbnames array
@@ -60,7 +60,7 @@ mysql --defaults-extra-file=$dbconf -e "CREATE USER 'maintenance'@'%'"
 echo "${configuration}" | shyaml get-values-0 websites.apache |
 while IFS='' read -r -d '' key; do
 
-    domainvaliddbname=$(echo "$key" | grep -w "domain" | cut -d ":" -f 2 | tr -d " " | tr "." "_")
+    domainvaliddbname=$(echo "$key" | grep -w "domain" | cut -d ":" -f 2 | tr -d " " | tr "." "_" | tr "-" "_")
     software=$(echo "$key" | grep -w "software" | cut -d ":" -f 2 | tr -d " ")
 
     if test -n "${software}"; then
