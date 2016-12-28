@@ -72,8 +72,8 @@ if (-not(Get-NetFirewallRule -DisplayName "SQL Server" -ErrorAction SilentlyCont
     New-NetFirewallRule -DisplayName "SQL Server" -Direction Inbound -Protocol TCP -LocalPort "1433" -Action Allow
 }
 Get-NetFirewallRule -DisplayName "SQL Server" | where-object {$_.PrimaryStatus}
- 
- 
+
+
 echo "`n=> Managing SQL Server Logins..."
 [System.Reflection.Assembly]::LoadWithPartialName("Microsoft.SqlServer.Smo") | Out-Null
 $server = new-object ("Microsoft.SqlServer.Management.Smo.Server") -ArgumentList "localhost\SQLEXPRESS"
@@ -98,7 +98,7 @@ $login.PasswordPolicyEnforced = $false
 $login.PasswordExpirationEnabled = $false
 $login.Alter()
 $login.Refresh()
- 
+
 
 echo "`n=> Managing SQL Server Databases..."
 [System.Reflection.Assembly]::LoadWithPartialName("Microsoft.SqlServer.Smo") | Out-Null
@@ -107,7 +107,7 @@ $server = new-object ("Microsoft.SqlServer.Management.Smo.Server") -ArgumentList
 # create an array of domainvaliddbnames
 $domainvaliddbnames = @("master","model","msdb","tempdb")
 foreach ($instance in $configuration.websites.iis) {
-    $domainvaliddbname = ("{0}_{1}" -f $($args[0]), $instance.domain -replace "\.","_")
+    $domainvaliddbname = ("{0}_{1}" -f $($args[0]), $instance.domain -replace "\.","_" -replace "-","_")
     $domainvaliddbnames += $domainvaliddbname
 }
 # cleanup databases from domainvaliddbnames array
@@ -124,7 +124,7 @@ foreach ($database in $server.Databases.name) {
 # create databases
 foreach ($instance in $configuration.websites.iis) {
 
-    $domainvaliddbname = ("{0}_{1}" -f $($args[0]), $instance.domain -replace "\.","_")
+    $domainvaliddbname = ("{0}_{1}" -f $($args[0]), $instance.domain -replace "\.","_" -replace "-","_")
 
     if ($($args[0]) -eq "production") {
         echo ("`nNOTICE: {1}" -f $($args[0]), $instance.domain)
