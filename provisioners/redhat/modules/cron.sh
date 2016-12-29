@@ -4,7 +4,7 @@ source "/catapult/provisioners/redhat/modules/catapult.sh"
 # create custom cron tasks
 # certificates
 if ([ "${4}" == "apache" ] && [ "${1}" != "dev" ]); then
-    cat "/catapult/provisioners/redhat/modules/cron_certificates.cron" > "/etc/cron.weekly/catapult-certificates.cron"
+    cat "/catapult/provisioners/redhat/modules/cron_certificates.sh" > "/etc/cron.weekly/catapult-certificates.cron"
 fi
 # git
 if ([ "${4}" == "apache" ] || [ "${4}" == "mysql" ]); then
