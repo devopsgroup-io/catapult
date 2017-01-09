@@ -332,7 +332,7 @@ module Catapult
       unless staged.include?("secrets/configuration.yml.gpg") || staged.include?("secrets/id_rsa.gpg") || staged.include?("secrets/id_rsa.pub.gpg")
         puts "You are trying to commit directly to the master branch, please create a pull request from release into master instead."
         exit 1
-      else 
+      else
         puts "To contribute to Catapult, please switch to the develop-catapult branch."
         exit 1
       end
@@ -580,9 +580,9 @@ module Catapult
       # ************* TASK 1: CREATE A CANONICAL REQUEST *************
       # http://docs.aws.amazon.com/general/latest/gr/sigv4-create-canonical-request.html
       # Step 1 is to define the verb (GET, POST, etc.)--already done.
-      # Step 2: Create canonical URI--the part of the URI from domain to query 
+      # Step 2: Create canonical URI--the part of the URI from domain to query
       # string (use '/' if no path)
-      canonical_uri = '/' 
+      canonical_uri = '/'
       # Step 3: Create the canonical query string. In this example (a GET request),
       # request parameters are in the query string. Query string values must
       # be URL-encoded (space=%20). The parameters must be sorted by name.
@@ -595,7 +595,7 @@ module Catapult
       # Step 5: Create the list of signed headers. This lists the headers
       # in the canonical_headers list, delimited with ";" and in alpha order.
       # Note: The request can include any headers; canonical_headers and
-      # signed_headers lists those that you want to be included in the 
+      # signed_headers lists those that you want to be included in the
       # hash of the request. "Host" and "x-amz-date" are always required.
       signed_headers = 'host;x-amz-date'
       # Step 6: Create payload hash (hash of the request body content). For GET
@@ -615,7 +615,7 @@ module Catapult
       # Sign the string_to_sign using the signing_key
       signature = OpenSSL::HMAC.hexdigest('sha256', signing_key, string_to_sign)
       # ************* TASK 4: ADD SIGNING INFORMATION TO THE REQUEST *************
-      # The signing information can be either in a query string value or in 
+      # The signing information can be either in a query string value or in
       # a header named Authorization. This code shows how to use a header.
       # Create authorization header and add to request headers
       authorization_header = algorithm + ' ' + 'Credential=' + @configuration["company"]["aws_access_key"] + '/' + credential_scope + ', ' +  'SignedHeaders=' + signed_headers + ', ' + 'Signature=' + signature
@@ -953,9 +953,9 @@ module Catapult
     # ************* TASK 1: CREATE A CANONICAL REQUEST *************
     # http://docs.aws.amazon.com/general/latest/gr/sigv4-create-canonical-request.html
     # Step 1 is to define the verb (GET, POST, etc.)--already done.
-    # Step 2: Create canonical URI--the part of the URI from domain to query 
+    # Step 2: Create canonical URI--the part of the URI from domain to query
     # string (use '/' if no path)
-    canonical_uri = '/' 
+    canonical_uri = '/'
     # Step 3: Create the canonical query string. In this example (a GET request),
     # request parameters are in the query string. Query string values must
     # be URL-encoded (space=%20). The parameters must be sorted by name.
@@ -968,7 +968,7 @@ module Catapult
     # Step 5: Create the list of signed headers. This lists the headers
     # in the canonical_headers list, delimited with ";" and in alpha order.
     # Note: The request can include any headers; canonical_headers and
-    # signed_headers lists those that you want to be included in the 
+    # signed_headers lists those that you want to be included in the
     # hash of the request. "Host" and "x-amz-date" are always required.
     signed_headers = 'host;x-amz-date'
     # Step 6: Create payload hash (hash of the request body content). For GET
@@ -988,7 +988,7 @@ module Catapult
     # Sign the string_to_sign using the signing_key
     signature = OpenSSL::HMAC.hexdigest('sha256', signing_key, string_to_sign)
     # ************* TASK 4: ADD SIGNING INFORMATION TO THE REQUEST *************
-    # The signing information can be either in a query string value or in 
+    # The signing information can be either in a query string value or in
     # a header named Authorization. This code shows how to use a header.
     # Create authorization header and add to request headers
     authorization_header = algorithm + ' ' + 'Credential=' + @configuration["company"]["aws_access_key"] + '/' + credential_scope + ', ' +  'SignedHeaders=' + signed_headers + ', ' + 'Signature=' + signature
@@ -1019,9 +1019,9 @@ module Catapult
       puts "\n[#{environment}]"
       puts "[machine]".ljust(45) + "[provider]".ljust(14) + "[state]".ljust(13) + "[id]".ljust(12) + "[type]".ljust(13) + "[ipv4_public]".ljust(17) + "[ipv4_private]".ljust(17)
       puts "\n"
-      
+
       @configuration["environments"]["#{environment}"]["servers"].each do |server,data|
-        
+
         # start new row
         row = Array.new
         # machine
@@ -1171,7 +1171,7 @@ module Catapult
             droplet = nil
           else
             droplet = @api_digitalocean["droplets"].find { |element| element['name'] == "#{@configuration["company"]["name"].downcase}-#{environment}-#{server.gsub("_","-")}" }
-            if "#{droplet["status"]}" != "active"
+            if droplet != nil && "#{droplet["status"]}" != "active"
               # any other status than active can not be trusted
               droplet = nil
             end
@@ -1272,7 +1272,7 @@ module Catapult
         end
 
         puts row.join(" ")
-      
+
       end
       # if environment passwords do not exist, create them
       ######################################################################
@@ -1506,7 +1506,7 @@ module Catapult
                 catapult_exception("There is an error in your secrets/configuration.yml file.\nThe domain_tld_override for websites => #{service} => domain => #{instance["domain"]} is invalid, it must only be one domain level (company.com).")
               end
             end
-            # there is a maximum domain (including domain_tld_override) length of 53 characters 
+            # there is a maximum domain (including domain_tld_override) length of 53 characters
             # max mysql database name length of 64 - 11 for longest prefix of production_ = 53
             # max mssql database name length of 128
             if (instance["domain"].length + (instance["domain_tld_override"].nil? ? 0 : instance["domain_tld_override"].length)) > 53
