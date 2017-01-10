@@ -60,6 +60,28 @@ else
         sudo git clone --recursive --branch ${branch} $2 "/catapult"
     fi
 fi
+# determine if there are catapult updates
+if ([ $1 = "dev" ]); then
+    cd "/catapult" && sudo git diff --exit-code --quiet
+    if [ $? -eq 1 ]; then
+        updates="True"
+    else
+        updates="False"
+    fi
+else
+    cd "/catapult" && sudo git diff --exit-code --quiet ${branch} origin/${branch}
+    if [ $? -eq 1 ]; then
+        updates="True"
+    else
+        updates="False"
+    fi
+fi
+# override updates variable if this is a new machine
+if [ ! -f "/catapult/provisioners/redhat/logs/${4}.log" ]; then
+    updates="True"
+fi
+
+
 
 
 
@@ -79,4 +101,4 @@ echo -e "==> GIT BRANCH: ${branch}"
 echo -e "\n\n\n==> STARTING PROVISION"
 
 # provision the server
-source "/catapult/provisioners/redhat/provision_server.sh"
+bash "/catapult/provisioners/redhat/provision_server.sh" $1 $2 $3 $4 $updates
