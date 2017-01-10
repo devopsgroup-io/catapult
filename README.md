@@ -337,127 +337,154 @@ Monitoring | New Relic Application (APM), Browser, Server, and \***Synthetics | 
 
 \*** New Relic customers receive a trial "pro" period ranging from 14-days to 30-days, however, there is [no free tier beyond the trial](#partnerships)
 
-1. **Cloud Hosting:**    
-    1. **DigitalOcean** sign-up and configuration
-        1. Create an account at http://digitalocean.com
-           * [Free Stuff] Get a $10 credit and give us $25 once you spend $25 https://www.digitalocean.com/?refcode=6127912f3462
-        2. Go to your DigitalOcean Applications & API Dashboard https://cloud.digitalocean.com/settings/api
-            1. Create a Personal Access Token named "Vagrant" and place the token value at `~/secrets/configuration.yml["company"]["digitalocean_personal_access_token"]`
-        3. Go to your DigitalOcean Security Dashboard https://cloud.digitalocean.com/settings/security
-            1. Add a new SSH Key named "Vagrant" with your newly created `id_rsa.pub` from `~/secrets/id_rsa.pub` key 
-    2. **Amazon Web Services** (AWS) sign-up and configuration
-        1. Create an account https://portal.aws.amazon.com/gp/aws/developer/registration
-            * [Free Stuff] Receive Free Tier benefits for the first 12 months after signing up https://aws.amazon.com/ec2/pricing/
-        2. Sign in to your new AWS console https://console.aws.amazon.com
-        3. Go to your AWS Identity and Access Management (IAM) Users Dashboard https://console.aws.amazon.com/iam/home#users
-            1. Create a "Catapult" user.
-            2. Place the Access Key ID at `~/secrets/configuration.yml["company"]["aws_access_key"]`
-            3. Place the Secret Access Key at `~/secrets/configuration.yml["company"]["aws_secret_key"]`
-        4. Go to your AWS Identity and Access Management (IAM) Groups Dashboard https://console.aws.amazon.com/iam/home#groups
-            1. Create a "Catapult" group.
-            2. Attach the "AmazonEC2FullAccess" policy to the "Catapult" group.
-        5. Go back to your AWS Identity and Access Management (IAM) Groups Dashboard https://console.aws.amazon.com/iam/home#groups
-            1. Select your newly created "Catapult" group.
-            2. Select Add Users to Group and add your newly created "Catapult" user.
-        6. Go to your AWS EC2 Key Pairs Dashboard https://console.aws.amazon.com/ec2/home#KeyPairs
-            1. Click Import Key Pair
-            2. Add your newly created `id_rsa.pub` from `~/secrets/id_rsa.pub` key
-            3. Set the Key pair name to "Catapult"
-        7. Go to your AWS EC2 Security Groups Dashboard https://console.aws.amazon.com/ec2/home#SecurityGroups
-            1. Select the "default" Group Name
-            2. Select the Inbound tab and click Edit
-            3. Change Source to "Anywhere"
-            4. Click Save
-2. **Repositories:**    
-    Bitbucket provides free private repositories and GitHub provides free public repositories, you will need to sign up for both. If you already have Bitbucket and GitHub accounts you may use them, however, it's best to setup a [machine user](https://developer.github.com/guides/managing-deploy-keys/#machine-users) if you're using Catapult with your team.
-    1. **Bitbucket** sign-up and configuration
-        1. Create an account at https://bitbucket.org
-            1. Place the username (not the email address) that you used to sign up for Bitbucket at `~/secrets/configuration.yml["company"]["bitbucket_username"]`
-            2. Place the password of the account for Bitbucket at `~/secrets/configuration.yml["company"]["bitbucket_password"]`
-        2. Add your newly created `id_rsa.pub` from `~/secrets/id_rsa.pub` key in https://bitbucket.org/account/user/`your-user-here`/ssh-keys/ named "Catapult"
-    2. **GitHub** sign-up and configuration
-        1. Create an account at https://github.com
-            1. Place the username (not the email address) that you used to sign up for GitHub at `~/secrets/configuration.yml["company"]["github_username"]`
-            2. Place the password of the account for GitHub at `~/secrets/configuration.yml["company"]["github_password"]`
-        2. Add your newly created `id_rsa.pub` from `~/secrets/id_rsa.pub` key in https://github.com/settings/ssh named "Catapult"
-3. **Automated Deployments:**
-    2. **Bamboo** sign-up and configuration
-        1. Create a Bamboo Cloud account at https://www.atlassian.com/software/bamboo
-        2. Sign in to your new custom Bamboo instance https://[your-name-here].atlassian.net
-        3. Place your Bamboo base URL at `~/secrets/configuration.yml["company"]["bamboo_base_url"]`, the format should be https://[your-name-here].atlassian.net/builds/
-        4. Place your Bamboo username (usually admin) at `~/secrets/configuration.yml["company"]["bamboo_username"]`
-        5. Place your Bamboo password (usually admin) at `~/secrets/configuration.yml["company"]["bamboo_password"]`
-        6. Click the settings gear from the top right in the header and select Elastic instances:
-            1. Click Configuration from the left
-            2. Click Edit configuration
-                1. **Amazon Web Services configuration**
-                    1. Set your AWS EC2 "Bamboo" Access Key ID and Secret Access Key from `~/secrets/configuration.yml["company"]["aws_access_key"]` and `~/secrets/configuration.yml["company"]["aws_secret_key"]`
-                    2. Region: `US East (Northern Virginia)`
-                2. **Automatic elastic instance management**
-                    1. Elastic instance management: `Custom`
-                    2. Idle agent shutdown delay: `10`
-                    3. Allowed non-Bamboo instances: `1`
-                    4. Maximum number of instances to start at once: `2`
-                    5. Number of builds in queue threshold: `1`
-                    6. Number of elastic builds in queue threshold: `1`
-                    7. Average queue time threshold: `2`
-                3. Click Save
-        7. Click the settings gear from the top right in the header and select Elastic instances:
-            1. Click Image configurations from the left
-                1. Disable all of the elastic images
-                2. Create elastic image configuration:
-                    1. Name: `Catapult`
-                    2. AMI ID: `ami-eb5b8080`
-                    3. Instance type: `T2 Burstable Performance Micro`
-                    4. Availability Zone: `Chosen by EC2`
-                    5. Product: `Linux/UNIX`
-                    6. Click Save
-        8. Click Create > Create a new plan from the header:
-            1. **Create Catapult Project and create TEST Plan**
-                * *Project and build plan name*
-                    1. Project > New Project
-                    2. Project name: Catapult
-                    3. Project key: CAT
-                    4. Plan name: TEST
-                    5. Plan key: TEST
-                    6. Plan description:
-                * *Link repository to new build plan*
-                    1. Repository host: Other > None
-            2. **Create QC Plan**
-                * *Project and build plan name*
-                    1. Project: Catapult
-                    4. Plan name: QC
-                    5. Plan key: QC
-                    6. Plan description:
-                * *Link repository to new build plan*
-                    1. Repository host: Other > None
-            2. **Create PROD Plan**
-                * *Project and build plan name*
-                    1. Project: Catapult
-                    4. Plan name: PRODUCTION
-                    5. Plan key: PROD
-                    6. Plan description:
-                * *Link repository to new build plan*
-                    1. Repository host: Other > None
-4. **DNS:**    
-    1. **CloudFlare** sign-up and configuration
-        1. Create a CloudFlare account at https://www.cloudflare.com
-        2. Sign in to your new CloudFlare account
-        3. Visit your My Account section at https://www.cloudflare.com/a/account/my-account and scroll down to your API Key and place the token value at `~/secrets/configuration.yml["company"]["cloudflare_api_key"]`
-        4. Place the email address of the email address that you used to sign up for CloudFlare at `~/secrets/configuration.yml["company"]["cloudflare_email"]`
-5. **Monitoring:**
-    1. **New Relic** sign-up and configuration
-        1. Create a New Relic account at http://newrelic.com/
-            * [Free Stuff] Sign-up up for New Relic and get a Data Nerd shirt! http://newrelic.com/lp/datanerd
-            * [Free Stuff] Refer Catapult and get a New Relic hoodie! http://newrelic.com/referral
-        2. Sign in to your New Relic account
-        3. Go to your Account Settings > Integrations > API keys.
-        4. Generate and place your REST API key at `~/secrets/configuration.yml["company"]["newrelic_api_key"]`
-        5. Generate and place your Admin API key at `~/secrets/configuration.yml["company"]["newrelic_admin_api_key"]`
-        3. Go to your Account Settings > Account > Summary.
-        5. Place your License key at `~/secrets/configuration.yml["company"]["newrelic_license_key"]`
-6. **Verify Configuration:**    
-    1. To verify all of the configuration that you just set, open your command line and change directory into your fork of Catapult, then run `vagrant status`. Catapult will confirm connection to all of the Services and inform you of any problems.
+### 1. **Cloud Hosting:**
+1. **DigitalOcean** sign-up and configuration
+    1. Create an account at http://digitalocean.com
+       * [Free Stuff] Get a $10 credit and give us $25 once you spend $25 https://www.digitalocean.com/?refcode=6127912f3462
+    2. Go to your DigitalOcean Applications & API Dashboard https://cloud.digitalocean.com/settings/api
+        1. Create a Personal Access Token named "Vagrant" and place the token value at `~/secrets/configuration.yml["company"]["digitalocean_personal_access_token"]`
+    3. Go to your DigitalOcean Security Dashboard https://cloud.digitalocean.com/settings/security
+        1. Add a new SSH Key named "Vagrant" with your newly created `id_rsa.pub` from `~/secrets/id_rsa.pub` key 
+2. **Amazon Web Services** (AWS) sign-up and configuration
+    1. Create an account https://portal.aws.amazon.com/gp/aws/developer/registration
+        * [Free Stuff] Receive Free Tier benefits for the first 12 months after signing up https://aws.amazon.com/ec2/pricing/
+    2. Sign in to your new AWS console https://console.aws.amazon.com
+    3. Go to your AWS Identity and Access Management (IAM) Users Dashboard https://console.aws.amazon.com/iam/home#users
+        1. Create a "Catapult" user.
+        2. Place the Access Key ID at `~/secrets/configuration.yml["company"]["aws_access_key"]`
+        3. Place the Secret Access Key at `~/secrets/configuration.yml["company"]["aws_secret_key"]`
+    4. Go to your AWS Identity and Access Management (IAM) Groups Dashboard https://console.aws.amazon.com/iam/home#groups
+        1. Create a "Catapult" group.
+        2. Attach the "AmazonEC2FullAccess" policy to the "Catapult" group.
+    5. Go back to your AWS Identity and Access Management (IAM) Groups Dashboard https://console.aws.amazon.com/iam/home#groups
+        1. Select your newly created "Catapult" group.
+        2. Select Add Users to Group and add your newly created "Catapult" user.
+    6. Go to your AWS EC2 Key Pairs Dashboard https://console.aws.amazon.com/ec2/home#KeyPairs
+        1. Click Import Key Pair
+        2. Add your newly created `id_rsa.pub` from `~/secrets/id_rsa.pub` key
+        3. Set the Key pair name to "Catapult"
+    7. Go to your AWS EC2 Security Groups Dashboard https://console.aws.amazon.com/ec2/home#SecurityGroups
+        1. Select the "default" Group Name
+        2. Select the Inbound tab and click Edit
+        3. Change Source to "Anywhere"
+        4. Click Save
+
+### 2. **Repositories:**
+Bitbucket provides free private repositories and GitHub provides free public repositories, you will need to sign up for both. If you already have Bitbucket and GitHub accounts you may use them, however, it's best to setup a [machine user](https://developer.github.com/guides/managing-deploy-keys/#machine-users) if you're using Catapult with your team.
+
+1. **Bitbucket** sign-up and configuration
+    1. Create an account at https://bitbucket.org
+        1. Place the username (not the email address) that you used to sign up for Bitbucket at `~/secrets/configuration.yml["company"]["bitbucket_username"]`
+        2. Place the password of the account for Bitbucket at `~/secrets/configuration.yml["company"]["bitbucket_password"]`
+    2. Add your newly created `id_rsa.pub` from `~/secrets/id_rsa.pub` key in https://bitbucket.org/account/user/`your-user-here`/ssh-keys/ named "Catapult"
+2. **GitHub** sign-up and configuration
+    1. Create an account at https://github.com
+        1. Place the username (not the email address) that you used to sign up for GitHub at `~/secrets/configuration.yml["company"]["github_username"]`
+        2. Place the password of the account for GitHub at `~/secrets/configuration.yml["company"]["github_password"]`
+    2. Add your newly created `id_rsa.pub` from `~/secrets/id_rsa.pub` key in https://github.com/settings/ssh named "Catapult"
+
+### 3. **Automated Deployments:**
+Please note that Bamboo Cloud has an end-of-life January 31, 2017. Catapult used Bamboo Cloud until recent, there is now an implemenation of Bamboo Server. Please use the setup instructions for Bamboo Server, Bamboo Cloud documenation kept for transitioning users.
+
+**Bamboo Cloud sign-up**
+1. Create a Bamboo Cloud account at https://www.atlassian.com/software/bamboo
+2. Sign in to your new custom Bamboo instance https://[your-name-here].atlassian.net
+3. Place your Bamboo base URL at `~/secrets/configuration.yml["company"]["bamboo_base_url"]`, the format should be https://[your-name-here].atlassian.net/builds/
+
+**Bamboo Server set-up**
+1. Access your MyAtlassian License section at https://my.atlassian.com/products/index
+    * Please read the Bamboo Licensing and Pricing page for more information https://www.atlassian.com/licensing/bamboo
+2a. For current Bamboo Cloud customers transitioning to Bamboo Server, you will see a Bamboo Starter License
+2b. For new Bamboo customers, please purchase a Bamboo Server license from https://www.atlassian.com/purchase/product/bamboo 
+3. It's now time to bring up your build server, please run `vagrant up ~/secrets/configuration.yml["company"]["name"]-build`
+    * The initial `up` will be fairly fast, once complete, login to DigitalOcean to obtain the IP address of the virtual machine to access via URL
+    * Accessing your new Bamboo Server instance by URL for the first time will take some time, please be patient
+4. Once your Bamboo Server instance is accessible via URL, you will be prompted with a license prompt, enter your license.
+5. You will next be prompted to enter the following information:
+    * Username (required) - root
+    * Password (required) - specify a complex password
+    * Confirm password (required)
+    * Full name (required) - use `~/secrets/configuration.yml["company"]["name"]`
+    * Email - use `~/secrets/configuration.yml["company"]["email"]`
+
+**Bamboo Configuration**
+
+1. Place your Bamboo username (usually admin) at `~/secrets/configuration.yml["company"]["bamboo_username"]`
+2. Place your Bamboo password (usually admin) at `~/secrets/configuration.yml["company"]["bamboo_password"]`
+3. Click the settings gear from the top right in the header and select Elastic instances:
+    1. Click Configuration from the left
+    2. Click Edit configuration
+        1. **Amazon Web Services configuration**
+            1. Set your AWS EC2 "Bamboo" Access Key ID and Secret Access Key from `~/secrets/configuration.yml["company"]["aws_access_key"]` and `~/secrets/configuration.yml["company"]["aws_secret_key"]`
+            2. Region: `US East (Northern Virginia)`
+        2. **Automatic elastic instance management**
+            1. Elastic instance management: `Custom`
+            2. Idle agent shutdown delay: `10`
+            3. Allowed non-Bamboo instances: `1`
+            4. Maximum number of instances to start at once: `2`
+            5. Number of builds in queue threshold: `1`
+            6. Number of elastic builds in queue threshold: `1`
+            7. Average queue time threshold: `2`
+        3. Click Save
+4. Click the settings gear from the top right in the header and select Elastic instances:
+    1. Click Image configurations from the left
+        1. Disable all of the elastic images
+        2. Create elastic image configuration:
+            1. Name: `Catapult`
+            2. AMI ID: `ami-eb5b8080`
+            3. Instance type: `T2 Burstable Performance Micro`
+            4. Availability Zone: `Chosen by EC2`
+            5. Product: `Linux/UNIX`
+            6. Click Save
+5. Click Create > Create a new plan from the header:
+    1. **Create Catapult Project and create TEST Plan**
+        * *Project and build plan name*
+            1. Project > New Project
+            2. Project name: Catapult
+            3. Project key: CAT
+            4. Plan name: TEST
+            5. Plan key: TEST
+            6. Plan description:
+        * *Link repository to new build plan*
+            1. Repository host: Other > None
+    2. **Create QC Plan**
+        * *Project and build plan name*
+            1. Project: Catapult
+            4. Plan name: QC
+            5. Plan key: QC
+            6. Plan description:
+        * *Link repository to new build plan*
+            1. Repository host: Other > None
+    2. **Create PROD Plan**
+        * *Project and build plan name*
+            1. Project: Catapult
+            4. Plan name: PRODUCTION
+            5. Plan key: PROD
+            6. Plan description:
+        * *Link repository to new build plan*
+            1. Repository host: Other > None
+
+### 4. **DNS:**
+1. **CloudFlare** sign-up and configuration
+    1. Create a CloudFlare account at https://www.cloudflare.com
+    2. Sign in to your new CloudFlare account
+    3. Visit your My Account section at https://www.cloudflare.com/a/account/my-account and scroll down to your API Key and place the token value at `~/secrets/configuration.yml["company"]["cloudflare_api_key"]`
+    4. Place the email address of the email address that you used to sign up for CloudFlare at `~/secrets/configuration.yml["company"]["cloudflare_email"]`
+
+### 5. **Monitoring:**
+1. **New Relic** sign-up and configuration
+    1. Create a New Relic account at http://newrelic.com/
+        * [Free Stuff] Sign-up up for New Relic and get a Data Nerd shirt! http://newrelic.com/lp/datanerd
+        * [Free Stuff] Refer Catapult and get a New Relic hoodie! http://newrelic.com/referral
+    2. Sign in to your New Relic account
+    3. Go to your Account Settings > Integrations > API keys.
+    4. Generate and place your REST API key at `~/secrets/configuration.yml["company"]["newrelic_api_key"]`
+    5. Generate and place your Admin API key at `~/secrets/configuration.yml["company"]["newrelic_admin_api_key"]`
+    3. Go to your Account Settings > Account > Summary.
+    5. Place your License key at `~/secrets/configuration.yml["company"]["newrelic_license_key"]`
+
+### 6. **Verify Configuration:**
+1. To verify all of the configuration that you just set, open your command line and change directory into your fork of Catapult, then run `vagrant status`. Catapult will confirm connection to all of the Services and inform you of any problems.
 
 
 
