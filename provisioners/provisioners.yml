@@ -4,75 +4,99 @@ redhat:
     apache:
       description: "Manages Apache HTTP daemon."
       multithreading: false
+      persistent: false
     apache_vhosts_clean:
       description: "Removes virtual hosts for websites."
       multithreading: false
+      persistent: false
     apache_vhosts:
       description: "Manages HTTP and HTTPS virtual hosts and SSL certificates for websites."
       multithreading: false
+      persistent: false
     bamboo:
       description: "Manages the Atlassian Bamboo Server instance."
       multithreading: false
+      persistent: true
     cloudflare_cache:
       description: "Manages CloudFlare zone cache for websites."
       multithreading: true
+      persistent: true
     cloudflare_dns:
       description: "Manages CloudfFlare DNS A records for websites."
       multithreading: true
+      persistent: false
     cloudflare_zones:
       description: "Manages CloudfFlare zones for websites."
       multithreading: true
+      persistent: false
     cron:
       description: "Manages cron tasks."
       multithreading: false
+      persistent: false
     git:
       description: "Manages Git repositories for websites."
       multithreading: true
+      persistent: true
     git_clean:
       description: "Removes Git repositories for websites."
       multithreading: false
+      persistent: false
     git_permissions:
       description: "Manages Git repository permissions for websites."
       multithreading: true
+      persistent: true
     iptables:
       description: "Manages a strict firewall to only allow necessary traffic."
       multithreading: false
+      persistent: false
     mysql:
       description: "Manages MariaDB server and databases for websites with software."
       multithreading: false
+      persistent: true
     newrelic_apm_php:
       description: "Manages New Relic APM PHP daemon."
       multithreading: false
+      persistent: false
     newrelic_synthetics:
       description: "Manages New Relic Synthetics monitors for websites."
       multithreading: true
+      persistent: false
     newrelic_sysmon:
       description: "Manages New Relic System Monitor daemon."
       multithreading: false
+      persistent: false
     php:
       description: "Manages PHP and PHP modules."
       multithreading: false
+      persistent: false
     rsync:
       description: "Manages software file stores for websites with software."
       multithreading: true
+      persistent: true
     software_config:
       description: "Manages software database configuration files."
       multithreading: true
+      persistent: true
     software_operations_file:
       description: "Manages software file operations, including: automatic software updates and file store permissions for websites with software."
       multithreading: true
+      persistent: true
     software_operations_meta:
       description: "Manages software meta operations, including: cron, garbage collection, caches, and migrations for websites with software."
       multithreading: true
+      persistent: true
     software_tools:
       description: "Manages software CLI tools."
       multithreading: false
+      persistent: false
     system:
       description: "Manages system requirements."
       multithreading: false
+      persistent: false
     time:
       description: "Manages NTP daemon based on the company timezone."
       multithreading: false
+      persistent: false
   servers:
     apache:
       modules: ["time","system","iptables","newrelic_sysmon","cron","git_clean","software_operations_file","git","git_permissions","software_config","rsync","php","software_tools","cloudflare_zones","cloudflare_dns","apache","apache_vhosts_clean","apache_vhosts","newrelic_apm_php"]

@@ -4,6 +4,7 @@
 # $2 => repository
 # $3 => gpg key
 # $4 => instance
+# $5 => catapult updates
 
 
 # resources function
@@ -135,9 +136,13 @@ if [ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-values-0 redha
         echo -e "==> MODULE: ${module}"
         echo -e "==> DESCRIPTION: $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-value redhat.modules.${module}.description)"
         echo -e "==> MULTITHREADING: $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-value redhat.modules.${module}.multithreading)"
-        
+        echo -e "==> PERSISTENT: ${5}"
+
+        # if there are no updates and the module is not persistent, skip
+        if ([ "${5}" == "False" ] && [ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-value redhat.modules.${module}.persistent) == "False" ]); then
+            echo "> This module does not need to be ran when there are no Catapult updates, skipping..."
         # invoke multithreading module in parallel
-        if ([ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-value redhat.modules.${module}.multithreading) == "True" ]); then
+        elif ([ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-value redhat.modules.${module}.multithreading) == "True" ]); then
             # enable job control
             set -m
             # create a website index to pass to each sub-process
