@@ -387,18 +387,20 @@ Bitbucket provides free private repositories and GitHub provides free public rep
 Please note that Bamboo Cloud has an end-of-life January 31, 2017. Catapult used Bamboo Cloud until recent, there is now an implemenation of Bamboo Server. Please use the setup instructions for Bamboo Server, Bamboo Cloud documenation kept for transitioning users.
 
 **Bamboo Cloud sign-up**
+
 1. Create a Bamboo Cloud account at https://www.atlassian.com/software/bamboo
 2. Sign in to your new custom Bamboo instance https://[your-name-here].atlassian.net
 3. Place your Bamboo base URL at `~/secrets/configuration.yml["company"]["bamboo_base_url"]`, the format should be https://[your-name-here].atlassian.net/builds/
 
 **Bamboo Server set-up**
+
 1. Access your MyAtlassian License section at https://my.atlassian.com/products/index
     * Please read the Bamboo Licensing and Pricing page for more information https://www.atlassian.com/licensing/bamboo
 2a. For current Bamboo Cloud customers transitioning to Bamboo Server, you will see a Bamboo Starter License
 2b. For new Bamboo customers, please purchase a Bamboo Server license from https://www.atlassian.com/purchase/product/bamboo 
 3. It's now time to bring up your build server, please run `vagrant up ~/secrets/configuration.yml["company"]["name"]-build`
-    * The initial `up` will be fairly fast, once complete, login to DigitalOcean to obtain the IP address of the virtual machine to access via URL
-    * Accessing your new Bamboo Server instance by URL for the first time will take some time, please be patient
+    * The initial `up` will take some time for, please be patient
+    * Login to DigitalOcean to obtain the IP address of the virtual machine to access via URL
 4. Once your Bamboo Server instance is accessible via URL, you will be prompted with a license prompt, enter your license.
 5. You will next be prompted to enter the following information:
     * Username (required) - root
