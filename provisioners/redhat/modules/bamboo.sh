@@ -29,8 +29,8 @@ sleep 5
 # confirm that bamboo has started, the first start can expect a 5-10 minute delay 
 response=0
 until [ $response -eq 200 ]; do
-    response=$(curl --connect-timeout 30 --head --output /dev/null --retry 1 --silent --write-out '%{http_code}\n' --location --url http://127.0.0.1)
-    echo "$(date) waiting for Bamboo to start, checking every 30 seconds..."
+    response=$(curl --connect-timeout 30 --max-time 30 --head --output /dev/null --retry 0 --silent --write-out '%{http_code}\n' --location --url http://127.0.0.1)
+    echo "$(date) waiting for Bamboo to start, checking every 30 seconds (a fresh install takes about 10 minutes startup time)..."
 done
 echo "Bamboo successfully started"
 
