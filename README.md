@@ -386,11 +386,36 @@ Bitbucket provides free private repositories and GitHub provides free public rep
 ### 3. **Automated Deployments:**
 Please note that Bamboo Cloud has an end-of-life January 31, 2017. Catapult used Bamboo Cloud until recent, there is now an implemenation of Bamboo Server. Please use the setup instructions for Bamboo Server, Bamboo Cloud documenation kept for transitioning users.
 
-**Bamboo Cloud sign-up**
+**Bamboo Cloud sign-up and set-up**
 
 1. Create a Bamboo Cloud account at https://www.atlassian.com/software/bamboo
 2. Sign in to your new custom Bamboo instance https://[your-name-here].atlassian.net
 3. Place your Bamboo base URL at `~/secrets/configuration.yml["company"]["bamboo_base_url"]`, the format should be https://[your-name-here].atlassian.net/builds/
+4. Click the settings gear from the top right in the header and select Elastic instances:
+    1. Click Configuration from the left
+    2. Click Edit configuration
+        1. **Amazon Web Services configuration**
+            1. Set your AWS EC2 "Bamboo" Access Key ID and Secret Access Key from `~/secrets/configuration.yml["company"]["aws_access_key"]` and `~/secrets/configuration.yml["company"]["aws_secret_key"]`
+            2. Region: `US East (Northern Virginia)`
+        2. **Automatic elastic instance management**
+            1. Elastic instance management: `Custom`
+            2. Idle agent shutdown delay: `10`
+            3. Allowed non-Bamboo instances: `1`
+            4. Maximum number of instances to start at once: `2`
+            5. Number of builds in queue threshold: `1`
+            6. Number of elastic builds in queue threshold: `1`
+            7. Average queue time threshold: `2`
+        3. Click Save
+5. Click the settings gear from the top right in the header and select Elastic instances:
+    1. Click Image configurations from the left
+        1. Disable all of the elastic images
+        2. Create elastic image configuration:
+            1. Name: `Catapult`
+            2. AMI ID: `ami-eb5b8080`
+            3. Instance type: `T2 Burstable Performance Micro`
+            4. Availability Zone: `Chosen by EC2`
+            5. Product: `Linux/UNIX`
+            6. Click Save
 
 **Bamboo Server set-up**
 
@@ -416,32 +441,7 @@ Please note that Bamboo Cloud has an end-of-life January 31, 2017. Catapult used
     * Normally admin for Bamboo Cloud
     * Normally root for Bamboo Server
 2. Place your Bamboo password at `~/secrets/configuration.yml["company"]["bamboo_password"]`
-3. Click the settings gear from the top right in the header and select Elastic instances:
-    1. Click Configuration from the left
-    2. Click Edit configuration
-        1. **Amazon Web Services configuration**
-            1. Set your AWS EC2 "Bamboo" Access Key ID and Secret Access Key from `~/secrets/configuration.yml["company"]["aws_access_key"]` and `~/secrets/configuration.yml["company"]["aws_secret_key"]`
-            2. Region: `US East (Northern Virginia)`
-        2. **Automatic elastic instance management**
-            1. Elastic instance management: `Custom`
-            2. Idle agent shutdown delay: `10`
-            3. Allowed non-Bamboo instances: `1`
-            4. Maximum number of instances to start at once: `2`
-            5. Number of builds in queue threshold: `1`
-            6. Number of elastic builds in queue threshold: `1`
-            7. Average queue time threshold: `2`
-        3. Click Save
-4. Click the settings gear from the top right in the header and select Elastic instances:
-    1. Click Image configurations from the left
-        1. Disable all of the elastic images
-        2. Create elastic image configuration:
-            1. Name: `Catapult`
-            2. AMI ID: `ami-eb5b8080`
-            3. Instance type: `T2 Burstable Performance Micro`
-            4. Availability Zone: `Chosen by EC2`
-            5. Product: `Linux/UNIX`
-            6. Click Save
-5. Click Create > Create a new plan from the header:
+3. Click Create > Create a new plan from the header:
     1. **Create Catapult Project and create TEST Plan**
         * *Project and build plan name*
             1. Project > New Project
