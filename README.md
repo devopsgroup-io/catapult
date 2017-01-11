@@ -441,7 +441,9 @@ Please note that Bamboo Cloud has an end-of-life January 31, 2017. Catapult used
     * Normally admin for Bamboo Cloud
     * Normally root for Bamboo Server
 2. Place your Bamboo password at `~/secrets/configuration.yml["company"]["bamboo_password"]`
-3. Click Create > Create a new plan from the header:
+3. Disable anonymous user access by clicking the gear at the top right and going to Overview
+    1. Next, under Security, go to Global permissions and remove Access from Anonymous Users
+4. Click Create > Create a new plan from the header:
     1. **Create Catapult Project and create TEST Plan**
         * *Project and build plan name*
             1. Project > New Project
