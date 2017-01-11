@@ -42,26 +42,14 @@ else
 fi
 # get the catapult instance
 if ([ $1 = "dev" ]); then
+    # determine if the vagrant synced folder is working properly
     if ! [ -e "/catapult/secrets/configuration.yml.gpg" ]; then
         echo -e "Cannot read from /catapult/secrets/configuration.yml.gpg, please vagrant reload the virtual machine."
         exit 1
     else
         echo -e "Your Catapult instance is being synced from your host machine."
     fi
-else
-    if [ -d "/catapult/.git" ]; then
-        cd "/catapult" \
-            && sudo git reset --quiet --hard HEAD -- \
-            && sudo git checkout . \
-            && sudo git checkout ${branch} \
-            && sudo git fetch \
-            && sudo git pull
-    else
-        sudo git clone --recursive --branch ${branch} $2 "/catapult"
-    fi
-fi
-# determine if there are catapult updates
-if ([ $1 = "dev" ]); then
+    # determine if there are changes to catapult
     cd "/catapult" && sudo git diff --exit-code --quiet
     if [ $? -eq 1 ]; then
         updates="True"
@@ -69,12 +57,27 @@ if ([ $1 = "dev" ]); then
         updates="False"
     fi
 else
+    # clone the repository if it does not exist
+    if ! [ -d "/catapult/.git" ]; then
+        sudo git clone --recursive --branch ${branch} $2 "/catapult"
+    # check out the defined branch
+    else
+        cd "/catapult" \
+            && sudo git reset --quiet --hard HEAD -- \
+            && sudo git checkout . \
+            && sudo git checkout ${branch} \
+            && sudo git fetch
+    fi
+    # determine if there are catapult updates
     cd "/catapult" && sudo git diff --exit-code --quiet ${branch} origin/${branch}
     if [ $? -eq 1 ]; then
         updates="True"
     else
         updates="False"
     fi
+    # pull in the latest
+    cd "/catapult" \
+        && sudo git pull
 fi
 # override updates variable if this is a new machine
 if [ ! -f "/catapult/provisioners/redhat/logs/${4}.log" ]; then
