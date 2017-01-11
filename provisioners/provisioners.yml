@@ -92,7 +92,7 @@ redhat:
     system:
       description: "Manages system requirements."
       multithreading: false
-      persistent: false
+      persistent: true
     time:
       description: "Manages NTP daemon based on the company timezone."
       multithreading: false
