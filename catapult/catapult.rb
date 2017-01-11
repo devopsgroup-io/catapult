@@ -1773,23 +1773,63 @@ module Catapult
                 puts "   - The Bitbucket API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
               else
                 api_bitbucket_services = JSON.parse(response.body)
-                @api_bitbucket_services_bamboo_cat_test = false
-                @api_bitbucket_services_bamboo_cat_qc = false
+                @api_bitbucket_services_bamboo_cat_test = 0
                 api_bitbucket_services.each do |service|
                   if service["service"]["type"] == "Bamboo"
                     service["service"]["fields"].each do |field|
                       if field["name"] == "Plan Key"
                         if field["value"] == "CAT-TEST"
-                          @api_bitbucket_services_bamboo_cat_test = true
+                          @api_bitbucket_services_bamboo_cat_test = @api_bitbucket_services_bamboo_cat_test + 1
+                          # remove potential duplicates
+                          if @api_bitbucket_services_bamboo_cat_test > 1
+                            uri = URI("https://api.bitbucket.org/1.0/repositories/#{repo_split_3[0]}/services/#{service["id"]}")
+                            Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
+                              request = Net::HTTP::Delete.new uri.request_uri
+                              request.basic_auth "#{@configuration["company"]["bitbucket_username"]}", "#{@configuration["company"]["bitbucket_password"]}"
+                              response = http.request request # Net::HTTPResponse object
+                              if response.code.to_f.between?(399,600)
+                                catapult_exception("Unable to configure Bitbucket Bamboo service for websites => #{service} => domain => #{instance["domain"]}. Ensure the github_username defined in secrets/configuration.yml has correct access to the repository.")
+                              end
+                            end
+                          # update existing
+                          else
+                            uri = URI("https://api.bitbucket.org/1.0/repositories/#{repo_split_3[0]}/services/#{service["id"]}")
+                            Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
+                              request = Net::HTTP::Put.new uri.request_uri
+                              request.basic_auth "#{@configuration["company"]["bitbucket_username"]}", "#{@configuration["company"]["bitbucket_password"]}"
+                              request.body = URI::encode\
+                                (""\
+                                  "type=Bamboo"\
+                                  "&URL=#{@configuration["company"]["bamboo_base_url"]}"\
+                                  "&Plan Key=CAT-TEST"\
+                                  "&Username=#{@configuration["company"]["bamboo_username"]}"\
+                                  "&Password=#{@configuration["company"]["bamboo_password"]}"\
+                                "")
+                              response = http.request request # Net::HTTPResponse object
+                              if response.code.to_f.between?(399,600)
+                                catapult_exception("Unable to configure Bitbucket Bamboo service for websites => #{service} => domain => #{instance["domain"]}. Ensure the github_username defined in secrets/configuration.yml has correct access to the repository.")
+                              end
+                            end
+                          end
                         end
+                        # remove known service plans we no longer want
                         if field["value"] == "CAT-QC"
-                          @api_bitbucket_services_bamboo_cat_qc = true
+                          uri = URI("https://api.bitbucket.org/1.0/repositories/#{repo_split_3[0]}/services/#{service["id"]}")
+                          Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
+                            request = Net::HTTP::Delete.new uri.request_uri
+                            request.basic_auth "#{@configuration["company"]["bitbucket_username"]}", "#{@configuration["company"]["bitbucket_password"]}"
+                            response = http.request request # Net::HTTPResponse object
+                            if response.code.to_f.between?(399,600)
+                              catapult_exception("Unable to configure Bitbucket Bamboo service for websites => #{service} => domain => #{instance["domain"]}. Ensure the github_username defined in secrets/configuration.yml has correct access to the repository.")
+                            end
+                          end
                         end
                       end
                     end
                   end
                 end
-                unless @api_bitbucket_services_bamboo_cat_test
+                # create the service if it does not exist
+                unless @api_bitbucket_services_bamboo_cat_test > 0
                   uri = URI("https://api.bitbucket.org/1.0/repositories/#{repo_split_3[0]}/services")
                   Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
                     request = Net::HTTP::Post.new uri.request_uri
@@ -1799,25 +1839,6 @@ module Catapult
                         "type=Bamboo"\
                         "&URL=#{@configuration["company"]["bamboo_base_url"]}"\
                         "&Plan Key=CAT-TEST"\
-                        "&Username=#{@configuration["company"]["bamboo_username"]}"\
-                        "&Password=#{@configuration["company"]["bamboo_password"]}"\
-                      "")
-                    response = http.request request # Net::HTTPResponse object
-                    if response.code.to_f.between?(399,600)
-                      catapult_exception("Unable to configure Bitbucket Bamboo service for websites => #{service} => domain => #{instance["domain"]}. Ensure the github_username defined in secrets/configuration.yml has correct access to the repository.")
-                    end
-                  end
-                end
-                unless @api_bitbucket_services_bamboo_cat_qc
-                  uri = URI("https://api.bitbucket.org/1.0/repositories/#{repo_split_3[0]}/services")
-                  Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
-                    request = Net::HTTP::Post.new uri.request_uri
-                    request.basic_auth "#{@configuration["company"]["bitbucket_username"]}", "#{@configuration["company"]["bitbucket_password"]}"
-                    request.body = URI::encode\
-                      (""\
-                        "type=Bamboo"\
-                        "&URL=#{@configuration["company"]["bamboo_base_url"]}"\
-                        "&Plan Key=CAT-QC"\
                         "&Username=#{@configuration["company"]["bamboo_username"]}"\
                         "&Password=#{@configuration["company"]["bamboo_password"]}"\
                       "")
@@ -1844,7 +1865,7 @@ module Catapult
                   "\"config\":"\
                     "{"\
                       "\"base_url\":\"#{@configuration["company"]["bamboo_base_url"]}\","\
-                      "\"build_key\":\"develop:CAT-TEST,release:CAT-QC\","\
+                      "\"build_key\":\"develop:CAT-TEST\","\
                       "\"username\":\"#{@configuration["company"]["bamboo_username"]}\","\
                       "\"password\":\"#{@configuration["company"]["bamboo_password"]}\""\
                     "}"\
