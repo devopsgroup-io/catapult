@@ -81,8 +81,8 @@ if [[ ! ${swaps[*]} =~ "/swapfile" ]]; then
     sudo dd if=/dev/zero of=/swapfile count=256 bs=1MiB
     sudo chmod 0600 /swapfile
     sudo mkswap /swapfile
-    sudo swapon /swapfile
 fi
+sudo swapon /swapfile
 # add the swap /swapfile to startup if it does not exist
 if [[ ! ${swap_volumes[*]} =~ "/swapfile" ]]; then
     sudo bash -c 'echo -e "\n/swapfile swap    swap    defaults    0   0" >> /etc/fstab'
@@ -94,8 +94,8 @@ if [[ ! ${swaps[*]} =~ "/swapfile512" ]]; then
     sudo dd if=/dev/zero of=/swapfile512 count=512 bs=1MiB
     sudo chmod 0600 /swapfile512
     sudo mkswap /swapfile512
-    sudo swapon /swapfile512
 fi
+sudo swapon /swapfile512
 # add the swap /swapfile512 to startup if it does not exist
 if [[ ! ${swap_volumes[*]} =~ "/swapfile512" ]]; then
     sudo bash -c 'echo -e "\n/swapfile512 swap    swap    defaults    0   0" >> /etc/fstab'
