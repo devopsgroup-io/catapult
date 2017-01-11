@@ -51,7 +51,7 @@ case "$1" in
   # Start command
   start)
     echo "Starting $APP"
-    /bin/su - $USER -c "export BAMBOO_HOME=${BAMBOO_HOME}; $BASE/bin/startup.sh &> /dev/null"
+    /bin/su - $USER -c "export BAMBOO_HOME=${BAMBOO_HOME}; $BASE/bin/start-bamboo.sh &> /dev/null"
     ;;
   # Stop command
   stop)
