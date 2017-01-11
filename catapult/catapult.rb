@@ -1171,6 +1171,7 @@ module Catapult
             droplet = nil
           else
             droplet = @api_digitalocean["droplets"].find { |element| element['name'] == "#{@configuration["company"]["name"].downcase}-#{environment}-#{server.gsub("_","-")}" }
+            puts droplet
             if droplet != nil && "#{droplet["status"]}" != "active"
               # any other status than active can not be trusted
               droplet = nil
@@ -1775,12 +1776,34 @@ module Catapult
                 api_bitbucket_services = JSON.parse(response.body)
                 @api_bitbucket_services_bamboo_cat_test = false
                 @api_bitbucket_services_bamboo_cat_qc = false
+
+                puts api_bitbucket_services
+
                 api_bitbucket_services.each do |service|
                   if service["service"]["type"] == "Bamboo"
+
+                    service_bamboo_cat_test = service.find { |element| element['fields']['value'] == "CAT-TEST" }
+
+                    puts "====="
+                    puts service_bamboo_cat_test["fields"]["Plan Key"]
+                    puts "====="
+
+                    puts "====="
+                    puts service_bamboo_cat_test["fields"]["URL"]
+                    puts "====="
+
+                    exit
+
                     service["service"]["fields"].each do |field|
                       if field["name"] == "Plan Key"
                         if field["value"] == "CAT-TEST"
-                          @api_bitbucket_services_bamboo_cat_test = true
+                          service["service"]["fields"].each do |field|
+                            if field["name"] == "URL"
+                              if field["value"] == "#{@configuration["company"]["bamboo_base_url"]}"
+                                @api_bitbucket_services_bamboo_cat_test = true
+                              end
+                            end
+                          end
                         end
                         if field["value"] == "CAT-QC"
                           @api_bitbucket_services_bamboo_cat_qc = true
