@@ -1479,9 +1479,13 @@ module Catapult
       domains = Array.new
       domains_sorted = Array.new
       unless @configuration["websites"]["#{service}"] == nil
-        puts " [#{service}]"
+        puts "[#{service}]"
+        puts "[domain]".ljust(40) + "[repo]".ljust(12) + "[repo write access]".ljust(20) + "[develop]".ljust(16) + "[release]".ljust(16) + "[master]".ljust(16) + "[bamboo service]".ljust(18)
         @configuration["websites"]["#{service}"].each do |instance|
-          puts " * #{instance["domain"]}"
+          # start new row
+          row = Array.new
+          # get domain
+          row.push(" * #{instance["domain"]}".slice!(0, 39).ljust(39))
           unless "#{service}" == "catapult"
             # validate the domain to ensure it only includes the domain and not protocol
             if instance["domain"].include? "://"
@@ -1659,7 +1663,10 @@ module Catapult
             if @api_bitbucket_repo_access === false
               catapult_exception("Your Bitbucket user #{@configuration["company"]["bitbucket_username"]} does not have write access to this repository.")
             elsif @api_bitbucket_repo_access === true
-              puts "   - Verified your Bitbucket user #{@configuration["company"]["bitbucket_username"]} has write access."
+              # get repo type
+              row.push("bitbucket".ljust(11))
+              # get repo user access
+              row.push("#{@configuration["company"]["bitbucket_username"]}".slice!(0, 19).ljust(19))
             end
           end
           if "#{repo_split_2[0]}" == "github.com"
@@ -1674,7 +1681,10 @@ module Catapult
                 puts "   - The GitHub API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
               else
                 if response.code.to_f == 204
-                  puts "   - Verified your GitHub user #{@configuration["company"]["github_username"]} has write access."
+                  # get repo type
+                  row.push("github".ljust(11))
+                  # get repo user access
+                  row.push("#{@configuration["company"]["github_username"]}".slice!(0, 19).ljust(19))
                 else
                   catapult_exception("Your GitHub user #{@configuration["company"]["github_username"]} does not have write access to this repository.")
                 end
@@ -1709,17 +1719,17 @@ module Catapult
                 unless @api_bitbucket_repo_develop
                   catapult_exception("Cannot find the develop branch for this repository, please create one.")
                 else
-                  puts "   - Found the develop branch."
+                  row.push("exists".ljust(15))
                 end
                 unless @api_bitbucket_repo_release
                   catapult_exception("Cannot find the release branch for this repository, please create one.")
                 else
-                  puts "   - Found the release branch."
+                  row.push("exists".ljust(15))
                 end
                 unless @api_bitbucket_repo_master
                   catapult_exception("Cannot find the master branch for this repository, please create one.")
                 else
-                  puts "   - Found the master branch."
+                  row.push("exists".ljust(15))
                 end
               end
             end
@@ -1751,17 +1761,17 @@ module Catapult
                 unless @api_github_repo_develop
                   catapult_exception("Cannot find the develop branch for this repository, please create one.")
                 else
-                  puts "   - Found the develop branch."
+                  row.push("exists".ljust(15))
                 end
                 unless @api_github_repo_release
                   catapult_exception("Cannot find the release branch for this repository, please create one.")
                 else
-                  puts "   - Found the release branch."
+                  row.push("exists".ljust(15))
                 end
                 unless @api_github_repo_master
                   catapult_exception("Cannot find the master branch for this repository, please create one.")
                 else
-                  puts "   - Found the master branch."
+                  row.push("exists".ljust(15))
                 end
               end
             end
@@ -1883,7 +1893,7 @@ module Catapult
               end
             end
           end
-          puts "   - Configured Bamboo service for automated deployments."
+          row.push("configured".ljust(17))
           # validate software
           unless instance["software"] == nil
             # create an array of available software
@@ -1904,6 +1914,9 @@ module Catapult
               catapult_exception("There is an error in your secrets/configuration.yml file.\nThe webroot for websites => #{service} => domain => #{instance["domain"]} is invalid, it must include a trailing slash.")
             end
           end
+
+          puts row.join(" ")
+
         end
       end
       # ensure domains are in alpha order
@@ -1944,7 +1957,7 @@ module Catapult
     if ["status"].include?(ARGV[0])
       totalwebsites = 0
       # start a new row
-      puts "\n\n\nAvailable websites legend:".color(Colors::WHITE)
+      puts "\nAvailable websites legend:".color(Colors::WHITE)
       puts "\n[http response codes]"
       puts " * The below http response codes are started from http:// and up to 10 redirects allowed - so if you're forcing https://, you will end up with that code below."
       puts "   - 200 ok, 301 moved permanently, 302 found"
