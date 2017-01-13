@@ -193,6 +193,7 @@ See an error or have a suggestion? Email competition@devopsgroup.io - we appreci
     - [Cloud Compliance](#cloud-compliance)
     - [Self Compliance](#self-compliance)
     - [HTTPS and SSL Certificates](#https-and-ssl-certificates)
+        - [Custom SSL Certificates](#custom-ssl-certificates)
     - [Security Breach Notification Laws](#security-breach-notification-laws)
 - [Troubleshooting](#troubleshooting)
 - [Contributing](#contributing)
@@ -622,7 +623,7 @@ Catapult enforces a unique solution to Release Management of a website, Software
 **Downstream Software Workflow - Untracked File Stores** | rsync file stores from **Production**                       | rsync file stores from **Production**                                                                          | rsync file stores from **Production**                          | 
 **Downstream Software Workflow - Tracked File Stores**   | Pull file stores from **develop**                           | Pull file stores from **develop**                                                                              | Pull file stores from **release**                              | Auto-commit file stores (up to 750MB each) to **master** of website repo
 
-**NOTE:** Catapult will automatically pull the **master** branch into the **develop** branch of a website's repository when in the **Downstream Software Workflow** direction.
+**Note:** Catapult will automatically pull the **master** branch into the **develop** branch of a website's repository when in the **Downstream Software Workflow** direction.
 
 ### Upstream ###
 
@@ -1076,7 +1077,7 @@ GitHub            | Repository hosting                       | [:question:](http
 
 ## HTTPS and SSL Certificates ##
 
-Catapult manages free HTTPS compliments of Cloudflare and Let's Encrypt, however, depending on your compliance needs you may need to purchase SSL certificates unique to your orginazation. Once you're aware of your compliance responsiblity, you can then make a decision for purchasing and implementing SSL certificates. Catapult will soon incorporate the ability to add custom SSL certificates.
+Catapult manages free HTTPS compliments of Cloudflare and Let's Encrypt, however, depending on your compliance needs you may need to purchase SSL certificates unique to your orginazation. Once you're aware of your compliance responsiblity, you can then make a decision for purchasing and implementing SSL certificates.
 
 Feature                                        | Domain Validation (DV certificates)                                                          | Organization Validation (OV certificates)                                                   | Extended Validation (EV certificates)
 -----------------------------------------------|----------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------
@@ -1092,6 +1093,33 @@ Industry Accepted Issuing Standard             | :x:                            
 Standard Browser Padlock                       | :white_check_mark:                                                                           | :white_check_mark:                                                                          | :x:
 Greenbar Browser Padlock                       | :x:                                                                                          | :x:                                                                                         | :white_check_mark:
 Browser Compatibility                          | Google Chrome 1+, Mozilla Firefox 1+, Internet Explorer 5+                                   | Google Chrome 1+, Mozilla Firefox 1+, Internet Explorer 5+                                  | Google Chrome 1+, Mozilla Firefox 3+, Internet Explorer 7+
+
+### Custom SSL Certificates
+
+Catapult supports custom SSL certificates purchased and issued by a Certificate Authority. The following files are required for Catapult to detect and use the custom SSL certificate:
+
+* A bundled file that contains the Root Certificate Authority certificate and any Intermediate Certificate Authority certificates
+* The certificate file
+* The Certificate Signing Request including the CSR file and private key file
+    * Generated with `openssl req -new -newkey rsa:2048 -nodes -keyout server.key -out server.csr`
+    * Your Certificate Signing Request file
+    * Your private key file
+
+Here is an example of a certificate implemenation for example.com:
+
+* `reporoot/_cert/example_com/example_com.ca-bundle`
+* `reporoot/_cert/example_com/example_com.crt`
+* `reporoot/_cert/example_com/server.csr`
+* `reporoot/_cert/example_com/server.key`
+
+Here is an example of a certificate implemenation for dev.example.com:
+
+* `reporoot/_cert/dev_example_com/dev_example_com.ca-bundle`
+* `reporoot/_cert/dev_example_com/dev_example_com.crt`
+* `reporoot/_cert/dev_example_com/server.csr`
+* `reporoot/_cert/dev_example_com/server.key`
+
+**Note:** If you have a wildcard certificate, duplicate each 
 
 ## Security Breach Notification Laws ##
 
