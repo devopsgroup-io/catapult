@@ -1098,9 +1098,10 @@ Browser Compatibility                          | Google Chrome 1+, Mozilla Firef
 
 Catapult supports custom SSL certificates purchased and issued by a Certificate Authority. The following files are required for Catapult to detect and use the custom SSL certificate:
 
-* A bundled file that contains the Root Certificate Authority certificate and any Intermediate Certificate Authority certificates
+* A bundled file that contains the Root Certificate Authority (CA) certificate and any Intermediate Certificate Authority certificates
+    * CA root and intermediate certificate files can be combined like this `cat COMODORSADomainValidationSecureServerCA.crt COMODORSAAddTrustCA.crt AddTrustExternalCARoot.crt >> example_com.ca-bundle`
 * The certificate file
-* The Certificate Signing Request including the CSR file and private key file
+* The Certificate Signing Request (CSR) including the CSR file and private key file
     * Generated with `openssl req -new -newkey rsa:2048 -nodes -keyout server.key -out server.csr`
     * Your Certificate Signing Request file
     * Your private key file
