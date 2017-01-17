@@ -97,7 +97,15 @@ if [ -d "/var/www/repositories/apache/${domain}/.git" ]; then
             cd "/var/www/repositories/apache/${domain}" \
                 && git commit --message="Catapult auto-commit ${1}:${software_workflow}:software_files"
             cd "/var/www/repositories/apache/${domain}" \
-                && sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git fetch" \
+                && sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git fetch"
+            # if are changes between us and remote, write a changes file for later use
+            cd "/var/www/repositories/apache/${domain}" \
+                && sudo git diff --exit-code --quiet ${branch} origin/${branch}
+            if [ $? -eq 1 ]; then
+                touch "/catapult/provisioners/redhat/logs/domain.${domain}.changes"
+            fi
+            # after we have a diff, continute to pull
+            cd "/var/www/repositories/apache/${domain}" \
                 && sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git pull origin ${branch}" \
                 && sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git submodule update --init --recursive" \
                 && sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git push origin ${branch}"
@@ -114,7 +122,15 @@ if [ -d "/var/www/repositories/apache/${domain}/.git" ]; then
                 && git checkout . \
                 && git clean -d --force --force \
                 && git checkout ${branch} \
-                && sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git fetch" \
+                && sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git fetch"
+            # if are changes between us and remote, write a changes file for later use
+            cd "/var/www/repositories/apache/${domain}" \
+                && sudo git diff --exit-code --quiet ${branch} origin/${branch}
+            if [ $? -eq 1 ]; then
+                touch "/catapult/provisioners/redhat/logs/domain.${domain}.changes"
+            fi
+            # after we have a diff, continute to pull
+            cd "/var/www/repositories/apache/${domain}" \
                 && sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git pull origin ${branch}" \
                 && sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git submodule update --init --recursive"
         fi
