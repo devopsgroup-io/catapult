@@ -70,8 +70,7 @@ Catapult orchestrates the following key components of DevOps to provide you with
     * **Cloud**
         * CloudFlare
 * **Continuous Integration**
-    * **Cloud**
-        * Automated Deployments - Bamboo
+    * Automated Deployments - Atlassian Bamboo Server
 * **Monitoring and Performance**
     * Server Resources - New Relic Servers
     * Application Performance - New Relic APM
@@ -325,9 +324,9 @@ Service | Product | Use Case | Monthly Cost
 Source Code Repositories | Atlassian Bitbucket | Private Repositories | Free
 Source Code Repositories | GitHub | Public Repositories | Free
 Continuous Integration | Amazon Web Services (AWS) | Build Server | \**$0+
-Continuous Integration | Atlassian Bamboo | Deployment Management | $10
+Continuous Integration | Atlassian Bamboo Server | Deployment Management | $10
 DNS | CloudFlare | Cloud DNS | Free
-Monitoring | New Relic Application (APM), Browser, Server, and \***Synthetics | Performance and Infrastructure Monitoring | Free
+Monitoring | New Relic Application Performance Monitoring (APM), Browser, Server, and \***Synthetics | Performance and Infrastructure Monitoring | Free
 **Total** | | | &dagger;$40+
 
 &dagger; Only one platform (Red Hat or Windows) is required to have a full-featured infrastructure. Generally speaking, the industry standard Red Hat platform will be used.
@@ -1055,10 +1054,9 @@ Security **of** the cloud. This is the responsibility of the cloud service.
 
 Service           | Catapult Context                         | SOC 1                                                              | SOC 2                                                              | SOC 3
 ------------------|------------------------------------------|--------------------------------------------------------------------|--------------------------------------------------------------------|--------------------------------------------------------------------
-AWS EC2 US EAST   | Temporary build servers                  | [:white_check_mark:](https://aws.amazon.com/compliance/soc-faqs/)  | [:white_check_mark:](https://aws.amazon.com/compliance/soc-faqs/)  | [:white_check_mark:](https://aws.amazon.com/compliance/soc-faqs/)
-Bamboo            | Server communication, log files, secrets | [:white_check_mark:](https://www.atlassian.com/cloud/security/)    |                                                                    |
+AWS EC2 US EAST   | Windows server hosting                   | [:white_check_mark:](https://aws.amazon.com/compliance/soc-faqs/)  | [:white_check_mark:](https://aws.amazon.com/compliance/soc-faqs/)  | [:white_check_mark:](https://aws.amazon.com/compliance/soc-faqs/)
 BitBucket         | Repository hosting                       | [:white_check_mark:](https://www.atlassian.com/cloud/security/)    |                                                                    |
-DigitalOcean NYC3 | Red Hat server hosting                   |                                                                    | [:white_check_mark:](https://www.digitalocean.com/help/policy/)    | [:white_check_mark:](https://www.digitalocean.com/help/policy/)
+DigitalOcean NYC3 | Red Hat and Bamboo server hosting        |                                                                    | [:white_check_mark:](https://www.digitalocean.com/help/policy/)    | [:white_check_mark:](https://www.digitalocean.com/help/policy/)
 GitHub            | Repository hosting                       |                                                                    |                                                                    |
 New Relic         | Server communication, log files          |                                                                    | [:white_check_mark:](http://newrelic.com/why-new-relic/security)   |
 
@@ -1068,11 +1066,10 @@ Security **in** the cloud. This is your responsibility, however, the underlying 
 
 Service           | Catapult Context                         | HIPAA BAA                                                                 | PCI DSS Level 1
 ------------------|------------------------------------------|---------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------
-AWS EC2           | Windows server hosting                   | [:white_check_mark:](https://aws.amazon.com/compliance/hipaa-compliance/) | [:white_check_mark:](https://aws.amazon.com/compliance/pci-dss-level-1-faqs/)
+AWS EC2 US EAST   | Windows server hosting                   | [:white_check_mark:](https://aws.amazon.com/compliance/hipaa-compliance/) | [:white_check_mark:](https://aws.amazon.com/compliance/pci-dss-level-1-faqs/)
 CloudFlare (Pro)  | Web application firewall                 |                                                                           | [:white_check_mark:](https://support.cloudflare.com/hc/en-us/articles/202249734-CloudFlare-and-PCI-Compliance)
-Bamboo            | Server communication, log files, secrets | [:x:](https://www.atlassian.com/security/security-faq/)                   |
 BitBucket         | Repository hosting                       | [:x:](https://www.atlassian.com/security/security-faq/)                   |
-DigitalOcean NYC3 | Red Hat server hosting                   | [:question:](https://www.digitalocean.com/help/policy/)                   | [:question:](https://www.digitalocean.com/help/policy/)
+DigitalOcean NYC3 | Red Hat and Bamboo server hosting        | [:question:](https://www.digitalocean.com/help/policy/)                   | [:question:](https://www.digitalocean.com/help/policy/)
 GitHub            | Repository hosting                       | [:question:](https://help.github.com/articles/github-security/)           |
 
 ## HTTPS and SSL Certificates ##
