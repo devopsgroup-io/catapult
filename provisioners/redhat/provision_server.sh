@@ -136,7 +136,8 @@ if [ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-values-0 redha
         echo -e "==> MODULE: ${module}"
         echo -e "==> DESCRIPTION: $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-value redhat.modules.${module}.description)"
         echo -e "==> MULTITHREADING: $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-value redhat.modules.${module}.multithreading)"
-        echo -e "==> PERSISTENT: $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-value redhat.modules.${module}.persistent)"
+        echo -e "==> PERSISTENCE: $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-value redhat.modules.${module}.persistent)"
+        echo -e "==> MULTITHREADING PERSISTENCE: $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-value redhat.modules.${module}.multithreading_persistent)"
 
         # if there are no updates and the module is not persistent, skip
         if ([ "${5}" == "False" ] && [ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-value redhat.modules.${module}.persistent) == "False" ]); then
@@ -150,18 +151,25 @@ if [ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-values-0 redha
             # loop through websites and start sub-processes
             while read -r -d $'\0' website; do
                 # only allow a certain number of parallel bash sub-processes at once
-                sleep 1
+                sleep 0.15
                 while true; do
                     resources=$(resources ${module})
                     if ([[ $resources == *"!"* ]]); then
                         echo "${resources}"
-                        sleep 1
+                        sleep 0.25
                     else
                         echo "${resources}"
                         break
                     fi
                 done
-                bash "/catapult/provisioners/redhat/modules/${module}.sh" $1 $2 $3 $4 $website_index >> "/catapult/provisioners/redhat/logs/${module}.$(echo "${website}" | shyaml get-value domain).log" 2>&1 &
+                # if there are no incoming website changes, there is no need to run persistent modules for this domain
+                if ([ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-value redhat.modules.${module}.multithreading_persistent) != "True" ] && [ ! -f "/catapult/provisioners/redhat/logs/domain.$(echo "${website}" | shyaml get-value domain).changes" ]); then
+                    echo "> detected no local or incoming changes for this domain, skipping..." > "/catapult/provisioners/redhat/logs/${module}.$(echo "${website}" | shyaml get-value domain).log"
+                    touch "/catapult/provisioners/redhat/logs/${module}.$(echo "${website}" | shyaml get-value domain).complete"
+                # if there are incoming websites changes, run the persistent module for this domain
+                else
+                    bash "/catapult/provisioners/redhat/modules/${module}.sh" $1 $2 $3 $4 $website_index >> "/catapult/provisioners/redhat/logs/${module}.$(echo "${website}" | shyaml get-value domain).log" 2>&1 &
+                fi
                 (( website_index += 1 ))
             done < <(echo "${configuration}" | shyaml get-values-0 websites.apache)
             # determine when each subprocess finishes
@@ -177,7 +185,7 @@ if [ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-values-0 redha
                     resources=$(resources ${module})
                     if [ ! -e "/catapult/provisioners/redhat/logs/${module}.${domain}.complete" ]; then
                         echo "${resources}"
-                        sleep 1
+                        sleep 0.25
                     else
                         break
                     fi
@@ -209,6 +217,12 @@ if [ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-values-0 redha
                 rm $file
             fi
         done
+    done
+    # cleanup leftover utility files
+    for file in /catapult/provisioners/redhat/logs/*.changes; do
+        if [ -e "$file" ]; then
+            rm $file
+        fi
     done
 
     # remove secrets

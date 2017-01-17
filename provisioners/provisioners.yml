@@ -4,98 +4,122 @@ redhat:
     apache:
       description: "Manages Apache HTTP daemon."
       multithreading: false
+      multithreading_persistent: false
       persistent: false
     apache_vhosts_clean:
       description: "Removes virtual hosts for websites."
       multithreading: false
+      multithreading_persistent: false
       persistent: false
     apache_vhosts:
       description: "Manages HTTP and HTTPS virtual hosts and SSL certificates for websites."
       multithreading: false
+      multithreading_persistent: false
       persistent: false
     bamboo:
       description: "Manages the Atlassian Bamboo Server instance."
       multithreading: false
+      multithreading_persistent: false
       persistent: true
     cloudflare_cache:
       description: "Manages CloudFlare zone cache for websites."
       multithreading: true
+      multithreading_persistent: false
       persistent: true
     cloudflare_dns:
       description: "Manages CloudfFlare DNS A records for websites."
       multithreading: true
+      multithreading_persistent: false
       persistent: false
     cloudflare_zones:
       description: "Manages CloudfFlare zones for websites."
       multithreading: true
+      multithreading_persistent: false
       persistent: false
     cron:
       description: "Manages cron tasks."
       multithreading: false
+      multithreading_persistent: false
       persistent: false
     git:
       description: "Manages Git repositories for websites."
       multithreading: true
+      multithreading_persistent: true
       persistent: true
     git_clean:
       description: "Removes Git repositories for websites."
       multithreading: false
+      multithreading_persistent: false
       persistent: false
     git_permissions:
       description: "Manages Git repository permissions for websites."
       multithreading: true
+      multithreading_persistent: false
       persistent: true
     iptables:
       description: "Manages a strict firewall to only allow necessary traffic."
       multithreading: false
+      multithreading_persistent: false
       persistent: false
     mysql:
       description: "Manages MariaDB server and databases for websites with software."
       multithreading: false
+      multithreading_persistent: false
       persistent: true
     newrelic_apm_php:
       description: "Manages New Relic APM PHP daemon."
       multithreading: false
+      multithreading_persistent: false
       persistent: false
     newrelic_synthetics:
       description: "Manages New Relic Synthetics monitors for websites."
       multithreading: true
+      multithreading_persistent: false
       persistent: false
     newrelic_sysmon:
       description: "Manages New Relic System Monitor daemon."
       multithreading: false
+      multithreading_persistent: false
       persistent: false
     php:
       description: "Manages PHP and PHP modules."
       multithreading: false
+      multithreading_persistent: false
       persistent: false
     rsync:
       description: "Manages software file stores for websites with software."
       multithreading: true
+      multithreading_persistent: false
       persistent: true
     software_config:
       description: "Manages software database configuration files."
       multithreading: true
+      multithreading_persistent: false
       persistent: true
     software_operations_file:
       description: "Manages software file operations, including: automatic software updates and file store permissions for websites with software."
       multithreading: true
+      multithreading_persistent: true
       persistent: true
     software_operations_meta:
       description: "Manages software meta operations, including: cron, garbage collection, caches, and migrations for websites with software."
       multithreading: true
+      multithreading_persistent: false
       persistent: true
     software_tools:
       description: "Manages software CLI tools."
       multithreading: false
+      multithreading_persistent: false
       persistent: false
     system:
       description: "Manages system requirements."
       multithreading: false
+      multithreading_persistent: false
       persistent: true
     time:
       description: "Manages NTP daemon based on the company timezone."
       multithreading: false
+      multithreading_persistent: false
       persistent: false
   servers:
     apache:
