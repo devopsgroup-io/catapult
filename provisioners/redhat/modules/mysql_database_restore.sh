@@ -16,7 +16,7 @@ webroot=$(catapult websites.apache.$5.webroot)
 
 
 # respect software_workflow
-if ([ test -n "${software}" ] && [ "${1}" = "production" ] && [ "${software_workflow}" = "downstream" ] && [ "${software_db}" != "" ] && [ "${software_db_tables}" != "0" ]) || ([ test -n "${software}" ] && [ "${1}" = "test" ] && [ "${software_workflow}" = "upstream" ] && [ "${software_db}" != "" ] && [ "${software_db_tables}" != "0" ]); then
+if ([ ! -z "${software}" ] && [ "${1}" = "production" ] && [ "${software_workflow}" = "downstream" ] && [ "${software_db}" != "" ] && [ "${software_db_tables}" != "0" ]) || ([ ! -z "${software}" ] && [ "${1}" = "test" ] && [ "${software_workflow}" = "upstream" ] && [ "${software_db}" != "" ] && [ "${software_db_tables}" != "0" ]); then
     : #no-op
 else
     if [ -z "${software_db}" ]; then

@@ -18,7 +18,7 @@ webroot=$(catapult websites.apache.$5.webroot)
 
 
 # respect software_workflow
-if ([ test -n "${software}" ] && [ "${1}" = "production" ] && [ "${software_workflow}" = "downstream" ] && [ "${software_db}" != "" ] && [ "${software_db_tables}" != "0" ]) || ([ test -n "${software}" ] && [ "${1}" = "test" ] && [ "${software_workflow}" = "upstream" ] && [ "${software_db}" != "" ] && [ "${software_db_tables}" != "0" ]); then
+if ([ ! -z "${software}" ] && [ "${1}" = "production" ] && [ "${software_workflow}" = "downstream" ] && [ "${software_db}" != "" ] && [ "${software_db_tables}" != "0" ]) || ([ ! -z "${software}" ] && [ "${1}" = "test" ] && [ "${software_workflow}" = "upstream" ] && [ "${software_db}" != "" ] && [ "${software_db_tables}" != "0" ]); then
     # dump the database as long as it hasn't been dumped for the day already
     if ! [ -f /var/www/repositories/apache/${domain}/_sql/$(date +"%Y%m%d").sql ]; then
         echo -e "\t* performing a database backup"
