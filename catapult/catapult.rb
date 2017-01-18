@@ -1478,20 +1478,21 @@ module Catapult
 
 
     # validate @configuration["websites"]
-    puts "\nVerification of configuration[\"websites\"]:\n".color(Colors::WHITE)
+    puts "\nVerification of configuration[\"websites\"]:".color(Colors::WHITE)
     # add catapult temporarily to verify repo and add bamboo services
     @configuration["websites"]["catapult"] = *(["domain" => "#{@repo}", "repo" => "#{@repo}"])
     # validate @configuration["websites"]
     @configuration["websites"].each do |service,data|
       if "#{service}" == "catapult"
-        puts "\nVerification of this Catapult instance:\n".color(Colors::WHITE)
+        puts "\nVerification of this Catapult instance:".color(Colors::WHITE)
       end
       # create array of domains to later validate domain alpha order per service
       domains = Array.new
       domains_sorted = Array.new
       unless @configuration["websites"]["#{service}"] == nil
-        puts "[#{service}]"
+        puts "\n[#{service}] #{@configuration["websites"]["#{service}"].nil? ? "0" : @configuration["websites"]["#{service}"].length} total"
         puts "[domain]".ljust(40) + "[repo]".ljust(12) + "[repo write access]".ljust(20) + "[develop]".ljust(16) + "[release]".ljust(16) + "[master]".ljust(16) + "[bamboo service]".ljust(18)
+        puts "\n"
         @configuration["websites"]["#{service}"].each do |instance|
           # start new row
           row = Array.new
@@ -1966,7 +1967,6 @@ module Catapult
 
     # vagrant status binding
     if ["status"].include?(ARGV[0])
-      totalwebsites = 0
       # start a new row
       puts "\nAvailable websites legend:".color(Colors::WHITE)
       puts "\n[http response codes]"
@@ -1984,8 +1984,6 @@ module Catapult
         puts "\n"
         if @configuration["websites"]["#{service}"] != nil
           @configuration["websites"]["#{service}"].each do |instance|
-            # count websites
-            totalwebsites = totalwebsites + 1
             # start new row
             row = Array.new
             # get domain
