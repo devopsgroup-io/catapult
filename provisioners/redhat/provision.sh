@@ -49,12 +49,10 @@ if ([ $1 = "dev" ]); then
     else
         echo -e "Your Catapult instance is being synced from your host machine."
     fi
-    # determine if there are changes to catapult
+    # if there are changes between us and remote, write a changes file for later use
     cd "/catapult" && sudo git diff --exit-code --quiet
     if [ $? -eq 1 ]; then
-        updates="True"
-    else
-        updates="False"
+        touch "/catapult/provisioners/redhat/logs/catapult.changes"
     fi
 else
     # clone the repository if it does not exist
@@ -68,12 +66,10 @@ else
             && sudo git checkout ${branch} \
             && sudo git fetch
     fi
-    # determine if there are catapult updates
+    # if there are changes between us and remote, write a changes file for later use
     cd "/catapult" && sudo git diff --exit-code --quiet ${branch} origin/${branch}
     if [ $? -eq 1 ]; then
-        updates="True"
-    else
-        updates="False"
+        touch "/catapult/provisioners/redhat/logs/catapult.changes"
     fi
     # pull in the latest
     cd "/catapult" \
@@ -81,7 +77,7 @@ else
 fi
 # override updates variable if this is a new machine
 if [ ! -f "/catapult/provisioners/redhat/logs/${4}.log" ]; then
-    updates="True"
+    touch "/catapult/provisioners/redhat/logs/catapult.changes"
 fi
 
 
@@ -104,4 +100,4 @@ echo -e "==> GIT BRANCH: ${branch}"
 echo -e "\n\n\n==> STARTING PROVISION"
 
 # provision the server
-bash "/catapult/provisioners/redhat/provision_server.sh" $1 $2 $3 $4 $updates
+bash "/catapult/provisioners/redhat/provision_server.sh" $1 $2 $3 $4

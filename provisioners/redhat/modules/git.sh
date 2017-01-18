@@ -98,7 +98,7 @@ if [ -d "/var/www/repositories/apache/${domain}/.git" ]; then
                 && git commit --message="Catapult auto-commit ${1}:${software_workflow}:software_files"
             cd "/var/www/repositories/apache/${domain}" \
                 && sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git fetch"
-            # if are changes between us and remote, write a changes file for later use
+            # if there are changes between us and remote, write a changes file for later use
             cd "/var/www/repositories/apache/${domain}" \
                 && sudo git diff --exit-code --quiet ${branch} origin/${branch}
             if [ $? -eq 1 ]; then
@@ -123,7 +123,7 @@ if [ -d "/var/www/repositories/apache/${domain}/.git" ]; then
                 && git clean -d --force --force \
                 && git checkout ${branch} \
                 && sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git fetch"
-            # if are changes between us and remote, write a changes file for later use
+            # if there are changes between us and remote, write a changes file for later use
             cd "/var/www/repositories/apache/${domain}" \
                 && sudo git diff --exit-code --quiet ${branch} origin/${branch}
             if [ $? -eq 1 ]; then

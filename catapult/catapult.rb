@@ -247,9 +247,20 @@ module Catapult
     puts "\n * Configuring the #{branch} branch:\n\n"
     # if on the develop branch, update from catapult core
     if "#{branch}" == "develop"
+      `#{@git} fetch`
+      # if there are changes between us and remote, write a changes file for later use
+      `#{@git} diff --exit-code --quiet develop origin/develop`
+      if $?.exitstatus > 0
+        FileUtils.touch('provisioners/redhat/logs/catapult.changes')
+      end
       `#{@git} pull origin develop`
       # only self update from catapult core if the same MAJOR
       `#{@git} fetch upstream`
+      # if there are changes between us and remote, write a changes file for later use
+      `#{@git} diff --exit-code --quiet develop upstream`
+      if $?.exitstatus > 0
+        FileUtils.touch('provisioners/redhat/logs/catapult.changes')
+      end
       @version_this = YAML.load_file("VERSION.yml")
       @version_this_integer = @version_this["version"].to_i
       @version_upstream = YAML.load(`#{@git} show upstream/master:VERSION.yml`)
