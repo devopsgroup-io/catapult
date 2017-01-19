@@ -1,5 +1,8 @@
 source "/catapult/provisioners/redhat/modules/catapult.sh"
 
+# set a variable to the .cnf
+dbconf="/catapult/provisioners/redhat/installers/temp/${1}.cnf"
+
 domain=$(catapult websites.apache.$5.domain)
 software=$(catapult websites.apache.$5.software)
 software_auto_update=$(catapult websites.apache.$5.software_auto_update)

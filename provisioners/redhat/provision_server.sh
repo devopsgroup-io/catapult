@@ -140,7 +140,7 @@ if [ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-values-0 redha
 
         # if there are no catpult updates and the module is not persistent, skip
         if ([ ! -f "/catapult/provisioners/redhat/logs/catapult.changes" ] && [ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-value redhat.modules.${module}.persistent) == "False" ]); then
-            echo "> This module does not need to be ran when there are no Catapult updates, skipping..."
+            echo "> This module does not need to be run when there are no Catapult updates, skipping..."
         # invoke multithreading module in parallel
         elif ([ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-value redhat.modules.${module}.multithreading) == "True" ]); then
             # enable job control
@@ -163,11 +163,9 @@ if [ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-values-0 redha
                 done
                 # if there are no incoming catapult changes, website changes, and there is no need to run persistent modules for this domain
                 if ([ ! -f "/catapult/provisioners/redhat/logs/catapult.changes" ] && [ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-value redhat.modules.${module}.multithreading_persistent) != "True" ] && [ ! -f "/catapult/provisioners/redhat/logs/domain.$(echo "${website}" | shyaml get-value domain).changes" ]); then
-                    echo -e "=> repository_changes: no" > "/catapult/provisioners/redhat/logs/${module}.$(echo "${website}" | shyaml get-value domain).log"
                     touch "/catapult/provisioners/redhat/logs/${module}.$(echo "${website}" | shyaml get-value domain).complete"
                 # if there are incoming websites changes, run the persistent module for this domain
                 else
-                    echo -e "=> repository_changes: yes" > "/catapult/provisioners/redhat/logs/${module}.$(echo "${website}" | shyaml get-value domain).log"
                     bash "/catapult/provisioners/redhat/modules/${module}.sh" $1 $2 $3 $4 $website_index >> "/catapult/provisioners/redhat/logs/${module}.$(echo "${website}" | shyaml get-value domain).log" 2>&1 &
                 fi
                 (( website_index += 1 ))
@@ -198,6 +196,18 @@ if [ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-values-0 redha
                 echo -e "=> software_auto_update: ${software_auto_update}"
                 echo -e "=> software_dbprefix: ${software_dbprefix}"
                 echo -e "=> software_workflow: ${software_workflow}"
+                # output status of catapult changes
+                if [ -f "/catapult/provisioners/redhat/logs/catapult.changes" ]; then
+                    echo -e "=> catapult_changes: yes"
+                else
+                    echo -e "=> catapult_changes: no"
+                fi
+                # output status of website changes
+                if [ -f "/catapult/provisioners/redhat/logs/domain.$(echo "${website}" | shyaml get-value domain).changes"  ]; then
+                    echo -e "=> website_changes: yes"
+                else
+                    echo -e "=> website_changes: no"
+                fi
                 cat "/catapult/provisioners/redhat/logs/${module}.${domain}.log"
                 echo -e "========================================================="
             done < <(echo "${configuration}" | shyaml get-values-0 websites.apache)
@@ -234,7 +244,9 @@ if [ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-values-0 redha
         sudo rm /catapult/secrets/id_rsa
         sudo rm /catapult/secrets/id_rsa.pub
     fi
-    sudo rm /catapult/provisioners/redhat/installers/temp/${1}.cnf
+    if [ -f /catapult/provisioners/redhat/installers/temp/${1}.cnf ]; then
+        sudo rm /catapult/provisioners/redhat/installers/temp/${1}.cnf
+    fi
 
     provisionend=$(date +%s)
     provisiontotal=$(date -d@$(($provisionend - $provisionstart)) -u +%H:%M:%S)
