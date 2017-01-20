@@ -107,7 +107,7 @@ redhat:
       multithreading_persistent: false
       persistent: true
     software_operations_file:
-      description: "Manages software file operations, including: automatic software updates and file store permissions for websites with software."
+      description: "Manages software file operations, including: software validation and automatic software updates."
       multithreading: true
       multithreading_persistent: true
       persistent: true
