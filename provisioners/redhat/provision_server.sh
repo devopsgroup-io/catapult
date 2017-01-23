@@ -140,7 +140,7 @@ if [ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-values-0 redha
 
         # if there are no catpult updates and the module is not persistent, skip
         if ([ ! -f "/catapult/provisioners/redhat/logs/catapult.changes" ] && [ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-value redhat.modules.${module}.persistent) == "False" ]); then
-            echo "> This module does not need to be run when there are no Catapult updates, skipping..."
+            echo "> module skipped when there are no catapult repository changes..."
         # invoke multithreading module in parallel
         elif ([ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-value redhat.modules.${module}.multithreading) == "True" ]); then
             # enable job control
@@ -163,6 +163,7 @@ if [ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-values-0 redha
                 done
                 # if there are no incoming catapult changes, website changes, and there is no need to run persistent modules for this domain
                 if ([ ! -f "/catapult/provisioners/redhat/logs/catapult.changes" ] && [ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-value redhat.modules.${module}.multithreading_persistent) != "True" ] && [ ! -f "/catapult/provisioners/redhat/logs/domain.$(echo "${website}" | shyaml get-value domain).changes" ]); then
+                    echo "> module skipped for this website when there are no website repository changes..." > "/catapult/provisioners/redhat/logs/${module}.$(echo "${website}" | shyaml get-value domain).log"
                     touch "/catapult/provisioners/redhat/logs/${module}.$(echo "${website}" | shyaml get-value domain).complete"
                 # if there are incoming websites changes, run the persistent module for this domain
                 else
