@@ -933,13 +933,13 @@ module Catapult
       request = Net::HTTP::Get.new uri.request_uri
       request.add_field "Authorization", "Bearer #{@configuration["company"]["digitalocean_personal_access_token"]}"
       response = http.request request
+      @api_digitalocean_slugs = Array.new
       if response.code.to_f.between?(399,499)
         catapult_exception("#{response.code} The DigitalOcean API could not authenticate, please verify [\"company\"][\"digitalocean_personal_access_token\"].")
       elsif response.code.to_f.between?(500,600)
         puts " * The DigitalOcean API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
       else
         api_digitalocean_sizes = JSON.parse(response.body)
-        @api_digitalocean_slugs = Array.new
         api_digitalocean_sizes["sizes"].each do |size|
           @api_digitalocean_slugs.push("#{size["slug"]}")
         end
