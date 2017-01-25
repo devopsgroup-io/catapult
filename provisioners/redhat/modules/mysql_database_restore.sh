@@ -15,7 +15,7 @@ softwareroot=$(provisioners software.apache.${software}.softwareroot)
 webroot=$(catapult websites.apache.$5.webroot)
 
 
-# respect software_workflow
+# respect software_workflow and restore the database if appropriate
 if ([ ! -z "${software}" ] && [ "${1}" = "production" ] && [ "${software_workflow}" = "downstream" ] && [ "${software_db}" != "" ] && [ "${software_db_tables}" != "0" ]) || ([ ! -z "${software}" ] && [ "${1}" = "test" ] && [ "${software_workflow}" = "upstream" ] && [ "${software_db}" != "" ] && [ "${software_db_tables}" != "0" ]); then
     : #no-op
 else
@@ -112,7 +112,7 @@ else
                     cp "/var/www/repositories/apache/${domain}/_sql/$(basename "$file")" "/var/www/repositories/apache/${domain}/_sql/${1}.$(basename "$file")"
                 fi
 
-                # restore the database sql file
+                # restore the full database sql file
                 mysql --defaults-extra-file=$dbconf ${1}_${domainvaliddbname} < "/var/www/repositories/apache/${domain}/_sql/${1}.$(basename "$file")"
                 rm --force "/var/www/repositories/apache/${domain}/_sql/${1}.$(basename "$file")"
 
@@ -125,6 +125,16 @@ else
                 fi
             fi
         done
+    fi
+fi
+
+# restore the software_dbtable_retain database sql file
+# we do not respect the software_workflow in the scenario and restore the _software_dbtable_retain in any environment if a _software_dbtable_retain db sql file exists
+# we look for the newest possible _software_dbtable_retain database sql file and restore
+if ([ ! -z "${software}" ] && [ "${software_workflow}" = "upstream" ] && [ "${software_db}" != "" ] && [ "${software_db_tables}" != "0" ])
+    filenewest=$(ls "/var/www/repositories/apache/${domain}/_sql" | grep -E ^[0-9]{8}_software_dbtable_retain\.sql$ | sort --numeric-sort | tail -1)
+    if [ -f "${filenewest}" ]; then
+        mysql --defaults-extra-file=$dbconf ${1}_${domainvaliddbname} < "${filenewest}"
     fi
 fi
 
