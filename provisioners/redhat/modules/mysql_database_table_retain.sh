@@ -7,7 +7,10 @@ domain=$(catapult websites.apache.$5.domain)
 domainvaliddbname=$(catapult websites.apache.$5.domain | tr "." "_" | tr "-" "_")
 software=$(catapult websites.apache.$5.software)
 software_dbprefix=$(catapult websites.apache.$5.software_dbprefix)
-software_dbtable_retain=$(catapult_array websites.apache.$5.software_dbtable_retain)
+software_dbtable_retain=($(catapult_array websites.apache.$5.software_dbtable_retain))
+if [ ${#software_dbtable_retain[*]} != 0 ]; then
+    software_dbtable_retain=( "${software_dbtable_retain[@]/#/${software_dbprefix}}" )
+fi
 software_workflow=$(catapult websites.apache.$5.software_workflow)
 software_db=$(mysql --defaults-extra-file=$dbconf --silent --skip-column-names --execute "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = '${1}_${domainvaliddbname}'")
 software_db_tables=$(mysql --defaults-extra-file=$dbconf --silent --skip-column-names --execute "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = '${1}_${domainvaliddbname}'")
@@ -24,7 +27,7 @@ if ([ ! -z "${software}" ] && [ "${1}" = "production" ] && [ "${software_workflo
         mkdir --parents "/var/www/repositories/apache/${domain}/_sql"
         # dump the database tables that are specified
         # note if there is an invalid table, there will be an error of: mysqldump: Couldn't find table: "test"
-        mysqldump --defaults-extra-file=$dbconf --single-transaction --quick ${1}_${domainvaliddbname} ${software_dbtable_retain} > /var/www/repositories/apache/${domain}/_sql/$(date +"%Y%m%d")_software_dbtable_retain.sql
+        mysqldump --defaults-extra-file=$dbconf --single-transaction --quick ${1}_${domainvaliddbname} ${software_dbtable_retain[*]} > /var/www/repositories/apache/${domain}/_sql/$(date +"%Y%m%d")_software_dbtable_retain.sql
         # ensure no more than 50mb or at least the one, newest, YYYYMMDD_software_dbtable_retain.sql file exists
         sql_files_size_maximum=$(( 1024 * 50 ))
         sql_files_size_total=0
