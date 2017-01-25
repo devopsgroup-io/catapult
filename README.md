@@ -772,6 +772,14 @@ The following options are available:
     * example: `software_dbprefix: wp_`
         * the value that prefixes table names within the database
             * PLEASE NOTE: table prefixes included in software distributions, such as WordPress' `wp_`, must be specified if desired
+* `software_dbtable_retain:`
+    * required: no
+    * dependency: `software:`
+    * dependency: `software_workflow: upstream`
+    * example: `software_dbtable_retain: ["comments","commentmeta"]`
+        * array of tables, excluding the `software_dbprefix:`, to retain from the Production environment when `software_workflow:` is set to `upstream`
+        * this will backup and commit a `YYYYMMDD_software_dbtable_retain.sql` file to `~/_sql`
+        * this is useful in a content regulated situation when moving a database upstream is necessary, however, needing to retain a table that includes, for example, a table of contact form submissions
 * `software_workflow:`
     * required: yes
     * dependency: `software:`

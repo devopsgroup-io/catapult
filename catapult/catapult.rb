@@ -1913,11 +1913,31 @@ module Catapult
             unless @provisioners["software"]["#{service}"] == nil
               @provisioners["software"]["#{service}"].each { |i, v| provisioners_software.push(i) }
             end
+            # validate software
             unless provisioners_software.include?("#{instance["software"]}")
               catapult_exception("There is an error in your secrets/configuration.yml file.\nThe software for websites => #{service} => domain => #{instance["domain"]} is invalid, it must be one of the following #{provisioners_software.join(", ")}.")
             end
+            # validate software_auto_update
+            unless instance["software_auto_update"] == nil
+              if instance["software_auto_update"].to_s != "true"
+                catapult_exception("There is an error in your secrets/configuration.yml file.\nThe software_auto_update for websites => #{service} => domain => #{instance["domain"]} is invalid, it must be \"true\" or not set.")
+              end
+            end
+            # validate software_dbprefix
+            unless instance["software_dbprefix"] == nil
+              if not instance["software_dbprefix"] =~ /^[0-9a-zA-Z\_]*$/
+                catapult_exception("There is an error in your secrets/configuration.yml file.\nThe software_dbprefix for websites => #{service} => domain => #{instance["domain"]} is invalid, it must only contain numbers, letters, and underscores.")
+              end
+            end
+            # validate software_dbtable_retain
+            unless instance["software_dbtable_retain"] == nil
+              if not instance["software_dbtable_retain"].kind_of?(Array)
+                catapult_exception("There is an error in your secrets/configuration.yml file.\nThe software_dbtable_retain for websites => #{service} => domain => #{instance["domain"]} is invalid, it must be an array in the following example format [\"comments\",\"commentmeta\"].")
+              end
+            end
+            # validate software_workflow
             unless ["downstream","upstream"].include?("#{instance["software_workflow"]}")
-              catapult_exception("There is an error in your secrets/configuration.yml file.\nThe software for websites => #{service} => domain => #{instance["domain"]} requires the software_workflow option, it must be one of the following [\"downstream\",\"upstream\"].")
+              catapult_exception("There is an error in your secrets/configuration.yml file.\nThe software_workflow for websites => #{service} => domain => #{instance["domain"]} is invalid, it must be one of the following [\"downstream\",\"upstream\"].")
             end
           end
           # validate webroot

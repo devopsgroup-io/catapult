@@ -129,7 +129,7 @@ if [ -d "/var/www/repositories/apache/${domain}/.git" ]; then
             if [ $? -eq 1 ]; then
                 touch "/catapult/provisioners/redhat/logs/domain.${domain}.changes"
             fi
-            # after we have a diff, continute to pull
+            # after we have a diff, continue to pull
             cd "/var/www/repositories/apache/${domain}" \
                 && sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git pull origin ${branch}" \
                 && sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git submodule update --init --recursive"

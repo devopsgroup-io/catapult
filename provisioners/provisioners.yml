@@ -76,6 +76,11 @@ redhat:
       multithreading: true
       multithreading_persistent: false
       persistent: true
+    mysql_database_table_retain:
+      description: "Manages MariaDB production database table backups when software_workflow is set to upstream. Driven by the software_dbtable_retain option."
+      multithreading: true
+      multithreading_persistent: true
+      persistent: true
     newrelic_apm_php:
       description: "Manages New Relic APM PHP daemon."
       multithreading: false
@@ -137,7 +142,7 @@ redhat:
     bamboo:
       modules: ["time","system","iptables","newrelic_sysmon","cron","bamboo"]
     mysql:
-      modules: ["time","system","iptables","newrelic_sysmon","cron","git_clean","git","git_permissions","software_config","rsync","php","software_tools","mysql","mysql_database_restore","software_operations_meta","mysql_database_backup","cloudflare_cache"]
+      modules: ["time","system","iptables","newrelic_sysmon","cron","git_clean","git","git_permissions","software_config","rsync","php","software_tools","mysql","mysql_database_table_retain","mysql_database_restore","software_operations_meta","mysql_database_backup","cloudflare_cache"]
 windows:
   modules:
     cloudflare_dns:
