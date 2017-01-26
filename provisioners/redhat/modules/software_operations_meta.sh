@@ -4,8 +4,10 @@ source "/catapult/provisioners/redhat/modules/catapult.sh"
 dbconf="/catapult/provisioners/redhat/installers/temp/${1}.cnf"
 
 domain=$(catapult websites.apache.$5.domain)
+domainvaliddbname=$(catapult websites.apache.$5.domain | tr "." "_" | tr "-" "_")
 software=$(catapult websites.apache.$5.software)
 software_auto_update=$(catapult websites.apache.$5.software_auto_update)
+software_dbprefix=$(catapult websites.apache.$5.software_dbprefix)
 software_workflow=$(catapult websites.apache.$5.software_workflow)
 webroot=$(catapult websites.apache.$5.webroot)
 
