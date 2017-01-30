@@ -7,6 +7,8 @@ for directory in /var/www/repositories/apache/*/; do
         if ! ([ "_default_" == "${folder}" ]); then
             cd "${directory}" \
                 && git gc
+            # allow for a cool down
+            sleep 60
         fi
     fi
 done
