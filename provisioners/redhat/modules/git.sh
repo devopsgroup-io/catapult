@@ -134,8 +134,9 @@ if [ -d "/var/www/repositories/apache/${domain}/.git" ]; then
                 && sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git pull origin ${branch}" \
                 && sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git submodule update --init --recursive"
         fi
-        # if we're on develop and software workflow is set to downstream, pull master into develop to keep it up to date
-        if ([ "${branch_this}" = "develop" ] && [ "${software_workflow}" = "downstream" ]); then
+        # if we're on develop, pull master into develop to keep it up to date
+        # this accomodates software_workflow = downstream and software_workflow = upstream (when dbtable_retain commits)
+        if ([ "${branch_this}" = "develop" ]); then
             cd "/var/www/repositories/apache/${domain}" \
                 && sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git fetch" \
                 && sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git pull origin master" \
