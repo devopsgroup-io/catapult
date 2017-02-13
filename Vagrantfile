@@ -61,7 +61,7 @@ Vagrant.configure("2") do |config|
     # configure the provisioner
     config.vm.provision "shell", path: "provisioners/redhat/provision.sh", args: ["dev","#{Catapult::Command.repo}","#{Catapult::Command.configuration_user["settings"]["gpg_key"]}","apache"]
     # ensure httpd is started once the synced_folder is mounted: fixes https://github.com/devopsgroup-io/catapult/issues/681
-    config.vm.provision :shell, :inline => "sudo systemctl httpd start", run: "always"
+    config.vm.provision :shell, :inline => "sudo systemctl start httpd.service", run: "always"
   end
   config.vm.define "#{Catapult::Command.configuration["company"]["name"].downcase}-dev-redhat-mysql" do |config|
     config.vm.box = "centos/7"
