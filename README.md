@@ -69,8 +69,9 @@ Catapult orchestrates the following key components of DevOps to provide you with
         * vagrant-hostmanager
     * **Cloud**
         * CloudFlare
-* **Continuous Integration**
+* **Release Management**
     * Automated Deployments - Atlassian Bamboo Server
+    * Continuous Integration - Branch-based environments with Git triggers
 * **Monitoring and Performance**
     * Server Resources - New Relic Servers
     * Application Performance - New Relic APM
