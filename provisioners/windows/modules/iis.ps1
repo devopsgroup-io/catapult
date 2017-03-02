@@ -37,7 +37,7 @@ if (Get-Module -ListAvailable -Name webadministration) {
 
 echo "`n=> Configuring IIS"
 # remove revealing headers
-$headers = @{ 
+$headers = @{
     "RESPONSE_X-AspNet-Version" = "ASP.NET";
     "RESPONSE_X-AspNetMvc-Version" = "ASP.NET";
     "RESPONSE_X-Powered-By" = "ASP.NET";
@@ -70,7 +70,7 @@ if (-not($connection.children | where { $_.schemaClassName -eq "group" } | where
 $group = $connection.Children.Find("IIS_AUTH", "group")
 $group.psbase.invoke('members')  | ForEach {
   $user = $_.GetType().InvokeMember("Name","GetProperty",$Null,$_,$Null)
-  $connection.delete("user", $user) 
+  $connection.delete("user", $user)
 }
 
 
@@ -122,9 +122,9 @@ foreach ($instance in $configuration.websites.iis) {
 
     # grant application pool user permissions to website directory
     $acl = Get-Acl -Path ("c:\inetpub\repositories\iis\{0}\{1}" -f $instance.domain,$instance.webroot)
-    $perm = ("IIS AppPool\{0}" -f $domain), 'Read,Modify', 'ContainerInherit, ObjectInherit', 'None', 'Allow' 
+    $perm = ("IIS AppPool\{0}" -f $domain), 'Read,Modify', 'ContainerInherit, ObjectInherit', 'None', 'Allow'
     $rule = New-Object -TypeName System.Security.AccessControl.FileSystemAccessRule -ArgumentList $perm
-    $acl.SetAccessRule($rule) 
+    $acl.SetAccessRule($rule)
     $acl | Set-Acl -Path ("c:\inetpub\repositories\iis\{0}\{1}" -f $instance.domain,$instance.webroot)
 }
 
@@ -201,5 +201,5 @@ if (get-childitem -path IIS:\Sites) {
     get-childitem -path IIS:\Sites | foreach { start-website $_.Name; }
 }
 foreach ($instance in $configuration.websites.iis) {
-    echo ("http://{0}" -f $domain)
+    echo ("http://{0}" -f $instance.domain)
 }
