@@ -1,6 +1,9 @@
 source "/catapult/provisioners/redhat/modules/catapult.sh"
 
 
+# IPTABLES CONFIGURATION
+echo -e "\n> configuring iptables-services"
+
 # disable the baked in firewalld
 sudo systemctl stop firewalld
 sudo systemctl mask firewalld
@@ -13,6 +16,19 @@ sudo systemctl start iptables
 
 # ensure iptables starts during boot
 sudo systemctl enable iptables
+
+
+
+# IPTABLES RULES BEFORE
+echo -e "\n> iptables rules before configuration"
+
+# output the iptables
+sudo iptables --list-rules
+
+
+
+# IPTABLES RULES CONFIGURATION
+echo -e "\n> iptables rules configuration"
 
 # establish default policies
 sudo iptables --policy INPUT ACCEPT
@@ -114,8 +130,6 @@ fi
 
 # now that everything is configured, we drop everything else (drop does not send any return packets, reject does)
 sudo iptables --policy INPUT DROP
-# output the iptables
-sudo iptables --list-rules
 
 # save our newly created config
 # saves to cat /etc/sysconfig/iptables
@@ -123,3 +137,41 @@ sudo service iptables save
 
 # restart iptables service
 sudo systemctl restart iptables
+
+
+
+# IPTABLES RULES CONFIGURATION
+echo -e "\n> fail2ban service configuration and fail2ban jail/filter configuration"
+
+# install fail2ban
+sudo yum install -y fail2ban
+
+# ensure fail2ban starts during boot
+sudo systemctl enable fail2ban
+
+# define our fail2ban jail
+# get a list of filters from below
+# ls /etc/fail2ban/filter.d
+sudo cat > /etc/fail2ban/jail.local << EOF
+[DEFAULT]
+bantime = 3600
+banaction = iptables-multiport
+
+[sshd]
+enabled = true
+
+EOF
+
+# restart fail2ban
+sudo systemctl restart fail2ban
+
+# output the fail2ban jails
+sudo fail2ban-client status
+
+
+
+# IPTABLES RULES AFTER
+echo -e "\n> iptables rules after configuration"
+
+# output the iptables
+sudo iptables --list-rules
