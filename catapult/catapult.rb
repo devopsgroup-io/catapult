@@ -837,7 +837,10 @@ module Catapult
             end
           end
         end
-      rescue Exception => ex
+      rescue Errno::ETIMEDOUT => ex
+        puts " * The Bamboo API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
+        puts "   - Error was: #{ex.class}".color(Colors::RED)
+      rescue Errno::ECONNREFUSED => ex
         puts " * The Bamboo API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
         puts "   - Error was: #{ex.class}".color(Colors::RED)
       end

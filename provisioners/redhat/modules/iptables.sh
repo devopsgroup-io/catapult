@@ -149,9 +149,11 @@ sudo yum install -y fail2ban
 # ensure fail2ban starts during boot
 sudo systemctl enable fail2ban
 
-# define our fail2ban jail
+# define our fail2ban jails
+# look for attacks from below
+## cat /var/log/httpd/access_log
 # get a list of filters from below
-# ls /etc/fail2ban/filter.d
+## ls /etc/fail2ban/filter.d
 sudo cat > /etc/fail2ban/jail.local << EOF
 [DEFAULT]
 bantime = 3600
