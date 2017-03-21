@@ -601,8 +601,8 @@ Catapult follows Gitflow for its **infrastructure configuration** *and* **websit
 <img src="https://cdn.rawgit.com/devopsgroup-io/catapult/master/catapult/installers/images/catapult_release_management.png" alt="Catapult Release Management">
 <sup>[1](#references)</sup>
 
-            | LocalDev | Test | QC | Production
-------------|----------|------|----|-----------
+|            | LocalDev | Test | QC | Production
+|------------|----------|------|----|-----------
 **Running Branch**                                       | *develop*                                                   | *develop*                                                                                                      | *release*                                                      | *master*
 **Deployments**                                          | Manually via `vagrant provision`                            | Automatically via Bamboo (new commits to **develop**)                                                          | Automatically via Bamboo (new commits to **release**)          | Manually via Bamboo
 **Testing Activities**                                   | Component Test                                              | Integration Test, System Test                                                                                  | Acceptance Test, Release Test                                  | Operational Qualification
@@ -617,8 +617,8 @@ Catapult enforces a unique solution to Release Management of a website, Software
 
 ### Downstream ###
 
-            | LocalDev | Test | QC | Production
-------------|----------|------|----|-----------
+|            | LocalDev | Test | QC | Production
+|------------|----------|------|----|-----------
 **Downstream Software Workflow - Database**              | Restore from **develop** `~/_sql` folder of website repo    | Restore from **develop** `~/_sql` folder of website repo                                                       | Restore from **release** `~/_sql` folder of website repo       | Auto-commit one backup per day (up to 500MB or 1) to **master** `~/_sql` folder of website repo
 **Downstream Software Workflow - Untracked File Stores** | rsync file stores from **Production**                       | rsync file stores from **Production**                                                                          | rsync file stores from **Production**                          | 
 **Downstream Software Workflow - Tracked File Stores**   | Pull file stores from **develop**                           | Pull file stores from **develop**                                                                              | Pull file stores from **release**                              | Auto-commit file stores (up to 750MB each) to **master** of website repo
@@ -627,8 +627,8 @@ Catapult enforces a unique solution to Release Management of a website, Software
 
 ### Upstream ###
 
-            | LocalDev | Test | QC | Production
-------------|----------|------|----|-----------
+|            | LocalDev | Test | QC | Production
+|------------|----------|------|----|-----------
 **Upstream Software Workflow - Database**                | Restore from **develop** `~/_sql` folder of website repo    | Auto-commit one backup per day (up to 500MB or 1) to **develop** `~/_sql` folder of website repo | Restore from **release** `~/_sql` folder of website repo       | Restore from **master** `~/_sql` folder of website repo
 **Upstream Software Workflow - Untracked File Stores**   | rsync file stores from **Test**                             |                                                                                                  | rsync file stores from **Test**                                | rsync file stores from **Test**
 **Upstream Software Workflow - Tracked File Stores**     | Pull file stores from **develop**                           | Auto-commit file stores (up to 750MB each) to **develop** of website repo                        | Pull file stores from **release**                              | Pull file stores from **master**
