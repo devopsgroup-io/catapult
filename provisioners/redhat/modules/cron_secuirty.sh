@@ -4,7 +4,7 @@
 
 /bin/echo -e "\nhere are recent ip addresses blocked by fail2ban"
 /bin/echo -e "================================================"
-/bin/tail /var/log/fail2ban.log
+/bin/tail /var/log/fail2ban.log | grep "Ban"
 
 /bin/echo -e "\nhere are recent 404s targeted at this server's ip address"
 /bin/echo -e "========================================================="
