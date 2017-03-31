@@ -837,6 +837,9 @@ module Catapult
             end
           end
         end
+      rescue Net::ReadTimeout => ex
+        puts " * The Bamboo API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
+        puts "   - Error was: #{ex.class}".color(Colors::RED)
       rescue Errno::ETIMEDOUT => ex
         puts " * The Bamboo API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
         puts "   - Error was: #{ex.class}".color(Colors::RED)
