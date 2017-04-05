@@ -189,7 +189,7 @@ module Catapult
     # configure catapult and git
     remote = `#{@git} config --get remote.origin.url`
     if remote.include?("devopsgroup-io/")
-      catapult_exception("In order to use Catapult Release Management, you must fork the repository so that the committed and encrypted configuration is unique to you! See https://github.com/devopsgroup-io/catapult for more information.")
+      catapult_exception("In order to use Catapult, you must fork the repository so that the committed and encrypted configuration is unique to you! See https://github.com/devopsgroup-io/catapult for more information.")
     end
     puts "\n\nSelf updating Catapult:\n".color(Colors::WHITE)
     `#{@git} fetch`
@@ -525,6 +525,7 @@ module Catapult
       catapult_exception("Please set [\"company\"][\"timezone_windows\"] in secrets/configuration.yml")
     end
     # https://developers.digitalocean.com/documentation/v2/
+    puts "[DigitalOcean API]"
     if @configuration["company"]["digitalocean_personal_access_token"] == nil
       catapult_exception("Please set [\"company\"][\"digitalocean_personal_access_token\"] in secrets/configuration.yml")
     else
@@ -536,7 +537,7 @@ module Catapult
         if response.code.to_f.between?(399,499)
           catapult_exception("#{response.code} The DigitalOcean API could not authenticate, please verify [\"company\"][\"digitalocean_personal_access_token\"].")
         elsif response.code.to_f.between?(500,600)
-          puts "   - The DigitalOcean API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
+          puts "   - The DigitalOcean API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
         else
           puts " * DigitalOcean API authenticated successfully."
           api_digitalocean_account_keys = JSON.parse(response.body)
@@ -565,6 +566,7 @@ module Catapult
     end
     # http://docs.aws.amazon.com/general/latest/gr/sigv4_signing.html
     # http://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_Operations.html
+    puts "[AWS API]"
     if @configuration["company"]["aws_access_key"] == nil || @configuration["company"]["aws_secret_key"] == nil
       catapult_exception("Please set [\"company\"][\"aws_access_key\"] and [\"company\"][\"aws_secret_key\"] in secrets/configuration.yml")
     else
@@ -641,7 +643,7 @@ module Catapult
         if response.code.to_f.between?(399,499)
           catapult_exception("#{response.code} The AWS API could not authenticate, please verify [\"company\"][\"aws_access_key\"] and [\"company\"][\"aws_secret_key\"].")
         elsif response.code.to_f.between?(500,600)
-          puts " * AWS API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
+          puts " * AWS API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
         else
           puts " * AWS API authenticated successfully."
           api_aws_account_keys = Nokogiri::XML.parse(response.body)
@@ -672,6 +674,7 @@ module Catapult
       end
     end
     # https://confluence.atlassian.com/display/BITBUCKET/Version+1
+    puts "[Bitbucket API]"
     if @configuration["company"]["bitbucket_username"] == nil || @configuration["company"]["bitbucket_password"] == nil
       catapult_exception("Please set [\"company\"][\"bitbucket_username\"] and [\"company\"][\"bitbucket_password\"] in secrets/configuration.yml")
     else
@@ -683,7 +686,7 @@ module Catapult
         if response.code.to_f.between?(399,499)
           catapult_exception("#{response.code} The Bitbucket API could not authenticate, please verify [\"company\"][\"bitbucket_username\"] and [\"company\"][\"bitbucket_password\"].")
         elsif response.code.to_f.between?(500,600)
-          puts " * Bitbucket API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
+          puts " * Bitbucket API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
         else
           puts " * Bitbucket API authenticated successfully."
           @api_bitbucket = JSON.parse(response.body)
@@ -721,6 +724,7 @@ module Catapult
       end
     end
     # https://developer.github.com/v3/
+    puts "[GitHub API]"
     if @configuration["company"]["github_username"] == nil || @configuration["company"]["github_password"] == nil
       catapult_exception("Please set [\"company\"][\"github_username\"] and [\"company\"][\"github_password\"] in secrets/configuration.yml")
     else
@@ -732,7 +736,7 @@ module Catapult
         if response.code.to_f.between?(399,499)
           catapult_exception("#{response.code} The GitHub API could not authenticate, please verify [\"company\"][\"github_username\"] and [\"company\"][\"github_password\"].")
         elsif response.code.to_f.between?(500,600)
-          puts " * GitHub API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
+          puts " * GitHub API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
         else
           puts " * GitHub API authenticated successfully."
           @api_github = JSON.parse(response.body)
@@ -770,6 +774,7 @@ module Catapult
       end
     end
     # https://docs.atlassian.com/bamboo/REST/
+    puts "[Bamboo API]"
     if @configuration["company"]["bamboo_base_url"] == nil || @configuration["company"]["bamboo_username"] == nil || @configuration["company"]["bamboo_password"] == nil
       catapult_exception("Please set [\"company\"][\"bamboo_base_url\"] and [\"company\"][\"bamboo_username\"] and [\"company\"][\"bamboo_password\"] in secrets/configuration.yml")
     else
@@ -782,7 +787,7 @@ module Catapult
           if response.code.to_f.between?(399,499)
             catapult_exception("#{response.code} The Bamboo API could not authenticate, please verify [\"company\"][\"bamboo_base_url\"] and [\"company\"][\"bamboo_username\"] and [\"company\"][\"bamboo_password\"].")
           elsif response.code.to_f.between?(500,600)
-            puts " * Bamboo API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
+            puts " * Bamboo API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
           else
             puts " * Bamboo API authenticated successfully."
             @api_bamboo = JSON.parse(response.body)
@@ -805,7 +810,7 @@ module Catapult
             if response.code.to_f.between?(399,499)
               catapult_exception("Could not find the plan key \"TEST\" in Bamboo, please follow the Services Setup for Bamboo at https://github.com/devopsgroup-io/catapult#services-setup")
             elsif response.code.to_f.between?(500,600)
-              puts "   - The Bamboo API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
+              puts "   - The Bamboo API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
             else
               puts "   - Found the plan key \"TEST\""
             end
@@ -818,7 +823,7 @@ module Catapult
             if response.code.to_f.between?(399,499)
               catapult_exception("Could not find the plan key \"QC\" in Bamboo, please follow the Services Setup for Bamboo at https://github.com/devopsgroup-io/catapult#services-setup")
             elsif response.code.to_f.between?(500,600)
-              puts "   - The Bamboo API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
+              puts "   - The Bamboo API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
             else
               puts "   - Found the plan key \"QC\""
             end
@@ -831,24 +836,25 @@ module Catapult
             if response.code.to_f.between?(399,499)
               catapult_exception("Could not find the plan key \"PROD\" in Bamboo, please follow the Services Setup for Bamboo at https://github.com/devopsgroup-io/catapult#services-setup")
             elsif response.code.to_f.between?(500,600)
-              puts "   - The Bamboo API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
+              puts "   - The Bamboo API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
             else
               puts "   - Found the plan key \"PROD\""
             end
           end
         end
       rescue Net::ReadTimeout => ex
-        puts " * The Bamboo API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
+        puts " * The Bamboo API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
         puts "   - Error was: #{ex.class}".color(Colors::RED)
       rescue Errno::ETIMEDOUT => ex
-        puts " * The Bamboo API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
+        puts " * The Bamboo API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
         puts "   - Error was: #{ex.class}".color(Colors::RED)
       rescue Errno::ECONNREFUSED => ex
-        puts " * The Bamboo API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
+        puts " * The Bamboo API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
         puts "   - Error was: #{ex.class}".color(Colors::RED)
       end
     end
     # https://api.cloudflare.com/
+    puts "[CloudFlare API]"
     if @configuration["company"]["cloudflare_api_key"] == nil || @configuration["company"]["cloudflare_email"] == nil
       catapult_exception("Please set [\"company\"][\"cloudflare_api_key\"] and [\"company\"][\"cloudflare_email\"] in secrets/configuration.yml")
     else
@@ -861,7 +867,7 @@ module Catapult
         if response.code.to_f.between?(399,499)
           catapult_exception("#{response.code} The CloudFlare API could not authenticate, please verify [\"company\"][\"cloudflare_api_key\"] and [\"company\"][\"cloudflare_email\"].")
         elsif response.code.to_f.between?(500,600)
-          puts " * CloudFlare API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
+          puts " * CloudFlare API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
         else
           puts " * CloudFlare API authenticated successfully."
           @api_cloudflare = JSON.parse(response.body)
@@ -869,6 +875,7 @@ module Catapult
       end
     end
     # https://docs.newrelic.com/docs/apis/rest-api-v2
+    puts "[New Relic API]"
     if @configuration["company"]["newrelic_api_key"] == nil || @configuration["company"]["newrelic_license_key"] == nil
       catapult_exception("Please set [\"company\"][\"newrelic_api_key\"] and [\"company\"][\"newrelic_license_key\"] in secrets/configuration.yml")
     else
@@ -880,7 +887,7 @@ module Catapult
         if response.code.to_f.between?(399,499)
           catapult_exception("#{response.code} The New Relic API could not authenticate, please verify [\"company\"][\"newrelic_api_key\"] and [\"company\"][\"newrelic_license_key\"].")
         elsif response.code.to_f.between?(500,600)
-          puts " * New Relic API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
+          puts " * New Relic API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
         else
           puts " * New Relic API authenticated successfully."
           @api_cloudflare = JSON.parse(response.body)
@@ -888,6 +895,7 @@ module Catapult
       end
     end
     # https://docs.newrelic.com/docs/apis
+    puts "[New Relic Admin API]"
     if @configuration["company"]["newrelic_admin_api_key"] == nil
       catapult_exception("Please set [\"company\"][\"newrelic_admin_api_key\"] in secrets/configuration.yml")
     else
@@ -900,7 +908,7 @@ module Catapult
           puts " * New Relic Admin API could not authenticate (Synthetics tests will not be created).".color(Colors::YELLOW)
           #catapult_exception("#{response.code} The New Relic Admin API could not authenticate, please verify [\"company\"][\"newrelic_admin_api_key\"].")
         elsif response.code.to_f.between?(500,600)
-          puts " * New Relic Admin API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
+          puts " * New Relic Admin API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
         else
           puts " * New Relic Admin API authenticated successfully."
           @api_cloudflare = JSON.parse(response.body)
@@ -928,7 +936,7 @@ module Catapult
         catapult_exception("#{response.code} The DigitalOcean API could not authenticate, please verify [\"company\"][\"digitalocean_personal_access_token\"].")
       elsif response.code.to_f.between?(500,600)
         @api_digitalocean = nil
-        puts " * The DigitalOcean API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
+        puts " * The DigitalOcean API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
       else
         @api_digitalocean = JSON.parse(response.body)
       end
@@ -943,7 +951,7 @@ module Catapult
       if response.code.to_f.between?(399,499)
         catapult_exception("#{response.code} The DigitalOcean API could not authenticate, please verify [\"company\"][\"digitalocean_personal_access_token\"].")
       elsif response.code.to_f.between?(500,600)
-        puts " * The DigitalOcean API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
+        puts " * The DigitalOcean API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
       else
         api_digitalocean_sizes = JSON.parse(response.body)
         api_digitalocean_sizes["sizes"].each do |size|
@@ -1026,7 +1034,7 @@ module Catapult
         catapult_exception("#{response.code} The AWS API could not authenticate, please verify [\"company\"][\"aws_access_key\"] and [\"company\"][\"aws_secret_key\"].")
       elsif response.code.to_f.between?(500,600)
         @api_aws = nil
-        puts " * AWS API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
+        puts " * AWS API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
       else
         @api_aws = Nokogiri::XML.parse(response.body)
       end
@@ -1227,8 +1235,10 @@ module Catapult
           if @configuration["environments"]["#{environment}"]["servers"]["#{server}"]["slug"] == nil
             catapult_exception("There is an error in your secrets/configuration.yml file.\nThe slug (DigitalOcean droplet size) for #{environment} => servers => redhat is empty and the droplet has not been created. Please choose from the following (see DigitalOcean.com for pricing):\n#{@api_digitalocean_slugs}")
           end
-          if not @api_digitalocean_slugs.include?("#{@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["slug"]}")
-            catapult_exception("There is an error in your secrets/configuration.yml file.\nThe slug (DigitalOcean droplet size) for #{environment} => servers => redhat is invalid and the droplet has not been created. Please choose from the following (see DigitalOcean.com for pricing):\n#{@api_digitalocean_slugs}")
+          if @api_digitalocean_slugs.any?
+            if not @api_digitalocean_slugs.include?("#{@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["slug"]}")
+              catapult_exception("There is an error in your secrets/configuration.yml file.\nThe slug (DigitalOcean droplet size) for #{environment} => servers => redhat is invalid and the droplet has not been created. Please choose from the following (see DigitalOcean.com for pricing):\n#{@api_digitalocean_slugs}")
+            end
           end
           # ipv4_public
           if droplet != nil
@@ -1283,7 +1293,7 @@ module Catapult
                 if response.code.to_f.between?(399,499)
                   catapult_exception("#{response.code} The DigitalOcean API could not authenticate, please verify [\"company\"][\"digitalocean_personal_access_token\"].")
                 elsif response.code.to_f.between?(500,600)
-                  puts "   - The DigitalOcean API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
+                  puts "   - The DigitalOcean API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
                 else
                   puts "   - Successfully updated the kernel, moving on..."
                 end
@@ -1626,7 +1636,7 @@ module Catapult
               if response.code.to_f == 404
                 catapult_exception("The Bitbucket repo #{instance["repo"]} does not exist")
               elsif response.code.to_f.between?(399,600)
-                puts "   - The Bitbucket API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
+                puts "   - The Bitbucket API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
               else
                 api_bitbucket_repo_repositories = JSON.parse(response.body)
                 if response.code.to_f == 200
@@ -1644,7 +1654,7 @@ module Catapult
               if response.code.to_f == 404
                 catapult_exception("The Bitbucket repo #{instance["repo"]} does not exist")
               elsif response.code.to_f.between?(399,600)
-                puts "   - The Bitbucket API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
+                puts "   - The Bitbucket API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
               else
                 api_bitbucket_repo_privileges = JSON.parse(response.body)
                 api_bitbucket_repo_privileges.each do |member|
@@ -1664,7 +1674,7 @@ module Catapult
               if response.code.to_f == 404
                 catapult_exception("The Bitbucket repo #{instance["repo"]} does not exist")
               elsif response.code.to_f.between?(399,600)
-                puts "   - The Bitbucket API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
+                puts "   - The Bitbucket API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
               else
                 api_bitbucket_repo_group_privileges = JSON.parse(response.body)
                 api_bitbucket_repo_group_privileges.each do |group|
@@ -1696,7 +1706,7 @@ module Catapult
               if response.code.to_f == 404
                 catapult_exception("The GitHub repo #{instance["repo"]} does not exist")
               elsif response.code.to_f.between?(399,600)
-                puts "   - The GitHub API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
+                puts "   - The GitHub API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
               else
                 if response.code.to_f == 204
                   # get repo type
@@ -1717,7 +1727,7 @@ module Catapult
               request.basic_auth "#{@configuration["company"]["bitbucket_username"]}", "#{@configuration["company"]["bitbucket_password"]}"
               response = http.request request # Net::HTTPResponse object
               if response.code.to_f.between?(399,600)
-                puts "   - The Bitbucket API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
+                puts "   - The Bitbucket API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
               else
                 api_bitbucket_repo_branches = JSON.parse(response.body)
                 @api_bitbucket_repo_develop = false
@@ -1759,7 +1769,7 @@ module Catapult
               request.basic_auth "#{@configuration["company"]["github_username"]}", "#{@configuration["company"]["github_password"]}"
               response = http.request request # Net::HTTPResponse object
               if response.code.to_f.between?(399,600)
-                puts "   - The GitHub API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
+                puts "   - The GitHub API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
               else
                 api_github_repo_branches = JSON.parse(response.body)
                 @api_github_repo_develop = false
@@ -1803,7 +1813,7 @@ module Catapult
               request.basic_auth "#{@configuration["company"]["bitbucket_username"]}", "#{@configuration["company"]["bitbucket_password"]}"
               response = http.request request # Net::HTTPResponse object
               if response.code.to_f.between?(399,600)
-                puts "   - The Bitbucket API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
+                puts "   - The Bitbucket API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
               else
                 api_bitbucket_services = JSON.parse(response.body)
                 @api_bitbucket_services_bamboo_cat_test = 0
@@ -1905,7 +1915,7 @@ module Catapult
                 "}"
               response = http.request request # Net::HTTPResponse object
               if response.code.to_f.between?(500,600)
-                puts "   - The GitHub API seems to be down, skipping... (this may impact provisioning and automated deployments)".color(Colors::RED)
+                puts "   - The GitHub API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
               elsif response.code.to_f.between?(399,499)
                 catapult_exception("Unable to configure GitHub Bamboo service for websites => #{service} => domain => #{instance["domain"]}. Ensure the github_username defined in secrets/configuration.yml has correct access to the repository.")
               end
