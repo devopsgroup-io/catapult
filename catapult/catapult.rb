@@ -2016,7 +2016,7 @@ module Catapult
 
       @configuration["websites"].each do |service,data|
         puts "\n[#{service}] #{@configuration["websites"]["#{service}"].nil? ? "0" : @configuration["websites"]["#{service}"].length} total"
-        puts "[domain]".ljust(40) + "[domain_tld_override]".ljust(30) + "[software]".ljust(21) + "[workflow]".ljust(14) + "[force_https]".ljust(15) + "[80:dev.]".ljust(22) + "[80:test.]".ljust(22) + "[80:qc.]".ljust(22) + "[80:production]"
+        puts "[domain]".ljust(40) + "[domain_tld_override]".ljust(30) + "[software]".ljust(21) + "[eol]".ljust(12) + "[workflow]".ljust(14) + "[force_https]".ljust(15) + "[80:dev.]".ljust(22) + "[80:test.]".ljust(22) + "[80:qc.]".ljust(22) + "[80:production]"
         puts "\n"
         if @configuration["websites"]["#{service}"] != nil
           @configuration["websites"]["#{service}"].each do |instance|
@@ -2028,6 +2028,16 @@ module Catapult
             row.push("#{instance["domain_tld_override"]}".slice!(0, 29).ljust(29))
             # get software
             row.push((instance["software"] || "").ljust(20))
+            # get software eol
+            software_eol = nil
+            if !defined?(@provisioners["software"]["#{service}"]["#{instance["software"]}"]["eol"]) || (@provisioners["software"]["#{service}"]["#{instance["software"]}"]["eol"].nil?)
+              # no eol
+            else
+              if Date.parse(@provisioners["software"]["#{service}"]["#{instance["software"]}"]["eol"]) < Date.today
+                software_eol = "#{@provisioners["software"]["#{service}"]["#{instance["software"]}"]["eol"]} ".color(Colors::RED)
+              end
+            end
+            row.push((software_eol || "").ljust(11))
             # get software_workflow
             row.push((instance["software_workflow"] || "").ljust(13))
             # get force_https
