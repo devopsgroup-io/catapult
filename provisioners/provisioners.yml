@@ -177,6 +177,7 @@ software:
       repo: "https://github.com/bcit-ci/CodeIgniter.git"
       branch: "2.2-stable"
       database_config_file: "application/config/database.php"
+      eol: "2015-10-31"
       file_store_containers: ["application/cache","application/logs","uploads"]
       file_stores: ["uploads"]
       version: [2]
@@ -191,6 +192,7 @@ software:
       repo: "https://git.drupal.org/project/drupal.git"
       branch: "6.x"
       database_config_file: "sites/default/settings.php"
+      eol: "2016-02-24"
       file_stores: ["sites/default/files"]
       version: [6]
     drupal7:
