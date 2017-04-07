@@ -4,24 +4,28 @@
 
 /bin/echo -e "\nhere are recent ip addresses blocked by fail2ban"
 /bin/echo -e "================================================"
-/bin/grep "Ban" /var/log/fail2ban.log* | /bin/head -n 20
+/bin/tac /var/log/fail2ban.log* | /bin/grep --extended-regexp --max-count=20 --regexp="(Ban|Warn)"
 
 if [ -d "/var/log/httpd" ]; then
 
     /bin/echo -e "\nhere are recent 404s targeted at this server's ip address"
     /bin/echo -e "========================================================="
-    /bin/grep --extended-regexp --max-count=20 --regexp="\" 404 " /var/log/httpd/access_log
+    /bin/tac /var/log/httpd/access_log* | /bin/grep --extended-regexp --max-count=20 --regexp="\" 404 "
 
     /bin/echo -e "\nhere are recent 404s potentially targeted at vhosts"
     /bin/echo -e "==================================================="
-    /bin/grep --extended-regexp --max-count=20 --regexp="\" 404 " /var/log/httpd/*/access_log
+    /bin/tac /var/log/httpd/*/access_log* | /bin/grep --extended-regexp --max-count=20 --regexp="\" 404 "
 
     /bin/echo -e "\nhere are recent matches from a keyword threatlist potentially targeted at vhosts"
     /bin/echo -e "(denied|failed|failure|invalid|limit|permission)"
     /bin/echo -e "================================================================================"
-    /bin/grep --extended-regexp --max-count=20 --regexp="(denied|failed|failure|invalid|limit|permission)" /var/log/httpd/*/error_log
+    /bin/tac /var/log/httpd/*/error_log* | /bin/grep --extended-regexp --max-count=20 --regexp="(denied|failed|failure|invalid|limit|permission)"
 
 fi
+
+/bin/echo -e "\nhere is the fail2ban configuration"
+/bin/echo -e "================================================"
+/bin/cat /etc/fail2ban/jail.local
 
 /bin/echo -e "\nhere are the currently configured fail2ban jails"
 /bin/echo -e "================================================"

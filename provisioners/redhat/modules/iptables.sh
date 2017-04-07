@@ -150,14 +150,16 @@ sudo yum install -y fail2ban
 sudo systemctl enable fail2ban
 
 # define our fail2ban jails
-# look for attacks from below
-## cat /var/log/httpd/access_log
-# get a list of filters from below
-## ls /etc/fail2ban/filter.d
+# see cron_security.sh for more information
 sudo cat > /etc/fail2ban/jail.local << EOF
 [DEFAULT]
-bantime = 3600
 banaction = iptables-multiport
+# "bantime" is the number of seconds that a host is banned.
+bantime  = 3600
+# a host is banned if it has generated "maxretry" during the last "findtime" seconds.
+findtime  = 600
+# "maxretry" is the number of failures before a host get banned.
+maxretry = 5
 
 [sshd]
 enabled = true
