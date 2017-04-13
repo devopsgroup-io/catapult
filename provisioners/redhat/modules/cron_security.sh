@@ -4,9 +4,9 @@
 
 /bin/echo -e "\nhere are recent ip addresses blocked by fail2ban (/var/log/fail2ban.log*)"
 /bin/echo -e "================================================"
-/bin/tac /var/log/fail2ban.log* | /bin/grep --ignore-case --extended-regexp --max-count=20 --regexp="(ban|warn)"
+/bin/tac /var/log/fail2ban.log* | /bin/grep --extended-regexp --max-count=20 --regexp="(Ban)"
 
-if [ -d "/var/log/httpd" ]; then
+if [ -f "/var/log/httpd/access_log" ]; then
 
     /bin/echo -e "\nhere are recent 404s targeted at this server's ip address of $(hostname -i | awk '{print $3}') (/var/log/httpd/access_log*)"
     /bin/echo -e "========================================================="

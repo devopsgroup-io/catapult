@@ -84,6 +84,8 @@ sudo pecl upgrade uploadprogress
 # output installed pecl extensions once finished
 sudo pecl list
 
-# reload httpd configuration for changes to reflect
-# reload httpd to clear zend opcache
-systemctl reload httpd.service
+if ([ "${4}" == "apache" ]); then
+    # reload httpd configuration for changes to reflect
+    # reload httpd to clear zend opcache
+    systemctl reload httpd.service
+fi
