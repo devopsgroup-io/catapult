@@ -14,10 +14,17 @@ webroot=$(catapult websites.apache.$5.webroot)
 softwareroot=$(provisioners software.apache.${software}.softwareroot)
 
 
-# reset admin credentials
+# set site email address
+# set admin credentials, email address, and role
+if ([ ! -z "${software}" ]); then
+    echo -e "* setting ${software} site email address..."
+    echo -e "* setting ${software} admin account credentials, email address, and role..."
+fi
+
 if [ "${software}" = "drupal6" ]; then
 
-    echo -e "\t* resetting ${software} admin password..."
+    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush variable-set site_mail $(catapult company.email)
+
     mysql --defaults-extra-file=$dbconf ${1}_${domainvaliddbname} -e "
         INSERT INTO ${software_dbprefix}users (uid, pass, mail, status)
         VALUES ('1', MD5('$(catapult environments.${1}.software.drupal.admin_password)'), '$(catapult company.email)', '1')
@@ -30,8 +37,9 @@ if [ "${software}" = "drupal6" ]; then
     "
 
 elif [ "${software}" = "drupal7" ]; then
+    
+    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush variable-set site_mail $(catapult company.email)
 
-    echo -e "\t* resetting ${software} admin password..."
     password_hash=$(cd "/var/www/repositories/apache/${domain}/${webroot}" && php ./scripts/password-hash.sh $(catapult environments.${1}.software.drupal.admin_password))
     password_hash=$(echo "${password_hash}" | awk '{ print $4 }' | tr -d " " | tr -d "\n")
     mysql --defaults-extra-file=$dbconf ${1}_${domainvaliddbname} -e "
@@ -46,8 +54,7 @@ elif [ "${software}" = "drupal7" ]; then
     "
 
 elif [ "${software}" = "elgg1" ]; then
-
-    echo -e "\t* resetting ${software} admin password..."
+    
     mysql --defaults-extra-file=$dbconf ${1}_${domainvaliddbname} -e "
         INSERT INTO ${software_dbprefix}users_entity (username, password_hash, email, banned, admin)
         VALUES ('admin', MD5('$(catapult environments.${1}.software.admin_password)'), '$(catapult company.email)', 'no', 'yes')
@@ -56,7 +63,6 @@ elif [ "${software}" = "elgg1" ]; then
 
 elif [ "${software}" = "joomla3" ]; then
 
-    echo -e "\t* resetting ${software} admin password..."
     mysql --defaults-extra-file=$dbconf ${1}_${domainvaliddbname} -e "
         UPDATE ${software_dbprefix}users
         SET username='admin', email='$(catapult company.email)', password=MD5('$(catapult environments.${1}.software.admin_password)'), block='0'
@@ -65,7 +71,6 @@ elif [ "${software}" = "joomla3" ]; then
 
 elif [ "${software}" = "mediawiki1" ]; then
 
-    echo -e "\t* resetting ${software} admin password..."
     mysql --defaults-extra-file=$dbconf ${1}_${domainvaliddbname} -e "
         INSERT INTO ${software_dbprefix}user (user_id, user_name, user_email)
         VALUES ('1', 'Admin', '$(catapult company.email)')
@@ -80,7 +85,6 @@ elif [ "${software}" = "mediawiki1" ]; then
 
 elif [ "${software}" = "moodle3" ]; then
 
-    echo -e "\t* resetting ${software} admin password..."
     mysql --defaults-extra-file=$dbconf ${1}_${domainvaliddbname} -e "
         UPDATE ${software_dbprefix}user
         SET username='admin', password=MD5('$(catapult environments.${1}.software.admin_password)'), suspended='0', email='$(catapult company.email)'
@@ -89,7 +93,6 @@ elif [ "${software}" = "moodle3" ]; then
 
 elif [ "${software}" = "silverstripe3" ]; then
 
-    echo -e "\t* resetting ${software} admin password..."
     mysql --defaults-extra-file=$dbconf ${1}_${domainvaliddbname} -e "
         UPDATE ${software_dbprefix}Member
         SET FirstName='Default Admin', Email='$(catapult company.email)', Password='$(catapult environments.${1}.software.admin_password)', PasswordEncryption='none', LockedOutUntil='NULL'
@@ -99,8 +102,7 @@ elif [ "${software}" = "silverstripe3" ]; then
     cd "/var/www/repositories/apache/${domain}/${webroot}" && php framework/cli-script.php dev/tasks/EncryptAllPasswordsTask
 
 elif [ "${software}" = "suitecrm7" ]; then
-
-    echo -e "\t* resetting ${software} admin password..."
+    
     mysql --defaults-extra-file=$dbconf ${1}_${domainvaliddbname} -e "
         INSERT INTO ${software_dbprefix}users (id, user_name, user_hash, is_admin)
         VALUES ('1', 'admin', MD5('$(catapult environments.${1}.software.admin_password)'), '1')
@@ -108,8 +110,9 @@ elif [ "${software}" = "suitecrm7" ]; then
     "
 
 elif [ "${software}" = "wordpress" ]; then
-
-    echo -e "\t* resetting ${software} admin password..."
+    
+    mysql --defaults-extra-file=$dbconf ${1}_${domainvaliddbname} -e "UPDATE ${software_dbprefix}options SET option_value='$(catapult company.email)' WHERE option_name = 'admin_email';"
+    
     mysql --defaults-extra-file=$dbconf ${1}_${domainvaliddbname} -e "
         INSERT INTO ${software_dbprefix}users (id, user_login, user_pass, user_nicename, user_email, user_status, display_name)
         VALUES ('1', 'admin', MD5('$(catapult environments.${1}.software.wordpress.admin_password)'), 'admin', '$(catapult company.email)', '0', 'admin')
@@ -121,6 +124,10 @@ fi
 
 
 # run software database operations
+if ([ ! -z "${software}" ]); then
+    echo -e "* running ${software} log cleanup, cron, database migrations, and cache rebuilds..."
+fi
+
 if [ "${software}" = "codeigniter2" ]; then
 
     result=$(cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && php index.php migrate)
