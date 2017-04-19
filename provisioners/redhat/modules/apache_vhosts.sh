@@ -174,11 +174,6 @@ EOF
             LogLevel warn
             SSLEngine on
 
-            # allow only secure protocols for client to connect
-            # SSLv2: FUBAR
-            # SSLv3: POODLE
-            SSLProtocol all -SSLv2 -SSLv3
-
             # SSLCompression: CRIME
             SSLCompression off
 
