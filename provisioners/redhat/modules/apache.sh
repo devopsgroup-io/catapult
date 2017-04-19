@@ -31,11 +31,21 @@ if ! grep -q "ServerName localhost" "/etc/httpd/conf/httpd.conf"; then
    sudo bash -c 'echo -e "\nServerName localhost" >> /etc/httpd/conf/httpd.conf'
 fi
 
-# use sites-available, sites-enabled convention. this is a debianism - but the convention is common and easy understand
+# use sites-available, sites-enabled convention. this is a debianism - but the convention is common and easy to understand
 sudo mkdir --parents /etc/httpd/sites-available
 sudo mkdir --parents /etc/httpd/sites-enabled
 if ! grep -q "IncludeOptional sites-enabled/\*.conf" "/etc/httpd/conf/httpd.conf"; then
    sudo bash -c 'echo -e "\nIncludeOptional sites-enabled/*.conf" >> "/etc/httpd/conf/httpd.conf"'
+fi
+if ! grep -q "IncludeOptional sites-enabled/\*.conf" "/etc/httpd/conf.d/ssl.conf"; then
+   sudo bash -c 'echo -e "\nIncludeOptional sites-enabled/*.conf" >> "/etc/httpd/conf.d/ssl.conf"'
+fi
+
+# define the default ssl protocols
+# SSLv2: FUBAR
+# SSLv3: POODLE
+if ! grep -q "SSLProtocol all -SSLv2 -SSLv3" "/etc/httpd/conf.d/ssl.conf"; then
+    sudo bash -c 'echo -e "\nSSLProtocol all -SSLv2 -SSLv3" >> /etc/httpd/conf.d/ssl.conf'
 fi
 
 # 80: remove the default vhost
@@ -43,9 +53,6 @@ sudo cat /dev/null > /etc/httpd/conf.d/welcome.conf
 
 # 443: remove the default vhost
 sed -i '/<VirtualHost _default_:443>/,$d' "/etc/httpd/conf.d/ssl.conf"
-if ! grep -q "IncludeOptional sites-enabled/\*.conf" "/etc/httpd/conf.d/ssl.conf"; then
-   sudo bash -c 'echo -e "\nIncludeOptional sites-enabled/*.conf" >> "/etc/httpd/conf.d/ssl.conf"'
-fi
 
 # 80/443: create a _default_ catchall
 # if the vhost has not been linked, link the vhost
