@@ -2,6 +2,10 @@ source "/catapult/provisioners/redhat/modules/catapult.sh"
 
 
 # create custom cron tasks
+# antivirus
+if ([ "${4}" == "apache" ]); then
+    cat "/catapult/provisioners/redhat/modules/cron_antivirus.sh" > "/etc/cron.weekly/catapult-antivirus.cron"
+fi
 # certificates
 if ([ "${4}" == "apache" ] && [ "${1}" != "dev" ]); then
     cat "/catapult/provisioners/redhat/modules/cron_certificates.sh" > "/etc/cron.weekly/catapult-certificates.cron"
@@ -28,7 +32,7 @@ cat "/catapult/provisioners/redhat/modules/cron_security.sh" > "/etc/cron.weekly
 # define cron tasks and be mindful of order
 hourly=("0anacron" "0yum-hourly.cron")
 daily=("0yum-daily.cron" "catapult-mail.cron" "logrotate" "man-db.cron")
-weekly=("0catapult-security.cron" "catapult-certificates.cron" "catapult-git.cron" "catapult-mysql.cron" "catapult-reboot.cron")
+weekly=("0catapult-security.cron" "catapult-antivirus.cron" "catapult-certificates.cron" "catapult-git.cron" "catapult-mysql.cron" "catapult-reboot.cron")
 monthly=()
 
 # ensure loose set of cron tasks and set correct permissions
