@@ -221,4 +221,5 @@ echo -e "\n> system clamav configuration"
 sudo yum install -y clamav
 # install clamav-update
 sudo yum install -y clamav-update
-sed -i '/^Example/d' /etc/freshclam.conf
+sed --in-place --expression='/^Example/d' /etc/freshclam.conf
+sed --in-place --expression="s/^FRESHCLAM_DELAY=disabled-warn/FRESHCLAM_DELAY=disabled/g" /etc/sysconfig/freshclam
