@@ -189,10 +189,17 @@ foreach ($instance in $configuration.websites.iis) {
     } else {
         $domain = ("$($args[0]).{0}" -f $instance.domain)
     }
-    # create self-signed cert
-    $certificate = New-SelfSignedCertificate -DnsName ("{0}" -f $domain) -CertStoreLocation "cert:\LocalMachine\My"
-    # bind self-signed cert to 443
-    new-item -path "IIS:\SslBindings\!443!$domain" -value $certificate -sslflags 1 -force
+    if ($instance.domain_tld_override) {
+        # create self-signed cert
+        $certificate = New-SelfSignedCertificate -DnsName ("{0}.{1}" -f $domain,$instance.domain_tld_override) -CertStoreLocation "cert:\LocalMachine\My"
+        # bind self-signed cert to 443
+        new-item -path ("IIS:\SslBindings\!443!{0}.{1}" -f $domain,$instance.domain_tld_override) -value $certificate -sslflags 1 -force
+    } else {
+        # create self-signed cert
+        $certificate = New-SelfSignedCertificate -DnsName ("{0}" -f $domain) -CertStoreLocation "cert:\LocalMachine\My"
+        # bind self-signed cert to 443
+        new-item -path ("IIS:\SslBindings\!443!{0}" -f $domain) -value $certificate -sslflags 1 -force
+    }
 }
 
 
