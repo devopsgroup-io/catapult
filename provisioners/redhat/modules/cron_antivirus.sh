@@ -6,6 +6,6 @@
 
 /usr/bin/freshclam
 
-/usr/bin/clamscan /var/www/repositories/apache/ --infected --recursive
+/usr/bin/clamscan /var/www/ --infected --recursive
 
 /bin/echo -e "\n"

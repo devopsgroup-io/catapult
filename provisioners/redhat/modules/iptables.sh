@@ -160,7 +160,11 @@ bantime  = 3600
 findtime  = 600
 # "maxretry" is the number of failures before a host get banned.
 maxretry = 5
-
+# enable carefully selected filters
+[apache-botsearch]
+enabled = true
+[sshd-ddos]
+enabled = true
 [sshd]
 enabled = true
 
