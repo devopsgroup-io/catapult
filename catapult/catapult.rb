@@ -1994,8 +1994,13 @@ module Catapult
     @dev_windows_hosts = Array.new
       unless @configuration["websites"]["iis"] == nil
       @configuration["websites"]["iis"].each do |instance|
-        @dev_windows_hosts.push("dev.#{instance["domain"]}")
-        @dev_windows_hosts.push("www.dev.#{instance["domain"]}")
+        if instance["domain_tld_override"] == nil
+          @dev_windows_hosts.push("dev.#{instance["domain"]}")
+          @dev_windows_hosts.push("www.dev.#{instance["domain"]}")
+        else
+          @dev_windows_hosts.push("dev.#{instance["domain"]}.#{instance["domain_tld_override"]}")
+          @dev_windows_hosts.push("www.dev.#{instance["domain"]}.#{instance["domain_tld_override"]}")
+        end
       end
     end
 
