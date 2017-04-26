@@ -1,7 +1,11 @@
 #!/bin/bash
 
-/bin/echo -e "\nTHIS CATAPULT CRON_ANTIVIRUS MODULE IS USED TO HELP FIND INFECTED FILES IN WEBSITE WEBROOTS\n"
+/bin/echo -e "==========================================================================================="
+/bin/echo -e "THIS CATAPULT CRON_ANTIVIRUS MODULE IS USED TO HELP FIND INFECTED FILES IN WEBSITE WEBROOTS"
+/bin/echo -e "==========================================================================================="
 
 /usr/bin/freshclam
 
 /usr/bin/clamscan /var/www/repositories/apache/ --infected --recursive
+
+/bin/echo -e "\n"
