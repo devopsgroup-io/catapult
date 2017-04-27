@@ -164,8 +164,6 @@ if [ "${4}" == "apache" ]; then
     "
 else
     fail2ban_filters="
-    [apache-botsearch]
-    enabled = true
     [sshd-ddos]
     enabled = true
     [sshd]
