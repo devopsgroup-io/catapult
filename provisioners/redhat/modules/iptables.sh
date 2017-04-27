@@ -154,21 +154,21 @@ sudo systemctl start fail2ban
 
 # define fail2ban filters
 if [ "${4}" == "apache" ]; then
-    fail2ban_filters="
-    [apache-botsearch]
-    enabled = true
-    [sshd-ddos]
-    enabled = true
-    [sshd]
-    enabled = true
-    "
+fail2ban_filters="
+[apache-botsearch]
+enabled = true
+[sshd-ddos]
+enabled = true
+[sshd]
+enabled = true
+"
 else
-    fail2ban_filters="
-    [sshd-ddos]
-    enabled = true
-    [sshd]
-    enabled = true
-    "
+fail2ban_filters="
+[sshd-ddos]
+enabled = true
+[sshd]
+enabled = true
+"
 fi
 
 # define fail2ban jails
