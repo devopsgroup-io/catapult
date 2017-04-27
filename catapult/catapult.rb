@@ -802,43 +802,19 @@ module Catapult
               puts "   - Found the project key \"CAT\""
             end
           end
-          uri = URI("#{@configuration["company"]["bamboo_base_url"]}rest/api/latest/result/CAT-TEST.json?os_authType=basic")
-          Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
-            request = Net::HTTP::Get.new uri.request_uri
-            request.basic_auth "#{@configuration["company"]["bamboo_username"]}", "#{@configuration["company"]["bamboo_password"]}"
-            response = http.request request
-            if response.code.to_f.between?(399,499)
-              catapult_exception("Could not find the plan key \"TEST\" in Bamboo, please follow the Services Setup for Bamboo at https://github.com/devopsgroup-io/catapult#services-setup")
-            elsif response.code.to_f.between?(500,600)
-              puts "   - The Bamboo API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
-            else
-              puts "   - Found the plan key \"TEST\""
-            end
-          end
-          uri = URI("#{@configuration["company"]["bamboo_base_url"]}rest/api/latest/result/CAT-QC.json?os_authType=basic")
-          Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
-            request = Net::HTTP::Get.new uri.request_uri
-            request.basic_auth "#{@configuration["company"]["bamboo_username"]}", "#{@configuration["company"]["bamboo_password"]}"
-            response = http.request request
-            if response.code.to_f.between?(399,499)
-              catapult_exception("Could not find the plan key \"QC\" in Bamboo, please follow the Services Setup for Bamboo at https://github.com/devopsgroup-io/catapult#services-setup")
-            elsif response.code.to_f.between?(500,600)
-              puts "   - The Bamboo API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
-            else
-              puts "   - Found the plan key \"QC\""
-            end
-          end
-          uri = URI("#{@configuration["company"]["bamboo_base_url"]}rest/api/latest/result/CAT-PROD.json?os_authType=basic")
-          Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
-            request = Net::HTTP::Get.new uri.request_uri
-            request.basic_auth "#{@configuration["company"]["bamboo_username"]}", "#{@configuration["company"]["bamboo_password"]}"
-            response = http.request request
-            if response.code.to_f.between?(399,499)
-              catapult_exception("Could not find the plan key \"PROD\" in Bamboo, please follow the Services Setup for Bamboo at https://github.com/devopsgroup-io/catapult#services-setup")
-            elsif response.code.to_f.between?(500,600)
-              puts "   - The Bamboo API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
-            else
-              puts "   - Found the plan key \"PROD\""
+          ["CAT-TEST", "CAT-QC", "CAT-PROD", "CAT-WINTEST", "CAT-WINQC", "CAT-WINPROD"].each do | plan |
+            uri = URI("#{@configuration["company"]["bamboo_base_url"]}rest/api/latest/result/#{plan}.json?os_authType=basic")
+            Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
+              request = Net::HTTP::Get.new uri.request_uri
+              request.basic_auth "#{@configuration["company"]["bamboo_username"]}", "#{@configuration["company"]["bamboo_password"]}"
+              response = http.request request
+              if response.code.to_f.between?(399,499)
+                catapult_exception("Could not find the plan key #{plan} in Bamboo, please follow the Services Setup for Bamboo at https://github.com/devopsgroup-io/catapult#services-setup")
+              elsif response.code.to_f.between?(500,600)
+                puts "   - The Bamboo API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
+              else
+                puts "   - Found the plan key \"#{plan}\""
+              end
             end
           end
         end

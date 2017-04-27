@@ -466,8 +466,32 @@ Please note that Bamboo Cloud has an end-of-life January 31, 2017. Catapult used
     2. **Create PROD Plan**
         * *Project and build plan name*
             1. Project: Catapult
-            4. Plan name: PRODUCTION
+            4. Plan name: PROD
             5. Plan key: PROD
+            6. Plan description:
+        * *Link repository to new build plan*
+            1. Repository host: Other > None
+    2. **Create WINTEST Plan**
+        * *Project and build plan name*
+            1. Project: Catapult
+            4. Plan name: WINTEST
+            5. Plan key: WINTEST
+            6. Plan description:
+        * *Link repository to new build plan*
+            1. Repository host: Other > None
+    2. **Create WINQC Plan**
+        * *Project and build plan name*
+            1. Project: Catapult
+            4. Plan name: WINQC
+            5. Plan key: WINQC
+            6. Plan description:
+        * *Link repository to new build plan*
+            1. Repository host: Other > None
+    2. **Create WINPROD Plan**
+        * *Project and build plan name*
+            1. Project: Catapult
+            4. Plan name: WINPROD
+            5. Plan key: WINPROD
             6. Plan description:
         * *Link repository to new build plan*
             1. Repository host: Other > None
@@ -591,6 +615,54 @@ Once the Web and Database Servers are up and running, it's then time to configur
             5. SSH Key: `~/secrets/id_rsa`
             6. SSH command: `bash /catapult/provisioners/redhat/provision.sh "production" "https://github.com/your-name-here/catapult" "~/secrets/configuration-user.yml["settings"]["gpg_key"]" "mysql"`
             7. Click Save
+    * **Configure Catapult Project WINTEST Plan**
+        1. Click the edit icon for the WINTEST plan
+        2. From the Stages tab, select Default Job
+        3. Remove all tasks that may have been added by default during initial setup
+        4. Click Add task
+            1. Search for Script Task and select it
+            2. Interpreter: `shell`
+            3. Script Location: `Inline`
+            4. Script body: `python /catapult/provisioners/windows/provision.py "~/secrets/configuration.yml["environments"]["test"]["servers"]["windows"]["ip"]" "Administrator" "~/secrets/configuration.yml["environments"]["test"]["servers"]["windows"]["admin_password"]" "test" "https://github.com/[your-name-here]/catapult" "~/secrets/configuration-user.yml["settings"]["gpg_key"]" "iis"`
+            5. Click Save
+        5. Click Add task
+            1. Search for Script Task and select it
+            2. Interpreter: `shell`
+            3. Script Location: `Inline`
+            4. Script body: `python /catapult/provisioners/windows/provision.py "~/secrets/configuration.yml["environments"]["test"]["servers"]["windows_mssql"]["ip"]" "Administrator" "~/secrets/configuration.yml["environments"]["test"]["servers"]["windows_mssql"]["admin_password"]" "test" "https://github.com/[your-name-here]/catapult" "~/secrets/configuration-user.yml["settings"]["gpg_key"]" "mssql"`
+            5. Click Save
+    * **Configure Catapult Project WINQC Plan**
+        1. Click the edit icon for the WINQC plan
+        2. From the Stages tab, select Default Job
+        3. Remove all tasks that may have been added by default during initial setup
+        4. Click Add task
+            1. Search for Script Task and select it
+            2. Interpreter: `shell`
+            3. Script Location: `Inline`
+            4. Script body: `python /catapult/provisioners/windows/provision.py "~/secrets/configuration.yml["environments"]["qc"]["servers"]["windows"]["ip"]" "Administrator" "~/secrets/configuration.yml["environments"]["qc"]["servers"]["windows"]["admin_password"]" "qc" "https://github.com/[your-name-here]/catapult" "~/secrets/configuration-user.yml["settings"]["gpg_key"]" "iis"`
+            5. Click Save
+        5. Click Add task
+            1. Search for Script Task and select it
+            2. Interpreter: `shell`
+            3. Script Location: `Inline`
+            4. Script body: `python /catapult/provisioners/windows/provision.py "~/secrets/configuration.yml["environments"]["qc"]["servers"]["windows_mssql"]["ip"]" "Administrator" "~/secrets/configuration.yml["environments"]["qc"]["servers"]["windows_mssql"]["admin_password"]" "qc" "https://github.com/[your-name-here]/catapult" "~/secrets/configuration-user.yml["settings"]["gpg_key"]" "mssql"`
+            5. Click Save
+    * **Configure Catapult Project WINPROD Plan**
+        1. Click the edit icon for the WINPROD plan
+        2. From the Stages tab, select Default Job
+        3. Remove all tasks that may have been added by default during initial setup
+        4. Click Add task
+            1. Search for Script Task and select it
+            2. Interpreter: `shell`
+            3. Script Location: `Inline`
+            4. Script body: `python /catapult/provisioners/windows/provision.py "~/secrets/configuration.yml["environments"]["production"]["servers"]["windows"]["ip"]" "Administrator" "~/secrets/configuration.yml["environments"]["production"]["servers"]["windows"]["admin_password"]" "production" "https://github.com/[your-name-here]/catapult" "~/secrets/configuration-user.yml["settings"]["gpg_key"]" "iis"`
+            5. Click Save
+        5. Click Add task
+            1. Search for Script Task and select it
+            2. Interpreter: `shell`
+            3. Script Location: `Inline`
+            4. Script body: `python /catapult/provisioners/windows/provision.py "~/secrets/configuration.yml["environments"]["production"]["servers"]["windows_mssql"]["ip"]" "Administrator" "~/secrets/configuration.yml["environments"]["production"]["servers"]["windows_mssql"]["admin_password"]" "production" "https://github.com/[your-name-here]/catapult" "~/secrets/configuration-user.yml["settings"]["gpg_key"]" "mssql"`
+            5. Click Save
 
 
 
