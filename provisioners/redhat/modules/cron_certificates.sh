@@ -6,4 +6,6 @@
 
 /bin/bash /catapult/provisioners/redhat/installers/dehydrated/dehydrated --cron --keep-going
 
+sudo /usr/bin/systemctl reload httpd.service
+
 /bin/echo -e "\n"
