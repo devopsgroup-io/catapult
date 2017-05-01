@@ -177,9 +177,9 @@ sudo cat > /etc/fail2ban/jail.local << EOF
 [DEFAULT]
 banaction = iptables-multiport
 # "bantime" is the number of seconds that a host is banned.
-bantime  = 3600
+bantime  = 7200
 # a host is banned if it has generated "maxretry" during the last "findtime" seconds.
-findtime  = 600
+findtime  = 3600
 # "maxretry" is the number of failures before a host get banned.
 maxretry = 5
 # enable carefully selected filters
