@@ -1220,12 +1220,12 @@ Catapult enforces many security best practices that are important for you to be 
 
 \* This security feature only takes effect when the website's nameservers are set to CloudFlare
 
-## Detective Security ##
+## Detective Controls ##
 
 * Fail2Ban filters for sshd, sshd-ddos, and apache-botsearch
 * Weekly report of 404s and error keywords targeteted at the server and virtual hosts
 
-## Corrective Security ##
+## Corrective Controls ##
 
 * Weekly ClamAV antivirus scan of website repositories
 
