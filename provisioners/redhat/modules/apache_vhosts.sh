@@ -217,38 +217,38 @@ EOF
             # https://github.com/h5bp/server-configs-apache
             # https://httpd.apache.org/docs/current/mod/mod_filter.html#addoutputfilterbytype
             <IfModule mod_filter.c>
-                AddOutputFilterByType DEFLATE "application/atom+xml" \\
-                                              "application/javascript" \\
-                                              "application/json" \\
-                                              "application/ld+json" \\
-                                              "application/manifest+json" \\
-                                              "application/rdf+xml" \\
-                                              "application/rss+xml" \\
-                                              "application/schema+json" \\
-                                              "application/vnd.geo+json" \\
-                                              "application/vnd.ms-fontobject" \\
-                                              "application/x-font-ttf" \\
-                                              "application/x-javascript" \\
-                                              "application/x-web-app-manifest+json" \\
-                                              "application/xhtml+xml" \\
-                                              "application/xml" \\
-                                              "font/eot" \\
-                                              "font/opentype" \\
-                                              "image/bmp" \\
-                                              "image/svg+xml" \\
-                                              "image/vnd.microsoft.icon" \\
-                                              "image/x-icon" \\
-                                              "text/cache-manifest" \\
-                                              "text/css" \\
-                                              "text/html" \\
-                                              "text/javascript" \\
-                                              "text/plain" \\
-                                              "text/vcard" \\
-                                              "text/vnd.rim.location.xloc" \\
-                                              "text/vtt" \\
-                                              "text/x-component" \\
-                                              "text/x-cross-domain-policy" \\
-                                              "text/xml"
+                AddOutputFilterByType DEFLATE "application/atom+xml"
+                AddOutputFilterByType DEFLATE "application/javascript"
+                AddOutputFilterByType DEFLATE "application/json"
+                AddOutputFilterByType DEFLATE "application/ld+json"
+                AddOutputFilterByType DEFLATE "application/manifest+json"
+                AddOutputFilterByType DEFLATE "application/rdf+xml"
+                AddOutputFilterByType DEFLATE "application/rss+xml"
+                AddOutputFilterByType DEFLATE "application/schema+json"
+                AddOutputFilterByType DEFLATE "application/vnd.geo+json"
+                AddOutputFilterByType DEFLATE "application/vnd.ms-fontobject"
+                AddOutputFilterByType DEFLATE "application/x-font-ttf"
+                AddOutputFilterByType DEFLATE "application/x-javascript"
+                AddOutputFilterByType DEFLATE "application/x-web-app-manifest+json"
+                AddOutputFilterByType DEFLATE "application/xhtml+xml"
+                AddOutputFilterByType DEFLATE "application/xml"
+                AddOutputFilterByType DEFLATE "font/eot"
+                AddOutputFilterByType DEFLATE "font/opentype"
+                AddOutputFilterByType DEFLATE "image/bmp"
+                AddOutputFilterByType DEFLATE "image/svg+xml"
+                AddOutputFilterByType DEFLATE "image/vnd.microsoft.icon"
+                AddOutputFilterByType DEFLATE "image/x-icon"
+                AddOutputFilterByType DEFLATE "text/cache-manifest"
+                AddOutputFilterByType DEFLATE "text/css"
+                AddOutputFilterByType DEFLATE "text/html"
+                AddOutputFilterByType DEFLATE "text/javascript"
+                AddOutputFilterByType DEFLATE "text/plain"
+                AddOutputFilterByType DEFLATE "text/vcard"
+                AddOutputFilterByType DEFLATE "text/vnd.rim.location.xloc"
+                AddOutputFilterByType DEFLATE "text/vtt"
+                AddOutputFilterByType DEFLATE "text/x-component"
+                AddOutputFilterByType DEFLATE "text/x-cross-domain-policy"
+                AddOutputFilterByType DEFLATE "text/xml"
             </IfModule>
         </IfModule>
     </Directory>
