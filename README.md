@@ -1007,8 +1007,13 @@ Each software type will vary as to the standard convention of asset versioning, 
 
 Please note that there are two implementations of caching with Catapult, with edge cache (Cloudflare) and without edge cache. Below are the exact definitions of the caching levels:
 
-**With Edge Cache (Cloudflare)** [https://support.cloudflare.com/hc/en-us/articles/200172516-Which-file-extensions-does-Cloudflare-cache-for-static-content-](https://support.cloudflare.com/hc/en-us/articles/200172516-Which-file-extensions-does-Cloudflare-cache-for-static-content-)
-**Without Edge Cache** [https://github.com/devopsgroup-io/catapult/blob/master/provisioners/redhat/modules/apache_vhosts.sh](https://github.com/devopsgroup-io/catapult/blob/master/provisioners/redhat/modules/apache_vhosts.sh)
+**With Edge Cache (Cloudflare)**
+
+[https://support.cloudflare.com/hc/en-us/articles/200172516-Which-file-extensions-does-Cloudflare-cache-for-static-content-](https://support.cloudflare.com/hc/en-us/articles/200172516-Which-file-extensions-does-Cloudflare-cache-for-static-content-)
+
+**Without Edge Cache**
+
+[https://github.com/devopsgroup-io/catapult/blob/master/provisioners/redhat/modules/apache_vhosts.sh](https://github.com/devopsgroup-io/catapult/blob/master/provisioners/redhat/modules/apache_vhosts.sh)
 
 ### Database Migrations ###
 
