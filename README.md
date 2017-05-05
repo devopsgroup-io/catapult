@@ -177,6 +177,7 @@ See an error or have a suggestion? Email competition@devopsgroup.io - we appreci
         - [Software Updates and Fresh Installs](#software-updates-and-fresh-installs)
         - [HTTPS and Certificates](#https-and-certificates)
         - [Forcing www](#forcing-www)
+        - [Caching](#caching)
         - [Database Migrations](#database-migrations)
         - [Refreshing Databases](#refreshing-databases)
         - [Connecting to Databases](#connecting-to-databases)
@@ -991,6 +992,23 @@ Software | Approach | Documentation
 `wordpress`         | Database             | http://codex.wordpress.org/Changing_The_Site_URL
 `xenforo`           |                      |
 `zendframework2`    |                      |
+
+### Caching ###
+
+Caching plays a very important role in the performance of your website. Cache expiration of websites within the Catapult platform is generally set to 4 hours. To ensure that a new website release is reflected in a user's browser you will want to adopt [semantic versioning]((http://semver.org/spec/v2.0.0.html)) of assets. Here's an example:
+
+`<link rel="stylesheet" href="style.min.css?v=3.4.1">`
+
+Ready to deploy a new release? Update the version number and the cache will be "busted":
+
+`<link rel="stylesheet" href="style.min.css?v=3.4.2">`
+
+Each software type will vary as to the standard convention of asset versioning, here is a [Wordpress example](https://wordpress.stackexchange.com/a/90824) to get you started.
+
+Please note that there are two implementations of caching with Catapult, with edge cache (Cloudflare) and without edge cache. Below are the exact definitions of the caching levels:
+
+**With Edge Cache (Cloudflare)** [https://support.cloudflare.com/hc/en-us/articles/200172516-Which-file-extensions-does-Cloudflare-cache-for-static-content-](https://support.cloudflare.com/hc/en-us/articles/200172516-Which-file-extensions-does-Cloudflare-cache-for-static-content-)
+**Without Edge Cache** [https://github.com/devopsgroup-io/catapult/blob/master/provisioners/redhat/modules/apache_vhosts.sh](https://github.com/devopsgroup-io/catapult/blob/master/provisioners/redhat/modules/apache_vhosts.sh)
 
 ### Database Migrations ###
 

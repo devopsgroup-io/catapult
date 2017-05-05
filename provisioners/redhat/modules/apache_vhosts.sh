@@ -204,18 +204,22 @@ EOF
         </VirtualHost>
     </IfModule>
 
-    # allow .htaccess in apache 2.4+
+    # define apache ruleset for the web root
     <Directory "/var/www/repositories/apache/${domain}/${webroot}">
+
+        # allow .htaccess in apache 2.4+
         AllowOverride All
         Options -Indexes +FollowSymlinks
+
         # define new relic appname
         <IfModule php5_module>
             php_value newrelic.appname "${domain_environment};$(catapult company.name | tr '[:upper:]' '[:lower:]')-${1}-redhat"
         </IfModule>
+
+        # compressed certain content types before being sent to the client over the network
+        # https://github.com/h5bp/server-configs-apache
+        # https://httpd.apache.org/docs/current/mod/mod_filter.html#addoutputfilterbytype
         <IfModule mod_deflate.c>
-            # compressed certain content types before being sent to the client over the network
-            # https://github.com/h5bp/server-configs-apache
-            # https://httpd.apache.org/docs/current/mod/mod_filter.html#addoutputfilterbytype
             <IfModule mod_filter.c>
                 AddOutputFilterByType DEFLATE "application/atom+xml"
                 AddOutputFilterByType DEFLATE "application/javascript"
@@ -251,6 +255,79 @@ EOF
                 AddOutputFilterByType DEFLATE "text/xml"
             </IfModule>
         </IfModule>
+
+        # remove ETags as resources are sent with far-future expires headers
+        # https://css-tricks.com/strategies-for-cache-busting-css/#article-header-id-4
+        # https://github.com/h5bp/server-configs-apache
+        # https://tools.ietf.org/html/rfc7232#section-2.3
+        <IfModule mod_headers.c>
+            Header unset ETag
+        </IfModule>
+
+        # serve resources with far-future expires headers
+        # (!) if you don't control versioning with filename-based cache busting, you should consider lowering the cache times to something like one week
+        # cloudflare uses 4 hours as a default cache expiration, we'll align with that for the most part
+        # https://support.cloudflare.com/hc/en-us/articles/200172516-Which-file-extensions-does-Cloudflare-cache-for-static-content-
+        # https://support.cloudflare.com/hc/en-us/article_attachments/212266867/cachable.txt
+        # https://github.com/h5bp/server-configs-apache
+        # https://httpd.apache.org/docs/current/mod/mod_expires.html
+        <IfModule mod_expires.c>
+            ExpiresActive on
+            ExpiresDefault                                      "access plus 4 hours"
+          # CSS
+            ExpiresByType text/css                              "access plus 4 hours"
+          # Data interchange
+            ExpiresByType application/atom+xml                  "access plus 1 hour"
+            ExpiresByType application/rdf+xml                   "access plus 1 hour"
+            ExpiresByType application/rss+xml                   "access plus 1 hour"
+            ExpiresByType application/json                      "access plus 0 seconds"
+            ExpiresByType application/ld+json                   "access plus 0 seconds"
+            ExpiresByType application/schema+json               "access plus 0 seconds"
+            ExpiresByType application/vnd.geo+json              "access plus 0 seconds"
+            ExpiresByType application/xml                       "access plus 0 seconds"
+            ExpiresByType text/xml                              "access plus 0 seconds"
+          # Favicon (cannot be renamed!) and cursor images
+            ExpiresByType image/vnd.microsoft.icon              "access plus 4 hours"
+            ExpiresByType image/x-icon                          "access plus 4 hours"
+          # HTML
+            ExpiresByType text/html                             "access plus 0 seconds"
+          # JavaScript
+            ExpiresByType application/javascript                "access plus 4 hours"
+            ExpiresByType application/x-javascript              "access plus 4 hours"
+            ExpiresByType text/javascript                       "access plus 4 hours"
+          # Manifest files
+            ExpiresByType application/manifest+json             "access plus 4 hours"
+            ExpiresByType application/x-web-app-manifest+json   "access plus 0 seconds"
+            ExpiresByType text/cache-manifest                   "access plus 0 seconds"
+          # Media files
+            ExpiresByType audio/ogg                             "access plus 4 hours"
+            ExpiresByType image/bmp                             "access plus 4 hours"
+            ExpiresByType image/gif                             "access plus 4 hours"
+            ExpiresByType image/jpeg                            "access plus 4 hours"
+            ExpiresByType image/png                             "access plus 4 hours"
+            ExpiresByType image/svg+xml                         "access plus 4 hours"
+            ExpiresByType image/webp                            "access plus 4 hours"
+            ExpiresByType video/mp4                             "access plus 4 hours"
+            ExpiresByType video/ogg                             "access plus 4 hours"
+            ExpiresByType video/webm                            "access plus 4 hours"
+          # Web fonts
+            # Embedded OpenType (EOT)
+            ExpiresByType application/vnd.ms-fontobject         "access plus 1 month"
+            ExpiresByType font/eot                              "access plus 1 month"
+            # OpenType
+            ExpiresByType font/opentype                         "access plus 1 month"
+            # TrueType
+            ExpiresByType application/x-font-ttf                "access plus 1 month"
+            # Web Open Font Format (WOFF) 1.0
+            ExpiresByType application/font-woff                 "access plus 1 month"
+            ExpiresByType application/x-font-woff               "access plus 1 month"
+            ExpiresByType font/woff                             "access plus 1 month"
+            # Web Open Font Format (WOFF) 2.0
+            ExpiresByType application/font-woff2                "access plus 1 month"
+          # Other
+            ExpiresByType text/x-cross-domain-policy            "access plus 4 hours"
+        </IfModule>
+
     </Directory>
 
     # deny access to _sql folders
