@@ -14,8 +14,8 @@ webroot=$(catapult websites.apache.$5.webroot)
 softwareroot=$(provisioners software.apache.${software}.softwareroot)
 
 
-# set site email address
-# set admin credentials, email address, and role
+# set website software email address
+# set website software admin credentials, email address, and role
 if ([ ! -z "${software}" ]); then
     echo -e "* setting ${software} site email address..."
     echo -e "* setting ${software} admin account credentials, email address, and role..."
@@ -123,7 +123,55 @@ elif [ "${software}" = "wordpress" ]; then
 fi
 
 
-# run software database operations
+# set website performance settings
+if ([ ! -z "${software}" ]); then
+    echo -e "* setting ${software} performance settings..."
+fi
+
+if [ "${software}" = "drupal6" ]; then
+
+    if [ "$1" = "dev" ]; then
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush variable-set block_cache 0
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush variable-set cache 0
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush variable-set cache_lifetime 0
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush variable-set page_cache_maximum_age 0
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush variable-set page_compression 0
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush variable-set preprocess_css 0
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush variable-set preprocess_js 0
+    else
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush variable-set block_cache 1
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush variable-set cache 2
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush variable-set cache_lifetime 0
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush variable-set page_cache_maximum_age 900
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush variable-set page_compression 0
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush variable-set preprocess_css 1
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush variable-set preprocess_js 1
+    fi
+
+elif [ "${software}" = "drupal7" ]; then
+
+    if [ "$1" = "dev" ]; then
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush variable-set block_cache 0
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush variable-set cache 0
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush variable-set cache_lifetime 0
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush variable-set page_cache_maximum_age 0
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush variable-set page_compression 0
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush variable-set preprocess_css 0
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush variable-set preprocess_js 0
+    else
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush variable-set block_cache 1
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush variable-set cache 1
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush variable-set cache_lifetime 0
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush variable-set page_cache_maximum_age 900
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush variable-set page_compression 0
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush variable-set preprocess_css 1
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush variable-set preprocess_js 1
+    fi
+
+fi
+
+
+# run website software database operations
 if ([ ! -z "${software}" ]); then
     echo -e "* running ${software} log cleanup, cron, database migrations, and cache rebuilds..."
 fi

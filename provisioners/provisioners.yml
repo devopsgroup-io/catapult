@@ -117,7 +117,7 @@ redhat:
       multithreading_persistent: true
       persistent: true
     software_operations_meta:
-      description: "Manages software meta operations, including: admin account integrity, cron, garbage collection, caches, and migrations for websites with software."
+      description: "Manages software meta operations, including: admin account integrity, performance settings, cron runs, garbage collection, cache clears, and migrations for websites with software."
       multithreading: true
       multithreading_persistent: false
       persistent: true
