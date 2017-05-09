@@ -262,9 +262,7 @@ EOF
         # https://github.com/h5bp/server-configs-apache
         # https://tools.ietf.org/html/rfc7232#section-2.3
         # https://httpd.apache.org/docs/2.4/mod/core.html#fileetag
-        <IfModule mod_headers.c>
-            Header set ETag
-        </IfModule>
+        FileETag MTime Size
 
         # serve resources with far-future expires headers
         # (!) if you don't control versioning with filename-based cache busting, you should consider lowering the cache times to something like one week
