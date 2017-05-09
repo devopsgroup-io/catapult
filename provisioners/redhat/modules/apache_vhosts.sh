@@ -256,12 +256,14 @@ EOF
             </IfModule>
         </IfModule>
 
-        # remove ETags as resources are sent with far-future expires headers
-        # https://css-tricks.com/strategies-for-cache-busting-css/#article-header-id-4
+        # allow ETags as there is only one data store (Apache does a file stat so serving the same file from multiple servers would invalidate ETags)
+        # https://github.com/expressjs/express/issues/2445
+        # https://gist.github.com/6a68/4971859
         # https://github.com/h5bp/server-configs-apache
         # https://tools.ietf.org/html/rfc7232#section-2.3
+        # https://httpd.apache.org/docs/2.4/mod/core.html#fileetag
         <IfModule mod_headers.c>
-            Header unset ETag
+            Header set ETag
         </IfModule>
 
         # serve resources with far-future expires headers
