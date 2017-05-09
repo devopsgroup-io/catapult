@@ -23,7 +23,7 @@ fi
 
 if [ "${software}" = "drupal6" ]; then
 
-    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush variable-set site_mail $(catapult company.email)
+    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush --always-set variable-set site_mail $(catapult company.email)
 
     mysql --defaults-extra-file=$dbconf ${1}_${domainvaliddbname} -e "
         INSERT INTO ${software_dbprefix}users (uid, pass, mail, status)
@@ -38,7 +38,7 @@ if [ "${software}" = "drupal6" ]; then
 
 elif [ "${software}" = "drupal7" ]; then
     
-    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush variable-set site_mail $(catapult company.email)
+    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush --always-set variable-set site_mail $(catapult company.email)
 
     password_hash=$(cd "/var/www/repositories/apache/${domain}/${webroot}" && php ./scripts/password-hash.sh $(catapult environments.${1}.software.drupal.admin_password))
     password_hash=$(echo "${password_hash}" | awk '{ print $4 }' | tr -d " " | tr -d "\n")
@@ -131,41 +131,41 @@ fi
 if [ "${software}" = "drupal6" ]; then
 
     if [ "$1" = "dev" ]; then
-        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush variable-set block_cache 0
-        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush variable-set cache 0
-        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush variable-set cache_lifetime 0
-        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush variable-set page_cache_maximum_age 0
-        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush variable-set page_compression 0
-        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush variable-set preprocess_css 0
-        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush variable-set preprocess_js 0
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush --always-set variable-set block_cache 0
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush --always-set variable-set cache 0
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush --always-set variable-set cache_lifetime 0
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush --always-set variable-set page_cache_maximum_age 0
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush --always-set variable-set page_compression 0
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush --always-set variable-set preprocess_css 0
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush --always-set variable-set preprocess_js 0
     else
-        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush variable-set block_cache 1
-        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush variable-set cache 2
-        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush variable-set cache_lifetime 0
-        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush variable-set page_cache_maximum_age 900
-        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush variable-set page_compression 0
-        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush variable-set preprocess_css 1
-        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush variable-set preprocess_js 1
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush --always-set variable-set block_cache 1
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush --always-set variable-set cache 2
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush --always-set variable-set cache_lifetime 0
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush --always-set variable-set page_cache_maximum_age 900
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush --always-set variable-set page_compression 0
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush --always-set variable-set preprocess_css 1
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush --always-set variable-set preprocess_js 1
     fi
 
 elif [ "${software}" = "drupal7" ]; then
 
     if [ "$1" = "dev" ]; then
-        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush variable-set block_cache 0
-        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush variable-set cache 0
-        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush variable-set cache_lifetime 0
-        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush variable-set page_cache_maximum_age 0
-        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush variable-set page_compression 0
-        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush variable-set preprocess_css 0
-        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush variable-set preprocess_js 0
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush --always-set variable-set block_cache 0
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush --always-set variable-set cache 0
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush --always-set variable-set cache_lifetime 0
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush --always-set variable-set page_cache_maximum_age 0
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush --always-set variable-set page_compression 0
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush --always-set variable-set preprocess_css 0
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush --always-set variable-set preprocess_js 0
     else
-        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush variable-set block_cache 1
-        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush variable-set cache 1
-        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush variable-set cache_lifetime 0
-        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush variable-set page_cache_maximum_age 900
-        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush variable-set page_compression 0
-        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush variable-set preprocess_css 1
-        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush variable-set preprocess_js 1
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush --always-set variable-set block_cache 1
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush --always-set variable-set cache 1
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush --always-set variable-set cache_lifetime 0
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush --always-set variable-set page_cache_maximum_age 900
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush --always-set variable-set page_compression 0
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush --always-set variable-set preprocess_css 1
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush --always-set variable-set preprocess_js 1
     fi
 
 fi
@@ -195,17 +195,17 @@ elif [ "${software}" = "codeigniter3" ]; then
 
 elif [ "${software}" = "drupal6" ]; then
 
-    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush -y watchdog-delete all
-    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush -y core-cron
-    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush -y updatedb
-    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush -y cache-clear all
+    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush --yes watchdog-delete all
+    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush --yes core-cron
+    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush --yes updatedb
+    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush --yes cache-clear all
 
 elif [ "${software}" = "drupal7" ]; then
 
-    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush -y watchdog-delete all
-    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush -y core-cron
-    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush -y updatedb
-    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush -y cache-clear all
+    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush --yes watchdog-delete all
+    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush --yes core-cron
+    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush --yes updatedb
+    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush --yes cache-clear all
 
 elif [ "${software}" = "elgg1" ]; then
 

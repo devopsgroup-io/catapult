@@ -57,8 +57,8 @@ if hash composer 2>/dev/null && hash drush 2>/dev/null && hash wp-cli 2>/dev/nul
             echo -e "\nSUPPORTED SOFTWARE VERSION DETECTED: ${version}\n"
 
             if [ "${software_auto_update}" = "true" ]; then
-                cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush -y pm-refresh
-                cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush -y pm-updatecode
+                cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush --yes pm-refresh
+                cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush --yes pm-updatecode
             fi
 
         else
@@ -73,8 +73,8 @@ if hash composer 2>/dev/null && hash drush 2>/dev/null && hash wp-cli 2>/dev/nul
             echo -e "\nSUPPORTED SOFTWARE VERSION DETECTED: ${version}\n"
 
             if [ "${software_auto_update}" = "true" ]; then
-                cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush -y pm-refresh
-                cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush -y pm-updatecode
+                cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush --yes pm-refresh
+                cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush --yes pm-updatecode
             fi
 
         else
