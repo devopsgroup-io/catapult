@@ -1327,6 +1327,7 @@ Catapult as a platform can only reach so far into the configuration of your webs
   * Image compression with [imagemin](https://www.npmjs.com/package/gulp-imagemin)
   * JavaScript minification with [UglifyJS2](https://www.npmjs.com/package/gulp-uglify)
   * CSS minification with [clean-css](https://www.npmjs.com/package/gulp-clean-css)
+* Use [CSS sprites](https://css-tricks.com/css-sprites/) to reduce the number of HTTP requests
 * Write [PHP the right way](http://www.phptherightway.com/#welcome)
 * Write [efficient PHP](http://www.phpbench.com/)
 * Practice [self documenting code](https://www.amazon.com/dp/0132350882/)
