@@ -1287,7 +1287,9 @@ See an error or have a suggestion? Email security@devopsgroup.io if confidential
 
 # Performance #
 
-Your website's performance is maximized with bandwidth, caching, and geographic optimizations, Catapult enforces these throughout all layers of your website. All in an effort to improve page loading times.
+Your website's performance is maximized with bandwidth, caching, and geographic optimizations, Catapult enforces these throughout all layers of your website. All in an effort to improve page loading times. Below is an example of the great performance impact of when page caching and CSS/JS aggregation is enabled for a Drupal website - all of which is managed by Catapult.
+
+<img src="https://cdn.rawgit.com/devopsgroup-io/catapult/master/catapult/installers/images/catapult_performance.png" alt="Catapult Performance">
 
 **Please note:** Any optimization that would impact development or component testing in LocalDev is disabled; this workflow aligns with the testing activites described in the [Release Management](#release-management) section.
 
