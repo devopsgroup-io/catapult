@@ -1287,7 +1287,7 @@ See an error or have a suggestion? Email security@devopsgroup.io if confidential
 
 # Performance #
 
-Your website's performance is maximized with bandwidth, caching, and geographic optimizations. Catapult enforces these throughout all layers of your website, all in an effort to improve page loading times. Below is an example of the great performance impact of when page caching and CSS/JS aggregation is enabled for a Drupal website - all of which is managed by Catapult.
+Your website's performance is maximized with bandwidth, caching, and geographic optimizations. Catapult enforces these throughout every layer of your website, all in an effort to improve page loading times. Below is an example of the great performance gain of when page caching and CSS/JS aggregation are enabled for a Drupal website - all of which is managed by Catapult.
 
 <img src="https://cdn.rawgit.com/devopsgroup-io/catapult/master/catapult/installers/images/catapult_performance.png" alt="Catapult Performance">
 
@@ -1298,14 +1298,12 @@ Your website's performance is maximized with bandwidth, caching, and geographic 
 Bandwidth optimizations are made to lower the total bytes downloaded and decrease the amount of requests made by the browser.
 
 * HTTP Content-Encoding headers are set for a defined list of files, this will compress the output sent with gzip. This saves network bandwidth.
-* HTTP ETag headers are set for all files, the ETag is a unique value based on the files modified time and size in bytes. If the ETag value is unchanged then a cached version is served if available. This saves network bandwidth.
-  * [https://github.com/devopsgroup-io/catapult/blob/master/provisioners/redhat/modules/apache_vhosts.sh](https://github.com/devopsgroup-io/catapult/blob/master/provisioners/redhat/modules/apache_vhosts.sh)
 * Aggregating CSS files and JavaScript files is enabled for the website's software type if available.
   * [https://github.com/devopsgroup-io/catapult/blob/master/provisioners/redhat/modules/software_operations_meta.sh](https://github.com/devopsgroup-io/catapult/blob/master/provisioners/redhat/modules/software_operations_meta.sh)
 
 ## Caching Optimizations ##
 
-Caching is enabled for many layers of your website including storing precompiled PHP in memory, storing precompiled page caches for certain software types, and storing files on visitor's local disk.
+Caching is enabled for many layers of your website including storing pre-interpreted PHP in memory, storing page caches for certain software types, and storing files on visitor's local disk.
 
 * Zend OPcache is enabled for faster PHP execution through opcode caching and optimization.
   * [https://secure.php.net/manual/en/intro.opcache.php](https://secure.php.net/manual/en/intro.opcache.php)
@@ -1313,10 +1311,12 @@ Caching is enabled for many layers of your website including storing precompiled
   * [https://github.com/devopsgroup-io/catapult/blob/master/provisioners/redhat/modules/software_operations_meta.sh](https://github.com/devopsgroup-io/catapult/blob/master/provisioners/redhat/modules/software_operations_meta.sh)
 * HTTP Cache-Control headers are set to expire browser cached files after a default of 4 hours; longer for specific file types.
   * [https://github.com/devopsgroup-io/catapult/blob/master/provisioners/redhat/modules/apache_vhosts.sh](https://github.com/devopsgroup-io/catapult/blob/master/provisioners/redhat/modules/apache_vhosts.sh)
+* HTTP ETag headers are set for all files, the ETag is a unique value based on the files modified time and size in bytes. If the ETag value is unchanged then a cached version is served if available. This saves network bandwidth.
+  * [https://github.com/devopsgroup-io/catapult/blob/master/provisioners/redhat/modules/apache_vhosts.sh](https://github.com/devopsgroup-io/catapult/blob/master/provisioners/redhat/modules/apache_vhosts.sh)
 
 ## Geographic Optimizations ##
 
-Shortening the physical distance between the origin server and visitor can trim priceless milliseconds off of page loading time. (One might make this as an argument as to why browser caching and your overall caching strategy is so important.)
+Shortening the physical distance between the server and visitor can trim priceless milliseconds from page loading time. (One might use this as an argument as to why browser caching and your overall caching strategy is so important.)
 
 * If your website's name servers are set to Cloudflare, you will take advantage of files being cached accross their global network, bringing it closer to visitors from every region.
   * [https://support.cloudflare.com/hc/en-us/articles/200172516-Which-file-extensions-does-Cloudflare-cache-for-static-content-](https://support.cloudflare.com/hc/en-us/articles/200172516-Which-file-extensions-does-Cloudflare-cache-for-static-content-)
@@ -1332,8 +1332,8 @@ Catapult as a platform can only reach so far into the configuration of your webs
 * Use [CSS sprites](https://css-tricks.com/css-sprites/) to reduce the number of HTTP requests
 * Take advantage of [link prefetching](https://css-tricks.com/prefetching-preloading-prebrowsing/) using `rel="prefetch"`
 * Write [PHP the right way](http://www.phptherightway.com/#welcome)
+  * Practice [self-documenting code](https://www.amazon.com/dp/0132350882/)
 * Write [efficient PHP](http://www.phpbench.com/)
-* Practice [self documenting code](https://www.amazon.com/dp/0132350882/)
 
 Google's [PageSpeed Insights](https://developers.google.com/speed/pagespeed/insights/) is a good tool to test for performance optimizations.
 
