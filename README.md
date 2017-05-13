@@ -1245,7 +1245,7 @@ Catapult enforces many security best practices that are important for you to be 
 
 ## Corrective Controls ##
 
-* Weekly ClamAV antivirus scan of website repositories
+* Weekly ClamAV antivirus scan of website files
 
 ## Security Breach Notification Laws ##
 
