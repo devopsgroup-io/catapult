@@ -266,16 +266,19 @@ EOF
 
         # serve resources with far-future expires headers
         # (!) if you don't control versioning with filename-based cache busting, you should consider lowering the cache times to something like one week
-        # cloudflare uses 4 hours as a default cache expiration, we'll align with that for the most part
+        # (!) cloudflare uses 4 hours as a default cache expiration
         # https://support.cloudflare.com/hc/en-us/articles/200172516-Which-file-extensions-does-Cloudflare-cache-for-static-content-
         # https://support.cloudflare.com/hc/en-us/article_attachments/212266867/cachable.txt
+        # (!) cloudflare automatically respects longer cache expiration specified by the server
+        # https://support.cloudflare.com/hc/en-us/articles/200168276
+        # (!) google pagespeed insights requires the cache level to be set to at least 7 days to pass the test
         # https://github.com/h5bp/server-configs-apache
         # https://httpd.apache.org/docs/current/mod/mod_expires.html
         <IfModule mod_expires.c>
             ExpiresActive on
-            ExpiresDefault                                      "access plus 4 hours"
+            ExpiresDefault                                      "access plus 1 week"
           # CSS
-            ExpiresByType text/css                              "access plus 4 hours"
+            ExpiresByType text/css                              "access plus 1 week"
           # Data interchange
             ExpiresByType application/atom+xml                  "access plus 1 hour"
             ExpiresByType application/rdf+xml                   "access plus 1 hour"
@@ -287,29 +290,29 @@ EOF
             ExpiresByType application/xml                       "access plus 0 seconds"
             ExpiresByType text/xml                              "access plus 0 seconds"
           # Favicon (cannot be renamed!) and cursor images
-            ExpiresByType image/vnd.microsoft.icon              "access plus 4 hours"
-            ExpiresByType image/x-icon                          "access plus 4 hours"
+            ExpiresByType image/vnd.microsoft.icon              "access plus 1 week"
+            ExpiresByType image/x-icon                          "access plus 1 week"
           # HTML
-            ExpiresByType text/html                             "access plus 0 seconds"
+            ExpiresByType text/html                             "access plus 1 week"
           # JavaScript
-            ExpiresByType application/javascript                "access plus 4 hours"
-            ExpiresByType application/x-javascript              "access plus 4 hours"
-            ExpiresByType text/javascript                       "access plus 4 hours"
+            ExpiresByType application/javascript                "access plus 1 week"
+            ExpiresByType application/x-javascript              "access plus 1 week"
+            ExpiresByType text/javascript                       "access plus 1 week"
           # Manifest files
-            ExpiresByType application/manifest+json             "access plus 4 hours"
+            ExpiresByType application/manifest+json             "access plus 1 week"
             ExpiresByType application/x-web-app-manifest+json   "access plus 0 seconds"
             ExpiresByType text/cache-manifest                   "access plus 0 seconds"
           # Media files
-            ExpiresByType audio/ogg                             "access plus 4 hours"
-            ExpiresByType image/bmp                             "access plus 4 hours"
-            ExpiresByType image/gif                             "access plus 4 hours"
-            ExpiresByType image/jpeg                            "access plus 4 hours"
-            ExpiresByType image/png                             "access plus 4 hours"
-            ExpiresByType image/svg+xml                         "access plus 4 hours"
-            ExpiresByType image/webp                            "access plus 4 hours"
-            ExpiresByType video/mp4                             "access plus 4 hours"
-            ExpiresByType video/ogg                             "access plus 4 hours"
-            ExpiresByType video/webm                            "access plus 4 hours"
+            ExpiresByType audio/ogg                             "access plus 1 week"
+            ExpiresByType image/bmp                             "access plus 1 week"
+            ExpiresByType image/gif                             "access plus 1 week"
+            ExpiresByType image/jpeg                            "access plus 1 week"
+            ExpiresByType image/png                             "access plus 1 week"
+            ExpiresByType image/svg+xml                         "access plus 1 week"
+            ExpiresByType image/webp                            "access plus 1 week"
+            ExpiresByType video/mp4                             "access plus 1 week"
+            ExpiresByType video/ogg                             "access plus 1 week"
+            ExpiresByType video/webm                            "access plus 1 week"
           # Web fonts
             # Embedded OpenType (EOT)
             ExpiresByType application/vnd.ms-fontobject         "access plus 1 month"
@@ -325,7 +328,7 @@ EOF
             # Web Open Font Format (WOFF) 2.0
             ExpiresByType application/font-woff2                "access plus 1 month"
           # Other
-            ExpiresByType text/x-cross-domain-policy            "access plus 4 hours"
+            ExpiresByType text/x-cross-domain-policy            "access plus 1 week"
         </IfModule>
 
     </Directory>
