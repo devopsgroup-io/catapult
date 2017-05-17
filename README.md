@@ -1000,7 +1000,7 @@ Software | Approach | Documentation
 
 ### Caching ###
 
-Caching plays a very important role in the performance of your website, Catapult generally enforces caching of files to 4 hours. To ensure that a new website release is reflected in a user's browser you will want to adopt [semantic versioning]((http://semver.org/spec/v2.0.0.html)) of files. Here's an example:
+Caching plays a very important role in the performance of your website, Catapult generally enforces caching of files to 7 days. To ensure that a new website release is reflected in a user's browser you will want to adopt [semantic versioning]((http://semver.org/spec/v2.0.0.html)) of files. Here's an example:
 
 `<link rel="stylesheet" href="style.min.css?v=3.4.1">`
 
@@ -1309,7 +1309,7 @@ Caching is enabled for many layers of your website including storing pre-interpr
   * [https://secure.php.net/manual/en/intro.opcache.php](https://secure.php.net/manual/en/intro.opcache.php)
 * Page caching is enabled for the website's software type if available.
   * [https://github.com/devopsgroup-io/catapult/blob/master/provisioners/redhat/modules/software_operations_meta.sh](https://github.com/devopsgroup-io/catapult/blob/master/provisioners/redhat/modules/software_operations_meta.sh)
-* HTTP Cache-Control headers are set to expire browser cached files after a default of 4 hours; longer for specific file types.
+* HTTP Cache-Control headers are set to expire browser cached files after a default of 7 days; longer for specific file types.
   * [https://github.com/devopsgroup-io/catapult/blob/master/provisioners/redhat/modules/apache_vhosts.sh](https://github.com/devopsgroup-io/catapult/blob/master/provisioners/redhat/modules/apache_vhosts.sh)
 * HTTP ETag headers are set for all files, the ETag is a unique value based on the files modified time and size in bytes. If the ETag value is unchanged then a cached version is served if available. This saves network bandwidth.
   * [https://github.com/devopsgroup-io/catapult/blob/master/provisioners/redhat/modules/apache_vhosts.sh](https://github.com/devopsgroup-io/catapult/blob/master/provisioners/redhat/modules/apache_vhosts.sh)
