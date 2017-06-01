@@ -1,7 +1,7 @@
 #!/bin/bash
 
 /bin/echo -e "==========================================================================="
-/bin/echo -e "THIS CATAPULT CRON_SECURITY MODULE IS USED TO HELP IDENTIFY ATTACK PATTERNS"
+/bin/echo -e "THIS CATAPULT CRON_SECURITY_DETECTIVE MODULE HELPS IDENTIFY ATTACK PATTERNS"
 /bin/echo -e "==========================================================================="
 
 /bin/echo -e "\nhere are recent ip addresses blocked by fail2ban (/var/log/fail2ban.log*)"

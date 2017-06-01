@@ -23,7 +23,8 @@ sudo systemctl enable iptables
 echo -e "\n> iptables rules before configuration"
 
 # output the iptables
-sudo iptables --list-rules
+echo -e "> check for rules which didn't get a hit (0 packets / 0 bytes)"
+sudo iptables --list --numeric --verbose
 
 
 
@@ -198,4 +199,5 @@ sudo fail2ban-client status
 echo -e "\n> iptables rules after configuration"
 
 # output the iptables
-sudo iptables --list-rules
+echo -e "> check for rules which didn't get a hit (0 packets / 0 bytes)"
+sudo iptables --list --numeric --verbose

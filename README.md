@@ -1209,7 +1209,7 @@ Being able to react to disasters immediately and consistently is crucial - Catap
 
 # Security #
 
-Catapult enforces many security best practices that are important for you to be aware of and understand. These controls avoid, detect, counteract, or minimize security risks to the platform and visitors.
+Catapult enforces many security best practices that are important for you to be aware of and understand. These controls avoid, detect, counteract, or minimize security risks to the platform and visitors. The [Lynis](https://cisofy.com/lynis/) security auditing tool is used to evaluate and harden configuration of the system.
 
 ## Preventive Controls ##
 
@@ -1221,7 +1221,7 @@ Catapult enforces many security best practices that are important for you to be 
 
 **Server**
 
-* Key-only authentication
+* Hardened SSH configuration including key-only authentication
 * Strict firewall ruleset
 * Automatic weekly kernel updates
 
@@ -1240,6 +1240,7 @@ Catapult enforces many security best practices that are important for you to be 
 
 ## Detective Controls ##
 
+* ARPwatch (Address Resolution Protocol) notifies of changed MAC/IP pairings
 * Fail2Ban filters for sshd, sshd-ddos, and apache-botsearch
 * Weekly report of 404s and error keywords targeteted at the server and virtual hosts
 

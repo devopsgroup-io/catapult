@@ -26,7 +26,7 @@ Vagrant.configure("2") do |config|
     config.vm.provider :digital_ocean do |provider,override|
       override.ssh.private_key_path = "secrets/id_rsa"
       override.vm.box = "digital_ocean"
-      override.vm.box_url = "https://github.com/smdahlen/vagrant-digitalocean/raw/master/box/digital_ocean.box"
+      override.vm.box_url = "https://github.com/devopsgroup-io/vagrant-digitalocean/raw/master/box/digital_ocean.box"
       provider.token = Catapult::Command.configuration["company"]["digitalocean_personal_access_token"]
       provider.image = "centos-7-x64"
       provider.region = "nyc3"
@@ -84,7 +84,7 @@ Vagrant.configure("2") do |config|
     config.vm.provider :digital_ocean do |provider,override|
       override.ssh.private_key_path = "secrets/id_rsa"
       override.vm.box = "digital_ocean"
-      override.vm.box_url = "https://github.com/smdahlen/vagrant-digitalocean/raw/master/box/digital_ocean.box"
+      override.vm.box_url = "https://github.com/devopsgroup-io/vagrant-digitalocean/raw/master/box/digital_ocean.box"
       provider.token = Catapult::Command.configuration["company"]["digitalocean_personal_access_token"]
       provider.image = "centos-7-x64"
       provider.region = "nyc3"
@@ -102,7 +102,7 @@ Vagrant.configure("2") do |config|
     config.vm.provider :digital_ocean do |provider,override|
       override.ssh.private_key_path = "secrets/id_rsa"
       override.vm.box = "digital_ocean"
-      override.vm.box_url = "https://github.com/smdahlen/vagrant-digitalocean/raw/master/box/digital_ocean.box"
+      override.vm.box_url = "https://github.com/devopsgroup-io/vagrant-digitalocean/raw/master/box/digital_ocean.box"
       provider.token = Catapult::Command.configuration["company"]["digitalocean_personal_access_token"]
       provider.image = "centos-7-x64"
       provider.region = "nyc3"
@@ -122,7 +122,7 @@ Vagrant.configure("2") do |config|
     config.vm.provider :digital_ocean do |provider,override|
       override.ssh.private_key_path = "secrets/id_rsa"
       override.vm.box = "digital_ocean"
-      override.vm.box_url = "https://github.com/smdahlen/vagrant-digitalocean/raw/master/box/digital_ocean.box"
+      override.vm.box_url = "https://github.com/devopsgroup-io/vagrant-digitalocean/raw/master/box/digital_ocean.box"
       provider.token = Catapult::Command.configuration["company"]["digitalocean_personal_access_token"]
       provider.image = "centos-7-x64"
       provider.region = "nyc3"
@@ -140,7 +140,7 @@ Vagrant.configure("2") do |config|
     config.vm.provider :digital_ocean do |provider,override|
       override.ssh.private_key_path = "secrets/id_rsa"
       override.vm.box = "digital_ocean"
-      override.vm.box_url = "https://github.com/smdahlen/vagrant-digitalocean/raw/master/box/digital_ocean.box"
+      override.vm.box_url = "https://github.com/devopsgroup-io/vagrant-digitalocean/raw/master/box/digital_ocean.box"
       provider.token = Catapult::Command.configuration["company"]["digitalocean_personal_access_token"]
       provider.image = "centos-7-x64"
       provider.region = "nyc3"
@@ -160,7 +160,7 @@ Vagrant.configure("2") do |config|
     config.vm.provider :digital_ocean do |provider,override|
       override.ssh.private_key_path = "secrets/id_rsa"
       override.vm.box = "digital_ocean"
-      override.vm.box_url = "https://github.com/smdahlen/vagrant-digitalocean/raw/master/box/digital_ocean.box"
+      override.vm.box_url = "https://github.com/devopsgroup-io/vagrant-digitalocean/raw/master/box/digital_ocean.box"
       provider.token = Catapult::Command.configuration["company"]["digitalocean_personal_access_token"]
       provider.image = "centos-7-x64"
       provider.region = "nyc3"
@@ -178,7 +178,7 @@ Vagrant.configure("2") do |config|
     config.vm.provider :digital_ocean do |provider,override|
       override.ssh.private_key_path = "secrets/id_rsa"
       override.vm.box = "digital_ocean"
-      override.vm.box_url = "https://github.com/smdahlen/vagrant-digitalocean/raw/master/box/digital_ocean.box"
+      override.vm.box_url = "https://github.com/devopsgroup-io/vagrant-digitalocean/raw/master/box/digital_ocean.box"
       provider.token = Catapult::Command.configuration["company"]["digitalocean_personal_access_token"]
       provider.image = "centos-7-x64"
       provider.region = "nyc3"
