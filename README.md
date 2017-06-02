@@ -1221,6 +1221,7 @@ Catapult enforces many security best practices that are important for you to be 
 
 **Server**
 
+* Hardened kernel and network interface configuration
 * Hardened SSH configuration including key-only authentication
 * Strict firewall ruleset
 * Automatic weekly kernel updates
@@ -1242,6 +1243,7 @@ Catapult enforces many security best practices that are important for you to be 
 
 * ARPwatch (Address Resolution Protocol) notifies of changed MAC/IP pairings
 * Fail2Ban filters for sshd, sshd-ddos, and apache-botsearch
+* SysStat collects and stores system performance and usage activity
 * Weekly report of 404s and error keywords targeteted at the server and virtual hosts
 
 ## Corrective Controls ##

@@ -63,7 +63,7 @@ if ! grep -q "AllowTcpForwarding no" "/etc/ssh/sshd_config"; then
    sudo bash -c 'echo -e "\nAllowTcpForwarding no" >> /etc/ssh/sshd_config'
 fi
 # https://wiki.centos.org/TipsAndTricks/BannerFiles
-sudo cat > /etc/issue.net << EOF
+banner="
 ********************************************************************
 *                                                                  *
 * This system is for the use of authorized users only.  Usage of   *
@@ -75,6 +75,12 @@ sudo cat > /etc/issue.net << EOF
 * evidence from such monitoring to law enforcement officials.      *
 *                                                                  *
 ********************************************************************
+"
+sudo cat > /etc/issue.net << EOF
+${banner}
+EOF
+sudo cat > /etc/issue << EOF
+${banner}
 EOF
 sed -i -e "/Banner/d" /etc/ssh/sshd_config
 if ! grep -q "Banner /etc/issue.net" "/etc/ssh/sshd_config"; then
@@ -137,6 +143,45 @@ SELINUX=disabled
 SELINUXTYPE=targeted
 EOF
 sestatus -v
+
+
+
+echo -e "\n> system control configuration"
+# runtime configuraiton
+# https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux/6/html/Performance_Tuning_Guide/s-memory-tunables.html
+sudo sysctl vm.swappiness=10
+sudo sysctl vm.vfs_cache_pressure=50
+# https://www.kernel.org/doc/Documentation/sysctl/kernel.txt
+# This toggle indicates whether restrictions are placed on exposing kernel addresses via /proc and other interfaces.
+sudo sysctl kernel.kptr_restrict=2
+# https://sites.google.com/site/syscookbook/rhel/rhel-sysrq-key
+# It is a 'magical' key combo you can hit which the kernel will respond to regardless of whatever else it is doing, even if the console is unresponsive.
+sudo sysctl kernel.sysrq=0
+# https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux/6/html/Security_Guide/sect-Security_Guide-Server_Security-Disable-Source-Routing.html
+sudo sysctl net.ipv4.conf.all.accept_redirects=0
+sudo sysctl net.ipv4.conf.all.log_martians=1
+sudo sysctl net.ipv4.conf.all.send_redirects=0
+sudo sysctl net.ipv4.conf.default.accept_redirects=0
+sudo sysctl net.ipv4.conf.default.log_martians=1
+sudo sysctl net.ipv4.tcp_timestamps=0
+sudo sysctl net.ipv6.conf.all.accept_redirects=0
+sudo sysctl net.ipv6.conf.default.accept_redirects=0
+
+# boot configuration
+sudo cat > "/etc/sysctl.d/catapult.conf" << EOF
+vm.swappiness=10
+vm.vfs_cache_pressure=50
+kernel.kptr_restrict=2
+kernel.sysrq=0
+net.ipv4.conf.all.accept_redirects=0
+net.ipv4.conf.all.log_martians=1
+net.ipv4.conf.all.send_redirects=0
+net.ipv4.conf.default.accept_redirects=0
+net.ipv4.conf.default.log_martians=1
+net.ipv4.tcp_timestamps=0
+net.ipv6.conf.all.accept_redirects=0
+net.ipv6.conf.default.accept_redirects=0
+EOF
 
 
 
@@ -219,17 +264,6 @@ done <<< "${swap_volumes}"
 # output the resulting swap
 swapon --summary
 
-# tune the swap temporarily for runtime
-# https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux/6/html/Performance_Tuning_Guide/s-memory-tunables.html
-sudo sysctl vm.swappiness=10
-sudo sysctl vm.vfs_cache_pressure=50
-
-# tune the swap permanently for boot
-sudo cat > "/etc/sysctl.d/catapult.conf" << EOF
-vm.swappiness=10
-vm.vfs_cache_pressure=50
-EOF
-
 
 
 echo -e "\n> system device configuration"
@@ -303,6 +337,16 @@ echo -e "\n> system arpwatch configuration"
 sudo yum -y install arpwatch
 sudo systemctl enable arpwatch.service
 sudo systemctl start arpwatch.service
+
+
+
+echo -e "\n> system sysstat configuration"
+# install sysstat
+# https://github.com/sysstat/sysstat
+sudo yum -y install sysstat
+sudo systemctl enable sysstat.service
+sudo systemctl start sysstat.service
+# cat /etc/sysconfig/sysstat
 
 
 
