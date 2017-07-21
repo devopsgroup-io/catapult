@@ -155,6 +155,7 @@ else
         sudo rm --force --recursive "/var/www/repositories/apache/${domain}"
     fi
     sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git clone --recursive -b ${branch} ${repo} /var/www/repositories/apache/${domain}"
+    touch "/catapult/provisioners/redhat/logs/domain.${domain}.changes"
 fi
 
 touch "/catapult/provisioners/redhat/logs/git.${domain}.complete"
