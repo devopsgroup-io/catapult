@@ -178,6 +178,7 @@ See an error or have a suggestion? Email competition@devopsgroup.io - we appreci
         - [HTTPS and Certificates](#https-and-certificates)
         - [Forcing www](#forcing-www)
         - [Caching](#caching)
+        - [Email](#email)
         - [Database Migrations](#database-migrations)
         - [Refreshing Databases](#refreshing-databases)
         - [Connecting to Databases](#connecting-to-databases)
@@ -524,7 +525,14 @@ Please note that Bamboo Cloud has an end-of-life January 31, 2017. Catapult used
     3. Go to your Account Settings > Account > Summary.
     5. Place your License key at `~/secrets/configuration.yml["company"]["newrelic_license_key"]`
 
-### 6. **Verify Configuration:**
+### 6. **Email:**
+1. **SendGrid** sign-up and configuration
+    1. Create a New Relic account at https://sendgrid.com/
+    2. Sign in to your SendGrid account
+    3. Go to Settings > API Keys.
+    4. Generate an API key named "Catapult" and place at `~/secrets/configuration.yml["company"]["sendgrid_api_key"]`
+
+### 7. **Verify Configuration:**
 1. To verify all of the configuration that you just set, open your command line and change directory into your fork of Catapult, then run `vagrant status`. Catapult will confirm connection to all of the Services and inform you of any problems.
 
 
@@ -1009,6 +1017,24 @@ Ready to deploy a new release? Update the version number and the cache will be "
 `<link rel="stylesheet" href="style.min.css?v=3.4.2">`
 
 Each software type will vary as to the standard convention of asset versioning, here is a [Wordpress example](https://wordpress.stackexchange.com/a/90824) to get you started.
+
+### Email ###
+
+Email delivery is an art, there are many considerations when trying to get an email into someone's inbox. Some considerations include, IP reputation, bounce management, analytics visibility, and more. For that reason, Catapult requires setup of a SendGrid accoung and recommned use of. To configure SendGrid with your software type, please set the SMTP configurtion to the following:
+
+* SMTP host: `smtp.sendgrid.net`
+* SMTP port: `587`
+* Encryption: `TLS`
+* Authenticaion: `yes`
+* Username: your SendGrid account username
+* Password: your SendGrid account password
+
+An example of implementation would be the [WP Mail SMTP](https://wordpress.org/plugins/wp-mail-smtp/) WordPress plugin.
+
+**Bounce Management**
+
+* With SendGrid: Catapult automatically configures SendGrid to forward bounces to your `~/secrets/configuration.yml["company"]["email"]` to clear hard bounces every 5 days and soft bounces every 3 days.
+* Without SendGrid: Postfix will retry sending every hour for five days. Catapult cron looks for bounces and emails them to your `~/secrets/configuration.yml["company"]["email"]` daily.
 
 ### Database Migrations ###
 

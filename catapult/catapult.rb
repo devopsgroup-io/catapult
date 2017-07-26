@@ -403,7 +403,7 @@ module Catapult
         if FileUtils.compare_file('secrets/configuration.yml', 'secrets/configuration.yml.compare')
           puts "\n * There were no changes to secrets/configuration.yml, no need to encrypt as this would create a new cipher to commit.\n\n"
         else
-          puts "\n * There were changes to secrets/configuration.yml, encrypting secrets/configuration.yml as secrets/configuration.yml.gpg. Please commit these changes to the master branch for your team to get the changes.\n\n"
+          puts "\n * There were changes to secrets/configuration.yml, encrypting secrets/configuration.yml as secrets/configuration.yml.gpg. Please commit these changes to the develop branch for your team to get the changes.\n\n"
           # flipping from downstream to upstream requires a production build to be run to ensure latest from production
           # flipping from upstream to downstream requires a test build to be run to ensure latest from test
           @temp_configuration_decrypted = YAML.load_file('secrets/configuration.yml')
@@ -470,7 +470,7 @@ module Catapult
         if FileUtils.compare_file('secrets/id_rsa', 'secrets/id_rsa.compare')
           puts "\n * There were no changes to secrets/id_rsa, no need to encrypt as this would create a new cipher to commit.\n\n"
         else
-          puts "\n * There were changes to secrets/id_rsa, encrypting secrets/id_rsa as secrets/id_rsa.gpg. Please commit these changes to the master branch for your team to get the changes.\n\n"
+          puts "\n * There were changes to secrets/id_rsa, encrypting secrets/id_rsa as secrets/id_rsa.gpg. Please commit these changes to the develop branch for your team to get the changes.\n\n"
           `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/id_rsa.gpg --armor --cipher-algo AES256 --symmetric secrets/id_rsa`
         end
         FileUtils.rm('secrets/id_rsa.compare')
@@ -479,7 +479,7 @@ module Catapult
         if FileUtils.compare_file('secrets/id_rsa.pub', 'secrets/id_rsa.pub.compare')
           puts "\n * There were no changes to secrets/id_rsa.pub, no need to encrypt as this would create a new cipher to commit.\n\n"
         else
-          puts "\n * There were changes to secrets/id_rsa.pub, encrypting secrets/id_rsa.pub as secrets/id_rsa.pub.gpg. Please commit these changes to the master branch for your team to get the changes.\n\n"
+          puts "\n * There were changes to secrets/id_rsa.pub, encrypting secrets/id_rsa.pub as secrets/id_rsa.pub.gpg. Please commit these changes to the develop branch for your team to get the changes.\n\n"
           `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/id_rsa.pub.gpg --armor --cipher-algo AES256 --symmetric secrets/id_rsa.pub`
         end
         FileUtils.rm('secrets/id_rsa.pub.compare')
@@ -888,6 +888,70 @@ module Catapult
         else
           puts " * New Relic Admin API authenticated successfully."
           @api_cloudflare = JSON.parse(response.body)
+        end
+      end
+    end
+    # https://sendgrid.com/docs/API_Reference/api_v3.html
+    puts "[SendGrid API]"
+    if @configuration["company"]["sendgrid_api_key"] == nil
+      catapult_exception("Please set [\"company\"][\"sendgrid_api_key\"] in secrets/configuration.yml")
+    else
+      uri = URI("https://api.sendgrid.com/v3/suppression/bounces")
+      Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
+        request = Net::HTTP::Get.new uri.request_uri
+        request.add_field "Authorization", "Bearer #{@configuration["company"]["sendgrid_api_key"]}"
+        response = http.request request
+        if response.code.to_f.between?(399,499)
+          catapult_exception("#{response.code} The SendGrid API could not authenticate, please verify [\"company\"][\"sendgrid_api_key\"].")
+        elsif response.code.to_f.between?(500,600)
+          puts " * SendGrid API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
+        else
+          puts " * SendGrid API authenticated successfully."
+          @api_sendgrid = JSON.parse(response.body)
+          if @api_sendgrid
+            @api_sendgrid.each do |bounce|
+              puts "   - Bounce: #{Time.at(bounce["created"]).to_date} #{bounce["email"]} #{bounce["reason"]}".color(Colors::YELLOW)
+            end
+          end
+        end
+      end
+      uri = URI("https://api.sendgrid.com/v3/mail_settings/bounce_purge")
+      Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
+        request = Net::HTTP::Patch.new uri.request_uri
+        request.add_field "Authorization", "Bearer #{@configuration["company"]["sendgrid_api_key"]}"
+        request.add_field "Content-Type", "application/json"
+        request.body = ""\
+          "{"\
+            "\"enabled\":true,"\
+            "\"hard_bounces\":5,"\
+            "\"soft_bounces\":3"\
+          "}"
+        response = http.request request
+        if response.code.to_f.between?(399,499)
+          catapult_exception("#{response.code} The SendGrid API could not authenticate, please verify [\"company\"][\"sendgrid_api_key\"].")
+        elsif response.code.to_f.between?(500,600)
+          puts " * SendGrid API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
+        else
+          puts "   - Configured bounce purge to 5 days for hard bounces and 3 days for soft bounces."
+        end
+      end
+      uri = URI("https://api.sendgrid.com/v3/mail_settings/forward_bounce")
+      Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
+        request = Net::HTTP::Patch.new uri.request_uri
+        request.add_field "Authorization", "Bearer #{@configuration["company"]["sendgrid_api_key"]}"
+        request.add_field "Content-Type", "application/json"
+        request.body = ""\
+          "{"\
+            "\"enabled\":true,"\
+            "\"email\":\"#{@configuration["company"]["email"]}\""\
+          "}"
+        response = http.request request
+        if response.code.to_f.between?(399,499)
+          catapult_exception("#{response.code} The SendGrid API could not authenticate, please verify [\"company\"][\"sendgrid_api_key\"].")
+        elsif response.code.to_f.between?(500,600)
+          puts " * SendGrid API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
+        else
+          puts "   - Configured bounces to forward to #{@configuration["company"]["email"]}."
         end
       end
     end
