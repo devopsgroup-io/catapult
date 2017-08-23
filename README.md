@@ -178,6 +178,7 @@ See an error or have a suggestion? Email competition@devopsgroup.io - we appreci
         - [HTTPS and Certificates](#https-and-certificates)
         - [Forcing www](#forcing-www)
         - [Caching](#caching)
+        - [Progressive Web App](#progressive-web-app)
         - [Email](#email)
         - [Database Migrations](#database-migrations)
         - [Refreshing Databases](#refreshing-databases)
@@ -1017,6 +1018,9 @@ Ready to deploy a new release? Update the version number and the cache will be "
 `<link rel="stylesheet" href="style.min.css?v=3.4.2">`
 
 Each software type will vary as to the standard convention of asset versioning, here is a [Wordpress example](https://wordpress.stackexchange.com/a/90824) to get you started.
+
+### Progressive Web App ###
+Progressive Web App (PWA), in general, is a term used to denote web apps that use the latest web technologies. Catapult allows a `manifest.json` file to be placed anywhere in your `webroot` and accessible regardless of whether you're using the `force_auth` option, this is necessary as `manifest.json` is accessed outside of the session of which you are authenticated. Don't forget to include the `link` tag `<link rel="manifest" href="/manifest.json">` to notify the browser of your manifest. More information regarding WPAs can be found at Google's [Web App Manifest](https://developers.google.com/web/fundamentals/engage-and-retain/web-app-manifest/) and [Progressive Web App Checklist](https://developers.google.com/web/progressive-web-apps/checklist).
 
 ### Email ###
 

@@ -216,6 +216,14 @@ EOF
             php_value newrelic.appname "${domain_environment};$(catapult company.name | tr '[:upper:]' '[:lower:]')-${1}-redhat"
         </IfModule>
 
+        # allow /manifest.json to be accessed regardless of basic auth
+        <Files "manifest.json">
+            <IfModule mod_authz_core.c>
+                Satisfy Any
+                Allow from all
+            </IfModule>
+        </Files>
+
         # compressed certain content types before being sent to the client over the network
         # https://github.com/h5bp/server-configs-apache
         # https://httpd.apache.org/docs/current/mod/mod_filter.html#addoutputfilterbytype
