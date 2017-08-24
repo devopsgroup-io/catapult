@@ -41,6 +41,7 @@ if [ -d "/var/www/repositories/apache/${domain}/.git" ]; then
             && git config core.fileMode false \
             && git config core.packedGitLimit 128m \
             && git config core.packedGitWindowSize 128m \
+            && git config merge.renameLimit 999999 \
             && git config pack.deltaCacheSize 128m \
             && git config pack.packSizeLimit 128m \
             && git config pack.threads 1 \
