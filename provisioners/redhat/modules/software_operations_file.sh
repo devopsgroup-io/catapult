@@ -178,7 +178,18 @@ if hash composer 2>/dev/null && hash drush 2>/dev/null && hash wp-cli 2>/dev/nul
             echo -e "\nSUPPORTED SOFTWARE VERSION DETECTED: ${version}\n"
 
             if [ "${software_auto_update}" = "true" ]; then
+                cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && php admin/cli/maintenance.php --enable
+                cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && git remote add source https://github.com/moodle/moodle
+                cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && git remote update
+                # Moodle 3.2 and later requires at least PHP 5.6.5
+                cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && git merge --strategy=recursive --strategy-option=theirs source/MOODLE_31_STABLE
+                # clean up any merge conflicts
+                cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && git diff --name-only --diff-filter=U | while read line; do
+                    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && git checkout --theirs -- $line
+                    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && git add $line
+                done
                 cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && php admin/cli/upgrade.php --non-interactive
+                cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && php admin/cli/maintenance.php --disable
             fi
 
         else
