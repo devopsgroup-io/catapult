@@ -21,13 +21,26 @@ if hash composer 2>/dev/null && hash drush 2>/dev/null && hash wp-cli 2>/dev/nul
 
     if [ "${software}" = "codeigniter2" ]; then
 
-        version=$(cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && cat system/core/CodeIgniter.php 2>/dev/null | grep "define('CI_VERSION'" | grep --extended-regexp --only-matching --regexp="[0-9]\.[0-9][0-9]?[0-9]?(\.[0-9][0-9]?[0-9]?)?" || echo "0")
+        version=$(cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && cat system/core/CodeIgniter.php 2>/dev/null | grep "CI_VERSION" | grep --extended-regexp --only-matching --regexp="[0-9]\.[0-9][0-9]?[0-9]?(\.[0-9][0-9]?[0-9]?)?" || echo "0")
 
         if [[ "${softwareversion_array[@]}" =~ "$(grep --only-matching --regexp="^[0-9]" <<< "${version}")" ]]; then
             echo -e "\nSUPPORTED SOFTWARE VERSION DETECTED: ${version}\n"
 
             if [ "${software_auto_update}" = "true" ]; then
-                : #no-op
+                if [ "${version}" != "2.2.6" ]; then 
+                    # https://www.codeigniter.com/userguide2/installation/upgrading.html
+                    git clone https://github.com/bcit-ci/CodeIgniter "/catapult/provisioners/redhat/installers/temp/${domain}/codeigniter"
+                    cd "/catapult/provisioners/redhat/installers/temp/${domain}/codeigniter" && git checkout tags/2.2.6
+                    # upgrading from 2.0.0 to 2.0.1
+                    yes | cp -rf /catapult/provisioners/redhat/installers/temp/$domain/codeigniter/application/config/mimes.php "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}/application/config/mimes.php"
+                    # upgrading from 2.0.2 to 2.0.3
+                    yes | cp -rf /catapult/provisioners/redhat/installers/temp/$domain/codeigniter/application/config/user_agents.php "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}/application/config/user_agents.php"
+                    # upgrading constant
+                    yes | cp -rf /catapult/provisioners/redhat/installers/temp/$domain/codeigniter/system/* "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}/system"
+                    cd "/catapult" && rm -rf "/catapult/provisioners/redhat/installers/temp/${domain}/codeigniter"
+                else
+                    echo "Version ${version} is installed and the latest supported software_auto_update version."
+                fi
             fi
 
         else
@@ -36,13 +49,24 @@ if hash composer 2>/dev/null && hash drush 2>/dev/null && hash wp-cli 2>/dev/nul
 
     elif [ "${software}" = "codeigniter3" ]; then
 
-        version=$(cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && cat system/core/CodeIgniter.php 2>/dev/null | grep "define('CI_VERSION'" | grep --extended-regexp --only-matching --regexp="[0-9]\.[0-9][0-9]?[0-9]?(\.[0-9][0-9]?[0-9]?)?" || echo "0")
+        version=$(cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && cat system/core/CodeIgniter.php 2>/dev/null | grep "CI_VERSION" | grep --extended-regexp --only-matching --regexp="[0-9]\.[0-9][0-9]?[0-9]?(\.[0-9][0-9]?[0-9]?)?" || echo "0")
 
         if [[ "${softwareversion_array[@]}" =~ "$(grep --only-matching --regexp="^[0-9]" <<< "${version}")" ]]; then
             echo -e "\nSUPPORTED SOFTWARE VERSION DETECTED: ${version}\n"
 
             if [ "${software_auto_update}" = "true" ]; then
-                : #no-op
+                if [ "${version}" != "3.1.5" ]; then 
+                    # https://www.codeigniter.com/userguide3/installation/upgrading.html
+                    git clone https://github.com/bcit-ci/CodeIgniter "/catapult/provisioners/redhat/installers/temp/${domain}/codeigniter"
+                    cd "/catapult/provisioners/redhat/installers/temp/${domain}/codeigniter" && git checkout tags/3.1.5
+                    # upgrading from 3.0.0 to 3.0.1
+                    yes | cp -rf /catapult/provisioners/redhat/installers/temp/$domain/codeigniter/application/views/errors/cli/* "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}/application/views/errors/cli"
+                    # upgrading constant
+                    yes | cp -rf /catapult/provisioners/redhat/installers/temp/$domain/codeigniter/system/* "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}/system"
+                    cd "/catapult" && rm -rf "/catapult/provisioners/redhat/installers/temp/${domain}/codeigniter"
+                else
+                    echo "Version ${version} is installed and the latest supported software_auto_update version."
+                fi
             fi
 
         else

@@ -906,8 +906,8 @@ Catapult enforces software configuration best practice for software fresh instal
 
 Software | `software_auto_update` Support | Install Approach | Install Notes
 ---------|--------------------------------|------------------|--------------
-`codeigniter2`      | [:x:](http://www.codeigniter.com/userguide2/installation/upgrading.html) |          |
-`codeigniter3`      | [:x:](http://www.codeigniter.com/user_guide/installation/upgrading.html) |          |
+`codeigniter2`      | [:white_check_mark:](http://www.codeigniter.com/userguide2/installation/upgrading.html) |          | Follow the [Installation Instructions](https://www.codeigniter.com/userguide2/installation/index.html).
+`codeigniter3`      | [:white_check_mark:](https://www.codeigniter.com/userguide3/installation/upgrading.html) |          | Follow the [Installation Instructions](https://www.codeigniter.com/userguide3/installation/index.html).
 `drupal6`           | :white_check_mark:                                                       | Drush    | `drush dl drupal-6`
 `drupal7`           | :white_check_mark:                                                       | Drush    | `drush dl drupal-7`
 `elgg1`             | [:x:](http://learn.elgg.org/en/2.0/admin/upgrading.html)                 | Fork     | Follow the installation [Overview](http://learn.elgg.org/en/2.0/intro/install.html). Catapult requires the `dataroot` directory to be within the webroot, it's pertinant to create a `.gitignore` to ignore and `.htaccess` to deny access to this directory.
