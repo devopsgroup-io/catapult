@@ -28,8 +28,11 @@ fi
 # bundled extensions
 # These extensions are bundled with PHP.
 sudo yum install -y php-gd
+sudo yum install -y php-intl
 sudo yum install -y php-mbstring
 sudo yum install -y php-posix
+sudo yum install -y php-soap
+sudo yum install -y php-xmlrpc
 
 # external extensions
 # These extensions are bundled with PHP but in order to compile them, external libraries will be needed.
