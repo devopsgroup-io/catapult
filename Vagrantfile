@@ -129,7 +129,7 @@ Vagrant.configure("2") do |config|
       provider.size = Catapult::Command.configuration["environments"]["qc"]["servers"]["redhat"]["slug"] || "512mb"
       provider.ipv6 = true
       provider.private_networking = true
-      provider.backups_enabled = true
+      provider.backups_enabled = false
     end
     # disable the default vagrant share
     config.vm.synced_folder ".", "/vagrant", disabled: true
@@ -147,7 +147,7 @@ Vagrant.configure("2") do |config|
       provider.size = Catapult::Command.configuration["environments"]["qc"]["servers"]["redhat_mysql"]["slug"] || "512mb"
       provider.ipv6 = true
       provider.private_networking = true
-      provider.backups_enabled = true
+      provider.backups_enabled = false
     end
     # disable the default vagrant share
     config.vm.synced_folder ".", "/vagrant", disabled: true
