@@ -341,8 +341,14 @@ EOF
 
     </Directory>
 
-    # deny access to _sql folders
-    <Directory "/var/www/repositories/apache/${domain}/${webroot}_sql">
+    # deny access to .git folder
+    <Directory "/var/www/repositories/apache/${domain}/.git">
+        Order Deny,Allow
+        Deny From All
+    </Directory>
+
+    # deny access to _sql folder
+    <Directory "/var/www/repositories/apache/${domain}/_sql">
         Order Deny,Allow
         Deny From All
     </Directory>
