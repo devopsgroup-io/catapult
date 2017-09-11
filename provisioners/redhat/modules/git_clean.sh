@@ -13,6 +13,7 @@ for directory in /var/www/repositories/apache/*/; do
         folder=$(basename "${directory}")
         if ! ([[ ${domains[*]} =~ "${folder}" ]] || [ "_default_" == "${folder}" ]); then
             echo "Removing the ${directory} directory as it does not exist in your configuration..."
+            sudo chown -R root:root * "${directory}"
             sudo chmod 0777 -R "${directory}"
             sudo rm -rf "${directory}"
         fi
