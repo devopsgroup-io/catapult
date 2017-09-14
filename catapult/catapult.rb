@@ -529,39 +529,50 @@ module Catapult
     if @configuration["company"]["digitalocean_personal_access_token"] == nil
       catapult_exception("Please set [\"company\"][\"digitalocean_personal_access_token\"] in secrets/configuration.yml")
     else
-      uri = URI("https://api.digitalocean.com/v2/account/keys")
-      Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
-        request = Net::HTTP::Get.new uri.request_uri
-        request.add_field "Authorization", "Bearer #{@configuration["company"]["digitalocean_personal_access_token"]}"
-        response = http.request request
-        if response.code.to_f.between?(399,499)
-          catapult_exception("#{response.code} The DigitalOcean API could not authenticate, please verify [\"company\"][\"digitalocean_personal_access_token\"].")
-        elsif response.code.to_f.between?(500,600)
-          puts "   - The DigitalOcean API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
-        else
-          puts " * DigitalOcean API authenticated successfully."
-          api_digitalocean_account_keys = JSON.parse(response.body)
-          @api_digitalocean_account_key_name = false
-          @api_digitalocean_account_key_public_key = false
-          api_digitalocean_account_keys["ssh_keys"].each do |key|
-            if key["name"] == "Vagrant"
-              @api_digitalocean_account_key_name = true
-              if "#{key["public_key"].match(/(\w*-\w*\s\S*)/)}" == "#{File.read("secrets/id_rsa.pub").match(/(\w*-\w*\s\S*)/)}"
-                @api_digitalocean_account_key_public_key = true
+      begin
+        uri = URI("https://api.digitalocean.com/v2/account/keys")
+        Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
+          request = Net::HTTP::Get.new uri.request_uri
+          request.add_field "Authorization", "Bearer #{@configuration["company"]["digitalocean_personal_access_token"]}"
+          response = http.request request
+          if response.code.to_f.between?(399,499)
+            catapult_exception("#{response.code} The DigitalOcean API could not authenticate, please verify [\"company\"][\"digitalocean_personal_access_token\"].")
+          elsif response.code.to_f.between?(500,600)
+            puts "   - The DigitalOcean API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
+          else
+            puts " * DigitalOcean API authenticated successfully."
+            api_digitalocean_account_keys = JSON.parse(response.body)
+            @api_digitalocean_account_key_name = false
+            @api_digitalocean_account_key_public_key = false
+            api_digitalocean_account_keys["ssh_keys"].each do |key|
+              if key["name"] == "Vagrant"
+                @api_digitalocean_account_key_name = true
+                if "#{key["public_key"].match(/(\w*-\w*\s\S*)/)}" == "#{File.read("secrets/id_rsa.pub").match(/(\w*-\w*\s\S*)/)}"
+                  @api_digitalocean_account_key_public_key = true
+                end
               end
             end
-          end
-          unless @api_digitalocean_account_key_name
-            catapult_exception("Could not find the SSH Key named \"Vagrant\" in DigitalOcean, please follow the Services Setup for DigitalOcean at https://github.com/devopsgroup-io/catapult#services-setup")
-          else
-            puts "   - Found the DigitalOcean SSH Key \"Vagrant\""
-          end
-          unless @api_digitalocean_account_key_public_key
-            catapult_exception("The DigitalOcean SSH Key \"Vagrant\" does not match your secrets/id_rsa.pub ssh public key, please follow the Services Setup for DigitalOcean at https://github.com/devopsgroup-io/catapult#services-setup")
-          else
-            puts "   - The DigitalOcean SSH Key \"Vagrant\" matches your secrets/id_rsa.pub ssh public key"
+            unless @api_digitalocean_account_key_name
+              catapult_exception("Could not find the SSH Key named \"Vagrant\" in DigitalOcean, please follow the Services Setup for DigitalOcean at https://github.com/devopsgroup-io/catapult#services-setup")
+            else
+              puts "   - Found the DigitalOcean SSH Key \"Vagrant\""
+            end
+            unless @api_digitalocean_account_key_public_key
+              catapult_exception("The DigitalOcean SSH Key \"Vagrant\" does not match your secrets/id_rsa.pub ssh public key, please follow the Services Setup for DigitalOcean at https://github.com/devopsgroup-io/catapult#services-setup")
+            else
+              puts "   - The DigitalOcean SSH Key \"Vagrant\" matches your secrets/id_rsa.pub ssh public key"
+            end
           end
         end
+      rescue Net::ReadTimeout => ex
+        puts " * The DigitalOcean API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
+        puts "   - Error was: #{ex.class}".color(Colors::RED)
+      rescue Errno::ETIMEDOUT => ex
+        puts " * The DigitalOcean API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
+        puts "   - Error was: #{ex.class}".color(Colors::RED)
+      rescue Errno::ECONNREFUSED => ex
+        puts " * The DigitalOcean API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
+        puts "   - Error was: #{ex.class}".color(Colors::RED)
       end
     end
     # http://docs.aws.amazon.com/general/latest/gr/sigv4_signing.html
@@ -570,107 +581,118 @@ module Catapult
     if @configuration["company"]["aws_access_key"] == nil || @configuration["company"]["aws_secret_key"] == nil
       catapult_exception("Please set [\"company\"][\"aws_access_key\"] and [\"company\"][\"aws_secret_key\"] in secrets/configuration.yml")
     else
-      # ************* REQUEST VALUES *************
-      method = 'GET'
-      service = 'ec2'
-      host = 'ec2.amazonaws.com'
-      region = 'us-east-1'
-      endpoint = 'https://ec2.amazonaws.com'
-      request_parameters = 'Action=DescribeKeyPairs&Version=2013-10-15'
-      # Key derivation functions. See:
-      # http://docs.aws.amazon.com/general/latest/gr/signature-v4-examples.html#signature-v4-examples-python
-      def Command::getSignatureKey(key, dateStamp, regionName, serviceName)
-          kDate    = OpenSSL::HMAC.digest('sha256', "AWS4" + key, dateStamp)
-          kRegion  = OpenSSL::HMAC.digest('sha256', kDate, regionName)
-          kService = OpenSSL::HMAC.digest('sha256', kRegion, serviceName)
-          kSigning = OpenSSL::HMAC.digest('sha256', kService, "aws4_request")
-          return kSigning
-      end
-      # Create a date for headers and the credential string
-      t = Time.now.utc
-      amzdate = t.strftime('%Y%m%dT%H%M%SZ')
-      datestamp = t.strftime('%Y%m%d') # Date w/o time, used in credential scope
-      # ************* TASK 1: CREATE A CANONICAL REQUEST *************
-      # http://docs.aws.amazon.com/general/latest/gr/sigv4-create-canonical-request.html
-      # Step 1 is to define the verb (GET, POST, etc.)--already done.
-      # Step 2: Create canonical URI--the part of the URI from domain to query
-      # string (use '/' if no path)
-      canonical_uri = '/'
-      # Step 3: Create the canonical query string. In this example (a GET request),
-      # request parameters are in the query string. Query string values must
-      # be URL-encoded (space=%20). The parameters must be sorted by name.
-      # For this example, the query string is pre-formatted in the request_parameters variable.
-      canonical_querystring = request_parameters
-      # Step 4: Create the canonical headers and signed headers. Header names
-      # and value must be trimmed and lowercase, and sorted in ASCII order.
-      # Note that there is a trailing \n.
-      canonical_headers = 'host:' + host + "\n" + 'x-amz-date:' + amzdate + "\n"
-      # Step 5: Create the list of signed headers. This lists the headers
-      # in the canonical_headers list, delimited with ";" and in alpha order.
-      # Note: The request can include any headers; canonical_headers and
-      # signed_headers lists those that you want to be included in the
-      # hash of the request. "Host" and "x-amz-date" are always required.
-      signed_headers = 'host;x-amz-date'
-      # Step 6: Create payload hash (hash of the request body content). For GET
-      # requests, the payload is an empty string ("").
-      payload_hash = Digest::SHA256.hexdigest('')
-      # Step 7: Combine elements to create create canonical request
-      canonical_request = method + "\n" + canonical_uri + "\n" + canonical_querystring + "\n" + canonical_headers + "\n" + signed_headers + "\n" + payload_hash
-      # ************* TASK 2: CREATE THE STRING TO SIGN*************
-      # Match the algorithm to the hashing algorithm you use, either SHA-1 or
-      # SHA-256 (recommended)
-      algorithm = 'AWS4-HMAC-SHA256'
-      credential_scope = datestamp + '/' + region + '/' + service + '/' + 'aws4_request'
-      string_to_sign = algorithm + "\n" +  amzdate + "\n" +  credential_scope + "\n" + Digest::SHA256.hexdigest(canonical_request)
-      # ************* TASK 3: CALCULATE THE SIGNATURE *************
-      # Create the signing key using the function defined above.
-      signing_key = getSignatureKey(@configuration["company"]["aws_secret_key"], datestamp, region, service)
-      # Sign the string_to_sign using the signing_key
-      signature = OpenSSL::HMAC.hexdigest('sha256', signing_key, string_to_sign)
-      # ************* TASK 4: ADD SIGNING INFORMATION TO THE REQUEST *************
-      # The signing information can be either in a query string value or in
-      # a header named Authorization. This code shows how to use a header.
-      # Create authorization header and add to request headers
-      authorization_header = algorithm + ' ' + 'Credential=' + @configuration["company"]["aws_access_key"] + '/' + credential_scope + ', ' +  'SignedHeaders=' + signed_headers + ', ' + 'Signature=' + signature
-      # ************* SEND THE REQUEST *************
-      uri = URI(endpoint + '?' + canonical_querystring)
-      Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
-        request = Net::HTTP::Get.new uri.request_uri
-        request.add_field "Authorization", "#{authorization_header}"
-        request.add_field "x-amz-date", "#{amzdate}"
-        request.add_field "content-type", "application/json"
-        response = http.request request
-        if response.code.to_f.between?(399,499)
-          catapult_exception("#{response.code} The AWS API could not authenticate, please verify [\"company\"][\"aws_access_key\"] and [\"company\"][\"aws_secret_key\"].")
-        elsif response.code.to_f.between?(500,600)
-          puts " * AWS API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
-        else
-          puts " * AWS API authenticated successfully."
-          api_aws_account_keys = Nokogiri::XML.parse(response.body)
-          @api_aws_account_key_name = false
-          @api_aws_account_key_public_key = false
-          api_aws_account_keys.xpath("//xmlns:item").each do |key|
-            if key.css('keyName').text == "Catapult"
-              @api_aws_account_key_name = true
-              # calculate the MD5 fingerprint from the binary (der) of the computed public key
-              key_private = OpenSSL::PKey::RSA.new(File.read("secrets/id_rsa"))
-              key_fingerprint = OpenSSL::Digest::MD5.hexdigest(key_private.public_key.to_der).scan(/../).join(':')
-              if "#{key.css('keyFingerprint').text}" == "#{key_fingerprint}"
-                @api_aws_account_key_public_key = true
+      begin
+        # ************* REQUEST VALUES *************
+        method = 'GET'
+        service = 'ec2'
+        host = 'ec2.amazonaws.com'
+        region = 'us-east-1'
+        endpoint = 'https://ec2.amazonaws.com'
+        request_parameters = 'Action=DescribeKeyPairs&Version=2013-10-15'
+        # Key derivation functions. See:
+        # http://docs.aws.amazon.com/general/latest/gr/signature-v4-examples.html#signature-v4-examples-python
+        def Command::getSignatureKey(key, dateStamp, regionName, serviceName)
+            kDate    = OpenSSL::HMAC.digest('sha256', "AWS4" + key, dateStamp)
+            kRegion  = OpenSSL::HMAC.digest('sha256', kDate, regionName)
+            kService = OpenSSL::HMAC.digest('sha256', kRegion, serviceName)
+            kSigning = OpenSSL::HMAC.digest('sha256', kService, "aws4_request")
+            return kSigning
+        end
+        # Create a date for headers and the credential string
+        t = Time.now.utc
+        amzdate = t.strftime('%Y%m%dT%H%M%SZ')
+        datestamp = t.strftime('%Y%m%d') # Date w/o time, used in credential scope
+        # ************* TASK 1: CREATE A CANONICAL REQUEST *************
+        # http://docs.aws.amazon.com/general/latest/gr/sigv4-create-canonical-request.html
+        # Step 1 is to define the verb (GET, POST, etc.)--already done.
+        # Step 2: Create canonical URI--the part of the URI from domain to query
+        # string (use '/' if no path)
+        canonical_uri = '/'
+        # Step 3: Create the canonical query string. In this example (a GET request),
+        # request parameters are in the query string. Query string values must
+        # be URL-encoded (space=%20). The parameters must be sorted by name.
+        # For this example, the query string is pre-formatted in the request_parameters variable.
+        canonical_querystring = request_parameters
+        # Step 4: Create the canonical headers and signed headers. Header names
+        # and value must be trimmed and lowercase, and sorted in ASCII order.
+        # Note that there is a trailing \n.
+        canonical_headers = 'host:' + host + "\n" + 'x-amz-date:' + amzdate + "\n"
+        # Step 5: Create the list of signed headers. This lists the headers
+        # in the canonical_headers list, delimited with ";" and in alpha order.
+        # Note: The request can include any headers; canonical_headers and
+        # signed_headers lists those that you want to be included in the
+        # hash of the request. "Host" and "x-amz-date" are always required.
+        signed_headers = 'host;x-amz-date'
+        # Step 6: Create payload hash (hash of the request body content). For GET
+        # requests, the payload is an empty string ("").
+        payload_hash = Digest::SHA256.hexdigest('')
+        # Step 7: Combine elements to create create canonical request
+        canonical_request = method + "\n" + canonical_uri + "\n" + canonical_querystring + "\n" + canonical_headers + "\n" + signed_headers + "\n" + payload_hash
+        # ************* TASK 2: CREATE THE STRING TO SIGN*************
+        # Match the algorithm to the hashing algorithm you use, either SHA-1 or
+        # SHA-256 (recommended)
+        algorithm = 'AWS4-HMAC-SHA256'
+        credential_scope = datestamp + '/' + region + '/' + service + '/' + 'aws4_request'
+        string_to_sign = algorithm + "\n" +  amzdate + "\n" +  credential_scope + "\n" + Digest::SHA256.hexdigest(canonical_request)
+        # ************* TASK 3: CALCULATE THE SIGNATURE *************
+        # Create the signing key using the function defined above.
+        signing_key = getSignatureKey(@configuration["company"]["aws_secret_key"], datestamp, region, service)
+        # Sign the string_to_sign using the signing_key
+        signature = OpenSSL::HMAC.hexdigest('sha256', signing_key, string_to_sign)
+        # ************* TASK 4: ADD SIGNING INFORMATION TO THE REQUEST *************
+        # The signing information can be either in a query string value or in
+        # a header named Authorization. This code shows how to use a header.
+        # Create authorization header and add to request headers
+        authorization_header = algorithm + ' ' + 'Credential=' + @configuration["company"]["aws_access_key"] + '/' + credential_scope + ', ' +  'SignedHeaders=' + signed_headers + ', ' + 'Signature=' + signature
+        # ************* SEND THE REQUEST *************
+        uri = URI(endpoint + '?' + canonical_querystring)
+        Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
+          request = Net::HTTP::Get.new uri.request_uri
+          request.add_field "Authorization", "#{authorization_header}"
+          request.add_field "x-amz-date", "#{amzdate}"
+          request.add_field "content-type", "application/json"
+          response = http.request request
+          if response.code.to_f.between?(399,499)
+            catapult_exception("#{response.code} The AWS API could not authenticate, please verify [\"company\"][\"aws_access_key\"] and [\"company\"][\"aws_secret_key\"].")
+          elsif response.code.to_f.between?(500,600)
+            puts " * AWS API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
+          else
+            puts " * AWS API authenticated successfully."
+            api_aws_account_keys = Nokogiri::XML.parse(response.body)
+            @api_aws_account_key_name = false
+            @api_aws_account_key_public_key = false
+            api_aws_account_keys.xpath("//xmlns:item").each do |key|
+              if key.css('keyName').text == "Catapult"
+                @api_aws_account_key_name = true
+                # calculate the MD5 fingerprint from the binary (der) of the computed public key
+                key_private = OpenSSL::PKey::RSA.new(File.read("secrets/id_rsa"))
+                key_fingerprint = OpenSSL::Digest::MD5.hexdigest(key_private.public_key.to_der).scan(/../).join(':')
+                if "#{key.css('keyFingerprint').text}" == "#{key_fingerprint}"
+                  @api_aws_account_key_public_key = true
+                end
               end
             end
-          end
-          unless @api_aws_account_key_name
-            catapult_exception("Could not find the EC2 Key Pair named \"Catapult\" in AWS, please follow the Services Setup for AWS at https://github.com/devopsgroup-io/catapult#services-setup")
-          else
-            puts "   - Found the AWS EC2 Key Pair \"Catapult\""
-          end
-          unless @api_aws_account_key_public_key
-            catapult_exception("The AWS EC2 Key Pair \"Catapult\" MD5 fingerprint does not match your secrets/id_rsa.pub ssh public key MD5 fingerprint, please follow the Services Setup for AWS at https://github.com/devopsgroup-io/catapult#services-setup")
-          else
-            puts "   - The AWS EC2 Key Pair \"Catapult\" MD5 fingerprint matches your secrets/id_rsa.pub ssh public key MD5 fingerprint"
+            unless @api_aws_account_key_name
+              catapult_exception("Could not find the EC2 Key Pair named \"Catapult\" in AWS, please follow the Services Setup for AWS at https://github.com/devopsgroup-io/catapult#services-setup")
+            else
+              puts "   - Found the AWS EC2 Key Pair \"Catapult\""
+            end
+            unless @api_aws_account_key_public_key
+              catapult_exception("The AWS EC2 Key Pair \"Catapult\" MD5 fingerprint does not match your secrets/id_rsa.pub ssh public key MD5 fingerprint, please follow the Services Setup for AWS at https://github.com/devopsgroup-io/catapult#services-setup")
+            else
+              puts "   - The AWS EC2 Key Pair \"Catapult\" MD5 fingerprint matches your secrets/id_rsa.pub ssh public key MD5 fingerprint"
+            end
           end
         end
+      rescue Net::ReadTimeout => ex
+        puts " * The AWS API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
+        puts "   - Error was: #{ex.class}".color(Colors::RED)
+      rescue Errno::ETIMEDOUT => ex
+        puts " * The AWS API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
+        puts "   - Error was: #{ex.class}".color(Colors::RED)
+      rescue Errno::ECONNREFUSED => ex
+        puts " * The AWS API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
+        puts "   - Error was: #{ex.class}".color(Colors::RED)
       end
     end
     # https://confluence.atlassian.com/display/BITBUCKET/Version+1
@@ -678,49 +700,60 @@ module Catapult
     if @configuration["company"]["bitbucket_username"] == nil || @configuration["company"]["bitbucket_password"] == nil
       catapult_exception("Please set [\"company\"][\"bitbucket_username\"] and [\"company\"][\"bitbucket_password\"] in secrets/configuration.yml")
     else
-      uri = URI("https://api.bitbucket.org/1.0/user")
-      Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
-        request = Net::HTTP::Get.new uri.request_uri
-        request.basic_auth "#{@configuration["company"]["bitbucket_username"]}", "#{@configuration["company"]["bitbucket_password"]}"
-        response = http.request request
-        if response.code.to_f.between?(399,499)
-          catapult_exception("#{response.code} The Bitbucket API could not authenticate, please verify [\"company\"][\"bitbucket_username\"] and [\"company\"][\"bitbucket_password\"].")
-        elsif response.code.to_f.between?(500,600)
-          puts " * Bitbucket API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
-        else
-          puts " * Bitbucket API authenticated successfully."
-          @api_bitbucket = JSON.parse(response.body)
-          # verify bitbucket user's catapult ssh key
-          uri = URI("https://api.bitbucket.org/1.0/users/#{@configuration["company"]["bitbucket_username"]}/ssh-keys")
-          Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
-            request = Net::HTTP::Get.new uri.request_uri
-            request.basic_auth "#{@configuration["company"]["bitbucket_username"]}", "#{@configuration["company"]["bitbucket_password"]}"
-            response = http.request request # Net::HTTPResponse object
-            @api_bitbucket_ssh_keys = JSON.parse(response.body)
-            @api_bitbucket_ssh_keys_title = false
-            @api_bitbucket_ssh_keys_key = false
-            unless response.code.to_f.between?(399,600)
-              @api_bitbucket_ssh_keys.each do |key|
-                if key["label"] == "Catapult"
-                  @api_bitbucket_ssh_keys_title = true
-                  if "#{key["key"].match(/(\w*-\w*\s\S*)/)}" == "#{File.read("secrets/id_rsa.pub").match(/(\w*-\w*\s\S*)/)}"
-                    @api_bitbucket_ssh_keys_key = true
+      begin
+        uri = URI("https://api.bitbucket.org/1.0/user")
+        Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
+          request = Net::HTTP::Get.new uri.request_uri
+          request.basic_auth "#{@configuration["company"]["bitbucket_username"]}", "#{@configuration["company"]["bitbucket_password"]}"
+          response = http.request request
+          if response.code.to_f.between?(399,499)
+            catapult_exception("#{response.code} The Bitbucket API could not authenticate, please verify [\"company\"][\"bitbucket_username\"] and [\"company\"][\"bitbucket_password\"].")
+          elsif response.code.to_f.between?(500,600)
+            puts " * Bitbucket API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
+          else
+            puts " * Bitbucket API authenticated successfully."
+            @api_bitbucket = JSON.parse(response.body)
+            # verify bitbucket user's catapult ssh key
+            uri = URI("https://api.bitbucket.org/1.0/users/#{@configuration["company"]["bitbucket_username"]}/ssh-keys")
+            Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
+              request = Net::HTTP::Get.new uri.request_uri
+              request.basic_auth "#{@configuration["company"]["bitbucket_username"]}", "#{@configuration["company"]["bitbucket_password"]}"
+              response = http.request request # Net::HTTPResponse object
+              @api_bitbucket_ssh_keys = JSON.parse(response.body)
+              @api_bitbucket_ssh_keys_title = false
+              @api_bitbucket_ssh_keys_key = false
+              unless response.code.to_f.between?(399,600)
+                @api_bitbucket_ssh_keys.each do |key|
+                  if key["label"] == "Catapult"
+                    @api_bitbucket_ssh_keys_title = true
+                    if "#{key["key"].match(/(\w*-\w*\s\S*)/)}" == "#{File.read("secrets/id_rsa.pub").match(/(\w*-\w*\s\S*)/)}"
+                      @api_bitbucket_ssh_keys_key = true
+                    end
                   end
                 end
               end
-            end
-            unless @api_bitbucket_ssh_keys_title
-              catapult_exception("Could not find the SSH Key named \"Catapult\" for your Bitbucket user #{@configuration["company"]["bitbucket_username"]}, please follow Provision Websites at https://github.com/devopsgroup-io/catapult#provision-websites")
-            else
-              puts "   - Found the ssh public key \"Catapult\" for your Bitbucket user #{@configuration["company"]["bitbucket_username"]}"
-            end
-            unless @api_bitbucket_ssh_keys_key
-              catapult_exception("The SSH Key named \"Catapult\" in Bitbucket does not match your Catapult instance's SSH Key at \"secrets/id_rsa.pub\", please follow Provision Websites at https://github.com/devopsgroup-io/catapult#provision-websites")
-            else
-              puts "   - The ssh public key \"Catapult\" matches your secrets/id_rsa.pub ssh public key"
+              unless @api_bitbucket_ssh_keys_title
+                catapult_exception("Could not find the SSH Key named \"Catapult\" for your Bitbucket user #{@configuration["company"]["bitbucket_username"]}, please follow Provision Websites at https://github.com/devopsgroup-io/catapult#provision-websites")
+              else
+                puts "   - Found the ssh public key \"Catapult\" for your Bitbucket user #{@configuration["company"]["bitbucket_username"]}"
+              end
+              unless @api_bitbucket_ssh_keys_key
+                catapult_exception("The SSH Key named \"Catapult\" in Bitbucket does not match your Catapult instance's SSH Key at \"secrets/id_rsa.pub\", please follow Provision Websites at https://github.com/devopsgroup-io/catapult#provision-websites")
+              else
+                puts "   - The ssh public key \"Catapult\" matches your secrets/id_rsa.pub ssh public key"
+              end
             end
           end
         end
+      rescue Net::ReadTimeout => ex
+        puts " * The Bitbucket API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
+        puts "   - Error was: #{ex.class}".color(Colors::RED)
+      rescue Errno::ETIMEDOUT => ex
+        puts " * The Bitbucket API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
+        puts "   - Error was: #{ex.class}".color(Colors::RED)
+      rescue Errno::ECONNREFUSED => ex
+        puts " * The Bitbucket API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
+        puts "   - Error was: #{ex.class}".color(Colors::RED)
       end
     end
     # https://developer.github.com/v3/
@@ -728,49 +761,60 @@ module Catapult
     if @configuration["company"]["github_username"] == nil || @configuration["company"]["github_password"] == nil
       catapult_exception("Please set [\"company\"][\"github_username\"] and [\"company\"][\"github_password\"] in secrets/configuration.yml")
     else
-      uri = URI("https://api.github.com/user")
-      Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
-        request = Net::HTTP::Get.new uri.request_uri
-        request.basic_auth "#{@configuration["company"]["github_username"]}", "#{@configuration["company"]["github_password"]}"
-        response = http.request request
-        if response.code.to_f.between?(399,499)
-          catapult_exception("#{response.code} The GitHub API could not authenticate, please verify [\"company\"][\"github_username\"] and [\"company\"][\"github_password\"].")
-        elsif response.code.to_f.between?(500,600)
-          puts " * GitHub API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
-        else
-          puts " * GitHub API authenticated successfully."
-          @api_github = JSON.parse(response.body)
-          # verify github user's catapult ssh key
-          uri = URI("https://api.github.com/user/keys")
-          Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
-            request = Net::HTTP::Get.new uri.request_uri
-            request.basic_auth "#{@configuration["company"]["github_username"]}", "#{@configuration["company"]["github_password"]}"
-            response = http.request request # Net::HTTPResponse object
-            @api_github_ssh_keys = JSON.parse(response.body)
-            @api_github_ssh_keys_title = false
-            @api_github_ssh_keys_key = false
-            unless response.code.to_f.between?(399,600)
-              @api_github_ssh_keys.each do |key|
-                if key["title"] == "Catapult"
-                  @api_github_ssh_keys_title = true
-                  if "#{key["key"].match(/(\w*-\w*\s\S*)/)}" == "#{File.read("secrets/id_rsa.pub").match(/(\w*-\w*\s\S*)/)}"
-                    @api_github_ssh_keys_key = true
+      begin
+        uri = URI("https://api.github.com/user")
+        Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
+          request = Net::HTTP::Get.new uri.request_uri
+          request.basic_auth "#{@configuration["company"]["github_username"]}", "#{@configuration["company"]["github_password"]}"
+          response = http.request request
+          if response.code.to_f.between?(399,499)
+            catapult_exception("#{response.code} The GitHub API could not authenticate, please verify [\"company\"][\"github_username\"] and [\"company\"][\"github_password\"].")
+          elsif response.code.to_f.between?(500,600)
+            puts " * GitHub API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
+          else
+            puts " * GitHub API authenticated successfully."
+            @api_github = JSON.parse(response.body)
+            # verify github user's catapult ssh key
+            uri = URI("https://api.github.com/user/keys")
+            Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
+              request = Net::HTTP::Get.new uri.request_uri
+              request.basic_auth "#{@configuration["company"]["github_username"]}", "#{@configuration["company"]["github_password"]}"
+              response = http.request request # Net::HTTPResponse object
+              @api_github_ssh_keys = JSON.parse(response.body)
+              @api_github_ssh_keys_title = false
+              @api_github_ssh_keys_key = false
+              unless response.code.to_f.between?(399,600)
+                @api_github_ssh_keys.each do |key|
+                  if key["title"] == "Catapult"
+                    @api_github_ssh_keys_title = true
+                    if "#{key["key"].match(/(\w*-\w*\s\S*)/)}" == "#{File.read("secrets/id_rsa.pub").match(/(\w*-\w*\s\S*)/)}"
+                      @api_github_ssh_keys_key = true
+                    end
                   end
                 end
               end
-            end
-            unless @api_github_ssh_keys_title
-              catapult_exception("Could not find the SSH Key named \"Catapult\" for your GitHub user #{@configuration["company"]["github_username"]}, please follow Provision Websites at https://github.com/devopsgroup-io/catapult#provision-websites")
-            else
-              puts "   - Found the ssh public key \"Catapult\" for your GitHub user #{@configuration["company"]["github_username"]}"
-            end
-            unless @api_github_ssh_keys_key
-              catapult_exception("The SSH Key named \"Catapult\" in GitHub does not match your Catapult instance's SSH Key at \"secrets/id_rsa.pub\", please follow Provision Websites at https://github.com/devopsgroup-io/catapult#provision-websites")
-            else
-              puts "   - The ssh public key \"Catapult\" matches your secrets/id_rsa.pub ssh public key"
+              unless @api_github_ssh_keys_title
+                catapult_exception("Could not find the SSH Key named \"Catapult\" for your GitHub user #{@configuration["company"]["github_username"]}, please follow Provision Websites at https://github.com/devopsgroup-io/catapult#provision-websites")
+              else
+                puts "   - Found the ssh public key \"Catapult\" for your GitHub user #{@configuration["company"]["github_username"]}"
+              end
+              unless @api_github_ssh_keys_key
+                catapult_exception("The SSH Key named \"Catapult\" in GitHub does not match your Catapult instance's SSH Key at \"secrets/id_rsa.pub\", please follow Provision Websites at https://github.com/devopsgroup-io/catapult#provision-websites")
+              else
+                puts "   - The ssh public key \"Catapult\" matches your secrets/id_rsa.pub ssh public key"
+              end
             end
           end
         end
+      rescue Net::ReadTimeout => ex
+        puts " * The GitHub API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
+        puts "   - Error was: #{ex.class}".color(Colors::RED)
+      rescue Errno::ETIMEDOUT => ex
+        puts " * The GitHub API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
+        puts "   - Error was: #{ex.class}".color(Colors::RED)
+      rescue Errno::ECONNREFUSED => ex
+        puts " * The GitHub API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
+        puts "   - Error was: #{ex.class}".color(Colors::RED)
       end
     end
     # https://docs.atlassian.com/bamboo/REST/
@@ -834,20 +878,31 @@ module Catapult
     if @configuration["company"]["cloudflare_api_key"] == nil || @configuration["company"]["cloudflare_email"] == nil
       catapult_exception("Please set [\"company\"][\"cloudflare_api_key\"] and [\"company\"][\"cloudflare_email\"] in secrets/configuration.yml")
     else
-      uri = URI("https://api.cloudflare.com/client/v4/zones")
-      Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
-        request = Net::HTTP::Get.new uri.request_uri
-        request.add_field "X-Auth-Key", "#{@configuration["company"]["cloudflare_api_key"]}"
-        request.add_field "X-Auth-Email", "#{@configuration["company"]["cloudflare_email"]}"
-        response = http.request request
-        if response.code.to_f.between?(399,499)
-          catapult_exception("#{response.code} The CloudFlare API could not authenticate, please verify [\"company\"][\"cloudflare_api_key\"] and [\"company\"][\"cloudflare_email\"].")
-        elsif response.code.to_f.between?(500,600)
-          puts " * CloudFlare API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
-        else
-          puts " * CloudFlare API authenticated successfully."
-          @api_cloudflare = JSON.parse(response.body)
+      begin
+        uri = URI("https://api.cloudflare.com/client/v4/zones")
+        Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
+          request = Net::HTTP::Get.new uri.request_uri
+          request.add_field "X-Auth-Key", "#{@configuration["company"]["cloudflare_api_key"]}"
+          request.add_field "X-Auth-Email", "#{@configuration["company"]["cloudflare_email"]}"
+          response = http.request request
+          if response.code.to_f.between?(399,499)
+            catapult_exception("#{response.code} The CloudFlare API could not authenticate, please verify [\"company\"][\"cloudflare_api_key\"] and [\"company\"][\"cloudflare_email\"].")
+          elsif response.code.to_f.between?(500,600)
+            puts " * CloudFlare API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
+          else
+            puts " * CloudFlare API authenticated successfully."
+            @api_cloudflare = JSON.parse(response.body)
+          end
         end
+      rescue Net::ReadTimeout => ex
+        puts " * The CloudFlare API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
+        puts "   - Error was: #{ex.class}".color(Colors::RED)
+      rescue Errno::ETIMEDOUT => ex
+        puts " * The CloudFlare API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
+        puts "   - Error was: #{ex.class}".color(Colors::RED)
+      rescue Errno::ECONNREFUSED => ex
+        puts " * The CloudFlare API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
+        puts "   - Error was: #{ex.class}".color(Colors::RED)
       end
     end
     # https://docs.newrelic.com/docs/apis/rest-api-v2
@@ -855,19 +910,30 @@ module Catapult
     if @configuration["company"]["newrelic_api_key"] == nil || @configuration["company"]["newrelic_license_key"] == nil
       catapult_exception("Please set [\"company\"][\"newrelic_api_key\"] and [\"company\"][\"newrelic_license_key\"] in secrets/configuration.yml")
     else
-      uri = URI("https://api.newrelic.com/v2/users.json")
-      Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
-        request = Net::HTTP::Get.new uri.request_uri
-        request.add_field "X-Api-Key", "#{@configuration["company"]["newrelic_api_key"]}"
-        response = http.request request
-        if response.code.to_f.between?(399,499)
-          catapult_exception("#{response.code} The New Relic API could not authenticate, please verify [\"company\"][\"newrelic_api_key\"] and [\"company\"][\"newrelic_license_key\"].")
-        elsif response.code.to_f.between?(500,600)
-          puts " * New Relic API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
-        else
-          puts " * New Relic API authenticated successfully."
-          @api_cloudflare = JSON.parse(response.body)
+      begin
+        uri = URI("https://api.newrelic.com/v2/users.json")
+        Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
+          request = Net::HTTP::Get.new uri.request_uri
+          request.add_field "X-Api-Key", "#{@configuration["company"]["newrelic_api_key"]}"
+          response = http.request request
+          if response.code.to_f.between?(399,499)
+            catapult_exception("#{response.code} The New Relic API could not authenticate, please verify [\"company\"][\"newrelic_api_key\"] and [\"company\"][\"newrelic_license_key\"].")
+          elsif response.code.to_f.between?(500,600)
+            puts " * New Relic API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
+          else
+            puts " * New Relic API authenticated successfully."
+            @api_cloudflare = JSON.parse(response.body)
+          end
         end
+      rescue Net::ReadTimeout => ex
+        puts " * The New Relic API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
+        puts "   - Error was: #{ex.class}".color(Colors::RED)
+      rescue Errno::ETIMEDOUT => ex
+        puts " * The New Relic API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
+        puts "   - Error was: #{ex.class}".color(Colors::RED)
+      rescue Errno::ECONNREFUSED => ex
+        puts " * The New Relic API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
+        puts "   - Error was: #{ex.class}".color(Colors::RED)
       end
     end
     # https://docs.newrelic.com/docs/apis
@@ -875,20 +941,31 @@ module Catapult
     if @configuration["company"]["newrelic_admin_api_key"] == nil
       catapult_exception("Please set [\"company\"][\"newrelic_admin_api_key\"] in secrets/configuration.yml")
     else
-      uri = URI("https://synthetics.newrelic.com/synthetics/api/v1/monitors")
-      Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
-        request = Net::HTTP::Get.new uri.request_uri
-        request.add_field "X-Api-Key", "#{@configuration["company"]["newrelic_admin_api_key"]}"
-        response = http.request request
-        if response.code.to_f.between?(399,499)
-          puts " * New Relic Admin API could not authenticate (Synthetics tests will not be created).".color(Colors::YELLOW)
-          #catapult_exception("#{response.code} The New Relic Admin API could not authenticate, please verify [\"company\"][\"newrelic_admin_api_key\"].")
-        elsif response.code.to_f.between?(500,600)
-          puts " * New Relic Admin API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
-        else
-          puts " * New Relic Admin API authenticated successfully."
-          @api_cloudflare = JSON.parse(response.body)
+      begin
+        uri = URI("https://synthetics.newrelic.com/synthetics/api/v1/monitors")
+        Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
+          request = Net::HTTP::Get.new uri.request_uri
+          request.add_field "X-Api-Key", "#{@configuration["company"]["newrelic_admin_api_key"]}"
+          response = http.request request
+          if response.code.to_f.between?(399,499)
+            puts " * New Relic Admin API could not authenticate (Synthetics tests will not be created).".color(Colors::YELLOW)
+            #catapult_exception("#{response.code} The New Relic Admin API could not authenticate, please verify [\"company\"][\"newrelic_admin_api_key\"].")
+          elsif response.code.to_f.between?(500,600)
+            puts " * New Relic Admin API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
+          else
+            puts " * New Relic Admin API authenticated successfully."
+            @api_cloudflare = JSON.parse(response.body)
+          end
         end
+      rescue Net::ReadTimeout => ex
+        puts " * The New Relic Admin API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
+        puts "   - Error was: #{ex.class}".color(Colors::RED)
+      rescue Errno::ETIMEDOUT => ex
+        puts " * The New Relic Admin API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
+        puts "   - Error was: #{ex.class}".color(Colors::RED)
+      rescue Errno::ECONNREFUSED => ex
+        puts " * The New Relic Admin API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
+        puts "   - Error was: #{ex.class}".color(Colors::RED)
       end
     end
     # https://sendgrid.com/docs/API_Reference/api_v3.html
