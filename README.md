@@ -1009,7 +1009,7 @@ Software | Approach | Documentation
 
 ### Caching ###
 
-Caching plays a very important role in the performance of your website, Catapult generally enforces caching of files to 7 days. To ensure that a new website release is reflected in a user's browser you will want to adopt [semantic versioning]((http://semver.org/spec/v2.0.0.html)) of files. Here's an example:
+Caching plays a very important role in the performance of your website. Catapult generally enforces caching of files to 7 days. To ensure that a new website release is reflected in a user's browser you will want to adopt [semantic versioning]((http://semver.org/spec/v2.0.0.html)) of files. Here's an example:
 
 `<link rel="stylesheet" href="style.min.css?v=3.4.1">`
 
