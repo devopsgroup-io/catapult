@@ -528,7 +528,7 @@ Please note that Bamboo Cloud has an end-of-life January 31, 2017. Catapult used
 
 ### 6. **Email:**
 1. **SendGrid** sign-up and configuration
-    1. Create a New Relic account at https://sendgrid.com/
+    1. Create a SendGrid account at https://sendgrid.com/
     2. Sign in to your SendGrid account
     3. Go to Settings > API Keys.
     4. Generate an API key named "Catapult" and place at `~/secrets/configuration.yml["company"]["sendgrid_api_key"]`
@@ -1020,11 +1020,11 @@ Ready to deploy a new release? Update the version number and the cache will be "
 Each software type will vary as to the standard convention of asset versioning, here is a [Wordpress example](https://wordpress.stackexchange.com/a/90824) to get you started.
 
 ### Progressive Web App ###
-Progressive Web App (PWA), in general, is a term used to denote web apps that use the latest web technologies. Catapult allows a `manifest.json` file to be placed anywhere in your `webroot` and accessible regardless of whether you're using the `force_auth` option, this is necessary as `manifest.json` is accessed outside of the session of which you are authenticated. Don't forget to include the `link` tag `<link rel="manifest" href="/manifest.json">` to notify the browser of your manifest. More information regarding WPAs can be found at Google's [Web App Manifest](https://developers.google.com/web/fundamentals/engage-and-retain/web-app-manifest/) and [Progressive Web App Checklist](https://developers.google.com/web/progressive-web-apps/checklist).
+Progressive Web App (PWA), in general, is a term used to denote web apps that use the latest web technologies. Catapult allows a `manifest.json` file to be placed in your `webroot`. Note that this will be accessible regardless of whether or not you are using the `force_auth` option, which is necessary because `manifest.json` is sometimes accessed outside of the session under which you authenticated. Don't forget to include the `link` tag `<link rel="manifest" href="/manifest.json">` to notify the browser of your manifest. More information regarding PWAs can be found at Google's [Web App Manifest](https://developers.google.com/web/fundamentals/engage-and-retain/web-app-manifest/) and [Progressive Web App Checklist](https://developers.google.com/web/progressive-web-apps/checklist).
 
 ### Email ###
 
-Email delivery is an art, there are many considerations when trying to get an email into someone's inbox. Some considerations include, IP reputation, bounce management, analytics visibility, and more. For that reason, Catapult requires setup of a SendGrid accoung and recommned use of. To configure SendGrid with your software type, please set the SMTP configurtion to the following:
+Email delivery is an art, there are many considerations when trying to get an email into someone's inbox. Some considerations include, IP reputation, bounce management, analytics visibility, and more. For that reason, Catapult requires setup of a SendGrid account and configuration of SMTP within your website's software. To configure SendGrid with your software type, please set the SMTP configurtion to the following:
 
 * SMTP host: `smtp.sendgrid.net`
 * SMTP port: `587`
