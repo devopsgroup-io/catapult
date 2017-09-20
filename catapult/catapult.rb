@@ -922,16 +922,20 @@ module Catapult
             puts " * Bamboo API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
           else
             puts " * Bamboo API authenticated successfully."
-            @api_bamboo = JSON.parse(response.body)
-            api_bamboo_project_key = @api_bamboo["projects"]["project"].find { |element| element["key"] == "CAT" }
-            unless api_bamboo_project_key
-              catapult_exception("Could not find the project key \"CAT\" in Bamboo, please follow the Services Setup for Bamboo at https://github.com/devopsgroup-io/catapult#services-setup")
-            end
-            api_bamboo_project_name = @api_bamboo["projects"]["project"].find { |element| element["name"] == "Catapult" }
-            unless api_bamboo_project_name
-              catapult_exception("Could not find the project name \"Catapult\" in Bamboo, please follow the Services Setup for Bamboo at https://github.com/devopsgroup-io/catapult#services-setup")
+            if response.body.nil? || response.body.empty?
+              puts "   - Received an empty response. This usually happens when the Bamboo server has not been initally configured.".color(Colors::YELLOW)
             else
-              puts "   - Found the project key \"CAT\""
+              @api_bamboo = JSON.parse(response.body)
+              api_bamboo_project_key = @api_bamboo["projects"]["project"].find { |element| element["key"] == "CAT" }
+              unless api_bamboo_project_key
+                catapult_exception("Could not find the project key \"CAT\" in Bamboo, please follow the Services Setup for Bamboo at https://github.com/devopsgroup-io/catapult#services-setup")
+              end
+              api_bamboo_project_name = @api_bamboo["projects"]["project"].find { |element| element["name"] == "Catapult" }
+              unless api_bamboo_project_name
+                catapult_exception("Could not find the project name \"Catapult\" in Bamboo, please follow the Services Setup for Bamboo at https://github.com/devopsgroup-io/catapult#services-setup")
+              else
+                puts "   - Found the project key \"CAT\""
+              end
             end
           end
           ["CAT-TEST", "CAT-QC", "CAT-PROD", "CAT-WINTEST", "CAT-WINQC", "CAT-WINPROD"].each do | plan |
@@ -944,6 +948,8 @@ module Catapult
                 catapult_exception("Could not find the plan key #{plan} in Bamboo, please follow the Services Setup for Bamboo at https://github.com/devopsgroup-io/catapult#services-setup")
               elsif response.code.to_f.between?(500,600)
                 puts "   - The Bamboo API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
+              elsif response.body.nil? || response.body.empty?
+                #puts "   - Received an empty response. This usually happens when the Bamboo server has not been initally configured.".color(Colors::YELLOW)
               else
                 puts "   - Found the plan key \"#{plan}\""
               end

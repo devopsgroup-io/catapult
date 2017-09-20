@@ -396,7 +396,7 @@ Bitbucket provides free private repositories and GitHub provides free public rep
     2. Add your newly created `id_rsa.pub` from `~/secrets/id_rsa.pub` key in https://github.com/settings/ssh named "Catapult"
 
 ### 3. **Automated Deployments:**
-Please note that Bamboo Cloud has an end-of-life January 31, 2017. Catapult used Bamboo Cloud until recent, there is now an implemenation of Bamboo Server. Please use the setup instructions for Bamboo Server, Bamboo Cloud documenation kept for transitioning users.
+Please note that Bamboo Cloud's end-of-life is January 31, 2017. For new setups, please use the **Bamboo Server sign-up and set-up** documentation. Existing Catapult user's may still be using Bamboo Cloud, in that case, please use the **Bamboo Cloud sign-up and set-up** documentation.
 
 **Bamboo Cloud sign-up and set-up**
 
@@ -431,16 +431,17 @@ Please note that Bamboo Cloud has an end-of-life January 31, 2017. Catapult used
 
 **Bamboo Server set-up**
 
-1. Access your MyAtlassian License section at https://my.atlassian.com/products/index
+1. Sign up for an Atlassian account at https://my.atlassian.com/
+2. Access your My Atlassian license section at https://my.atlassian.com/products/index
     * Please read the Bamboo Licensing and Pricing page for more information https://www.atlassian.com/licensing/bamboo
-2a. For current Bamboo Cloud customers transitioning to Bamboo Server, you will see a Bamboo Starter License
-2b. For new Bamboo customers, please purchase a Bamboo Server license from https://www.atlassian.com/purchase/product/bamboo 
-3. It's now time to bring up your build server, please run `vagrant up ~/secrets/configuration.yml["company"]["name"]-build`
+3a. For current Bamboo Cloud customers transitioning to Bamboo Server, you will see a Bamboo Starter License
+3b. For new Bamboo customers, please purchase a Bamboo Server license from https://www.atlassian.com/purchase/product/bamboo 
+4. It's now time to bring up your build server, please run `vagrant up ~/secrets/configuration.yml["company"]["name"]-build`
     * The initial `up` will take some time for, please be patient
-4. Login to DigitalOcean to obtain the IP address of the virtual machine to access via URL
+5. Login to DigitalOcean to obtain the IP address of the virtual machine to access via URL
     * Place your Bamboo base URL at `~/secrets/configuration.yml["company"]["bamboo_base_url"]`, the format should be http://[digitalocean-ip-here]/
-5. Once your Bamboo Server instance is accessible via URL, you will be prompted with a license prompt, enter your license.
-6. You will next be prompted to enter the following information:
+6. Once your Bamboo Server instance is accessible via URL, you will be prompted with a license prompt, enter your license.
+7. You will next be prompted to enter the following information:
     * Username (required) - root
     * Password (required) - specify a complex password
     * Confirm password (required)
@@ -448,6 +449,7 @@ Please note that Bamboo Cloud has an end-of-life January 31, 2017. Catapult used
     * Email - use `~/secrets/configuration.yml["company"]["email"]`
 
 **Bamboo Configuration**
+To avoid having to manually configure the Bamboo project, plans, stages, jobs, and tasks configuration, you may optionally install and purchase the "Bob Swift Atlassian Add-ons - Bamboo CLI Connector" Bamboo add-on. Otherwise, the manual setup configuration steps are outlined below:
 
 1. Place your Bamboo username at `~/secrets/configuration.yml["company"]["bamboo_username"]`
     * Normally admin for Bamboo Cloud
