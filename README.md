@@ -449,6 +449,7 @@ Please note that Bamboo Cloud's end-of-life is January 31, 2017. For new setups,
     * Email - use `~/secrets/configuration.yml["company"]["email"]`
 
 **Bamboo Configuration**
+
 To avoid having to manually configure the Bamboo project, plans, stages, jobs, and tasks configuration, you may optionally install and purchase the "Bob Swift Atlassian Add-ons - Bamboo CLI Connector" Bamboo add-on. Otherwise, the manual setup configuration steps are outlined below:
 
 1. Place your Bamboo username at `~/secrets/configuration.yml["company"]["bamboo_username"]`
@@ -570,9 +571,9 @@ For each **Environment** you will need to:
 
 ## Configure Automated Deployments ##
 
-Once the Web and Database Servers are up and running, it's then time to configure your Bamboo Catapult project's TEST, QC, and PROD plans.
+Once the Web and Database Servers are up and running, it's then time to configure your Bamboo Catapult project's TEST, QC, and PROD plans. To avoid having to manually configure the Bamboo project, plans, stages, jobs, and tasks configuration, you may optionally install and purchase the "Bob Swift Atlassian Add-ons - Bamboo CLI Connector" Bamboo add-on. Otherwise, the manual setup configuration steps are outlined below:
 
-1. Sign in to your new custom Bamboo instance https://[your-name-here].atlassian.net
+1. Sign in to your new custom Bamboo instance `~/secrets/configuration.yml["company"]["bamboo_base_url"]`
 2. Click Build > All build plans from the header:
 3. From the Build Dashboard and under the Catapult project:
     * **Configure Catapult Project TEST Plan**
