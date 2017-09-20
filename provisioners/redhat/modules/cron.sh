@@ -10,6 +10,10 @@ cat "/catapult/provisioners/redhat/modules/cron_security_detective.sh" > "/etc/c
 if ([ "${4}" == "apache" ]); then
     cat "/catapult/provisioners/redhat/modules/cron_security_corrective.sh" > "/etc/cron.weekly/02catapult-security-corrective.cron"
 fi
+# bamboo
+if ([ "${4}" == "bamboo" ]); then
+    cat "/catapult/provisioners/redhat/modules/cron_bamboo.sh" > "/etc/cron.daily/catapult-bamboo.cron"
+fi
 # certificates
 if ([ "${4}" == "apache" ] && [ "${1}" != "dev" ]); then
     cat "/catapult/provisioners/redhat/modules/cron_certificates.sh" > "/etc/cron.weekly/catapult-certificates.cron"
@@ -23,7 +27,7 @@ if ([ "${4}" == "apache" ]); then
     cat "/catapult/provisioners/redhat/modules/cron_mail.sh" > "/etc/cron.daily/catapult-mail.cron"
 fi
 # mysql
-if [ "${4}" == "mysql" ]; then
+if ([ "${4}" == "mysql" ]); then
     # ref: https://mariadb.com/kb/en/mariadb/mysqlcheck/
     cat "/catapult/provisioners/redhat/modules/cron_mysql.sh" > "/etc/cron.weekly/catapult-mysql.cron"
 fi
@@ -33,7 +37,7 @@ cat "/catapult/provisioners/redhat/modules/cron_reboot.sh" > "/etc/cron.weekly/c
 
 # define cron tasks and be mindful of order
 hourly=("0anacron" "0yum-hourly.cron")
-daily=("0yum-daily.cron" "catapult-mail.cron" "logrotate" "man-db.cron")
+daily=("0yum-daily.cron" "catapult-bamboo.cron" "catapult-mail.cron" "logrotate" "man-db.cron")
 weekly=("00catapult-security-preventive.cron" "01catapult-security-detective.cron" "02catapult-security-corrective.cron" "catapult-certificates.cron" "catapult-git.cron" "catapult-mysql.cron" "catapult-reboot.cron")
 monthly=()
 
