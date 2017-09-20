@@ -1,0 +1,32 @@
+
+   For license information, see LICENSE files included with
+   this distribution as well as LICENSE files packaged in
+   the various jar files included with this distribution.
+
+   This product includes software originally developed by
+   Bob Swift and Bob Swift Software, LLC.
+   License is BSD (http://www.opensource.org/licenses/bsd-license.php).
+
+   This distribution includes binary distributions from
+   other providers including, but not limited to, the following:
+
+   This product includes software developed by
+   The Apache Software Foundation (http://www.apache.org/).
+
+   This product includes software developed by
+   Martian Software, Inc. (http://www.martiansoftware.com).
+
+   This product includes software developed by
+   PostgreSQL Global Development Group. (http://jdbc.postgresql.org).
+
+   This product includes software provided by
+   JSON.simple (http://code.google.com/p/json-simple).
+
+   This product includes software provided by
+   Jonathan Hedley (https://github.com/jhy/jsoup).
+
+   This product includes software provided by
+   Atlassian Pty Ltd and Vladimir Schneider (https://github.com/vsch/flexmark-java).
+
+   This product includes software provided by
+   Robin Stocker (https://github.com/robinst/autolink-java).
