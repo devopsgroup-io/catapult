@@ -961,8 +961,6 @@ module Catapult
         puts "   - Error was: #{ex.class}".color(Colors::RED)
       end
     end
-    File.delete(@lock_file_unique)
-    exit
     # https://api.cloudflare.com/
     puts "[CloudFlare API]"
     if @configuration["company"]["cloudflare_api_key"] == nil || @configuration["company"]["cloudflare_email"] == nil
