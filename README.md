@@ -1365,9 +1365,9 @@ Catapult as a platform can only reach so far into the configuration of your webs
   * Image compression with [imagemin](https://www.npmjs.com/package/gulp-imagemin)
   * JavaScript minification with [UglifyJS2](https://www.npmjs.com/package/gulp-uglify)
   * CSS minification with [clean-css](https://www.npmjs.com/package/gulp-clean-css)
-* Execute resource files [asynchronously](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script#attr-async)
+* Execute `<script>` tags [asynchronously](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script#attr-async)
     * Note that asynchronous scripts are not guaranteed to execute in specified order
-* Execute website resource files after the document has been parsed with [defer](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script#attr-defer)
+* Execute `<script>` tags after the document has been parsed with [defer](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script#attr-defer)
     * Note this is the same as placing script tags just before the `</body>` tag
 * Use [CSS sprites](https://css-tricks.com/css-sprites/) to reduce the number of HTTP requests
 * Take advantage of [link prefetching](https://css-tricks.com/prefetching-preloading-prebrowsing/) using `rel="prefetch"`
