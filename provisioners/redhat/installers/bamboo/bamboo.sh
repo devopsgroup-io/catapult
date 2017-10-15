@@ -19,7 +19,7 @@ APP=bamboo
 # Name of the user to run as
 USER=root
 # Location of application's bin directory
-BASE=/usr/local/src/bamboo/atlassian-bamboo-5.15.7
+BASE=/usr/local/src/bamboo/atlassian-bamboo-BAMBOO_VERSION
 
 case "$1" in
   # Start command

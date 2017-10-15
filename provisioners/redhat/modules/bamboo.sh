@@ -18,11 +18,8 @@ if [ ! -d /usr/local/src/bamboo/atlassian-bamboo-${bamboo_version}/atlassian-bam
     #pkill -9 java
 
     mkdir --parents /usr/local/src/bamboo
-    cd /usr/local/src/bamboo
-    
-    curl --silent --show-error --connect-timeout 5 --output bamboo.tar.gz --retry 5 --location --url https://www.atlassian.com/software/bamboo/downloads/binary/atlassian-bamboo-${bamboo_version}.tar.gz
-
-    tar -xzf bamboo.tar.gz
+    cd /usr/local/src/bamboo && curl --silent --show-error --connect-timeout 5 --output bamboo.tar.gz --retry 5 --location --url https://www.atlassian.com/software/bamboo/downloads/binary/atlassian-bamboo-${bamboo_version}.tar.gz
+    cd /usr/local/src/bamboo && tar -xzf bamboo.tar.gz
 
 fi
 
@@ -43,7 +40,9 @@ bash /usr/local/src/bamboo/atlassian-bamboo-${bamboo_version}/bin/setenv.sh
 
 # run bamboo as as service
 # https://confluence.atlassian.com/bamboo/running-bamboo-as-a-linux-service-416056046.html
-sudo cat "/catapult/provisioners/redhat/installers/bamboo/bamboo.sh" > "/etc/init.d/bamboo"
+sudo sed "s/BAMBOO_VERSION/${bamboo_version}/g" "/catapult/provisioners/redhat/installers/bamboo/bamboo.sh" > "/etc/init.d/bamboo"
+# the damon may need to be reloaded for an upgrade
+sudo systemctl daemon-reload
 # make the bamboo init script executable
 chmod a+x /etc/init.d/bamboo
 # add the bamboo init script to systemctl
