@@ -83,7 +83,7 @@ if [ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-values-0 redha
     # get configuration
     source "/catapult/provisioners/redhat/modules/catapult.sh"
 
-    # report a deployment to new relic
+    # report the start of this deployment to new relic
     newrelic_deployment=$(curl --silent --show-error --connect-timeout 10 --max-time 20 --write-out "HTTPSTATUS:%{http_code}" --request POST "https://api.newrelic.com/deployments.xml" \
     --header "X-Api-Key: $(catapult company.newrelic_api_key)" \
     --data "deployment[app_name]=$(catapult company.name | tr '[:upper:]' '[:lower:]')-${1}-redhat" \
@@ -93,9 +93,9 @@ if [ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-values-0 redha
     newrelic_deployment=$(echo "${newrelic_deployment}" | sed -e 's/HTTPSTATUS\:.*//g')
     # check for a curl error
     if [ $newrelic_deployment_status == 000 ]; then
-        echo "there was a problem reporting this deployment to new relic"
+        echo -e "==> REPORTED TO NEW RELIC: ERROR"
     else
-        echo "successfully reported this deployment to new relic"
+        echo -e "==> REPORTED TO NEW RELIC: YES"
     fi
 
     # loop through each required module
@@ -254,6 +254,22 @@ if [ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-values-0 redha
     echo -e "\n\n\n==> PROVISION: ${4}"
     echo -e "==> FINISH: $(date)" | tee -a /catapult/provisioners/redhat/logs/$4.log
     echo -e "==> DURATION: ${provisiontotal} total time" | tee -a /catapult/provisioners/redhat/logs/$4.log
+
+    # report the end of this deployment to new relic
+    newrelic_deployment=$(curl --silent --show-error --connect-timeout 10 --max-time 20 --write-out "HTTPSTATUS:%{http_code}" --request POST "https://api.newrelic.com/deployments.xml" \
+    --header "X-Api-Key: $(catapult company.newrelic_api_key)" \
+    --data "deployment[app_name]=$(catapult company.name | tr '[:upper:]' '[:lower:]')-${1}-redhat" \
+    --data "deployment[description]=Catapult Provision Ended" \
+    --data "deployment[revision]=$(cat "/catapult/VERSION.yml" | shyaml get-value version)")
+    newrelic_deployment_status=$(echo "${newrelic_deployment}" | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
+    newrelic_deployment=$(echo "${newrelic_deployment}" | sed -e 's/HTTPSTATUS\:.*//g')
+    # check for a curl error
+    if [ $newrelic_deployment_status == 000 ]; then
+        echo -e "==> REPORTED TO NEW RELIC: ERROR"
+    else
+        echo -e "==> REPORTED TO NEW RELIC: YES"
+    fi
+
 else
     echo -e "Error: Cannot detect the server type."
     exit 1

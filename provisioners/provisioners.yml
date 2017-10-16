@@ -138,7 +138,7 @@ redhat:
       persistent: false
   servers:
     apache:
-      modules: ["time","system","iptables","newrelic_sysmon","cron","apache","php","newrelic_apm_php","software_tools","git_clean","software_operations_file","git","rsync","git_permissions","software_config","cloudflare_zones","cloudflare_dns","apache_vhosts_clean","apache_vhosts"]
+      modules: ["time","system","iptables","newrelic_sysmon","cron","apache","php","software_tools","git_clean","software_operations_file","git","rsync","git_permissions","software_config","cloudflare_zones","cloudflare_dns","apache_vhosts_clean","apache_vhosts"]
     bamboo:
       modules: ["time","system","iptables","newrelic_sysmon","cron","bamboo"]
     mysql:
@@ -180,6 +180,7 @@ software:
       eol: "2015-10-31"
       file_store_containers: ["application/cache","application/logs","uploads"]
       file_stores: ["uploads"]
+      php_version: "5.4"
       version: [2]
     codeigniter3:
       repo: "https://github.com/bcit-ci/CodeIgniter.git"
@@ -187,6 +188,7 @@ software:
       database_config_file: "application/config/database.php"
       file_store_containers: ["application/cache","application/logs","uploads"]
       file_stores: ["uploads"]
+      php_version: "5.6"
       version: [3]
     drupal6:
       repo: "https://git.drupal.org/project/drupal.git"
@@ -194,29 +196,34 @@ software:
       database_config_file: "sites/default/settings.php"
       eol: "2016-02-24"
       file_stores: ["sites/default/files"]
+      php_version: "5.4"
       version: [6]
     drupal7:
       repo: "https://git.drupal.org/project/drupal.git"
       branch: "7.x"
       database_config_file: "sites/default/settings.php"
       file_stores: ["sites/default/files"]
+      php_version: "5.6"
       version: [7]
     elgg1:
       repo: "https://github.com/Elgg/Elgg.git"
       branch: "1.12"
       database_config_file: "engine/settings.php"
       file_store_containers: ["dataroot"]
+      php_version: "5.6"
       version: [1]
     expressionengine3:
       repo: PRIVATE
       database_config_file: "system/user/config/config.php"
       file_store_containers: ["system/user/cache","system/user/templates","images/avatars","images/captchas","images/member_photos","images/pm_attachments","images/signature_attachments","images/uploads"]
+      php_version: "5.4"
       version: [3]
     joomla3:
       repo: "https://github.com/joomla/joomla-cms.git"
       branch: "3.6.x"
       database_config_file: "configuration.php"
       file_store_containers: ["administrator/cache","cache","logs","tmp"]
+      php_version: "5.6"
       version: [3]
     laravel5:
       repo: "https://github.com/laravel/laravel.git"
@@ -224,6 +231,7 @@ software:
       database_config_file: "config/database.php"
       file_store_containers: ["bootstrap/cache","resources","storage"]
       file_stores: ["resources","storage"]
+      php_version: "5.6"
       softwareroot: "../"
       version: [5]
     mediawiki1:
@@ -232,13 +240,15 @@ software:
       database_config_file: "LocalSettings.php"
       file_store_containers: ["images"]
       file_stores: ["images"]
+      php_version: "5.6"
       version: [3]
     moodle3:
       repo: "https://github.com/moodle/moodle.git"
       branch: "MOODLE_30_STABLE"
+      database_config_file: "config.php"
       file_store_containers: ["moodledata"]
       file_stores: ["moodledata/filedir"]
-      database_config_file: "config.php"
+      php_version: "7.0"
       version: [3]
     silverstripe3:
       repo: "https://github.com/silverstripe/silverstripe-installer"
@@ -246,6 +256,7 @@ software:
       database_config_file: "mysite/_config.php"
       file_store_containers: ["assets"]
       file_stores: ["assets/Uploads"]
+      php_version: "5.6"
       version: [3]
     suitecrm7:
       repo: "https://github.com/salesagility/SuiteCRM.git"
@@ -253,6 +264,7 @@ software:
       database_config_file: "config_override.php"
       file_store_containers: ["cache","custom","data","modules","upload","themes","tmp"]
       file_stores: ["uploads"]
+      php_version: "5.6"
       version: [7]
     wordpress:
       repo: "https://github.com/WordPress/WordPress.git"
@@ -260,17 +272,20 @@ software:
       database_config_file: "wp-config.php"
       file_store_containers: ["wp-content"]
       file_stores: ["wp-content/uploads"]
+      php_version: "7.0"
       version: [3,4]
     xenforo:
       repo: PRIVATE
       database_config_file: "sites/default/settings.php"
       file_store_containers: ["data","internal_data"]
       file_stores: ["data","internal_data"]
+      php_version: "5.6"
       version: [1]
     zendframework2:
       repo: "https://github.com/zendframework/zendframework.git"
       tag: "release-2.4.10"
       database_config_file: "config/autoload/global.php"
+      php_version: "5.6"
       softwareroot: "../"
       version: [2]
   iis:

@@ -101,7 +101,7 @@ SuiteCRM 7                        | `suitecrm7`            | October 21, 2013   
 WordPress >=3.7                   | `wordpress`            | June 17, 2010      |
 WordPress 4                       | `wordpress`            | September 4, 2014  |
 XenForo 1                         | `xenforo`              | March 8, 2011      |
-Zend Framework 2.0.x <=2.4.x      | `zendframework2`       | September 5, 2012  |
+Zend Framework 2                  | `zendframework2`       | September 5, 2012  |
 
 Catapult additionally supports basic PHP projects that do not have a database requirement:
 

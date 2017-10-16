@@ -1,12 +1,7 @@
 source "/catapult/provisioners/redhat/modules/catapult.sh"
 
 # set variables from secrets/configuration.yml
-mysql_user="$(echo "${configuration}" | shyaml get-value environments.$1.servers.redhat_mysql.mysql.user)"
-mysql_user_password="$(echo "${configuration}" | shyaml get-value environments.$1.servers.redhat_mysql.mysql.user_password)"
-mysql_root_password="$(echo "${configuration}" | shyaml get-value environments.$1.servers.redhat_mysql.mysql.root_password)"
-redhat_ip="$(echo "${configuration}" | shyaml get-value environments.$1.servers.redhat.ip)"
-redhat_mysql_ip="$(echo "${configuration}" | shyaml get-value environments.$1.servers.redhat_mysql.ip)"
-company_email="$(echo "${configuration}" | shyaml get-value company.email)"
+company_email="$(catapult company.email)"
 
 # create a vhost per website
 echo "${configuration}" | shyaml get-values-0 websites.apache |
@@ -34,6 +29,7 @@ while IFS='' read -r -d '' key; do
     force_https=$(echo "$key" | grep -w "force_https" | cut -d ":" -f 2 | tr -d " ")
     software=$(echo "$key" | grep -w "software" | cut -d ":" -f 2 | tr -d " ")
     software_dbprefix=$(echo "$key" | grep -w "software_dbprefix" | cut -d ":" -f 2 | tr -d " ")
+    software_php_version=$(provisioners software.apache.${software}.php_version)
     software_workflow=$(echo "$key" | grep -w "software_workflow" | cut -d ":" -f 2 | tr -d " ")
     webroot=$(echo "$key" | grep -w "webroot" | cut -d ":" -f 2 | tr -d " ")
 
@@ -144,6 +140,26 @@ EOF
         force_https_value="# HTTPS is only forced when force_https=true"
         force_https_hsts="# HSTS is only enabled when force_https=true"
     fi
+    # handle the software php_version setting
+    if [ "${software_php_version}" = "7.0" ]; then
+        software_php_version_value="
+        <FilesMatch \.php$>
+            SetHandler \"proxy:fcgi://127.0.0.1:9700\"
+        </FilesMatch>
+        "
+    elif [ "${software_php_version}" = "5.6" ]; then
+        software_php_version_value="
+        <FilesMatch \.php$>
+            SetHandler \"proxy:fcgi://127.0.0.1:9560\"
+        </FilesMatch>
+        "
+    else
+        software_php_version_value="
+        <FilesMatch \.php$>
+            SetHandler \"proxy:fcgi://127.0.0.1:9540\"
+        </FilesMatch>
+        "
+    fi
     # write vhost apache conf file
     sudo cat > /etc/httpd/sites-available/${domain_environment}.conf << EOF
 
@@ -206,6 +222,9 @@ EOF
 
     # define apache ruleset for the web root
     <Directory "/var/www/repositories/apache/${domain}/${webroot}">
+
+        # define the php version being used
+        ${software_php_version_value}
 
         # allow .htaccess in apache 2.4+
         AllowOverride All
