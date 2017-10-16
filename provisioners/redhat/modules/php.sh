@@ -17,9 +17,9 @@ sudo yum install -y rh-php70
 # configure php-fpm
 if ([ "${4}" == "apache" ]); then
     sudo yum install -y rh-php70-php-fpm
+    sed -i -e "s#^listen = 127.0.0.1:9000#listen = 127.0.0.1:9700#g" /etc/opt/rh/rh-php70/php-fpm.d/www.conf
     sudo systemctl enable rh-php70-php-fpm
     sudo systemctl start rh-php70-php-fpm
-    sed -i -e "s#^listen = 127.0.0.1:9000#listen = 127.0.0.1:9700#g" /etc/opt/rh/rh-php70/php-fpm.d/www.conf
 fi
 
 # php.ini configuration options
@@ -84,9 +84,9 @@ sudo yum install -y rh-php56
 # configure php-fpm
 if ([ "${4}" == "apache" ]); then
     sudo yum install -y rh-php56-php-fpm
+    sed -i -e "s#^listen = 127.0.0.1:9000#listen = 127.0.0.1:9560#g" /etc/opt/rh/rh-php56/php-fpm.d/www.conf
     sudo systemctl enable rh-php56-php-fpm
     sudo systemctl start rh-php56-php-fpm
-    sed -i -e "s#^listen = 127.0.0.1:9000#listen = 127.0.0.1:9560#g" /etc/opt/rh/rh-php56/php-fpm.d/www.conf
 fi
 
 # php.ini configuration options
@@ -151,9 +151,9 @@ sudo yum install -y php-cli
 # configure php-fpm
 if ([ "${4}" == "apache" ]); then
     sudo yum install -y php-fpm
+    sed -i -e "s#^listen = 127.0.0.1:9000#listen = 127.0.0.1:9540#g" /etc/php-fpm.d/www.conf
     sudo systemctl enable php-fpm
     sudo systemctl start php-fpm
-    sed -i -e "s#^listen = 127.0.0.1:9000#listen = 127.0.0.1:9540#g" /etc/php-fpm.d/www.conf
 fi
 
 # php.ini configuration options
