@@ -245,9 +245,9 @@ EOF
 
         # https://www.owasp.org/index.php/OWASP_Secure_Headers_Project#tab=Headers
         # https://securityheaders.io/?q=devopsgroup.io&followRedirects=on
-        Header set X-Content-Type-Options: nosniff
-        Header set X-Frame-Options: sameorigin
-        Header set X-XSS-Protection: 1; mode=block
+        #Header set X-Content-Type-Options: nosniff
+        #Header set X-Frame-Options: sameorigin
+        #Header set X-XSS-Protection: 1; mode=block
 
         # compressed certain content types before being sent to the client over the network
         # https://github.com/h5bp/server-configs-apache
