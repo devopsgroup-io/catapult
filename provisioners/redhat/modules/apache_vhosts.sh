@@ -243,13 +243,18 @@ EOF
             </IfModule>
         </Files>
 
+        # set security related response headers
         # https://www.owasp.org/index.php/OWASP_Secure_Headers_Project#tab=Headers
         # https://securityheaders.io/?q=devopsgroup.io&followRedirects=on
-        #Header set X-Content-Type-Options: nosniff
-        #Header set X-Frame-Options: sameorigin
-        #Header set X-XSS-Protection: 1; mode=block
+        # https://github.com/h5bp/server-configs-apache/tree/master/src/security
+        <IfModule mod_headers.c>
+            #Header set Content-Security-Policy "script-src 'self'; object-src 'self'"
+            Header set X-Content-Type-Options: "nosniff"
+            Header set X-Frame-Options: "sameorigin"
+            Header set X-XSS-Protection: "1; mode=block"
+        </IfModule>
 
-        # compressed certain content types before being sent to the client over the network
+        # compress certain content types before being sent to the client over the network
         # https://github.com/h5bp/server-configs-apache
         # https://httpd.apache.org/docs/current/mod/mod_filter.html#addoutputfilterbytype
         <IfModule mod_deflate.c>
