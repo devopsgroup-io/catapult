@@ -243,6 +243,12 @@ EOF
             </IfModule>
         </Files>
 
+        # https://www.owasp.org/index.php/OWASP_Secure_Headers_Project#tab=Headers
+        # https://securityheaders.io/?q=devopsgroup.io&followRedirects=on
+        X-Content-Type-Options: nosniff
+        X-Frame-Options: sameorigin
+        X-XSS-Protection: 1; mode=block
+
         # compressed certain content types before being sent to the client over the network
         # https://github.com/h5bp/server-configs-apache
         # https://httpd.apache.org/docs/current/mod/mod_filter.html#addoutputfilterbytype
