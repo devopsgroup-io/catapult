@@ -39,6 +39,7 @@ domainvaliddbname=$(catapult websites.apache.$5.domain | tr "." "_" | tr "-" "_"
 software=$(catapult websites.apache.$5.software)
 software_dbprefix=$(catapult websites.apache.$5.software_dbprefix)
 softwareroot=$(provisioners software.apache.${software}.softwareroot)
+unique_hash=$(dmidecode -s system-uuid)
 webroot=$(catapult websites.apache.$5.webroot)
 database_config_file=$(provisioners software.apache.${software}.database_config_file)
 
@@ -102,6 +103,7 @@ elif [ "${software}" = "drupal7" ]; then
     fi
     connectionstring="\$databases['default']['default'] = array('driver' => 'mysql','database' => '${1}_${domainvaliddbname}','username' => '${mysql_user}','password' => '${mysql_user_password}','host' => '${redhat_mysql_ip}','prefix' => '${software_dbprefix}');"
     sed --expression="s/\$databases\s=\sarray();/${connectionstring}/g" \
+        --expression="s/\$drupal_hash_salt\s=\s'';/\$drupal_hash_salt = '${unique_hash}';/g" \
         /catapult/provisioners/redhat/installers/software/${software}/settings.php > "${file}"
     sudo chmod 0444 "${file}"
 
@@ -116,7 +118,9 @@ elif [ "${software}" = "drupal8" ]; then
     fi
     connectionstring="\$databases['default']['default'] = array('driver' => 'mysql','database' => '${1}_${domainvaliddbname}','username' => '${mysql_user}','password' => '${mysql_user_password}','host' => '${redhat_mysql_ip}','prefix' => '${software_dbprefix}');"
     sed --expression="s/\$databases\s=\sarray();/${connectionstring}/g" \
+        --expression="s/\$settings\['hash_salt'\]\s=\s'';/\$settings['hash_salt'] = '${unique_hash}';/g" \
         /catapult/provisioners/redhat/installers/software/${software}/settings.php > "${file}"
+
     # drupal requires the config file to be writable for installation
     cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush status bootstrap | grep -q Successful
     if [ $? -eq 0 ]; then
@@ -288,6 +292,7 @@ elif [ "${software}" = "wordpress" ]; then
         --expression="s/password_here/${mysql_user_password}/g" \
         --expression="s/localhost/${redhat_mysql_ip}/g" \
         --expression="s/'wp_'/'${software_dbprefix}'/g" \
+        --expression="s/'put your unique phrase here'/'${unique_hash}'/g" \
         /catapult/provisioners/redhat/installers/software/${software}/wp-config.php > "${file}"
     sudo chmod 0444 "${file}"
 
