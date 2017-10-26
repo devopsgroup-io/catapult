@@ -82,26 +82,26 @@ Catapult orchestrates the following key components of DevOps to provide you with
 
 ## Supported Software ##
 
-Catapult intelligently manages the following software that has been chosen from trending usage statistics from [BuiltWith](https://trends.builtwith.com/cms) and align with the [CentOS 7 trunk](http://mirror.centos.org/centos/7/os/x86_64/Packages/):
+Catapult intelligently manages the following software that has been chosen from trending usage statistics from [BuiltWith](https://trends.builtwith.com/cms) and align with the [CentOS 7 trunk](http://mirror.centos.org/centos/7/os/x86_64/Packages/) along with the [Software Collections trunk](https://www.softwarecollections.org/):
 
-Software | [Key](#websites) | Released | End-of-Life
+Software | [Key](#websites) | Minimum PHP Version | Defined PHP Version | Released | End-of-Life
 ---------|------------------|----------|------------
-CodeIgniter 2                     | `codeigniter2`         | January 28, 2011   | [October 31, 2015](http://forum.codeigniter.com/thread-61357.html)
-CodeIgniter 3                     | `codeigniter3`         | March 30, 2015     | 
-Drupal 6                          | `drupal6`              | February 13, 2008  | [February 24, 2016](https://www.drupal.org/drupal-6-eol)
-Drupal 7                          | `drupal7`              | January 5, 2011    |
-Elgg 1                            | `elgg1`                | August 20, 2008    |
-ExpressionEngine 3                | `expressionengine3`    | October 13, 2015   |
-Joomla 3                          | `joomla3`              | September 27, 2012 |
-Laravel 5.0.x                     | `laravel5`             | February 4, 2015   |
-MediaWiki 1                       | `mediawiki1`           | December 8, 2003   |
-Moodle 3                          | `moodle3`              | November 16, 2015  |
-SilverStripe 3                    | `silverstripe3`        | June 29, 2012      |
-SuiteCRM 7                        | `suitecrm7`            | October 21, 2013   |
-WordPress >=3.7                   | `wordpress`            | June 17, 2010      |
-WordPress 4                       | `wordpress`            | September 4, 2014  |
-XenForo 1                         | `xenforo`              | March 8, 2011      |
-Zend Framework 2                  | `zendframework2`       | September 5, 2012  |
+CodeIgniter 2                     | `codeigniter2`         | 5.1.6  | 5.4 | January 28, 2011   | [October 31, 2015](http://forum.codeigniter.com/thread-61357.html)
+CodeIgniter 3                     | `codeigniter3`         | 5.6    | 5.6 | March 30, 2015     | 
+Drupal 6                          | `drupal6`              | 5.4    | 5.4 | February 13, 2008  | [February 24, 2016](https://www.drupal.org/drupal-6-eol)
+Drupal 7                          | `drupal7`              | 5.2.5  | 5.6 | January 5, 2011    |
+Drupal 8                          | `drupal8`              | 5.5.9  | 7.0 | November 19, 2015  |
+Elgg 1                            | `elgg1`                | 5.4    | 5.4 | August 20, 2008    |
+ExpressionEngine 3                | `expressionengine3`    | 5.3.10 | 5.4 | October 13, 2015   |
+Joomla 3                          | `joomla3`              | 5.3.10 | 5.6 | September 27, 2012 |
+Laravel 5                         | `laravel5`             | 7.0.0  | 7.0 | February 4, 2015   |
+MediaWiki 1                       | `mediawiki1`           | 5.5.9  | 5.6 | December 8, 2003   |
+Moodle 3                          | `moodle3`              | 5.6.5  | 5.6 | November 16, 2015  |
+SilverStripe 3                    | `silverstripe3`        | 5.3.3  | 5.4 | June 29, 2012      |
+SuiteCRM 7                        | `suitecrm7`            | 5.5    | 5.6 | October 21, 2013   |
+WordPress 4                       | `wordpress`            | 7.0    | 7.0 | September 4, 2014  |
+XenForo 1                         | `xenforo`              | 5.2.11 | 5.4 | March 8, 2011      |
+Zend Framework 2                  | `zendframework2`       | 5.3.23 | 5.4 | September 5, 2012  |
 
 Catapult additionally supports basic PHP projects that do not have a database requirement:
 
@@ -842,6 +842,7 @@ The following options are available:
     * option: `software: codeigniter3`
     * option: `software: drupal6`
     * option: `software: drupal7`
+    * option: `software: drupal8`
     * option: `software: elgg1`
     * option: `software: expressionengine3`
     * option: `software: joomla3`
@@ -913,6 +914,7 @@ Software | `software_auto_update` Support | Install Approach | Install Notes
 `codeigniter3`      | [:white_check_mark:](https://www.codeigniter.com/userguide3/installation/upgrading.html) |          | Follow the [Installation Instructions](https://www.codeigniter.com/userguide3/installation/index.html).
 `drupal6`           | :white_check_mark:                                                       | Drush    | `drush dl drupal-6`
 `drupal7`           | :white_check_mark:                                                       | Drush    | `drush dl drupal-7`
+`drupal8`           | :white_check_mark:                                                       | Drush    | `drush dl drupal-8`
 `elgg1`             | [:x:](http://learn.elgg.org/en/2.0/admin/upgrading.html)                 | Fork     | Follow the installation [Overview](http://learn.elgg.org/en/2.0/intro/install.html). Catapult requires the `dataroot` directory to be within the webroot, it's pertinant to create a `.gitignore` to ignore and `.htaccess` to deny access to this directory.
 `expressionengine3` | [:x:](https://docs.expressionengine.com/latest/installation/update.html) | Download |
 `joomla3`           | [:x:](https://docs.joomla.org/J3.x:Updating_from_an_existing_version)    | Fork     |
@@ -996,8 +998,9 @@ Software | Approach | Documentation
 ---------|----------|--------------
 `codeigniter2`      |                      |
 `codeigniter3`      |                      |
-`drupal6`           | `.htaccess`          | https://www.drupal.org/node/150215
-`drupal7`           | `.htaccess`          | https://www.drupal.org/node/150215
+`drupal6`           | `.htaccess`          |
+`drupal7`           | `.htaccess`          |
+`drupal8`           | `.htaccess`          |
 `elgg1`             |                      |
 `expressionengine3` |                      |
 `joomla3`           |                      |
@@ -1053,6 +1056,7 @@ Software | Tool | Command | Documentation
 `codeigniter3`      | Migrations      | `php index.php migrate`                                | https://www.codeigniter.com/user_guide/libraries/migration.html
 `drupal6`           | Drush           | `drush updatedb -y`                                    | https://www.drupal.org/node/150215
 `drupal7`           | Drush           | `drush updatedb -y`                                    | https://www.drupal.org/node/150215
+`drupal8`           | Drush           | `drush updatedb -y`                                    | https://www.drupal.org/docs/8/api/update-api/introduction-to-update-api-for-drupal-8
 `elgg1`             |                 |                                                        |
 `expressionengine3` |                 |                                                        |
 `joomla3`           |                 |                                                        |

@@ -16,6 +16,10 @@ if [ ! -f /usr/bin/composer ]; then
     ln -s /usr/local/src/composer/composer.phar /usr/bin/composer
 
 fi
+# configure php version
+if ! grep -q "alias composer-php70='/opt/rh/rh-php70/root/usr/bin/php /usr/local/src/composer/composer.phar'" ~/.bashrc; then
+    sudo bash -c "echo -e \"\nalias composer-php70='/opt/rh/rh-php70/root/usr/bin/php /usr/local/src/composer/composer.phar'\" >> ~/.bashrc"
+fi
 # update to latest composer
 composer self-update
 composer --version
@@ -32,6 +36,9 @@ if [ ! -f /usr/bin/drush ]; then
     ln -s /usr/local/src/drush/drush /usr/bin/drush
 
 fi
+# configure php version
+# http://docs.drush.org/en/master/install/
+export DRUSH_PHP="/opt/rh/rh-php70/root/usr/bin/php"
 # update to specific drush version
 cd /usr/local/src/drush \
     && git fetch \
@@ -53,6 +60,17 @@ if [ ! -f /usr/bin/wp-cli ]; then
     ln -s /usr/local/src/wp-cli/wp-cli.phar /usr/bin/wp-cli
 
 fi
+# configure php version
+# https://github.com/wp-cli/wp-cli#installing
+# https://make.wordpress.org/cli/handbook/installing/#using-a-custom-php-binary
+if ! grep -q "alias wp-cli-php70='/opt/rh/rh-php70/root/usr/bin/php /usr/local/src/wp-cli/wp-cli.phar'" ~/.bashrc; then
+    sudo bash -c "echo -e \"\nalias wp-cli-php70='/opt/rh/rh-php70/root/usr/bin/php /usr/local/src/wp-cli/wp-cli.phar'\" >> ~/.bashrc"
+fi
 # update to latest wp-cli
 wp-cli --allow-root cli update --yes
 wp-cli --allow-root cli version
+
+
+# expose the alternate software tool version aliases
+shopt -s expand_aliases
+source ~/.bashrc

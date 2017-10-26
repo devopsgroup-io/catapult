@@ -105,6 +105,20 @@ elif [ "${software}" = "drupal7" ]; then
         /catapult/provisioners/redhat/installers/software/${software}/settings.php > "${file}"
     sudo chmod 0444 "${file}"
 
+elif [ "${software}" = "drupal8" ]; then
+
+    file="/var/www/repositories/apache/${domain}/${webroot}${softwareroot}${database_config_file}"
+    echo -e "generating ${software} ${file}..."
+    if [ -f "${file}" ]; then
+        sudo chmod 0777 "${file}"
+    else
+        mkdir --parents $(dirname "${file}")
+    fi
+    connectionstring="\$databases['default']['default'] = array('driver' => 'mysql','database' => '${1}_${domainvaliddbname}','username' => '${mysql_user}','password' => '${mysql_user_password}','host' => '${redhat_mysql_ip}','prefix' => '${software_dbprefix}');"
+    sed --expression="s/\$databases\s=\sarray();/${connectionstring}/g" \
+        /catapult/provisioners/redhat/installers/software/${software}/settings.php > "${file}"
+    sudo chmod 0444 "${file}"
+
 elif [ "${software}" = "elgg1" ]; then
 
     file="/var/www/repositories/apache/${domain}/${webroot}${softwareroot}${database_config_file}"
