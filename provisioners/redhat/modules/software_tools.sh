@@ -38,7 +38,9 @@ if [ ! -f /usr/bin/drush ]; then
 fi
 # configure php version
 # http://docs.drush.org/en/master/install/
-export DRUSH_PHP="/opt/rh/rh-php70/root/usr/bin/php"
+if ! grep -q "export DRUSH_PHP='/opt/rh/rh-php70/root/usr/bin/php'" ~/.bashrc; then
+    sudo bash -c "echo -e \"\nexport DRUSH_PHP='/opt/rh/rh-php70/root/usr/bin/php'\" >> ~/.bashrc"
+fi
 # update to specific drush version
 cd /usr/local/src/drush \
     && git fetch \
