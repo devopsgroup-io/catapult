@@ -205,6 +205,13 @@ software:
       file_stores: ["sites/default/files"]
       php_version: "5.6"
       version: [7]
+    drupal8:
+      repo: "https://git.drupal.org/project/drupal.git"
+      branch: "8.4.x"
+      database_config_file: "sites/default/settings.php"
+      file_stores: ["sites/default/files"]
+      php_version: "7.0"
+      version: [8]
     elgg1:
       repo: "https://github.com/Elgg/Elgg.git"
       branch: "1.12"
@@ -231,7 +238,7 @@ software:
       database_config_file: "config/database.php"
       file_store_containers: ["bootstrap/cache","resources","storage"]
       file_stores: ["resources","storage"]
-      php_version: "5.6"
+      php_version: "7.0"
       softwareroot: "../"
       version: [5]
     mediawiki1:
@@ -248,7 +255,7 @@ software:
       database_config_file: "config.php"
       file_store_containers: ["moodledata"]
       file_stores: ["moodledata/filedir"]
-      php_version: "7.0"
+      php_version: "5.6"
       version: [3]
     silverstripe3:
       repo: "https://github.com/silverstripe/silverstripe-installer"
@@ -279,13 +286,13 @@ software:
       database_config_file: "sites/default/settings.php"
       file_store_containers: ["data","internal_data"]
       file_stores: ["data","internal_data"]
-      php_version: "5.6"
+      php_version: "5.4"
       version: [1]
     zendframework2:
       repo: "https://github.com/zendframework/zendframework.git"
       tag: "release-2.4.10"
       database_config_file: "config/autoload/global.php"
-      php_version: "5.6"
+      php_version: "5.4"
       softwareroot: "../"
       version: [2]
   iis:

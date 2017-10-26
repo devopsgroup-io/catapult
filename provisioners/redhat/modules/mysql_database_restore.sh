@@ -96,6 +96,7 @@ if ([ ! -z "${software}" ]); then
                      || [ "${software}" = "codeigniter3" ] \
                      || [ "${software}" = "drupal6" ] \
                      || [ "${software}" = "drupal7" ] \
+                     || [ "${software}" = "drupal8" ] \
                      || [ "${software}" = "elgg1" ] \
                      || [ "${software}" = "expressionengine3" ] \
                      || [ "${software}" = "joomla3" ] \
