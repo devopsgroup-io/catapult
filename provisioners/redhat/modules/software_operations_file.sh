@@ -107,7 +107,7 @@ if hash composer 2>/dev/null && hash drush 2>/dev/null && hash wp-cli 2>/dev/nul
 
     elif [ "${software}" = "drupal8" ]; then
 
-        version=$(cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && cat lib/Drupal.php 2>/dev/null | grep "const VERSION =" | grep --extended-regexp --only-matching --regexp="[0-9]\.[0-9][0-9]?[0-9]?(\.[0-9][0-9]?[0-9]?)?" || echo "0")
+        version=$(cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && cat core/lib/Drupal.php 2>/dev/null | grep "const VERSION =" | grep --extended-regexp --only-matching --regexp="[0-9]\.[0-9][0-9]?[0-9]?(\.[0-9][0-9]?[0-9]?)?" || echo "0")
 
         if [[ "${softwareversion_array[@]}" =~ "$(grep --only-matching --regexp="^[0-9]" <<< "${version}")" ]]; then
             echo -e "\nSUPPORTED SOFTWARE VERSION DETECTED: ${version}\n"
