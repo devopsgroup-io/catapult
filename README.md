@@ -85,7 +85,7 @@ Catapult orchestrates the following key components of DevOps to provide you with
 Catapult intelligently manages the following software that has been chosen from trending usage statistics from [BuiltWith](https://trends.builtwith.com/cms) and align with the [CentOS 7 trunk](http://mirror.centos.org/centos/7/os/x86_64/Packages/) along with the [Software Collections trunk](https://www.softwarecollections.org/):
 
 Software | [Key](#websites) | Minimum PHP Version | Defined PHP Version | Released | End-of-Life
----------|------------------|----------|------------
+---------|------------------|---------------------|---------------------|----------|------------
 CodeIgniter 2                     | `codeigniter2`         | 5.1.6  | 5.4 | January 28, 2011   | [October 31, 2015](http://forum.codeigniter.com/thread-61357.html)
 CodeIgniter 3                     | `codeigniter3`         | 5.6    | 5.6 | March 30, 2015     | 
 Drupal 6                          | `drupal6`              | 5.4    | 5.4 | February 13, 2008  | [February 24, 2016](https://www.drupal.org/drupal-6-eol)
