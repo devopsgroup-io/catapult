@@ -117,7 +117,11 @@ elif [ "${software}" = "drupal8" ]; then
     connectionstring="\$databases['default']['default'] = array('driver' => 'mysql','database' => '${1}_${domainvaliddbname}','username' => '${mysql_user}','password' => '${mysql_user_password}','host' => '${redhat_mysql_ip}','prefix' => '${software_dbprefix}');"
     sed --expression="s/\$databases\s=\sarray();/${connectionstring}/g" \
         /catapult/provisioners/redhat/installers/software/${software}/settings.php > "${file}"
-    sudo chmod 0444 "${file}"
+    # drupal requires the config file to be writable for installation
+    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush status bootstrap | grep -q Successful
+    if [ $? -eq 1 ]; then
+        sudo chmod 0444 "${file}"
+    fi
 
 elif [ "${software}" = "elgg1" ]; then
 
