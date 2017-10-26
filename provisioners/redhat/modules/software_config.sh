@@ -119,7 +119,7 @@ elif [ "${software}" = "drupal8" ]; then
         /catapult/provisioners/redhat/installers/software/${software}/settings.php > "${file}"
     # drupal requires the config file to be writable for installation
     cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush status bootstrap | grep -q Successful
-    if [ $? -eq 1 ]; then
+    if [ $? -eq 0 ]; then
         sudo chmod 0444 "${file}"
     fi
 
