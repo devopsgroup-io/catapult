@@ -273,15 +273,15 @@ software:
       file_stores: ["uploads"]
       php_version: "5.6"
       version: [7]
-    wordpress:
+    wordpress4:
       repo: "https://github.com/WordPress/WordPress.git"
       branch: "4.5-branch"
       database_config_file: "wp-config.php"
       file_store_containers: ["wp-content"]
       file_stores: ["wp-content/uploads"]
       php_version: "7.0"
-      version: [3,4]
-    xenforo:
+      version: [4]
+    xenforo1:
       repo: PRIVATE
       database_config_file: "sites/default/settings.php"
       file_store_containers: ["data","internal_data"]

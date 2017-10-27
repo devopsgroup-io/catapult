@@ -126,7 +126,7 @@ elif [ "${software}" = "suitecrm7" ]; then
         ON DUPLICATE KEY UPDATE user_name='admin', user_hash=MD5('$(catapult environments.${1}.software.admin_password)'), is_admin='1';
     "
 
-elif [ "${software}" = "wordpress" ]; then
+elif [ "${software}" = "wordpress4" ]; then
     
     mysql --defaults-extra-file=$dbconf ${1}_${domainvaliddbname} -e "UPDATE ${software_dbprefix}options SET option_value='$(catapult company.email)' WHERE option_name = 'admin_email';"
     
@@ -288,12 +288,12 @@ elif [ "${software}" = "suitecrm7" ]; then
 
     cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && php cron.php
 
-elif [ "${software}" = "wordpress" ]; then
+elif [ "${software}" = "wordpress4" ]; then
 
     cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && wp-cli --allow-root core update-db
     cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && wp-cli --allow-root cache flush
 
-elif [ "${software}" = "xenforo" ]; then
+elif [ "${software}" = "xenforo1" ]; then
 
     echo "nothing to perform, skipping..."
 
