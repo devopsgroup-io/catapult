@@ -458,8 +458,18 @@ To avoid having to manually configure the Bamboo project, plans, stages, jobs, a
 2. Place your Bamboo password at `~/secrets/configuration.yml["company"]["bamboo_password"]`
 3. Disable anonymous user access by clicking the gear at the top right and going to Overview
     1. Next, under Security, go to Global permissions and remove Access from Anonymous Users
-4. Click Create > Create a new plan from the header:
-    1. **Create Catapult Project and create TEST Plan**
+4. Click Create > Create a new plan from the top navigation:
+    1. **Create Catapult Project and create BUILD Plan**
+        * *Project and build plan name*
+            1. Project > New Project
+            2. Project name: Catapult
+            3. Project key: CAT
+            4. Plan name: BUILD
+            5. Plan key: BUILD
+            6. Plan description:
+        * *Link repository to new build plan*
+            1. Repository host: Other > None
+    2. **Create Catapult Project and create TEST Plan**
         * *Project and build plan name*
             1. Project > New Project
             2. Project name: Catapult
@@ -469,7 +479,7 @@ To avoid having to manually configure the Bamboo project, plans, stages, jobs, a
             6. Plan description:
         * *Link repository to new build plan*
             1. Repository host: Other > None
-    2. **Create QC Plan**
+    3. **Create QC Plan**
         * *Project and build plan name*
             1. Project: Catapult
             4. Plan name: QC
@@ -477,7 +487,7 @@ To avoid having to manually configure the Bamboo project, plans, stages, jobs, a
             6. Plan description:
         * *Link repository to new build plan*
             1. Repository host: Other > None
-    2. **Create PROD Plan**
+    4. **Create PROD Plan**
         * *Project and build plan name*
             1. Project: Catapult
             4. Plan name: PROD
@@ -485,7 +495,7 @@ To avoid having to manually configure the Bamboo project, plans, stages, jobs, a
             6. Plan description:
         * *Link repository to new build plan*
             1. Repository host: Other > None
-    2. **Create WINTEST Plan**
+    5. **Create WINTEST Plan**
         * *Project and build plan name*
             1. Project: Catapult
             4. Plan name: WINTEST
@@ -493,7 +503,7 @@ To avoid having to manually configure the Bamboo project, plans, stages, jobs, a
             6. Plan description:
         * *Link repository to new build plan*
             1. Repository host: Other > None
-    2. **Create WINQC Plan**
+    6. **Create WINQC Plan**
         * *Project and build plan name*
             1. Project: Catapult
             4. Plan name: WINQC
@@ -501,7 +511,7 @@ To avoid having to manually configure the Bamboo project, plans, stages, jobs, a
             6. Plan description:
         * *Link repository to new build plan*
             1. Repository host: Other > None
-    2. **Create WINPROD Plan**
+    7. **Create WINPROD Plan**
         * *Project and build plan name*
             1. Project: Catapult
             4. Plan name: WINPROD
@@ -576,6 +586,16 @@ Once the Web and Database Servers are up and running, it's then time to configur
 1. Sign in to your new custom Bamboo instance `~/secrets/configuration.yml["company"]["bamboo_base_url"]`
 2. Click Build > All build plans from the header:
 3. From the Build Dashboard and under the Catapult project:
+    * **Configure Catapult Project BUILD Plan**
+        1. Click the edit icon for the BUILD plan
+        2. From the Stages tab, select Default Job
+        3. Remove all tasks that may have been added by default during initial setup
+        4. Click Add task
+            1. Search for Script Task and select it
+            2. Interpreter: `shell`
+            3. Script Location: `Inline`
+            6. Script body: `bash /catapult/provisioners/redhat/provision.sh "build" "https://github.com/[your-name-here]/catapult" "~/secrets/configuration-user.yml["settings"]["gpg_key"]" "bamboo"`
+            7. Click Save
     * **Configure Catapult Project TEST Plan**
         1. Click the edit icon for the TEST plan
         2. From the Stages tab, select Default Job
