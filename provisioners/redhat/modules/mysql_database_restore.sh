@@ -105,7 +105,7 @@ if ([ ! -z "${software}" ]); then
                      || [ "${software}" = "moodle3" ] \
                      || [ "${software}" = "silverstripe3" ] \
                      || [ "${software}" = "suitecrm7" ] \
-                     || [ "${software}" = "xenforo" ] \
+                     || [ "${software}" = "xenforo1" ] \
                      || [ "${software}" = "zendframework2" ]); then
                         echo -e "\t* replacing URLs in the database to align with the enivronment..."
                         replacements=$(grep --extended-regexp --only-matching --regexp=":\/\/(www\.)?(dev\.|test\.|qc\.)?(${domain_url_replace})" "/var/www/repositories/apache/${domain}/_sql/$(basename "$file")" | wc --lines)
@@ -122,7 +122,7 @@ if ([ ! -z "${software}" ]); then
                     # post-process the database
                     # necessary for PHP serialized arrays
                     # for software with a cli tool for database url reference replacements, use cli tool to post-process database and replace url references
-                    if [[ "${software}" = "wordpress" ]]; then
+                    if [[ "${software}" = "wordpress4" ]]; then
                         echo -e "\t* replacing URLs in the database to align with the enivronment..."
                         wp-cli --allow-root --path="/var/www/repositories/apache/${domain}/${webroot}" search-replace ":\/\/(www\.)?(dev\.|test\.|qc\.)?(${domain_url_replace})" "://\$1${domain_url}" --regex | sed "s/^/\t\t/"
                     fi

@@ -278,7 +278,7 @@ elif [ "${software}" = "suitecrm7" ]; then
         /catapult/provisioners/redhat/installers/software/${software}/config_override.php > "${file}"
     sudo chmod 0444 "${file}"
 
-elif [ "${software}" = "wordpress" ]; then
+elif [ "${software}" = "wordpress4" ]; then
 
     file="/var/www/repositories/apache/${domain}/${webroot}${softwareroot}${database_config_file}"
     echo -e "generating ${software} ${file}..."
@@ -296,7 +296,7 @@ elif [ "${software}" = "wordpress" ]; then
         /catapult/provisioners/redhat/installers/software/${software}/wp-config.php > "${file}"
     sudo chmod 0444 "${file}"
 
-elif [ "${software}" = "xenforo" ]; then
+elif [ "${software}" = "xenforo1" ]; then
 
     file="/var/www/repositories/apache/${domain}/${webroot}${softwareroot}${database_config_file}"
     echo -e "generating ${software} ${file}..."
