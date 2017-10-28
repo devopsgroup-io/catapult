@@ -82,7 +82,7 @@ Catapult orchestrates the following key components of DevOps to provide you with
 
 ## Supported Software ##
 
-Catapult intelligently manages the following software that has been chosen from trending usage statistics from [BuiltWith](https://trends.builtwith.com/cms) and align with the [CentOS 7 trunk](http://mirror.centos.org/centos/7/os/x86_64/Packages/) along with the [Software Collections trunk](https://www.softwarecollections.org/):
+Catapult intelligently manages the following software that has been chosen from trending usage statistics from [BuiltWith](https://trends.builtwith.com/cms) and aligns with the [CentOS 7 trunk](http://mirror.centos.org/centos/7/os/x86_64/Packages/) along with the [Software Collections trunk](https://www.softwarecollections.org/):
 
 Software | [Key](#websites) | Minimum PHP Version | Defined PHP Version | Released | End-of-Life
 ---------|------------------|---------------------|---------------------|----------|------------
