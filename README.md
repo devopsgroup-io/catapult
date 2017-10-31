@@ -84,7 +84,7 @@ Catapult orchestrates the following key components of DevOps to provide you with
 
 Catapult intelligently manages the following software that has been chosen from trending usage statistics from [BuiltWith](https://trends.builtwith.com/cms) and aligns with the [CentOS 7 trunk](http://mirror.centos.org/centos/7/os/x86_64/Packages/) along with the [Software Collections trunk](https://www.softwarecollections.org/):
 
-Software | [Key](#websites) | Minimum PHP Version | Defined PHP Version | Released | End-of-Life
+Software | [Key](#websites) | Required PHP Version | Defined PHP Version | Released | End-of-Life
 ---------|------------------|---------------------|---------------------|----------|------------
 CodeIgniter 2                     | `codeigniter2`         | 5.1.6  | 5.4 | January 28, 2011   | [October 31, 2015](http://forum.codeigniter.com/thread-61357.html)
 CodeIgniter 3                     | `codeigniter3`         | 5.6    | 5.6 | March 30, 2015     | 
@@ -92,6 +92,7 @@ Drupal 6                          | `drupal6`              | 5.4    | 5.4 | Febr
 Drupal 7                          | `drupal7`              | 5.2.5  | 5.6 | January 5, 2011    |
 Drupal 8                          | `drupal8`              | 5.5.9  | 7.0 | November 19, 2015  |
 Elgg 1                            | `elgg1`                | 5.4    | 5.4 | August 20, 2008    |
+Elgg 2                            | `elgg2`                | 5.6    | 5.6 | December 14, 2015  |
 ExpressionEngine 3                | `expressionengine3`    | 5.3.10 | 5.4 | October 13, 2015   |
 Joomla 3                          | `joomla3`              | 5.3.10 | 5.6 | September 27, 2012 |
 Laravel 5                         | `laravel5`             | 7.0.0  | 7.0 | February 4, 2015   |
@@ -118,7 +119,7 @@ Source                                        | Open                            
 Subscription Feature Set                      | Bundled                               | Separated                     | Separated
 Traditional Tooling (VMs & Shell)             | :white_check_mark:                    | :x:                           | :x:
 Multi-Platform (Linux & Windows)              | :white_check_mark:                    | :x:                           | :x:
-Supported PHP Software                        | 15                                    | 2                             | 1
+Supported PHP Software                        | 17                                    | 2                             | 1
 Supported .NET Software                       | TBA                                   | :x:                           | :x:
 Minimum Bundled<br>Monthly Cost               | $40                                   | $400                          | $134
 Websites per Instance/Subscription            | Unlimited                             | 1                             | 1
@@ -936,6 +937,7 @@ Software | `software_auto_update` Support | Install Approach | Install Notes
 `drupal7`           | :white_check_mark:                                                       | Drush    | `drush dl drupal-7`
 `drupal8`           | :white_check_mark:                                                       | Drush    | `drush dl drupal-8`
 `elgg1`             | [:x:](http://learn.elgg.org/en/2.0/admin/upgrading.html)                 | Fork     | Follow the installation [Overview](http://learn.elgg.org/en/2.0/intro/install.html). Catapult requires the `dataroot` directory to be within the webroot, it's pertinant to create a `.gitignore` to ignore and `.htaccess` to deny access to this directory.
+`elgg2`             | [:x:](http://learn.elgg.org/en/2.0/admin/upgrading.html)                 | Fork     | Follow the installation [Overview](http://learn.elgg.org/en/2.0/intro/install.html). Catapult requires the `dataroot` directory to be within the webroot, it's pertinant to create a `.gitignore` to ignore and `.htaccess` to deny access to this directory.
 `expressionengine3` | [:x:](https://docs.expressionengine.com/latest/installation/update.html) | Download |
 `joomla3`           | [:x:](https://docs.joomla.org/J3.x:Updating_from_an_existing_version)    | Fork     |
 `laravel5`          | [:x:](https://www.laravel.com/docs/master/upgrade)                       | Composer | Follow the [Composer Create-Project](https://laravel.com/docs/5.0/installation) documentation.

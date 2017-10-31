@@ -78,6 +78,14 @@ elif [ "${software}" = "elgg1" ]; then
         ON DUPLICATE KEY UPDATE username='admin', password_hash=MD5('$(catapult environments.${1}.software.admin_password)'), email='$(catapult company.email)', banned='no', admin='yes';
     "
 
+elif [ "${software}" = "elgg2" ]; then
+    
+    mysql --defaults-extra-file=$dbconf ${1}_${domainvaliddbname} -e "
+        INSERT INTO ${software_dbprefix}users_entity (username, password_hash, email, banned, admin)
+        VALUES ('admin', MD5('$(catapult environments.${1}.software.admin_password)'), '$(catapult company.email)', 'no', 'yes')
+        ON DUPLICATE KEY UPDATE username='admin', password_hash=MD5('$(catapult environments.${1}.software.admin_password)'), email='$(catapult company.email)', banned='no', admin='yes';
+    "
+
 elif [ "${software}" = "joomla3" ]; then
 
     mysql --defaults-extra-file=$dbconf ${1}_${domainvaliddbname} -e "
@@ -246,6 +254,10 @@ elif [ "${software}" = "drupal8" ]; then
     cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush --yes cache-clear all
 
 elif [ "${software}" = "elgg1" ]; then
+
+    echo "nothing to perform, skipping..."
+
+elif [ "${software}" = "elgg2" ]; then
 
     echo "nothing to perform, skipping..."
 

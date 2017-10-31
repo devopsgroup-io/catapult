@@ -219,6 +219,13 @@ software:
       file_store_containers: ["dataroot"]
       php_version: "5.6"
       version: [1]
+    elgg2:
+      repo: "https://github.com/Elgg/Elgg.git"
+      branch: "2.3"
+      database_config_file: "elgg-config/settings.php"
+      file_store_containers: ["dataroot"]
+      php_version: "5.6"
+      version: [2]
     expressionengine3:
       repo: PRIVATE
       database_config_file: "system/user/config/config.php"
