@@ -255,7 +255,7 @@ software:
       file_store_containers: ["images"]
       file_stores: ["images"]
       php_version: "5.6"
-      version: [3]
+      version: [1]
     moodle3:
       repo: "https://github.com/moodle/moodle.git"
       branch: "MOODLE_30_STABLE"
