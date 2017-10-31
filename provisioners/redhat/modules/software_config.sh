@@ -145,6 +145,24 @@ elif [ "${software}" = "elgg1" ]; then
         /catapult/provisioners/redhat/installers/software/${software}/settings.php > "${file}"
     sudo chmod 0444 "${file}"
 
+elif [ "${software}" = "elgg2" ]; then
+
+    file="/var/www/repositories/apache/${domain}/${webroot}${softwareroot}${database_config_file}"
+    echo -e "generating ${software} ${file}..."
+    if [ -f "${file}" ]; then
+        sudo chmod 0777 "${file}"
+    else
+        mkdir --parents $(dirname "${file}")
+    fi
+    sed --expression="s/{{dbuser}}/${mysql_user}/g" \
+        --expression="s/{{dbpassword}}/${mysql_user_password}/g" \
+        --expression="s/{{dbname}}/${1}_${domainvaliddbname}/g" \
+        --expression="s/{{dbhost}}/${redhat_mysql_ip}/g" \
+        --expression="s/{{dbprefix}}/${software_dbprefix}/g" \
+        --expression="s/{{dataroot}}/\\/var\\/www\\/repositories\\/apache\\/${domain}\\/${webroot}dataroot/g" \
+        /catapult/provisioners/redhat/installers/software/${software}/settings.php > "${file}"
+    sudo chmod 0444 "${file}"
+
 elif [ "${software}" = "expressionengine3" ]; then
 
     # https://docs.expressionengine.com/latest/general/system_configuration_overrides.html
