@@ -13,9 +13,9 @@ company:
   bitbucket_password:
   github_username:
   github_password:
-  bamboo_base_url:
-  bamboo_username:
-  bamboo_password:
+  bamboo_base_url: http://0.0.0.0/
+  bamboo_username: root
+  bamboo_password: password
   cloudflare_api_key: 
   cloudflare_email:
   newrelic_admin_api_key:

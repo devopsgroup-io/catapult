@@ -253,10 +253,10 @@ module Catapult
     if "#{branch}" == "master" || "#{branch}" == "release"
       catapult_exception(""\
         "You are on the #{branch} branch, all interaction should be done from either the develop or develop-catapult branch."\
-        " * The develop branch is running in test"\
-        " * The release branch is running in qc"\
-        " * The master branch is running in production"\
-        "To move your configuration from environment to environment, create pull requests (develop => release, release => master)."\
+        "\n\n* The develop branch is running in test"\
+        "\n* The release branch is running in qc"\
+        "\n* The master branch is running in production"\
+        "\n\nTo move your configuration from environment to environment, create pull requests (develop => release, release => master)."\
       "")
     end
     puts "\n * Configuring the #{branch} branch:\n\n"
@@ -380,7 +380,7 @@ module Catapult
     @configuration_user_template = YAML.load_file("catapult/installers/templates/configuration-user.yml.template")
     # check for required fields
     if @configuration_user["settings"]["gpg_key"] == nil || @configuration_user["settings"]["gpg_key"].match(/\s/) || @configuration_user["settings"]["gpg_key"].length < 20
-      catapult_exception("Please set your team's gpg_key in secrets/configuration-user.yml - spaces are not permitted and must be at least 20 characters.")
+      catapult_exception("Please set your team's gpg_key in secrets/configuration-user.yml - spaces are not permitted and must be at least 20 characters. Please visit https://github.com/devopsgroup-io/catapult#instance-setup for more information.")
     end
 
 
@@ -469,7 +469,7 @@ module Catapult
       # decrypt id_rsa and id_rsa.pub
       if File.zero?("secrets/id_rsa.gpg") || File.zero?("secrets/id_rsa.pub.gpg")
         if not File.exist?("secrets/id_rsa") || File.zero?("secrets/id_rsa.pub")
-          catapult_exception("Please place your team's ssh public (id_rsa.pub) and private key (id_rsa.pub) in the ~/secrets folder.")
+          catapult_exception("Please place your team's ssh public (id_rsa.pub) and private key (id_rsa.pub) in the ~/secrets folder. Please visit https://github.com/devopsgroup-io/catapult#instance-setup for more information.")
         else
           `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/id_rsa.gpg --armor --cipher-algo AES256 --symmetric secrets/id_rsa`
           `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/id_rsa.pub.gpg --armor --cipher-algo AES256 --symmetric secrets/id_rsa.pub`
@@ -525,6 +525,16 @@ module Catapult
 
     puts "\nVerification of configuration[\"company\"]:\n".color(Colors::WHITE)
     # validate @configuration["company"]
+    if @configuration["company"]["name"] == nil
+      if @configuration_user["settings"]["gpg_edit"] == false
+        confirm = ask("The gpg_edit settings in your configuration-user.yml file is set to false, would you like to set it to true? [Y/N]") { |yn| yn.limit = 1, yn.validate = /[yn]/i }
+        if confirm.downcase == 'y'
+          @configuration_user["settings"]["gpg_edit"] = true
+          File.open('secrets/configuration-user.yml', 'w') {|f| f.write configuration_user.to_yaml }
+          @configuration_user = YAML.load_file("secrets/configuration-user.yml")
+        end
+      end
+    end
     if @configuration["company"]["name"] == nil
       catapult_exception("Please set [\"company\"][\"name\"] in secrets/configuration.yml")
     end

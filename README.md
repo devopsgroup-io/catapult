@@ -306,7 +306,7 @@ Catapult is quick to setup. Fork the Github repository and start adding your con
     1. Fork https://github.com/devopsgroup-io/catapult and clone via SourceTree or the git utility of your choice.
 2. **SSH Key Pair**
     1. Create a *passwordless* SSH key pair - this will drive authentication for Catapult.
-        1. For instructions please see https://help.github.com/articles/generating-ssh-keys/
+        1. For instructions please see https://help.github.com/articles/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent/
         2. Place the newly created *passwordless* SSH key pair `id_rsa` and `id_rsa.pub` in the `~/secrets/` folder.
 3. **GPG Key**
     1. Generate a GPG key - this will drive encryption for Catapult.
@@ -373,9 +373,10 @@ Monitoring | New Relic Application Performance Monitoring (APM), Browser, Server
         1. Select your newly created "Catapult" group.
         2. Select Add Users to Group and add your newly created "Catapult" user.
     6. Go to your AWS EC2 Key Pairs Dashboard https://console.aws.amazon.com/ec2/home#KeyPairs
-        1. Click Import Key Pair
-        2. Add your newly created `id_rsa.pub` from `~/secrets/id_rsa.pub` key
-        3. Set the Key pair name to "Catapult"
+        1. Select "N. Virginia" from the top navigation
+        2. Click Import Key Pair
+        3. Add your newly created `id_rsa.pub` from `~/secrets/id_rsa.pub` key
+        4. Set the Key pair name to "Catapult"
     7. Go to your AWS EC2 Security Groups Dashboard https://console.aws.amazon.com/ec2/home#SecurityGroups
         1. Select the "default" Group Name
         2. Select the Inbound tab and click Edit
@@ -525,7 +526,7 @@ To avoid having to manually configure the Bamboo project, plans, stages, jobs, a
 1. **CloudFlare** sign-up and configuration
     1. Create a CloudFlare account at https://www.cloudflare.com
     2. Sign in to your new CloudFlare account
-    3. Visit your My Account section at https://www.cloudflare.com/a/account/my-account and scroll down to your API Key and place the token value at `~/secrets/configuration.yml["company"]["cloudflare_api_key"]`
+    3. Visit your My Account section at https://www.cloudflare.com/a/account/my-account and scroll down to your Global API Key and place the token value at `~/secrets/configuration.yml["company"]["cloudflare_api_key"]`
     4. Place the email address of the email address that you used to sign up for CloudFlare at `~/secrets/configuration.yml["company"]["cloudflare_email"]`
 
 ### 5. **Monitoring:**
@@ -537,8 +538,8 @@ To avoid having to manually configure the Bamboo project, plans, stages, jobs, a
     3. Go to your Account Settings > Integrations > API keys.
     4. Generate and place your REST API key at `~/secrets/configuration.yml["company"]["newrelic_api_key"]`
     5. Generate and place your Admin API key at `~/secrets/configuration.yml["company"]["newrelic_admin_api_key"]`
-    3. Go to your Account Settings > Account > Summary.
-    5. Place your License key at `~/secrets/configuration.yml["company"]["newrelic_license_key"]`
+    6. Go to your Account Settings > Account > Summary.
+    7. Place your License key at `~/secrets/configuration.yml["company"]["newrelic_license_key"]`
 
 ### 6. **Email:**
 1. **SendGrid** sign-up and configuration
