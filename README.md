@@ -87,7 +87,7 @@ Catapult intelligently manages the following software that has been chosen from 
 Software | [Key](#websites) | Required PHP Version | Defined PHP Version | Released | End-of-Life
 ---------|------------------|---------------------|---------------------|----------|------------
 CodeIgniter 2                     | `codeigniter2`         | 5.1.6  | 5.4 | January 28, 2011   | [October 31, 2015](http://forum.codeigniter.com/thread-61357.html)
-CodeIgniter 3                     | `codeigniter3`         | 5.6    | 5.6 | March 30, 2015     | 
+CodeIgniter 3                     | `codeigniter3`         | 5.6    | 5.4 | March 30, 2015     | 
 Drupal 6                          | `drupal6`              | 5.4    | 5.4 | February 13, 2008  | [February 24, 2016](https://www.drupal.org/drupal-6-eol)
 Drupal 7                          | `drupal7`              | 5.2.5  | 5.6 | January 5, 2011    |
 Drupal 8                          | `drupal8`              | 5.5.9  | 7.0 | November 19, 2015  |

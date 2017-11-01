@@ -214,7 +214,7 @@ fi
 # pecl extension: yaml
 # https://pecl.php.net/package/yaml
 sudo yum install -y libyaml-devel
-echo autodetect | sudo pecl upgrade yaml
+echo autodetect | sudo pecl upgrade yaml-1.3.1
 #################
 # pecl extension: geoip
 # https://pecl.php.net/package/geoip
