@@ -217,11 +217,24 @@ module Catapult
     if not @branches.find { |element| element.include?("refs/heads/master") }
       catapult_exception("Cannot find the master branch for your Catapult's fork, please fork again or manually correct.")
     end
-    # create the release branch if it does not yet exist
-    if not @branches.find { |element| element.include?("refs/heads/release") }
-      `#{@git} checkout master`
-      `#{@git} checkout -b release`
-      `#{@git} push origin release`
+    # verify that there is a ssh public and private key
+    if !File.exist?(ENV['HOME']+'/.ssh/id_rsa.pub')
+        catapult_exception("Could not detect your SSH public key at ~/.ssh/id_rsa.pub - please follow the Instance Setup at https://github.com/devopsgroup-io/catapult#instance-setup")
+    end
+    if !File.exist?(ENV['HOME']+'/.ssh/id_rsa')
+        catapult_exception("Could not detect your SSH private key at ~/.ssh/id_rsa - please follow the Instance Setup at https://github.com/devopsgroup-io/catapult#instance-setup")
+    end
+    # create the develop-catapult branch if it does not yet exist
+    if not @branches.find { |element| element.include?("refs/heads/develop-catapult") }
+      `#{@git} fetch upstream`
+      `#{@git} checkout -b develop-catapult --track upstream/master`
+      `#{@git} pull upstream master`
+      `#{@git} push origin develop-catapult`
+      # this is our first opportunity to verify write access to the repository
+      if $?.exitstatus > 0
+        ssh_public_key = File.read(ENV['HOME']+'/.ssh/id_rsa.pub')
+        catapult_exception("It seems that your SSH public key pair does not have write access to this Catapult repository.\nPlease ensure that your GitHub user has appropriate rights.\n\nHere is your workstation's SSH public key for reference:\n\n#{ssh_public_key}")
+      end
     end
     # create the develop branch if it does not yet exist
     if not @branches.find { |element| element.include?("refs/heads/develop") }
@@ -230,12 +243,11 @@ module Catapult
       `#{@git} pull upstream master`
       `#{@git} push origin develop`
     end
-    # create the develop-catapult branch if it does not yet exist
-    if not @branches.find { |element| element.include?("refs/heads/develop-catapult") }
-      `#{@git} fetch upstream`
-      `#{@git} checkout -b develop-catapult --track upstream/master`
-      `#{@git} pull upstream master`
-      `#{@git} push origin develop-catapult`
+    # create the release branch if it does not yet exist
+    if not @branches.find { |element| element.include?("refs/heads/release") }
+      `#{@git} checkout master`
+      `#{@git} checkout -b release`
+      `#{@git} push origin release`
     end
     # if on the master or release branch, stop user
     if "#{branch}" == "master" || "#{branch}" == "release"
