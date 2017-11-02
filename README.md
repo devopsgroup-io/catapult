@@ -185,9 +185,6 @@ See an error or have a suggestion? Email competition@devopsgroup.io - we appreci
         - [Refreshing Databases](#refreshing-databases)
         - [Connecting to Databases](#connecting-to-databases)
         - [Production Hotfixes](#production-hotfixes)
-    - [Performance Testing](#performance-testing)
-        - [Website Concurrency Maximum](#website-concurrency-maximum)
-        - [Interpreting Apache AB Results](#interpreting-apache-ab-results)
     - [Maintenance Cycle](#maintenance-cycle)
         - [Daily](#daily)
         - [Weekly](#weekly)
@@ -207,6 +204,9 @@ See an error or have a suggestion? Email competition@devopsgroup.io - we appreci
     - [Caching Optimizations](#caching-optimizations)
     - [Geographic Optimizations](#geographic-optimizations)
     - [Recommended Optimizations](#recommended-optimizations)
+- [Performance Testing](#performance-testing)
+    - [Website Concurrency Maximum](#website-concurrency-maximum)
+    - [Interpreting Apache AB Results](#interpreting-apache-ab-results)
 - [Troubleshooting](#troubleshooting)
 - [Contributing](#contributing)
     - [Releases](#releases)
@@ -1152,73 +1152,6 @@ Always weigh the risk of *not performing* a production hotfix versus *performing
 
 
 
-## Performance Testing ##
-
-Often disregarded, performance testing is a crucial component of quality assurance. The risks of neglecting performance testing include downtime, SEO impacts, gaps in analytics, poor user experience, and unknown ability to scale.
-
-With Catapult's exactly duplicated configuration, even the Test environment can accurately represent the performance potential of the Production environment. [ApacheBench](https://httpd.apache.org/docs/2.4/programs/ab.html) is a powerful tool to test request performance and concurrency - OSX includes ApacheBench out of the box, while [this StackOverflow post](http://stackoverflow.com/a/7407602/4838803) details how to get up and running on Windows.
-
-ApacheBench enables us to profile request performance (`-n` represents the number of requests to perform) and concurrency (`-c` represents the number of multiple requests to make at a time) to test for performance, including common limits such as [C10k and C10M](http://highscalability.com/blog/2013/5/13/the-secret-to-10-million-concurrent-connections-the-kernel-i.html).
-
-### Website Concurrency Maximum ###
-
-Using a website with historical Google Analytics data, access the Audience Overview and find the busiest Pageview day from the past 30-days and then drill into that date. Find the hour with the most Pageviews, then the accompanying Avg. Session Duration. Using the following formula, we are able to find the Concurrency Maxiumum.
-
-*(Pageviews x Avg. Session Duration in seconds) / 3,600 seconds* = **Concurrency Maxiumum**
-
-<img src="https://cdn.rawgit.com/devopsgroup-io/catapult/master/catapult/installers/images/catapult_website_concurrency_maximum.png" alt="Catapult Website Concurrency Maximum">
-
-**365,000 pageviews per month**
-
-Take a website with an average of 500 pageviews per hour, or 365,000 pageviews per month, which has a busiest hour of 1,000 pageviews.
-
-Pageviews | Avg. Session Duration | Total Session Seconds | Concurrency Maxiumum
-----------|-----------------------|-----------------------|---------------------
-1,000 | 60 minutes (3,600 seconds) | 3,600,000 | **1,000**
-1,000 | 10 minutes (600 seconds) | 600,000 | **166**
-1,000 | 5 minutes (300 seconds) | 300,000 | **88**
-1,000 | 1 minute (60 seconds) | 60,000 | **16**
-
-*100 concurrent requests performed 10 times*
-```
-ab -l -r -n 1000 -c 100 -H "Accept-Encoding: gzip, deflate" http://test.drupal7.devopsgroup.io/
-```
-
-**14,600 pageviews per month**
-
-Take a website with an average of 20 pageviews per hour, or 14,600 pageviews per month, which has a busiest hour of 100 pageviews.
-
-Pageviews | Avg. Session Duration | Total Session Seconds | Concurrency Maxiumum
-----------|-----------------------|-----------------------|---------------------
-100 | 60 minutes (3,600 seconds) | 36,000 | **1,000**
-100 | 10 minutes (600 seconds) | 60,000 | **16**
-100 | 5 minutes (300 seconds) | 30,000 | **8**
-100 | 1 minute (60 seconds) | 6,000 | **1.6**
-
-*10 concurrent requests performed 10 times*
-```
-ab -l -r -n 100 -c 10 -H "Accept-Encoding: gzip, deflate" http://test.drupal7.devopsgroup.io/
-```
-
-### Interpreting Apache AB Results ###
-
-Using a satisifed [Apdex](https://en.wikipedia.org/wiki/Apdex) of 7 seconds, we can see that 98% of users would be satisfied.
-
-```
-Percentage of the requests served within a certain time (ms)
-  50%     19
-  66%     21
-  75%     24
-  80%     27
-  90%     34
-  95%   3968
-  98%   6127
-  99%   7227
- 100%   7325 (longest request)
-```
-
-
-
 ## Maintenance Cycle ##
 
 A maintenance cycle is scheduled for defined times within the timezone that is defined within `~/secrets/configuration.yml` at the `timezone_redhat` and `timezone_windows` value of the [Company](#company) entry. This ensures servers within your infrastructure are automatically patched to mitigate security vulnerabilites.
@@ -1403,6 +1336,73 @@ Catapult as a platform can only reach so far into the configuration of your webs
 * Write [efficient PHP](http://www.phpbench.com/)
 
 Google's [PageSpeed Insights](https://developers.google.com/speed/pagespeed/insights/) is a good tool to test for performance optimizations.
+
+
+
+# Performance Testing #
+
+Often disregarded, performance testing is a crucial component of quality assurance. The risks of neglecting performance testing include downtime, SEO impacts, gaps in analytics, poor user experience, and unknown ability to scale.
+
+With Catapult's exactly duplicated configuration, even the Test environment can accurately represent the performance potential of the Production environment. [ApacheBench](https://httpd.apache.org/docs/2.4/programs/ab.html) is a powerful tool to test request performance and concurrency - OSX includes ApacheBench out of the box, while [this StackOverflow post](http://stackoverflow.com/a/7407602/4838803) details how to get up and running on Windows.
+
+ApacheBench enables us to profile request performance (`-n` represents the number of requests to perform) and concurrency (`-c` represents the number of multiple requests to make at a time) to test for performance, including common limits such as [C10k and C10M](http://highscalability.com/blog/2013/5/13/the-secret-to-10-million-concurrent-connections-the-kernel-i.html).
+
+## Website Concurrency Maximum ##
+
+Using a website with historical Google Analytics data, access the Audience Overview and find the busiest Pageview day from the past 30-days and then drill into that date. Find the hour with the most Pageviews, then the accompanying Avg. Session Duration. Using the following formula, we are able to find the Concurrency Maxiumum.
+
+*(Pageviews x Avg. Session Duration in seconds) / 3,600 seconds* = **Concurrency Maxiumum**
+
+<img src="https://cdn.rawgit.com/devopsgroup-io/catapult/master/catapult/installers/images/catapult_website_concurrency_maximum.png" alt="Catapult Website Concurrency Maximum">
+
+**365,000 pageviews per month**
+
+Take a website with an average of 500 pageviews per hour, or 365,000 pageviews per month, which has a busiest hour of 1,000 pageviews.
+
+Pageviews | Avg. Session Duration | Total Session Seconds | Concurrency Maxiumum
+----------|-----------------------|-----------------------|---------------------
+1,000 | 60 minutes (3,600 seconds) | 3,600,000 | **1,000**
+1,000 | 10 minutes (600 seconds) | 600,000 | **166**
+1,000 | 5 minutes (300 seconds) | 300,000 | **88**
+1,000 | 1 minute (60 seconds) | 60,000 | **16**
+
+*100 concurrent requests performed 10 times*
+```
+ab -l -r -n 1000 -c 100 -H "Accept-Encoding: gzip, deflate" http://test.drupal7.devopsgroup.io/
+```
+
+**14,600 pageviews per month**
+
+Take a website with an average of 20 pageviews per hour, or 14,600 pageviews per month, which has a busiest hour of 100 pageviews.
+
+Pageviews | Avg. Session Duration | Total Session Seconds | Concurrency Maxiumum
+----------|-----------------------|-----------------------|---------------------
+100 | 60 minutes (3,600 seconds) | 36,000 | **1,000**
+100 | 10 minutes (600 seconds) | 60,000 | **16**
+100 | 5 minutes (300 seconds) | 30,000 | **8**
+100 | 1 minute (60 seconds) | 6,000 | **1.6**
+
+*10 concurrent requests performed 10 times*
+```
+ab -l -r -n 100 -c 10 -H "Accept-Encoding: gzip, deflate" http://test.drupal7.devopsgroup.io/
+```
+
+## Interpreting Apache AB Results ##
+
+Using a satisifed [Apdex](https://en.wikipedia.org/wiki/Apdex) of 7 seconds, we can see that 98% of users would be satisfied.
+
+```
+Percentage of the requests served within a certain time (ms)
+  50%     19
+  66%     21
+  75%     24
+  80%     27
+  90%     34
+  95%   3968
+  98%   6127
+  99%   7227
+ 100%   7325 (longest request)
+```
 
 
 
