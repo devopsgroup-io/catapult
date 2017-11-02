@@ -1221,8 +1221,9 @@ Catapult enforces many security best practices that are important for you to be 
 
 **Application**
 
-* OWASP ModSecurity core rule set
-* HTTPS strict protocol and cipher suite
+* [OWASP ModSecurity Core Rule Set (CRS)](https://www.owasp.org/index.php/Category:OWASP_ModSecurity_Core_Rule_Set_Project) Apache rules
+* [Mozilla OpSec](https://wiki.mozilla.org/Security/Server_Side_TLS) strict HTTPS protocol and cipher suite
+* [OWASP Secure Headers Project](https://www.owasp.org/index.php/OWASP_Secure_Headers_Project#tab=Headers) recommended HTTP response headers
 * Automatic hourly application updates
 
 **Software**
