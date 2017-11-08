@@ -4,6 +4,11 @@
 /bin/echo -e "THIS CATAPULT CRON_SECURITY_DETECTIVE MODULE HELPS IDENTIFY ATTACK PATTERNS"
 /bin/echo -e "==========================================================================="
 
+/bin/echo -e "\nhere are recent ethernet/ip address pairings detected by arpwatch"
+/bin/echo -e "----------------------------------------"
+/bin/echo -e  "$(/bin/cat /var/log/messages* | /bin/grep 'arpwatch: new station' | /bin/wc -l) new stations detected"
+/bin/echo -e  "$(/bin/cat /var/log/messages* | /bin/grep 'arpwatch: changed' | /bin/wc -l) changes detected"
+
 /bin/echo -e "\nhere are recent ip addresses blocked by fail2ban (/var/log/fail2ban.log*)"
 /bin/echo -e "----------------------------------------"
 /bin/tac /var/log/fail2ban.log* | /bin/grep --extended-regexp --max-count=20 --regexp="(Ban)" | while read line ; do echo $line [$(/usr/bin/geoiplookup -f /usr/share/GeoIP/GeoIP.dat -i $(/bin/echo $line | /usr/bin/awk '{ print $8 }') | /usr/bin/head -1  | sed -r 's/GeoIP Country Edition: //g' )] ; done
