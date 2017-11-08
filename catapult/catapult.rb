@@ -194,7 +194,7 @@ module Catapult
     if remote.include?("devopsgroup-io/")
       catapult_exception("In order to use Catapult, you must fork the repository so that the committed and encrypted configuration is unique to you! See https://github.com/devopsgroup-io/catapult for more information.")
     end
-    puts "\n\nSelf updating Catapult:\n".color(Colors::WHITE)
+    puts "\n\nVerfication and self updating of this Catapult instance:\n".color(Colors::WHITE)
     `#{@git} fetch`
     # get current branch
     branch = `#{@git} rev-parse --abbrev-ref HEAD`.strip
@@ -1780,13 +1780,8 @@ module Catapult
 
     # validate @configuration["websites"]
     puts "\nVerification of configuration[\"websites\"]:".color(Colors::WHITE)
-    # add catapult temporarily to verify repo and add bamboo services
-    @configuration["websites"]["catapult"] = *(["domain" => "#{@repo}", "repo" => "#{@repo}"])
     # validate @configuration["websites"]
     @configuration["websites"].each do |service,data|
-      if "#{service}" == "catapult"
-        puts "\nVerification of this Catapult instance:".color(Colors::WHITE)
-      end
       # create array of domains to later validate domain alpha order per service
       domains = Array.new
       domains_sorted = Array.new
@@ -1799,41 +1794,39 @@ module Catapult
           row = Array.new
           # get domain
           row.push(" * #{instance["domain"]}".slice!(0, 39).ljust(39))
-          unless "#{service}" == "catapult"
-            # validate the domain to ensure it only includes the domain and not protocol
-            if instance["domain"].include? "://"
-              catapult_exception("There is an error in your secrets/configuration.yml file.\nThe domain for websites => #{service} => domain => #{instance["domain"]} is invalid, it must not include http:// or https://.")
+          # validate the domain to ensure it only includes the domain and not protocol
+          if instance["domain"].include? "://"
+            catapult_exception("There is an error in your secrets/configuration.yml file.\nThe domain for websites => #{service} => domain => #{instance["domain"]} is invalid, it must not include http:// or https://.")
+          end
+          # validate the domain_tld_override to ensure only valid characters
+          if not instance["domain"] =~ /^[0-9a-zA-Z\-\.]*$/
+            catapult_exception("There is an error in your secrets/configuration.yml file.\nThe domain for websites => #{service} => domain => #{instance["domain"]} must only contain numbers, letters, hyphens, and periods.")
+          end
+          # validate the domain depth
+          domain_depth = instance["domain"].split(".")
+          if domain_depth.count > 3
+            catapult_exception("There is an error in your secrets/configuration.yml file.\nThe domain for websites => #{service} => domain => #{instance["domain"]} is invalid, there is a maximum of one subdomain.")
+          end
+          unless instance["domain_tld_override"] == nil
+            # validate the domain_tld_override to ensure it only includes the domain and not protocol
+            if instance["domain_tld_override"].include? "://"
+              catapult_exception("There is an error in your secrets/configuration.yml file.\nThe domain_tld_override for websites => #{service} => domain => #{instance["domain"]} is invalid, it must not include http:// or https://.")
             end
             # validate the domain_tld_override to ensure only valid characters
-            if not instance["domain"] =~ /^[0-9a-zA-Z\-\.]*$/
-              catapult_exception("There is an error in your secrets/configuration.yml file.\nThe domain for websites => #{service} => domain => #{instance["domain"]} must only contain numbers, letters, hyphens, and periods.")
+            if not instance["domain_tld_override"] =~ /^[0-9a-zA-Z\-\.]*$/
+              catapult_exception("There is an error in your secrets/configuration.yml file.\nThe domain_tld_override for websites => #{service} => domain => #{instance["domain"]} must only contain numbers, letters, hyphens, and periods.")
             end
-            # validate the domain depth
-            domain_depth = instance["domain"].split(".")
-            if domain_depth.count > 3
-              catapult_exception("There is an error in your secrets/configuration.yml file.\nThe domain for websites => #{service} => domain => #{instance["domain"]} is invalid, there is a maximum of one subdomain.")
+            # validate the domain_tld_override depth
+            domain_tld_override_depth = instance["domain_tld_override"].split(".")
+            if domain_tld_override_depth.count != 2
+              catapult_exception("There is an error in your secrets/configuration.yml file.\nThe domain_tld_override for websites => #{service} => domain => #{instance["domain"]} is invalid, it must only be one domain level (company.com).")
             end
-            unless instance["domain_tld_override"] == nil
-              # validate the domain_tld_override to ensure it only includes the domain and not protocol
-              if instance["domain_tld_override"].include? "://"
-                catapult_exception("There is an error in your secrets/configuration.yml file.\nThe domain_tld_override for websites => #{service} => domain => #{instance["domain"]} is invalid, it must not include http:// or https://.")
-              end
-              # validate the domain_tld_override to ensure only valid characters
-              if not instance["domain_tld_override"] =~ /^[0-9a-zA-Z\-\.]*$/
-                catapult_exception("There is an error in your secrets/configuration.yml file.\nThe domain_tld_override for websites => #{service} => domain => #{instance["domain"]} must only contain numbers, letters, hyphens, and periods.")
-              end
-              # validate the domain_tld_override depth
-              domain_tld_override_depth = instance["domain_tld_override"].split(".")
-              if domain_tld_override_depth.count != 2
-                catapult_exception("There is an error in your secrets/configuration.yml file.\nThe domain_tld_override for websites => #{service} => domain => #{instance["domain"]} is invalid, it must only be one domain level (company.com).")
-              end
-            end
-            # there is a maximum domain (including domain_tld_override) length of 53 characters
-            # max mysql database name length of 64 - 11 for longest prefix of production_ = 53
-            # max mssql database name length of 128
-            if (instance["domain"].length + (instance["domain_tld_override"].nil? ? 0 : instance["domain_tld_override"].length)) > 53
-              catapult_exception("There is an error in your secrets/configuration.yml file.\nThe combination of domain and domain_tld_override for websites => #{service} => domain => #{instance["domain"]} must not exceed 53 characters in length.")
-            end
+          end
+          # there is a maximum domain (including domain_tld_override) length of 53 characters
+          # max mysql database name length of 64 - 11 for longest prefix of production_ = 53
+          # max mssql database name length of 128
+          if (instance["domain"].length + (instance["domain_tld_override"].nil? ? 0 : instance["domain_tld_override"].length)) > 53
+            catapult_exception("There is an error in your secrets/configuration.yml file.\nThe combination of domain and domain_tld_override for websites => #{service} => domain => #{instance["domain"]} must not exceed 53 characters in length.")
           end
           # validate force_auth
           unless instance["force_auth"] == nil
@@ -2368,8 +2361,6 @@ module Catapult
         catapult_exception("There is an error in your secrets/configuration.yml file.\nThe domains in secrets/configuration.yml are not in alpha order for websites => #{service} - please adjust.")
       end
     end
-    # remove catapult as this was done to temporarily verify repo and add bamboo services
-    @configuration["websites"].delete("catapult")
 
 
 
