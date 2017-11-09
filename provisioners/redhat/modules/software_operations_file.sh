@@ -27,7 +27,7 @@ if hash composer 2>/dev/null && hash drush 2>/dev/null && hash wp-cli 2>/dev/nul
             echo -e "\nSUPPORTED SOFTWARE VERSION DETECTED: ${version}\n"
 
             if [ "${software_auto_update}" = "true" ]; then
-                if [ "${version}" != "2.2.6" ]; then 
+                if [ "${version}" != "2.2.6" ]; then
                     # https://www.codeigniter.com/userguide2/installation/upgrading.html
                     git clone https://github.com/bcit-ci/CodeIgniter "/catapult/provisioners/redhat/installers/temp/${domain}/codeigniter"
                     cd "/catapult/provisioners/redhat/installers/temp/${domain}/codeigniter" && git checkout tags/2.2.6
@@ -55,10 +55,10 @@ if hash composer 2>/dev/null && hash drush 2>/dev/null && hash wp-cli 2>/dev/nul
             echo -e "\nSUPPORTED SOFTWARE VERSION DETECTED: ${version}\n"
 
             if [ "${software_auto_update}" = "true" ]; then
-                if [ "${version}" != "3.1.5" ]; then 
+                if [ "${version}" != "3.1.6" ]; then
                     # https://www.codeigniter.com/userguide3/installation/upgrading.html
                     git clone https://github.com/bcit-ci/CodeIgniter "/catapult/provisioners/redhat/installers/temp/${domain}/codeigniter"
-                    cd "/catapult/provisioners/redhat/installers/temp/${domain}/codeigniter" && git checkout tags/3.1.5
+                    cd "/catapult/provisioners/redhat/installers/temp/${domain}/codeigniter" && git checkout tags/3.1.6
                     # upgrading from 3.0.0 to 3.0.1
                     yes | cp -rf /catapult/provisioners/redhat/installers/temp/$domain/codeigniter/application/views/errors/cli/* "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}/application/views/errors/cli"
                     # upgrading constant
@@ -237,7 +237,7 @@ if hash composer 2>/dev/null && hash drush 2>/dev/null && hash wp-cli 2>/dev/nul
                 cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && git remote add source https://github.com/moodle/moodle
                 cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && git remote update
                 # Moodle 3.2 and later requires at least PHP 5.6.5
-                cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && git merge --strategy=recursive --strategy-option=theirs source/MOODLE_31_STABLE
+                cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && git merge --strategy=recursive --strategy-option=theirs source/MOODLE_33_STABLE
                 # clean up any merge conflicts
                 cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && git diff --name-only --diff-filter=U | while read line; do
                     cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && git checkout --theirs -- $line
@@ -328,7 +328,7 @@ if hash composer 2>/dev/null && hash drush 2>/dev/null && hash wp-cli 2>/dev/nul
             echo -e "\nSUPPORTED SOFTWARE VERSION DETECTED: ${version}\n"
 
             if [ "${software_auto_update}" = "true" ]; then
-                cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && composer require "zendframework/zendframework:^2.0" --no-update
+                cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && composer require "zendframework/zendframework:^2" --no-update
                 cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && composer update
             fi
 
