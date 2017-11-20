@@ -138,11 +138,11 @@ redhat:
       persistent: false
   servers:
     apache:
-      modules: ["time","system","iptables","newrelic_sysmon","cron","apache","php","software_tools","git_clean","software_operations_file","git","rsync","git_permissions","software_config","cloudflare_zones","cloudflare_dns","apache_vhosts_clean","apache_vhosts"]
+      modules: ["time","system","iptables","cron","apache","php","software_tools","git_clean","software_operations_file","git","rsync","git_permissions","software_config","cloudflare_zones","cloudflare_dns","apache_vhosts_clean","apache_vhosts"]
     bamboo:
-      modules: ["time","system","iptables","newrelic_sysmon","cron","bamboo"]
+      modules: ["time","system","iptables","cron","bamboo"]
     mysql:
-      modules: ["time","system","iptables","newrelic_sysmon","cron","php","software_tools","git_clean","git","rsync","git_permissions","software_config","mysql","mysql_database_table_retain","mysql_database_restore","software_operations_meta","mysql_database_backup","cloudflare_cache"]
+      modules: ["time","system","iptables","cron","php","software_tools","git_clean","git","rsync","git_permissions","software_config","mysql","mysql_database_table_retain","mysql_database_restore","software_operations_meta","mysql_database_backup","cloudflare_cache"]
 windows:
   modules:
     cloudflare_dns:
@@ -167,9 +167,9 @@ windows:
       description: "Manages system requirements."
   servers:
     iis:
-      modules: ["time","system","newrelic_sysmon","git_clean","git","iis","cloudflare_zones","cloudflare_dns"]
+      modules: ["time","system","git_clean","git","iis","cloudflare_zones","cloudflare_dns"]
     mssql:
-      modules: ["time","system","newrelic_sysmon","git_clean","git","mssql"]
+      modules: ["time","system","git_clean","git","mssql"]
 
 software:
   apache:
