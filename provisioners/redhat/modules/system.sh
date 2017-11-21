@@ -143,6 +143,12 @@ SELINUX=disabled
 SELINUXTYPE=targeted
 EOF
 sestatus -v
+# restart if SELinux is enabled
+if $(sestatus | grep "SELinux status:" | grep -q "enabled"); then
+    echo -e "\n> SELinux is enabled, this is normally due to a fresh install. We need to reboot to disable it, rebooting in 1 minute..."
+    /sbin/shutdown --reboot
+    exit 0
+fi
 
 
 
