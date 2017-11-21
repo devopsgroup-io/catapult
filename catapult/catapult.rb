@@ -1562,7 +1562,7 @@ module Catapult
           # kernel
           if droplet != nil
             # make sure the droplet has the correct kernel, if not, update it
-            if defined?(droplet["kernel"]["id"]).! || (defined?(droplet["kernel"]["id"]) && "#{droplet["kernel"]["id"]}" != "7516")
+            if (defined?(droplet["kernel"]["id"]) && "#{droplet["kernel"]["id"]}" != "7516")
               puts "   - The Kernel version must be updated to DigitalOcean GrubLoader v0.2, performing now...".color(Colors::YELLOW)
               uri = URI("https://api.digitalocean.com/v2/droplets/#{droplet["id"]}/actions")
               Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
