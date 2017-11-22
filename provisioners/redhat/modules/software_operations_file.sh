@@ -237,7 +237,7 @@ if hash composer 2>/dev/null && hash drush 2>/dev/null && hash wp-cli 2>/dev/nul
                 cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && git remote add source https://github.com/moodle/moodle
                 cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && git remote update
                 # Moodle 3.2 and later requires at least PHP 5.6.5
-                cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && git merge --strategy=recursive --strategy-option=theirs source/MOODLE_33_STABLE
+                cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && git merge --strategy=recursive --strategy-option=theirs source/MOODLE_34_STABLE
                 # clean up any merge conflicts
                 cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && git diff --name-only --diff-filter=U | while read line; do
                     cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && git checkout --theirs -- $line
