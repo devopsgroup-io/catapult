@@ -854,7 +854,9 @@ module Catapult
       @api_bamboo_cli_redirect = "2>"
     end
     api_bamboo_cli_result = `#{@api_bamboo_cli} --server #{@configuration["company"]["bamboo_base_url"]} --password #{@configuration["company"]["bamboo_password"]} --user #{@configuration["company"]["bamboo_username"]} --action validateLicense #{@api_bamboo_cli_redirect}`; result=$?.success?
-    if api_bamboo_cli_result.strip.include?("has a valid license")
+    if api_bamboo_cli_result.strip.include?("401")
+      catapult_exception("The Bamboo CLI could not authenticate, please verify [\"company\"][\"bamboo_base_url\"] and [\"company\"][\"bamboo_username\"] and [\"company\"][\"bamboo_password\"]. If the credentials are correct, you may need to login to Bamboo #{@configuration["company"]["bamboo_base_url"]} and provide an answer to a CAPTCHA.")
+    elsif api_bamboo_cli_result.strip.include?("has a valid license")
       puts " * Bamboo CLI authenticated successfully."
       ["CAT-BUILD", "CAT-TEST", "CAT-QC", "CAT-PROD", "CAT-WINTEST", "CAT-WINQC", "CAT-WINPROD"].each do | plan |
         # define environments
@@ -980,7 +982,7 @@ module Catapult
           request.basic_auth "#{@configuration["company"]["bamboo_username"]}", "#{@configuration["company"]["bamboo_password"]}"
           response = http.request request
           if response.code.to_f.between?(399,499)
-            catapult_exception("#{response.code} The Bamboo API could not authenticate, please verify [\"company\"][\"bamboo_base_url\"] and [\"company\"][\"bamboo_username\"] and [\"company\"][\"bamboo_password\"].")
+            catapult_exception("#{response.code} The Bamboo API could not authenticate, please verify [\"company\"][\"bamboo_base_url\"] and [\"company\"][\"bamboo_username\"] and [\"company\"][\"bamboo_password\"]. If the credentials are correct, you may need to login to Bamboo #{@configuration["company"]["bamboo_base_url"]} and provide an answer to a CAPTCHA.")
           elsif response.code.to_f.between?(500,600)
             puts " * Bamboo API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
           else
