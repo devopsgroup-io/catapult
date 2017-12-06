@@ -36,6 +36,7 @@ sed --in-place 's/port="8085"/port="80"/g' /usr/local/src/bamboo/atlassian-bambo
 # https://confluence.atlassian.com/bamboo/configuring-your-system-properties-289277345.html
 sed --in-place --expression='s/JVM_MINIMUM_MEMORY="512m"/JVM_MINIMUM_MEMORY="768m"/g' /usr/local/src/bamboo/atlassian-bamboo-${bamboo_version}/bin/setenv.sh
 sed --in-place --expression='s/JVM_MAXIMUM_MEMORY="1024m"/JVM_MAXIMUM_MEMORY="2048m"/g' /usr/local/src/bamboo/atlassian-bamboo-${bamboo_version}/bin/setenv.sh
+sed --in-place --expression='s/JVM_REQUIRED_ARGS=""/JVM_REQUIRED_ARGS="-Datlassian.darkfeature.bamboo.experimental.rest.admin.enabled=true"/g' /usr/local/src/bamboo/atlassian-bamboo-${bamboo_version}/bin/setenv.sh
 bash /usr/local/src/bamboo/atlassian-bamboo-${bamboo_version}/bin/setenv.sh
 
 # run bamboo as as service

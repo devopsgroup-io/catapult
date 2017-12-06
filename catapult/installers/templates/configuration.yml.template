@@ -22,6 +22,8 @@ company:
   newrelic_api_key:
   newrelic_license_key:
   sendgrid_api_key:
+  sendgrid_username:
+  sendgrid_password:
 environments:
   dev:
     branch: develop
