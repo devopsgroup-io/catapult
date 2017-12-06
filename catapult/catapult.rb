@@ -1001,8 +1001,10 @@ module Catapult
               "\"tlsEnabled\":true"\
             "}"
           response = http.request(request)
-          if response.code.to_f.between?(399,499)
-            catapult_exception("#{response.code} The Bamboo API could not authenticate, please verify [\"company\"][\"bamboo_base_url\"] and [\"company\"][\"bamboo_username\"] and [\"company\"][\"bamboo_password\"]. If the credentials are correct, you may need to login to Bamboo #{@configuration["company"]["bamboo_base_url"]} and provide an answer to a CAPTCHA.")
+          if response.code.to_f.between?(399,401)
+            catapult_exception("#{response.code} The Bamboo Admin API could not authenticate, please verify [\"company\"][\"bamboo_base_url\"] and [\"company\"][\"bamboo_username\"] and [\"company\"][\"bamboo_password\"]. If the credentials are correct, you may need to login to Bamboo #{@configuration["company"]["bamboo_base_url"]} and provide an answer to a CAPTCHA.")
+          elsif response.code.to_f === 404
+            catapult_exception("#{response.code} The Bamboo Admin API is not enabled, please provision and restart your Bamboo build server.")
           elsif response.code.to_f.between?(500,600)
             puts " * Bamboo Admin API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
           else
