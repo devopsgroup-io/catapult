@@ -127,6 +127,7 @@ module Catapult
     require "fileutils"
     require "highline/import"
     require "json"
+    require "net/smtp"
     require "net/ssh"
     require "net/http"
     require "nokogiri"
@@ -561,7 +562,7 @@ module Catapult
         Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
           request = Net::HTTP::Get.new uri.request_uri
           request.add_field "Authorization", "Bearer #{@configuration["company"]["digitalocean_personal_access_token"]}"
-          response = http.request request
+          response = http.request(request)
           if response.code.to_f.between?(399,499)
             catapult_exception("#{response.code} The DigitalOcean API could not authenticate, please verify [\"company\"][\"digitalocean_personal_access_token\"].")
           elsif response.code.to_f.between?(500,600)
@@ -678,7 +679,7 @@ module Catapult
           request.add_field "Authorization", "#{authorization_header}"
           request.add_field "x-amz-date", "#{amzdate}"
           request.add_field "content-type", "application/json"
-          response = http.request request
+          response = http.request(request)
           if response.code.to_f.between?(399,499)
             catapult_exception("#{response.code} The AWS API could not authenticate, please verify [\"company\"][\"aws_access_key\"] and [\"company\"][\"aws_secret_key\"].")
           elsif response.code.to_f.between?(500,600)
@@ -732,7 +733,7 @@ module Catapult
         Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
           request = Net::HTTP::Get.new uri.request_uri
           request.basic_auth "#{@configuration["company"]["bitbucket_username"]}", "#{@configuration["company"]["bitbucket_password"]}"
-          response = http.request request
+          response = http.request(request)
           if response.code.to_f.between?(399,499)
             catapult_exception("#{response.code} The Bitbucket API could not authenticate, please verify [\"company\"][\"bitbucket_username\"] and [\"company\"][\"bitbucket_password\"].")
           elsif response.code.to_f.between?(500,600)
@@ -793,7 +794,7 @@ module Catapult
         Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
           request = Net::HTTP::Get.new uri.request_uri
           request.basic_auth "#{@configuration["company"]["github_username"]}", "#{@configuration["company"]["github_password"]}"
-          response = http.request request
+          response = http.request(request)
           if response.code.to_f.between?(399,499)
             catapult_exception("#{response.code} The GitHub API could not authenticate, please verify [\"company\"][\"github_username\"] and [\"company\"][\"github_password\"].")
           elsif response.code.to_f.between?(500,600)
@@ -977,12 +978,55 @@ module Catapult
     if @configuration["company"]["bamboo_base_url"] == nil || @configuration["company"]["bamboo_username"] == nil || @configuration["company"]["bamboo_password"] == nil
       catapult_exception("Please set [\"company\"][\"bamboo_base_url\"] and [\"company\"][\"bamboo_username\"] and [\"company\"][\"bamboo_password\"] in secrets/configuration.yml")
     else
+      # smtp
+      # https://jira.atlassian.com/browse/BAM-9344?page=com.atlassian.jira.plugin.system.issuetabpanels%3Acomment-tabpanel&showAll=true
+      begin
+        uri = URI("#{@configuration["company"]["bamboo_base_url"]}rest/admin/latest/config/mailServer")
+        Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
+          request = Net::HTTP::Put.new uri.request_uri
+          request.basic_auth "#{@configuration["company"]["bamboo_username"]}", "#{@configuration["company"]["bamboo_password"]}"
+          request.add_field "Content-Type", "application/json"
+          request.body = ""\
+            "{"\
+              "\"self\":\"#{@configuration["company"]["bamboo_base_url"]}rest/admin/latest/config/mailServer\","\
+              "\"name\":\"Bamboo\","\
+              "\"fromAddress\":\"#{@configuration["company"]["email"]}\","\
+              "\"subjectPrefix\":\"[Bamboo]\","\
+              "\"precedenceBulkHeaderExcluded\":false,"\
+              "\"emailSetting\":\"SMTP\","\
+              "\"smtpServer\":\"smtp.sendgrid.net\","\
+              "\"smtpPort\":\"587\","\
+              "\"smtpUsername\":\"#{@configuration["company"]["sendgrid_username"]}\","\
+              "\"smtpPassword\":\"#{@configuration["company"]["sendgrid_password"]}\","\
+              "\"tlsEnabled\":true"\
+            "}"
+          response = http.request(request)
+          if response.code.to_f.between?(399,499)
+            catapult_exception("#{response.code} The Bamboo API could not authenticate, please verify [\"company\"][\"bamboo_base_url\"] and [\"company\"][\"bamboo_username\"] and [\"company\"][\"bamboo_password\"]. If the credentials are correct, you may need to login to Bamboo #{@configuration["company"]["bamboo_base_url"]} and provide an answer to a CAPTCHA.")
+          elsif response.code.to_f.between?(500,600)
+            puts " * Bamboo Admin API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
+          else
+            puts " * Bamboo Admin API authenticated successfully."
+            puts "   - Successfully configured Bamboo SMTP settings."
+          end
+        end
+      rescue Net::ReadTimeout => ex
+        puts " * The Bamboo API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
+        puts "   - Error was: #{ex.class}".color(Colors::RED)
+      rescue Errno::ETIMEDOUT => ex
+        puts " * The Bamboo API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
+        puts "   - Error was: #{ex.class}".color(Colors::RED)
+      rescue Errno::ECONNREFUSED => ex
+        puts " * The Bamboo API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
+        puts "   - Error was: #{ex.class}".color(Colors::RED)
+      end
+      # plans
       begin
         uri = URI("#{@configuration["company"]["bamboo_base_url"]}rest/api/latest/project.json?os_authType=basic")
         Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
           request = Net::HTTP::Get.new uri.request_uri
           request.basic_auth "#{@configuration["company"]["bamboo_username"]}", "#{@configuration["company"]["bamboo_password"]}"
-          response = http.request request
+          response = http.request(request)
           if response.code.to_f.between?(399,499)
             catapult_exception("#{response.code} The Bamboo API could not authenticate, please verify [\"company\"][\"bamboo_base_url\"] and [\"company\"][\"bamboo_username\"] and [\"company\"][\"bamboo_password\"]. If the credentials are correct, you may need to login to Bamboo #{@configuration["company"]["bamboo_base_url"]} and provide an answer to a CAPTCHA.")
           elsif response.code.to_f.between?(500,600)
@@ -1010,7 +1054,7 @@ module Catapult
             Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
               request = Net::HTTP::Get.new uri.request_uri
               request.basic_auth "#{@configuration["company"]["bamboo_username"]}", "#{@configuration["company"]["bamboo_password"]}"
-              response = http.request request
+              response = http.request(request)
               if response.code.to_f.between?(399,499)
                 catapult_exception("Could not find the plan key #{plan} in Bamboo, please follow the Services Setup for Bamboo at https://github.com/devopsgroup-io/catapult#services-setup")
               elsif response.code.to_f.between?(500,600)
@@ -1045,7 +1089,7 @@ module Catapult
           request = Net::HTTP::Get.new uri.request_uri
           request.add_field "X-Auth-Key", "#{@configuration["company"]["cloudflare_api_key"]}"
           request.add_field "X-Auth-Email", "#{@configuration["company"]["cloudflare_email"]}"
-          response = http.request request
+          response = http.request(request)
           if response.code.to_f.between?(399,499)
             catapult_exception("#{response.code} The CloudFlare API could not authenticate, please verify [\"company\"][\"cloudflare_api_key\"] and [\"company\"][\"cloudflare_email\"].")
           elsif response.code.to_f.between?(500,600)
@@ -1076,7 +1120,7 @@ module Catapult
         Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
           request = Net::HTTP::Get.new uri.request_uri
           request.add_field "X-Api-Key", "#{@configuration["company"]["newrelic_api_key"]}"
-          response = http.request request
+          response = http.request(request)
           if response.code.to_f.between?(399,499)
             catapult_exception("#{response.code} The New Relic API could not authenticate, please verify [\"company\"][\"newrelic_api_key\"] and [\"company\"][\"newrelic_license_key\"].")
           elsif response.code.to_f.between?(500,600)
@@ -1107,7 +1151,7 @@ module Catapult
         Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
           request = Net::HTTP::Get.new uri.request_uri
           request.add_field "X-Api-Key", "#{@configuration["company"]["newrelic_admin_api_key"]}"
-          response = http.request request
+          response = http.request(request)
           if response.code.to_f.between?(399,499)
             puts " * New Relic Admin API could not authenticate (Synthetics tests will not be created).".color(Colors::YELLOW)
             #catapult_exception("#{response.code} The New Relic Admin API could not authenticate, please verify [\"company\"][\"newrelic_admin_api_key\"].")
@@ -1131,6 +1175,7 @@ module Catapult
     end
     # https://sendgrid.com/docs/API_Reference/api_v3.html
     puts "[SendGrid API]"
+    # api
     if @configuration["company"]["sendgrid_api_key"] == nil
       catapult_exception("Please set [\"company\"][\"sendgrid_api_key\"] in secrets/configuration.yml")
     else
@@ -1139,7 +1184,7 @@ module Catapult
         Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
           request = Net::HTTP::Get.new uri.request_uri
           request.add_field "Authorization", "Bearer #{@configuration["company"]["sendgrid_api_key"]}"
-          response = http.request request
+          response = http.request(request)
           if response.code.to_f.between?(399,499)
             catapult_exception("#{response.code} The SendGrid API could not authenticate, please verify [\"company\"][\"sendgrid_api_key\"].")
           elsif response.code.to_f.between?(500,600)
@@ -1165,7 +1210,7 @@ module Catapult
               "\"hard_bounces\":5,"\
               "\"soft_bounces\":3"\
             "}"
-          response = http.request request
+          response = http.request(request)
           if response.code.to_f.between?(399,499)
             catapult_exception("#{response.code} The SendGrid API could not authenticate, please verify [\"company\"][\"sendgrid_api_key\"].")
           elsif response.code.to_f.between?(500,600)
@@ -1184,7 +1229,7 @@ module Catapult
               "\"enabled\":true,"\
               "\"email\":\"#{@configuration["company"]["email"]}\""\
             "}"
-          response = http.request request
+          response = http.request(request)
           if response.code.to_f.between?(399,499)
             catapult_exception("#{response.code} The SendGrid API could not authenticate, please verify [\"company\"][\"sendgrid_api_key\"].")
           elsif response.code.to_f.between?(500,600)
@@ -1204,6 +1249,29 @@ module Catapult
         puts "   - Error was: #{ex.class}".color(Colors::RED)
       end
     end
+    # smtp
+    if @configuration["company"]["sendgrid_username"] == nil
+      catapult_exception("Please set [\"company\"][\"sendgrid_username\"] in secrets/configuration.yml")
+    elsif @configuration["company"]["sendgrid_password"] == nil
+      catapult_exception("Please set [\"company\"][\"sendgrid_password\"] in secrets/configuration.yml")
+    else
+      begin
+        smtp = Net::SMTP.start(
+          "smtp.sendgrid.net",
+          587,
+          Socket.gethostname,
+          "#{@configuration["company"]["sendgrid_username"]}",
+          "#{@configuration["company"]["sendgrid_password"]}",
+          :login
+        )
+      rescue Net::ReadTimeout => ex
+        puts " * The SendGrid API[SMTP] seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
+        puts "   - Error was: #{ex.class}".color(Colors::RED)
+      rescue Net::SMTPAuthenticationError => ex
+        catapult_exception("The SendGrid API[SMTP] could not authenticate, please verify [\"company\"][\"sendgrid_username\"] and [\"company\"][\"sendgrid_password\"].")
+      end
+    end
+    puts " * SendGrid API[SMTP] authenticated successfully."
 
 
 
@@ -1220,7 +1288,7 @@ module Catapult
     Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
       request = Net::HTTP::Get.new uri.request_uri
       request.add_field "Authorization", "Bearer #{@configuration["company"]["digitalocean_personal_access_token"]}"
-      response = http.request request
+      response = http.request(request)
       if response.code.to_f.between?(399,499)
         catapult_exception("#{response.code} The DigitalOcean API could not authenticate, please verify [\"company\"][\"digitalocean_personal_access_token\"].")
       elsif response.code.to_f.between?(500,600)
@@ -1235,7 +1303,7 @@ module Catapult
     Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
       request = Net::HTTP::Get.new uri.request_uri
       request.add_field "Authorization", "Bearer #{@configuration["company"]["digitalocean_personal_access_token"]}"
-      response = http.request request
+      response = http.request(request)
       @api_digitalocean_slugs = Array.new
       if response.code.to_f.between?(399,499)
         catapult_exception("#{response.code} The DigitalOcean API could not authenticate, please verify [\"company\"][\"digitalocean_personal_access_token\"].")
@@ -1318,7 +1386,7 @@ module Catapult
       request.add_field "Authorization", "#{authorization_header}"
       request.add_field "x-amz-date", "#{amzdate}"
       request.add_field "content-type", "application/json"
-      response = http.request request
+      response = http.request(request)
       if response.code.to_f.between?(399,499)
         catapult_exception("#{response.code} The AWS API could not authenticate, please verify [\"company\"][\"aws_access_key\"] and [\"company\"][\"aws_secret_key\"].")
       elsif response.code.to_f.between?(500,600)
@@ -1578,7 +1646,7 @@ module Catapult
                     "\"type\":\"change_kernel\","\
                     "\"kernel\":7516"\
                   "}"
-                response = http.request request
+                response = http.request(request)
                 if response.code.to_f.between?(399,499)
                   catapult_exception("#{response.code} The DigitalOcean API could not authenticate, please verify [\"company\"][\"digitalocean_personal_access_token\"].")
                 elsif response.code.to_f.between?(500,600)
