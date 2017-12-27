@@ -276,7 +276,6 @@ if ([ "${4}" == "apache" ]); then
     tail /var/log/newrelic/newrelic-daemon.log
     tail /var/log/newrelic/php_agent.log
 
-
     echo -e "\n> php 7.0 configuration"
     /opt/rh/rh-php70/root/usr/bin/php --version
     /opt/rh/rh-php70/root/usr/bin/php --modules
@@ -295,4 +294,9 @@ if ([ "${4}" == "apache" ]); then
     sudo systemctl reload php-fpm
     # reload httpd for configuration changes to take effect
     sudo systemctl reload httpd.service
+    # a start may be needed if we've just installed php-fpm
+    # cat /var/log/httpd/error_log
+    # [Tue Dec 26 21:06:23.816950 2017] [mpm_prefork:notice] [pid 792] AH00171: Graceful restart requested, doing restart
+    # [Tue Dec 26 21:06:24.648573 2017] [core:notice] [pid 792] AH00060: seg fault or similar nasty error detected in the parent process
+    sudo systemctl start httpd.service
 fi
