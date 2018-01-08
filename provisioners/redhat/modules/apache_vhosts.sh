@@ -331,7 +331,7 @@ EOF
             ExpiresByType image/vnd.microsoft.icon              "access plus 1 week"
             ExpiresByType image/x-icon                          "access plus 1 week"
           # HTML
-            ExpiresByType text/html                             "access plus 1 week"
+            ExpiresByType text/html                             "access plus 0 seconds"
           # JavaScript
             ExpiresByType application/javascript                "access plus 1 week"
             ExpiresByType application/x-javascript              "access plus 1 week"
