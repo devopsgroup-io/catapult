@@ -88,7 +88,7 @@ Vagrant.configure("2") do |config|
       provider.token = Catapult::Command.configuration["company"]["digitalocean_personal_access_token"]
       provider.image = "centos-7-x64"
       provider.region = "nyc3"
-      provider.size = Catapult::Command.configuration["environments"]["test"]["servers"]["redhat"]["slug"] || "512mb"
+      provider.size = Catapult::Command.configuration["environments"]["test"]["servers"]["redhat"]["slug"] || "s-1vcpu-1gb"
       provider.ipv6 = true
       provider.private_networking = true
       provider.backups_enabled = true
@@ -106,7 +106,7 @@ Vagrant.configure("2") do |config|
       provider.token = Catapult::Command.configuration["company"]["digitalocean_personal_access_token"]
       provider.image = "centos-7-x64"
       provider.region = "nyc3"
-      provider.size = Catapult::Command.configuration["environments"]["test"]["servers"]["redhat_mysql"]["slug"] || "512mb"
+      provider.size = Catapult::Command.configuration["environments"]["test"]["servers"]["redhat_mysql"]["slug"] || "s-1vcpu-1gb"
       provider.ipv6 = true
       provider.private_networking = true
       provider.backups_enabled = true
@@ -126,7 +126,7 @@ Vagrant.configure("2") do |config|
       provider.token = Catapult::Command.configuration["company"]["digitalocean_personal_access_token"]
       provider.image = "centos-7-x64"
       provider.region = "nyc3"
-      provider.size = Catapult::Command.configuration["environments"]["qc"]["servers"]["redhat"]["slug"] || "512mb"
+      provider.size = Catapult::Command.configuration["environments"]["qc"]["servers"]["redhat"]["slug"] || "s-1vcpu-1gb"
       provider.ipv6 = true
       provider.private_networking = true
       provider.backups_enabled = false
@@ -144,7 +144,7 @@ Vagrant.configure("2") do |config|
       provider.token = Catapult::Command.configuration["company"]["digitalocean_personal_access_token"]
       provider.image = "centos-7-x64"
       provider.region = "nyc3"
-      provider.size = Catapult::Command.configuration["environments"]["qc"]["servers"]["redhat_mysql"]["slug"] || "512mb"
+      provider.size = Catapult::Command.configuration["environments"]["qc"]["servers"]["redhat_mysql"]["slug"] || "s-1vcpu-1gb"
       provider.ipv6 = true
       provider.private_networking = true
       provider.backups_enabled = false
@@ -164,7 +164,7 @@ Vagrant.configure("2") do |config|
       provider.token = Catapult::Command.configuration["company"]["digitalocean_personal_access_token"]
       provider.image = "centos-7-x64"
       provider.region = "nyc3"
-      provider.size = Catapult::Command.configuration["environments"]["production"]["servers"]["redhat"]["slug"] || "512mb"
+      provider.size = Catapult::Command.configuration["environments"]["production"]["servers"]["redhat"]["slug"] || "s-1vcpu-1gb"
       provider.ipv6 = true
       provider.private_networking = true
       provider.backups_enabled = true
@@ -182,7 +182,7 @@ Vagrant.configure("2") do |config|
       provider.token = Catapult::Command.configuration["company"]["digitalocean_personal_access_token"]
       provider.image = "centos-7-x64"
       provider.region = "nyc3"
-      provider.size = Catapult::Command.configuration["environments"]["production"]["servers"]["redhat_mysql"]["slug"] || "512mb"
+      provider.size = Catapult::Command.configuration["environments"]["production"]["servers"]["redhat_mysql"]["slug"] || "s-1vcpu-1gb"
       provider.ipv6 = true
       provider.private_networking = true
       provider.backups_enabled = true
