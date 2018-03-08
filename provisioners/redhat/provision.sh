@@ -55,11 +55,14 @@ if ([ $1 = "dev" ]); then
         touch "/catapult/provisioners/redhat/logs/catapult.changes"
     fi
 else
-    # clone the repository if it does not exist
+    # clone the catapultrepository if it does not exist
     if ! [ -d "/catapult/.git" ]; then
         sudo git clone --recursive --branch ${branch} $2 "/catapult"
-    # check out the defined branch
+    # if the catapult repository does exist
     else
+        # accomodate for a change from https to ssh as the origin url
+        cd "/catapult" && sudo git remote set-url origin $2
+        # check out the defined branch
         cd "/catapult" \
             && sudo git reset --quiet --hard HEAD -- \
             && sudo git checkout . \

@@ -95,6 +95,8 @@ Vagrant.configure("2") do |config|
     end
     # disable the default vagrant share
     config.vm.synced_folder ".", "/vagrant", disabled: true
+    # copy the ssh private key to root's home folder
+    config.vm.provision "file", source: "secrets/id_rsa", destination: "/root/.ssh/id_rsa"
     # configure the provisioner
     config.vm.provision "shell", path: "provisioners/redhat/provision.sh", args: ["test","#{Catapult::Command.repo}","#{Catapult::Command.configuration_user["settings"]["gpg_key"]}","apache"]
   end
@@ -113,6 +115,8 @@ Vagrant.configure("2") do |config|
     end
     # disable the default vagrant share
     config.vm.synced_folder ".", "/vagrant", disabled: true
+    # copy the ssh private key to root's home folder
+    config.vm.provision "file", source: "secrets/id_rsa", destination: "/root/.ssh/id_rsa"
     # configure the provisioner
     config.vm.provision "shell", path: "provisioners/redhat/provision.sh", args: ["test","#{Catapult::Command.repo}","#{Catapult::Command.configuration_user["settings"]["gpg_key"]}","mysql"]
   end
@@ -133,6 +137,8 @@ Vagrant.configure("2") do |config|
     end
     # disable the default vagrant share
     config.vm.synced_folder ".", "/vagrant", disabled: true
+    # copy the ssh private key to root's home folder
+    config.vm.provision "file", source: "secrets/id_rsa", destination: "/root/.ssh/id_rsa"
     # configure the provisioner
     config.vm.provision "shell", path: "provisioners/redhat/provision.sh", args: ["qc","#{Catapult::Command.repo}","#{Catapult::Command.configuration_user["settings"]["gpg_key"]}","apache"]
   end
@@ -151,6 +157,8 @@ Vagrant.configure("2") do |config|
     end
     # disable the default vagrant share
     config.vm.synced_folder ".", "/vagrant", disabled: true
+    # copy the ssh private key to root's home folder
+    config.vm.provision "file", source: "secrets/id_rsa", destination: "/root/.ssh/id_rsa"
     # configure the provisioner
     config.vm.provision "shell", path: "provisioners/redhat/provision.sh", args: ["qc","#{Catapult::Command.repo}","#{Catapult::Command.configuration_user["settings"]["gpg_key"]}","mysql"]
   end
@@ -171,6 +179,8 @@ Vagrant.configure("2") do |config|
     end
     # disable the default vagrant share
     config.vm.synced_folder ".", "/vagrant", disabled: true
+    # copy the ssh private key to root's home folder
+    config.vm.provision "file", source: "secrets/id_rsa", destination: "/root/.ssh/id_rsa"
     # configure the provisioner
     config.vm.provision "shell", path: "provisioners/redhat/provision.sh", args: ["production","#{Catapult::Command.repo}","#{Catapult::Command.configuration_user["settings"]["gpg_key"]}","apache"]
   end
@@ -189,6 +199,8 @@ Vagrant.configure("2") do |config|
     end
     # disable the default vagrant share
     config.vm.synced_folder ".", "/vagrant", disabled: true
+    # copy the ssh private key to root's home folder
+    config.vm.provision "file", source: "secrets/id_rsa", destination: "/root/.ssh/id_rsa"
     # configure the provisioner
     config.vm.provision "shell", path: "provisioners/redhat/provision.sh", args: ["production","#{Catapult::Command.repo}","#{Catapult::Command.configuration_user["settings"]["gpg_key"]}","mysql"]
   end

@@ -300,10 +300,13 @@ Having your team use the same tools is beneficial to streamlining your workflow 
 
 ## Instance Setup ##
 
-Catapult is quick to setup. Fork the Github repository and start adding your configuration.
+Catapult is quick to setup. You have the option of using GitHub (public) or Bitbucket (private) to store your Catapult instance. Your Catapult secrets are encrypted and safe, but please use your best judgment when choosing a destination for your Catapult instance.
 
 1. **Fork Catapult**
-    1. Fork https://github.com/devopsgroup-io/catapult and clone via SourceTree or the git utility of your choice.
+    * **GitHub (public)**
+        1. Fork https://github.com/devopsgroup-io/catapult and clone via SourceTree or the git utility of your choice.
+    * **BitBucket (private)**
+        1. From BitBucket, create a new repository and import https://github.com/devopsgroup-io/catapult. Then clone via SourceTree or the git utility of your choice.
 2. **SSH Key Pair**
     1. Create a *passwordless* SSH key pair - this will drive authentication for Catapult.
         1. For instructions please see https://help.github.com/articles/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent/
