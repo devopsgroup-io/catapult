@@ -185,6 +185,7 @@ See an error or have a suggestion? Email competition@devopsgroup.io - we appreci
         - [Refreshing Databases](#refreshing-databases)
         - [Connecting to Databases](#connecting-to-databases)
         - [Production Hotfixes](#production-hotfixes)
+    - [Automated Deployment Cycle](#automated-deployment-cycle)
     - [Maintenance Cycle](#maintenance-cycle)
         - [Daily](#daily)
         - [Weekly](#weekly)
@@ -722,7 +723,7 @@ Catapult follows Gitflow for its **infrastructure configuration** *and* **websit
 |            | LocalDev | Test | QC | Production
 |------------|----------|------|----|-----------
 **Running Branch**                                       | *develop*                                                   | *develop*                                                                                                      | *release*                                                      | *master*
-**Deployments**                                          | Manually via `vagrant provision`                            | Automatically via Bamboo (new commits to **develop**)                                                          | Automatically via Bamboo (new commits to **release**)          | Manually via Bamboo
+**Automated Deployments**                                | No, manually via `vagrant provision`                        | Yes, triggered by new commits to **develop**                                                                   | Yes, nightly or manually via Bamboo                            | Yes, nightly or manually via Bamboo
 **Testing Activities**                                   | Component Test                                              | Integration Test, System Test                                                                                  | Acceptance Test, Release Test                                  | Operational Qualification
 **Scrum Activity**                                       | Sprint Start: Development of User Stories                   | Daily Scrum                                                                                                    | Sprint Review                                                  | Sprint End: Accepted Product Release
 **Scrum Roles**                                          | Development Team                                            | Scrum Master, Development Team, Product Owner (optional)                                                       | Scrum Master, Development Team, Product Owner                  | Product Owner
@@ -1155,23 +1156,62 @@ Always weigh the risk of *not performing* a production hotfix versus *performing
 
 
 
+## Automated Deployment Cycle ##
+
+The automated deployment cycle releases changesets merged into respective environment branches for websites and your Catapult configuration, in addition to running server updates.
+
+Environment | Scheduled
+----------- | ---------
+LocalDev    | n/a, requires provision
+Test        | 12:00 AM
+QC          | 1:00 AM
+Production  | 2:00 AM
+
+* Operating System and server software updates
+* [Website software updates](#software-updates-and-fresh-installs)
+* [Website repository changesets](#software-workflow)
+* [Website software database restores](#software-workflows)
+* [Website software database migrations](#database-migrations)
+* [Website software database backups](#software-workflows)
+
+
+
 ## Maintenance Cycle ##
 
-A maintenance cycle is scheduled for defined times within the timezone that is defined within `~/secrets/configuration.yml` at the `timezone_redhat` and `timezone_windows` value of the [Company](#company) entry. This ensures servers within your infrastructure are automatically patched to mitigate security vulnerabilites.
+A maintenance cycle is scheduled for defined times within the timezone that is defined within `~/secrets/configuration.yml` at the `timezone_redhat` and `timezone_windows` value of the [Company](#company) entry. This ensures system and website software is patched and other security controls are run within your infrastructure to automatically mitigate security vulnerabilites.
 
 ### Daily ###
+Daily maintenance occurs:
 
-During daily maintenance, system updates are downloaded and installed, logs are rotated, and database maintenance performed.
+* Red Hat - 3:05 AM
+* Windows - 2:00 AM
 
-* Red Hat - 3:05AM
-* Windows - 2:00AM
+Daily maintenance includes:
+
+* Updating Operating System and server software
+* Rotating logs
+* Discovering mail which has failed to send
 
 ### Weekly ###
 
-During weekly maintenance, if necessary, servers will be rebooted dependant upon kernel updates for Red Hat and the Windows Updates pending restart status for Windows. Server reboots are generally fast for Red Hat at 5-10 seconds and 1-2 minutes for Windows.
+Weekly maintenance occurs:
 
-* Red Hat - Sunday 3:25AM
-* Windows - Sunday 3:00AM
+* Red Hat - Sunday 3:25 AM
+* Windows - Sunday 3:00 AM
+
+Weekly maintenance includes:
+
+* [Security Preventive Controls](#preventive-controls)
+* [Security Detective Controls](#detective-controls)
+* [Security Corrective Controls](#corrective-controls)
+* [Auto-rewew HTTPS certificate](#https-and-certificates)
+* Git garbage collection for website repositories
+* Performing database maintenance
+
+Servers will be rebooted when:
+
+* Red Hat - a kernel update is staged
+* Windows - Microsoft Update indicates a restart is required
 
 
 
