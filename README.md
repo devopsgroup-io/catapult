@@ -1113,12 +1113,12 @@ Oracle SQL Developer is the recommended tool, to connect to and work with, datab
         * For convenience, you may also use `~/catapult/installers/jtds-1.3.1.jar`
 * **Connecting to:** LocalDev
     * The firewall allows direct connection to the database server. 
-        * Use the mysql values in `~/secrets/configuration.yml` to connect.
+        * From Oracle SQL Developer > View > Connections, add a New Connection with the respective environment's mysql user values in `~/secrets/configuration.yml`.
 * **Connecting to:** Test, QC, Production
     * The firewall does not allow direct connect to the database servers.
-        * Add a New SSH Host in Oracle SQL Developer with the respective environment's web server host public ip address, root username with key file at `~/secrets/id_rsa`.
+        * From Oracle SQL Developer > View > SSH, add a New SSH Host in Oracle SQL Developer with the respective environment's web server host public ip address, root username with key file at `~/secrets/id_rsa`.
             * Create a New Local Port Forward with the respective environment's database server host private ip address and port 3306.
-        * Then add a New Connection with the respective environment's mysql user values in `~/secrets/configuration.yml`.
+        * From Oracle SQL Developer > View > Connections, add a New Connection with the respective environment's mysql user values in `~/secrets/configuration.yml`.
             * The hostname will be localhost since we are forwarding the port through our local SSH tunnel.
 
 ### Production Hotfixes ###
