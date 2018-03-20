@@ -1123,7 +1123,28 @@ Oracle SQL Developer is the recommended tool, to connect to and work with, datab
 
 ### Production Hotfixes ###
 
-Always weigh the risk of *not performing* a production hotfix versus *performing* it, as production hotfixes require going outside of the normal development and testing workflow. Performing a production hotfix varies depending on the website's `software` type, `software_workflow` direction, and type of change (code or database).
+Always weigh the risk of *not performing* a production hotfix versus *performing* it, as production hotfixes require going outside of the normal development and testing workflow. Below is an example of how you can determine severity:
+
+Ask key stakeholders the following questions and assign a 1 or 0 for the answer, then add up the total:
+
+* What is the organizational risk?
+    * High = 1 or Low = 0
+* How many users does this effect?
+    * Many = 1 or Few = 0
+* Is there a workaround?
+    * No = 1 or Yes = 0
+* What is the user impact?
+    * High = 1 or Low = 0
+
+The total will determine the level of severity, typically a 4 would be considered a candidate for a production hotfix:
+
+* 0=Tolerate
+* 1=Trivial
+* 2=Minor
+* 3=Major
+* 4=Critical
+
+Performing a production hotfix varies depending on the website's `software` type, `software_workflow` direction, and type of change (code or database).
 
 * `software_workflow: downstream`
     * **Code**
