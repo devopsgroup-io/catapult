@@ -197,6 +197,8 @@ See an error or have a suggestion? Email competition@devopsgroup.io - we appreci
     - [Detective Controls](#reactive-controls)
     - [Corrective Controls](#corrective-controls)
     - [Security Breach Notification Laws](#security-breach-notification-laws)
+        - [United States](#united-states)
+        - [Europe](#europe)
 - [Compliance](#compliance)
     - [Cloud Compliance](#cloud-compliance)
     - [Self Compliance](#self-compliance)
@@ -1310,8 +1312,15 @@ Catapult enforces many security best practices that are important for you to be 
 
 ## Security Breach Notification Laws ##
 
-Catapult introduces many best practice security measures, however, security of customer data is ultimately your responsibility. Generally speaking, if personal information is compromised, you are required by law to notify the party. Personal information, in the United States, is generally classified as **an individual's first and last name in combination with a Social Security number, driver's license number, or financial account number**. Laws vary country-by-country and state-by-state - for more information please see [this list](http://www.itgovernanceusa.com/data-breach-notification-laws.aspx) of data breach laws by U.S. state compiled by IT Governence.
+Catapult introduces many best practice data protection measures, however, security of personal data is ultimately your responsibility. Generally speaking, if personal information is compromised, you are required by law to notify the party. Laws vary country-by-country and state-by-state, and can be enforcable in the state or country where the individual is physically located when the data is collected. This means that, even if your website is hosted within the U.S., you could potentially be subject to another country's data protection laws.
 
+### United States ###
+
+Personally identifiable information (PII), in the U.S., is generally classified as **an individual's first and last name in combination with a Social Security number, driver's license number, or financial account number**. For more information, please see [this list](http://www.itgovernanceusa.com/data-breach-notification-laws.aspx) of data breach laws by U.S. state compiled by IT Governence.
+
+### Europe ###
+
+The General Data Protection Regulation (GDPR) is a regulation in E.U. law on data protection and privacy for all individuals within the European Union that becomes enforceable starting May 25, 2018. Article 4(1) of the GPDR defines "personal data" as any information relating to an identified or identifiable natural person ('data subject'); an identifiable natural person is one who can be identified, directly or indirectly, in particular by reference to an identifier such as a name, an identification number, location data, an online identifier or to one or more factors specific to the physical, physiological, genetic, mental, economic, cultural or social identity of that natural person. For more information, please see the [GPDR](http://eur-lex.europa.eu/legal-content/EN/TXT/?uri=celex:32016R0679).
 
 
 # Compliance #
