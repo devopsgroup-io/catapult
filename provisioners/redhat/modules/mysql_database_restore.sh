@@ -137,8 +137,8 @@ if ([ ! -z "${software}" ]); then
     # we look for the newest possible _software_dbtable_retain database sql file and restore
     if ([ ! -z "${software}" ] && [ "${software_workflow}" = "upstream" ] && [ "${software_db}" != "" ] && [ "${software_db_tables}" != "0" ]); then
         filenewest=$(ls "/var/www/repositories/apache/${domain}/_sql" | grep -E ^[0-9]{8}_software_dbtable_retain\.sql$ | sort --numeric-sort | tail -1)
-        if [ -f "${filenewest}" ]; then
-            mysql --defaults-extra-file=$dbconf ${1}_${domainvaliddbname} < "${filenewest}"
+        if [ -f "/var/www/repositories/apache/${domain}/_sql/${filenewest}" ]; then
+            mysql --defaults-extra-file=$dbconf ${1}_${domainvaliddbname} < "/var/www/repositories/apache/${domain}/_sql/${filenewest}"
         fi
     fi
 
