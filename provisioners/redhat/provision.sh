@@ -17,7 +17,7 @@ hostnamectl status
 echo -e "\n\n\n==> INSTALLING MINIMAL DEPENDENCIES"
 
 # update packages
-sudo yum update -y
+sudo yum update -y --skip-broken
 
 # install git
 sudo yum install -y git
