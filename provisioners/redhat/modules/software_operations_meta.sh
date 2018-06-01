@@ -55,20 +55,15 @@ elif [ "${software}" = "drupal7" ]; then
 
 elif [ "${software}" = "drupal8" ]; then
     
-    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush --always-set variable-set site_mail $(catapult company.email)
+    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush --yes config-set system.site mail --value="$(catapult company.email)"
 
-    password_hash=$(cd "/var/www/repositories/apache/${domain}/${webroot}" && php ./core/scripts/password-hash.sh $(catapult environments.${1}.software.drupal.admin_password))
-    password_hash=$(echo "${password_hash}" | awk '{ print $4 }' | tr -d " " | tr -d "\n")
+    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush user-create "admin" --mail="$(catapult company.email)" --password="$(catapult environments.${1}.software.drupal.admin_password)"
+    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush user-password 1 --password="$(catapult environments.${1}.software.drupal.admin_password)"
+    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush user-add-role "administrator" --uid=1
+
     mysql --defaults-extra-file=$dbconf ${1}_${domainvaliddbname} -e "
-        INSERT INTO ${software_dbprefix}users_field_data (uid, pass, mail, status)
-        VALUES ('1', '${password_hash}', '$(catapult company.email)', '1')
-        ON DUPLICATE KEY UPDATE name='admin', mail='$(catapult company.email)', pass='${password_hash}', status='1';
+        UPDATE users_field_data SET name='admin', mail='$(catapult company.email)', status='1' WHERE uid='1';
     "
-    #mysql --defaults-extra-file=$dbconf ${1}_${domainvaliddbname} -e "
-    #    INSERT INTO ${software_dbprefix}users_roles (uid, rid)
-    #    VALUES ('1', '3')
-    #    ON DUPLICATE KEY UPDATE rid='3';
-    #"
 
 elif [ "${software}" = "elgg1" ]; then
     
@@ -251,7 +246,7 @@ elif [ "${software}" = "drupal8" ]; then
     cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush --yes watchdog-delete all
     cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush --yes core-cron
     cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush --yes updatedb
-    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush --yes cache-clear all
+    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush --yes cache-rebuild
 
 elif [ "${software}" = "elgg1" ]; then
 
