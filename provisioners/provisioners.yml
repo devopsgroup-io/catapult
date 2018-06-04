@@ -210,7 +210,7 @@ software:
       branch: "8.4.x"
       database_config_file: "sites/default/settings.php"
       file_stores: ["sites/default/files"]
-      php_version: "7.0"
+      php_version: "7.1"
       version: [8]
     elgg1:
       repo: "https://github.com/Elgg/Elgg.git"
