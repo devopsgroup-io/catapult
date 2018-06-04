@@ -4,12 +4,12 @@ source "/catapult/provisioners/redhat/modules/catapult.sh"
 dbconf="/catapult/provisioners/redhat/installers/temp/${1}.cnf"
 
 domain=$(catapult websites.apache.$5.domain)
-domainvaliddbname=$(catapult websites.apache.$5.domain | tr "." "_" | tr "-" "_")
+domain_valid_db_name=$(catapult websites.apache.$5.domain | tr "." "_" | tr "-" "_")
 software=$(catapult websites.apache.$5.software)
 software_dbprefix=$(catapult websites.apache.$5.software_dbprefix)
 software_workflow=$(catapult websites.apache.$5.software_workflow)
-software_db=$(mysql --defaults-extra-file=$dbconf --silent --skip-column-names --execute "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = '${1}_${domainvaliddbname}'")
-software_db_tables=$(mysql --defaults-extra-file=$dbconf --silent --skip-column-names --execute "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = '${1}_${domainvaliddbname}'")
+software_db=$(mysql --defaults-extra-file=$dbconf --silent --skip-column-names --execute "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = '${1}_${domain_valid_db_name}'")
+software_db_tables=$(mysql --defaults-extra-file=$dbconf --silent --skip-column-names --execute "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = '${1}_${domain_valid_db_name}'")
 
 # @todo create workflow so that a developer can commit a dump from active work in localdev then the process detect this and kick off the restore rather than dump workflow
 
@@ -24,7 +24,7 @@ if ([ ! -z "${software}" ]); then
             # create the _sql directory if it does not exist
             mkdir --parents "/var/www/repositories/apache/${domain}/_sql"
             # dump the database
-            mysqldump --defaults-extra-file=$dbconf --single-transaction --quick ${1}_${domainvaliddbname} > /var/www/repositories/apache/${domain}/_sql/$(date +"%Y%m%d").sql
+            mysqldump --defaults-extra-file=$dbconf --single-transaction --quick ${1}_${domain_valid_db_name} > /var/www/repositories/apache/${domain}/_sql/$(date +"%Y%m%d").sql
             # ensure no more than 250mb or at least the one, newest, YYYYMMDD.sql file exists
             sql_files_size_maximum=$(( 1024 * 250 ))
             sql_files_size_total=0
