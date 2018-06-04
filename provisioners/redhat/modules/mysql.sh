@@ -32,14 +32,14 @@ mysql --defaults-extra-file=$dbconf -e "DELETE FROM mysql.user WHERE user!='root
 # tune mysql
 mysql --defaults-extra-file=$dbconf -e "SET global max_allowed_packet=1024 * 1024 * 64;"
 
-# create an array of domainvaliddbnames
+# create an array of domain_valid_db_names
 while IFS='' read -r -d '' key; do
-    domainvaliddbname=$(echo "$key" | grep -w "domain" | cut -d ":" -f 2 | tr -d " " | tr "." "_" | tr "-" "_")
-    domainvaliddbnames+=(${1}_${domainvaliddbname})
+    domain_valid_db_name=$(echo "$key" | grep -w "domain" | cut -d ":" -f 2 | tr -d " " | tr "." "_" | tr "-" "_")
+    domain_valid_db_names+=(${1}_${domain_valid_db_name})
 done < <(echo "${configuration}" | shyaml get-values-0 websites.apache)
-# cleanup databases from domainvaliddbnames array
+# cleanup databases from domain_valid_db_names array
 for database in $(mysql --defaults-extra-file=$dbconf -e "show databases" | egrep -v "Database|mysql|information_schema|performance_schema"); do
-    if ! [[ ${domainvaliddbnames[*]} =~ $database ]]; then
+    if ! [[ ${domain_valid_db_names[*]} =~ $database ]]; then
         echo "Removing the ${database} database as it does not exist in your configuration..."
         mysql --defaults-extra-file=$dbconf -e "DROP DATABASE $database";
     fi
@@ -60,14 +60,14 @@ mysql --defaults-extra-file=$dbconf -e "CREATE USER 'maintenance'@'%'"
 echo "${configuration}" | shyaml get-values-0 websites.apache |
 while IFS='' read -r -d '' key; do
 
-    domainvaliddbname=$(echo "$key" | grep -w "domain" | cut -d ":" -f 2 | tr -d " " | tr "." "_" | tr "-" "_")
+    domain_valid_db_name=$(echo "$key" | grep -w "domain" | cut -d ":" -f 2 | tr -d " " | tr "." "_" | tr "-" "_")
     software=$(echo "$key" | grep -w "software" | cut -d ":" -f 2 | tr -d " ")
 
     if test -n "${software}"; then
         # grant mysql user to database
-        mysql --defaults-extra-file=$dbconf -e "GRANT ALL ON ${1}_${domainvaliddbname}.* TO '$(catapult environments.${1}.servers.redhat_mysql.mysql.user)'@'%'";
+        mysql --defaults-extra-file=$dbconf -e "GRANT ALL ON ${1}_${domain_valid_db_name}.* TO '$(catapult environments.${1}.servers.redhat_mysql.mysql.user)'@'%'";
         # grant maintenance user to database
-        mysql --defaults-extra-file=$dbconf -e "GRANT ALL ON ${1}_${domainvaliddbname}.* TO 'maintenance'@'%'";
+        mysql --defaults-extra-file=$dbconf -e "GRANT ALL ON ${1}_${domain_valid_db_name}.* TO 'maintenance'@'%'";
     fi
 
 done

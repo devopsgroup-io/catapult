@@ -5,12 +5,12 @@ dbconf="/catapult/provisioners/redhat/installers/temp/${1}.cnf"
 
 domain=$(catapult websites.apache.$5.domain)
 domain_tld_override=$(catapult websites.apache.$5.domain_tld_override)
-domainvaliddbname=$(catapult websites.apache.$5.domain | tr "." "_" | tr "-" "_")
+domain_valid_db_name=$(catapult websites.apache.$5.domain | tr "." "_" | tr "-" "_")
 software=$(catapult websites.apache.$5.software)
 software_dbprefix=$(catapult websites.apache.$5.software_dbprefix)
 software_workflow=$(catapult websites.apache.$5.software_workflow)
-software_db=$(mysql --defaults-extra-file=$dbconf --silent --skip-column-names --execute "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = '${1}_${domainvaliddbname}'")
-software_db_tables=$(mysql --defaults-extra-file=$dbconf --silent --skip-column-names --execute "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = '${1}_${domainvaliddbname}'")
+software_db=$(mysql --defaults-extra-file=$dbconf --silent --skip-column-names --execute "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = '${1}_${domain_valid_db_name}'")
+software_db_tables=$(mysql --defaults-extra-file=$dbconf --silent --skip-column-names --execute "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = '${1}_${domain_valid_db_name}'")
 softwareroot=$(provisioners software.apache.${software}.softwareroot)
 webroot=$(catapult websites.apache.$5.webroot)
 
@@ -31,12 +31,12 @@ if ([ ! -z "${software}" ]); then
         # drop the database
         # the loop is necessary just in case the database doesn't yet exist
         for database in $(mysql --defaults-extra-file=$dbconf -e "show databases" | egrep -v "Database|mysql|information_schema|performance_schema"); do
-            if [ ${database} = ${1}_${domainvaliddbname} ]; then
-                mysql --defaults-extra-file=$dbconf -e "DROP DATABASE ${1}_${domainvaliddbname}";
+            if [ ${database} = ${1}_${domain_valid_db_name} ]; then
+                mysql --defaults-extra-file=$dbconf -e "DROP DATABASE ${1}_${domain_valid_db_name}";
             fi
         done
         # create database
-        mysql --defaults-extra-file=$dbconf -e "CREATE DATABASE ${1}_${domainvaliddbname}"
+        mysql --defaults-extra-file=$dbconf -e "CREATE DATABASE ${1}_${domain_valid_db_name}"
         # confirm we have a usable database backup
         if ! [ -d "/var/www/repositories/apache/${domain}/_sql" ]; then
             echo -e "\t* ~/_sql directory does not exist, ${software} may not function properly"
@@ -117,7 +117,7 @@ if ([ ! -z "${software}" ]); then
                     fi
 
                     # restore the full database sql file
-                    mysql --defaults-extra-file=$dbconf ${1}_${domainvaliddbname} < "/var/www/repositories/apache/${domain}/_sql/${1}.$(basename "$file")"
+                    mysql --defaults-extra-file=$dbconf ${1}_${domain_valid_db_name} < "/var/www/repositories/apache/${domain}/_sql/${1}.$(basename "$file")"
                     rm --force "/var/www/repositories/apache/${domain}/_sql/${1}.$(basename "$file")"
 
                     # post-process the database
@@ -138,7 +138,7 @@ if ([ ! -z "${software}" ]); then
     if ([ ! -z "${software}" ] && [ "${software_workflow}" = "upstream" ] && [ "${software_db}" != "" ] && [ "${software_db_tables}" != "0" ]); then
         filenewest=$(ls "/var/www/repositories/apache/${domain}/_sql" | grep -E ^[0-9]{8}_software_dbtable_retain\.sql$ | sort --numeric-sort | tail -1)
         if [ -f "/var/www/repositories/apache/${domain}/_sql/${filenewest}" ]; then
-            mysql --defaults-extra-file=$dbconf ${1}_${domainvaliddbname} < "/var/www/repositories/apache/${domain}/_sql/${filenewest}"
+            mysql --defaults-extra-file=$dbconf ${1}_${domain_valid_db_name} < "/var/www/repositories/apache/${domain}/_sql/${filenewest}"
         fi
     fi
 
