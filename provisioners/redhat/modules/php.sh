@@ -3,6 +3,72 @@ source "/catapult/provisioners/redhat/modules/catapult.sh"
 # http://php.net/manual/en/extensions.membership.php
 
 #################
+# PHP 7.1 PHP_FPM
+# /opt/rh/rh-php71/root/usr/bin/php
+# /etc/opt/rh/rh-php71/php.ini
+# sudo yum list \*-php71-\*
+#################
+
+# core extensions
+sudo yum install -y centos-release-scl
+sudo yum install -y rh-php71
+# These are not actual extensions. They are part of the PHP core and cannot be left out of a PHP binary with compilation options.
+
+# configure php-fpm
+if ([ "${4}" == "apache" ]); then
+    sudo yum install -y rh-php71-php-fpm
+    sed -i -e "s#^listen = 127.0.0.1:9000#listen = 127.0.0.1:9710#g" /etc/opt/rh/rh-php71/php-fpm.d/www.conf
+    sudo systemctl enable rh-php71-php-fpm
+    sudo systemctl start rh-php71-php-fpm
+fi
+
+# php.ini configuration options
+# set the timezone
+sed -i -e "s#\;date\.timezone.*#date.timezone = \"$(catapult company.timezone_redhat)\"#g" /etc/opt/rh/rh-php71/php.ini
+# increase the upload_max_filesize
+sed -i -e "s#^upload_max_filesize.*#upload_max_filesize = 10M#g" /etc/opt/rh/rh-php71/php.ini
+# hide x-powered-by
+sed -i -e "s#^expose_php.*#expose_php = Off#g" /etc/opt/rh/rh-php71/php.ini
+# increase php memory limit for tools like composer
+sed -i -e "s#^memory_limit.*#memory_limit = 256M#g" /etc/opt/rh/rh-php71/php.ini
+# display errors on screen using the default recommendations for development and production
+if [ "$1" = "dev" ]; then
+    sed -i -e "s#^display_errors.*#display_errors = On#g" /etc/opt/rh/rh-php71/php.ini
+    sed -i -e "s#^error_reporting.*#error_reporting = E_ALL#g" /etc/opt/rh/rh-php71/php.ini
+else
+    sed -i -e "s#^display_errors.*#display_errors = Off#g" /etc/opt/rh/rh-php71/php.ini
+    sed -i -e "s#^error_reporting.*#error_reporting = E_ALL \& \~E_DEPRECATED \& \~E_STRICT#g" /etc/opt/rh/rh-php71/php.ini
+fi
+
+# bundled extensions
+# These extensions are bundled with PHP.
+sudo yum install -y rh-php71-php-gd
+sudo yum install -y rh-php71-php-intl
+sudo yum install -y rh-php71-php-mbstring
+sudo yum install -y rh-php71-php-opcache
+# disable opcache for dev
+if [ "$1" = "dev" ]; then
+    sudo bash -c 'echo "/var/www" > /etc/opt/rh/rh-php71/php.d/opcache-default.blacklist'
+else
+    sudo bash -c 'echo "" > /etc/opt/rh/rh-php71/php.d/opcache-default.blacklist'
+fi
+sudo yum install -y rh-php71-php-soap
+sudo yum install -y rh-php71-php-xmlrpc
+
+# external extensions
+# These extensions are bundled with PHP but in order to compile them, external libraries will be needed.
+sudo yum install -y rh-php71-php-gmp
+sudo yum install -y rh-php71-php-mysqlnd
+
+# pecl extensions
+# https://blog.remirepo.net/post/2017/02/23/Additional-PHP-packages-for-RHSCL
+curl --output /etc/yum.repos.d/rhscl-centos-release-scl-epel-7.repo wget https://copr.fedorainfracloud.org/coprs/rhscl/centos-release-scl/repo/epel-7/rhscl-centos-release-scl-epel-7.repo
+sudo yum install -y centos-release-scl
+# These extensions are available from » PECL. They may require external libraries. More PECL extensions exist but they are not documented in the PHP manual yet.
+sudo yum install -y sclo-php71-php-pecl-geoip
+sudo yum install -y sclo-php71-php-pecl-uploadprogress
+
+#################
 # PHP 7.0 PHP_FPM
 # /opt/rh/rh-php70/root/usr/bin/php
 # /etc/opt/rh/rh-php70/php.ini
@@ -268,13 +334,17 @@ if ([ "${4}" == "apache" ]); then
     cp "/usr/share/newrelic/newrelic-php5-7.6.0.201-linux/scripts/newrelic.ini.template" "/etc/opt/rh/rh-php70/php.d/newrelic.ini"
 
     # apm php installed but we need to set configuration
-    NR_INSTALL_PHPLIST="/usr/bin:/opt/rh/rh-php56/root/usr/bin:/opt/rh/rh-php70/root/usr/bin", NR_INSTALL_SILENT="true", NR_INSTALL_KEY="$(catapult company.newrelic_license_key)" /usr/bin/newrelic-install install
+    NR_INSTALL_PHPLIST="/usr/bin:/opt/rh/rh-php56/root/usr/bin:/opt/rh/rh-php70/root/usr/bin:/opt/rh/rh-php71/root/usr/bin", NR_INSTALL_SILENT="true", NR_INSTALL_KEY="$(catapult company.newrelic_license_key)" /usr/bin/newrelic-install install
     # ensure newrelic daemon is started with latest configuration
     /etc/init.d/newrelic-daemon start
     /etc/init.d/newrelic-daemon reload
     /etc/init.d/newrelic-daemon status
     tail /var/log/newrelic/newrelic-daemon.log
     tail /var/log/newrelic/php_agent.log
+
+    echo -e "\n> php 7.1 configuration"
+    /opt/rh/rh-php71/root/usr/bin/php --version
+    /opt/rh/rh-php71/root/usr/bin/php --modules
 
     echo -e "\n> php 7.0 configuration"
     /opt/rh/rh-php70/root/usr/bin/php --version
@@ -289,6 +359,7 @@ if ([ "${4}" == "apache" ]); then
     /usr/bin/php --modules
 
     # reload php-fpm for configuration changes to take effect
+    sudo systemctl reload rh-php71-php-fpm
     sudo systemctl reload rh-php70-php-fpm
     sudo systemctl reload rh-php56-php-fpm
     sudo systemctl reload php-fpm
@@ -299,6 +370,7 @@ if ([ "${4}" == "apache" ]); then
     # cat /var/log/httpd/error_log
     # [Tue Dec 26 21:06:23.816950 2017] [mpm_prefork:notice] [pid 792] AH00171: Graceful restart requested, doing restart
     # [Tue Dec 26 21:06:24.648573 2017] [core:notice] [pid 792] AH00060: seg fault or similar nasty error detected in the parent process
+    sudo systemctl start rh-php71-php-fpm
     sudo systemctl start rh-php70-php-fpm
     sudo systemctl start rh-php56-php-fpm
     sudo systemctl start php-fpm
