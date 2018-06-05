@@ -120,10 +120,14 @@ elif [ "${software}" = "drupal8" ]; then
     connectionstring="\$databases['default']['default'] = ['driver' => 'mysql','database' => '${1}_${domain_valid_db_name}','username' => '${mysql_user}','password' => '${mysql_user_password}','host' => '${redhat_mysql_ip}','prefix' => '${software_dbprefix}'];"
     sed --expression="s/\$databases\s=\s\[\];/${connectionstring}/g" \
         --expression="s/\$settings\['hash_salt'\]\s=\s'';/\$settings['hash_salt'] = '${unique_hash}';/g" \
+        --expression="s/\$config_directories\s=\s\[\];/\$config_directories = [CONFIG_SYNC_DIRECTORY => '\\/var\\/www\\/repositories\\/apache\\/${domain}\\/${webroot}sites\\/default\\/files\\/sync'];/g" \
         --expression="s/\$settings\['trusted_host_patterns'\]\s=\s\[\];/\$settings['trusted_host_patterns'] = ['^.+\\\.${domain_valid_regex}'];/g" \
         /catapult/provisioners/redhat/installers/software/${software}/settings.php > "${file}"
 
-    # drupal requires the config file to be writable for installation
+    # create the drupal 8 sync directory
+    mkdir --parents "/var/www/repositories/apache/${domain}/${webroot}sites/default/files/sync"
+
+    # drupal 8 requires the config file to be writable for installation
     cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush status bootstrap | grep -q Successful
     if [ $? -eq 0 ]; then
         sudo chmod 0444 "${file}"
