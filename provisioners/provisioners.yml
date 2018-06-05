@@ -207,7 +207,7 @@ software:
       version: [7]
     drupal8:
       repo: "https://git.drupal.org/project/drupal.git"
-      branch: "8.4.x"
+      branch: "8.5.x"
       database_config_file: "sites/default/settings.php"
       file_stores: ["sites/default/files"]
       php_version: "7.1"
