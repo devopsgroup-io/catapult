@@ -852,7 +852,7 @@ The following options are available:
         * free certificates are created and managed for you compliments of CloudFlare (single-subdomain) and Let's Encrypt (multi-subdomain)
 * `force_ip:`
     * required: no
-    * example: `force_ip: [175.45.176.1]`
+    * example: `force_ip: ["208.80.154.224"]`
         * an array of valid IPv4 or IPv6 addresses that denies all traffic except for traffic coming from the defined addresses
         * option applies to LocalDev, Test, QC, and Production unless `force_ip_exclude` is defined
         * can be used as an alternative to `force_auth` for when HTTP basic authentication cannot be used. e.g. [Drupal 8 Basic Auth Module](https://www.drupal.org/project/drupal/issues/2842858)
