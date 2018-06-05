@@ -1998,6 +1998,32 @@ module Catapult
               catapult_exception("There is an error in your secrets/configuration.yml file.\nThe force_https for websites => #{service} => domain => #{instance["domain"]} is invalid, it must be true or removed.")
             end
           end
+          # validate force_ip
+          unless instance["force_ip"] == nil
+            # validate both IPv4 and IPv6 adressess
+            instance["force_ip"].each do |value|
+              if not (value =~ Resolv::IPv4::Regex || value =~ Resolv::IPv6::Regex)
+                catapult_exception("There is an error in your secrets/configuration.yml file.\nThe force_ip for websites => #{service} => domain => #{instance["domain"]} is invalid, it must be an array of valid IPv4 or IPv6 address.")
+              end
+            end
+          end
+          # validate force_ip_exclude
+          unless instance["force_ip_exclude"] == nil
+            # this can only be used with force_ip
+            if instance["force_ip"] == nil
+              catapult_exception("There is an error in your secrets/configuration.yml file.\nThe force_ip_exclude for websites => #{service} => domain => #{instance["domain"]} requires force_ip to be set.")
+            end
+            # only test, qc, and production are valid values
+            @force_ip_exclude_valid_values = true
+            instance["force_ip_exclude"].each do |value|
+              if not ["dev","test","qc","production"].include?("#{value}")
+                @force_ip_exclude_valid_values = false
+              end
+            end
+            unless @force_ip_exclude_valid_values
+              catapult_exception("There is an error in your secrets/configuration.yml file.\nThe force_ip_exclude for websites => #{service} => domain => #{instance["domain"]} is invalid, it must only include one, some, or all of the following [\"dev\",\"test\",\"qc\",\"production\"].")
+            end
+          end
           # validate software
           unless instance["software"] == nil
             # create an array of available software
