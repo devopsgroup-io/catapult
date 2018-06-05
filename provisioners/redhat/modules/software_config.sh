@@ -117,10 +117,11 @@ elif [ "${software}" = "drupal8" ]; then
     else
         mkdir --parents $(dirname "${file}")
     fi
+    # @todo: the sed delimiter was updated from / to ~ to accomodate for the ${webroot}'s "/" - plan to persist the ~ delimiter
     connectionstring="\$databases['default']['default'] = ['driver' => 'mysql','database' => '${1}_${domain_valid_db_name}','username' => '${mysql_user}','password' => '${mysql_user_password}','host' => '${redhat_mysql_ip}','prefix' => '${software_dbprefix}'];"
     sed --expression="s/\$databases\s=\s\[\];/${connectionstring}/g" \
         --expression="s/\$settings\['hash_salt'\]\s=\s'';/\$settings['hash_salt'] = '${unique_hash}';/g" \
-        --expression="s/\$config_directories\s=\s\[\];/\$config_directories = [CONFIG_SYNC_DIRECTORY => '\\/var\\/www\\/repositories\\/apache\\/${domain}\\/${webroot}sites\\/default\\/files\\/sync'];/g" \
+        --expression="s~\$config_directories\s=\s\[\];~\$config_directories = [CONFIG_SYNC_DIRECTORY => '\\/var\\/www\\/repositories\\/apache\\/${domain}\\/${webroot}sites\\/default\\/files\\/sync'];~g" \
         --expression="s/\$settings\['trusted_host_patterns'\]\s=\s\[\];/\$settings['trusted_host_patterns'] = ['^.+\\\.${domain_valid_regex}'];/g" \
         /catapult/provisioners/redhat/installers/software/${software}/settings.php > "${file}"
 
