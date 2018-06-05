@@ -26,6 +26,8 @@ while IFS='' read -r -d '' key; do
     force_auth=$(echo "$key" | grep -w "force_auth" | cut -d ":" -f 2 | tr -d " ")
     force_auth_exclude=$(echo "$key" | grep -w "force_auth_exclude" | tr -d " ")
     force_https=$(echo "$key" | grep -w "force_https" | cut -d ":" -f 2 | tr -d " ")
+    force_ip=$(echo "$key" | grep -w "force_ip" | tr -d " ")
+    force_ip_exclude=$(echo "$key" | grep -w "force_ip_exclude" | tr -d " ")
     software=$(echo "$key" | grep -w "software" | cut -d ":" -f 2 | tr -d " ")
     software_dbprefix=$(echo "$key" | grep -w "software_dbprefix" | cut -d ":" -f 2 | tr -d " ")
     software_php_version=$(provisioners software.apache.${software}.php_version)
@@ -90,8 +92,48 @@ EOF
             "
         fi
     else
-        # never force_auth in dev
         force_auth_value=""
+    fi
+    # handle the force_ip option
+    echo "${force_auth}"
+    echo "${force_auth_exclude}"
+    echo "${force_ip}"
+    echo "${force_ip_exclude}"
+    if ([ ! -z "${force_ip}" ]); then
+        if ([ ! -z "${force_ip_exclude}" ]); then
+            force_ip_excludes=($(echo "${key}" | shyaml get-values force_ip_exclude))
+            if ([[ "${force_ip_excludes[@]}" =~ "$1" ]]); then
+                force_ip_value=""
+            else
+                force_ip_value="
+                    <Location />
+                        Require all denied
+                "
+                while IFS='' read -r -d '' ip; do
+                    force_ip_value+="
+                        Require ip ${ip}
+                    "
+                done < <(echo "${key}" | shyaml get-values-0 force_ip)
+                force_ip_value+="
+                    </Location>
+                "
+            fi
+        else
+            force_ip_value="
+                <Location />
+                    Require all denied
+            "
+            while IFS='' read -r -d '' ip; do
+                force_ip_value+="
+                    Require ip ${ip}
+                "
+            done < <(echo "${key}" | shyaml get-values-0 force_ip)
+            force_ip_value+="
+                </Location>
+            "
+        fi
+    else
+        force_ip_value=""
     fi
     # handle ssl certificates
     # if there is a specified custom certificate available
@@ -171,6 +213,7 @@ EOF
     RewriteEngine On
 
     <VirtualHost *:80> # must listen * to support cloudflare
+
         ServerAdmin ${company_email}
         ServerName ${domain_environment}
         ServerAlias www.${domain_environment}
@@ -179,12 +222,21 @@ EOF
         ErrorLog /var/log/httpd/${domain_environment}/error_log
         CustomLog /var/log/httpd/${domain_environment}/access_log combined
         LogLevel warn
+
+        # force http basic auth if configured
         ${force_auth_value}
+
+        # force visitor ip address if configured
+        ${force_ip_value}
+
+        # force https if configured
         ${force_https_value}
+
     </VirtualHost>
 
     <IfModule mod_ssl.c>
         <VirtualHost *:443> # must listen * to support cloudflare
+
             ServerAdmin ${company_email}
             ServerName ${domain_environment}
             ServerAlias www.${domain_environment}
@@ -219,8 +271,11 @@ EOF
             # set the ssl certificates
             ${https_certificates}
 
-            # force httpd basic auth if configured
+            # force http basic auth if configured
             ${force_auth_value}
+
+            # force visitor ip address if configured
+            ${force_ip_value}
 
         </VirtualHost>
     </IfModule>
@@ -228,19 +283,19 @@ EOF
     # define apache ruleset for the web root
     <Directory "/var/www/repositories/apache/${domain}/${webroot}">
 
-        # define the php version being used
-        ${software_php_version_value}
-
         # allow .htaccess in apache 2.4+
         AllowOverride All
         Options -Indexes +FollowSymlinks
+
+        # define the php version being used
+        ${software_php_version_value}
 
         # define new relic appname
         <IfModule php5_module>
             php_value newrelic.appname "${domain_environment};$(catapult company.name | tr '[:upper:]' '[:lower:]')-${1}-redhat"
         </IfModule>
 
-        # allow /manifest.json to be accessed regardless of basic auth
+        # allow /manifest.json to be accessed regardless of basic auth as /manifest.json is usually accessed out of basic auth context
         <Files "manifest.json">
             <IfModule mod_authz_core.c>
                 Satisfy Any
@@ -378,14 +433,12 @@ EOF
 
     # deny access to .git folder
     <Directory "/var/www/repositories/apache/${domain}/.git">
-        Order Deny,Allow
-        Deny From All
+        Require all denied
     </Directory>
 
     # deny access to _sql folder
     <Directory "/var/www/repositories/apache/${domain}/_sql">
-        Order Deny,Allow
-        Deny From All
+        Require all denied
     </Directory>
 
 EOF

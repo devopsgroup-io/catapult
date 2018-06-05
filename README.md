@@ -843,17 +843,29 @@ The following options are available:
     * required: no
     * dependency: `force_auth:`
     * example: `force_auth_exclude: ["production"]`
-        * array of select environments ["dev","test","qc","production"] to exclude from the `force_auth` option
+        * array of select environments `["dev","test","qc","production"]` to exclude from the `force_auth` option
 * `force_https:`
     * required: no
     * option: `force_https: true`
         * rewrites all http traffic to https
         * all `dev.` domains in LocalDev will have an unsigned certificate warning
         * free certificates are created and managed for you compliments of CloudFlare (single-subdomain) and Let's Encrypt (multi-subdomain)
+* `force_ip:`
+    * required: no
+    * example: `force_ip: [175.45.176.1]`
+        * an array of valid IPv4 or IPv6 addresses that denies all traffic except for traffic coming from the defined addresses
+        * option applies to LocalDev, Test, QC, and Production unless `force_ip_exclude` is defined
+        * can be used as an alternative to `force_auth` for when HTTP basic authentication cannot be used. e.g. [Drupal 8 Basic Auth Module](https://www.drupal.org/project/drupal/issues/2842858)
+        * can be used in addition to `force_auth` for added security
+* `force_ip_exclude:`
+    * required: no
+    * dependency: `force_ip:`
+    * example: `force_ip_exclude: ["production"]`
+        * array of select environments `["dev","test","qc","production"]` to exclude from the `force_ip` option
 * `repo:`
     * required: yes
     * example: `repo: git@github.com:devopsgroup-io/devopsgroup-io.git`
-        * the existing source code repository of your website (please create one if none exists)
+        * the existing source code repository of your website (repo automatically created if none exists)
         * GitHub and Bitbucket over SSH are supported, HTTPS is not supported
 * `software:`
     * required: no
@@ -940,9 +952,9 @@ Software | `software_auto_update` Support | Install Approach | Install Notes
 ---------|--------------------------------|------------------|--------------
 `codeigniter2`      | [:white_check_mark:](http://www.codeigniter.com/userguide2/installation/upgrading.html) |          | Follow the [Installation Instructions](https://www.codeigniter.com/userguide2/installation/index.html).
 `codeigniter3`      | [:white_check_mark:](https://www.codeigniter.com/userguide3/installation/upgrading.html) |          | Follow the [Installation Instructions](https://www.codeigniter.com/userguide3/installation/index.html).
-`drupal6`           | :white_check_mark:                                                       | Drush    | `drush dl drupal-6`
-`drupal7`           | :white_check_mark:                                                       | Drush    | `drush dl drupal-7`
-`drupal8`           | :white_check_mark:                                                       | Drush    | `drush dl drupal-8`
+`drupal6`           | :white_check_mark:                                                       | Drush    | `drush pm-download drupal-6`
+`drupal7`           | :white_check_mark:                                                       | Drush    | `drush pm-download drupal-7`
+`drupal8`           | :white_check_mark:                                                       | Drush    | `drush pm-download drupal-8`
 `elgg1`             | [:x:](http://learn.elgg.org/en/2.0/admin/upgrading.html)                 | Fork     | Follow the installation [Overview](http://learn.elgg.org/en/2.0/intro/install.html). Catapult requires the `dataroot` directory to be within the webroot, it's pertinant to create a `.gitignore` to ignore and `.htaccess` to deny access to this directory.
 `elgg2`             | [:x:](http://learn.elgg.org/en/2.0/admin/upgrading.html)                 | Fork     | Follow the installation [Overview](http://learn.elgg.org/en/2.0/intro/install.html). Catapult requires the `dataroot` directory to be within the webroot, it's pertinant to create a `.gitignore` to ignore and `.htaccess` to deny access to this directory.
 `expressionengine3` | [:x:](https://docs.expressionengine.com/latest/installation/update.html) | Download |
