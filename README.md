@@ -222,6 +222,7 @@ See an error or have a suggestion? Email competition@devopsgroup.io - we appreci
 Catapult requires a [Developer Setup](#developer-setup), [Instance Setup](#instance-setup), and [Services Setup](#services-setup) as described in the following sections.
 
 **Please Note:**
+* You must run most commands from an elevated shell. For macOS and Linux, type `sudo su` in a terminal window, or for Windows, right-clicking on Command Prompt from the Start Menu and selecting "Run as Administrator".
 * It is advised to turn off any antivirus software that you may have installed during setup and usage of Catapult - tasks such as forwarding ports and writing hosts files may be blocked.
 * Virtualizaion must be enabled in the BIOS of the developer's workstation - follow [this how-to](https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux/5/html/Virtualization/sect-Virtualization-Troubleshooting-Enabling_Intel_VT_and_AMD_V_virtualization_hardware_extensions_in_BIOS.html) to get started.
 * Using a VPN client during usage of LocalDev may result in lost communication between your workstation and the guests, requiring a `vagrant reload` to regain SSH and/or WinRM communication.
@@ -230,23 +231,23 @@ Catapult requires a [Developer Setup](#developer-setup), [Instance Setup](#insta
 
 Catapult is controlled via Vagrant and the command line of a developer's workstation - below is a list of required software that will need to be installed.
 
-* OS X workstations: Compatible and supported
+* macOS workstations: Compatible and supported
 * Linux workstations: Compatible and supported
 * Windows workstations: Limited testing and support
 
 1. **Vagrant**
-    * **Using OS X?**
+    * **Using macOS?**
         1. Ensure Xcode Command Line Tools are installed by running `xcode-select --install` from Terminal
-        2. Download and install the latest version of Vagrant from https://www.vagrantup.com/downloads.html
+        2. Download and install the latest version of Vagrant v1 from https://releases.hashicorp.com/vagrant/
     * **Using Windows?**
-        1. Download and install the latest version of Vagrant from https://www.vagrantup.com/downloads.html
+        1. Download and install the latest version of Vagrant v1 from https://releases.hashicorp.com/vagrant/
     * **Using Linux (Debian, Ubuntu)?**
-        1. Download the latest version of Vagrant respective to your architecture from https://releases.hashicorp.com/vagrant/ by running e.g. `wget https://releases.hashicorp.com/vagrant/1.8.1/vagrant_1.8.1_x86_64.deb`
-        2. Install Vagrant using dpkg e.g. `sudo dpkg --install vagrant_1.8.1_x86_64.deb`
+        1. Download the latest version of Vagrant v1 respective to your architecture from https://releases.hashicorp.com/vagrant/ by running e.g. `wget https://releases.hashicorp.com/vagrant/1.9.8/vagrant_1.9.8_x86_64.deb`
+        2. Install Vagrant using dpkg e.g. `sudo dpkg --install vagrant_1.9.8_x86_64.deb`
         3. Install Network File System (NFS) `sudo apt-get install nfs-kernel-server`
     * **Using Linux (Fedora, Red Hat, Suse)?**
-        1. Download the latest version of Vagrant respective to your architecture from https://releases.hashicorp.com/vagrant/ by running e.g. `wget https://releases.hashicorp.com/vagrant/1.8.1/vagrant_1.8.1_x86_64.rpm`
-        2. Install Vagrant using yum e.g. `sudo yum install vagrant_1.8.1_x86_64.rpm`
+        1. Download the latest version of Vagrant v1 respective to your architecture from https://releases.hashicorp.com/vagrant/ by running e.g. `wget https://releases.hashicorp.com/vagrant/1.9.8/vagrant_1.9.8_x86_64.rpm`
+        2. Install Vagrant using yum e.g. `sudo yum install vagrant_1.9.8_x86_64.rpm`
 2. **Vagrant Plugins**
     1. Open your command line and install the following Vagrant plugins:
         1. `vagrant plugin install vagrant-aws`
@@ -258,7 +259,7 @@ Catapult is controlled via Vagrant and the command line of a developer's worksta
         4. `vagrant plugin install vagrant-vbguest`
             * [![Gem](https://img.shields.io/gem/dt/vagrant-vbguest.svg)](https://rubygems.org/gems/vagrant-vbguest)
 3. **VirtualBox**
-    * **Using OS X?**
+    * **Using macOS?**
         1. Download and install the latest version of VirtualBox from https://www.virtualbox.org/wiki/Downloads
     * **Using Windows?**
         1. Download and install the latest version of VirtualBox from https://www.virtualbox.org/wiki/Downloads
@@ -267,7 +268,7 @@ Catapult is controlled via Vagrant and the command line of a developer's worksta
     * **Using Linux (Fedora, Red Hat, Suse)?**
         1. Download and install the latest version of VirtualBox using Yellowdog Updater, Modifed (yum) `sudo yum install virtualbox`
 4. **GPG2**
-    * **Using OS X?**
+    * **Using macOS?**
         1. Download and install GPG Suite from https://gpgtools.org
     * **Using Windows?**
         1. Download and install Gpg4win from http://gpg4win.org/download.html
@@ -275,7 +276,7 @@ Catapult is controlled via Vagrant and the command line of a developer's worksta
         1. GPG is included in the base distribution in most cases.
         1. If being prompted by the Passphrase GUI Agent, comment out 'use-agent' in `~/.gnupg/gpg.conf`
 5. **Git**
-    * **Using OS X?**
+    * **Using macOS?**
         1. Git commandline is included in the base distribution in most cases.
         1. For a streamlined Git GUI, download and install SourceTree from https://www.sourcetreeapp.com/
     * **Using Windows?**
@@ -284,7 +285,7 @@ Catapult is controlled via Vagrant and the command line of a developer's worksta
         1. Git commandline is included in the base distribution in most cases.
         1. For a streamlined Git GUI, download and install SmartGit from http://www.syntevo.com/smartgit/
 6. **Terminal**
-    * **Using OS X?**
+    * **Using macOS?**
         1. The terminal in the base distrubitions are 100% compatible.
     * **Using Windows?**
         1. Download and install Cygwin from https://cygwin.com/install.html
