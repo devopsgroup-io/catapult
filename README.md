@@ -181,6 +181,7 @@ See an error or have a suggestion? Email competition@devopsgroup.io - we appreci
         - [Cache Busting](#cache-busting)
         - [Progressive Web App](#progressive-web-app)
         - [Email](#email)
+        - [Upload Limits](#upload-limits)
         - [Database Migrations](#database-migrations)
         - [Refreshing Databases](#refreshing-databases)
         - [Connecting to Databases](#connecting-to-databases)
@@ -1089,6 +1090,15 @@ An example of implementation would be the [WP Mail SMTP](https://wordpress.org/p
 
 * With SendGrid: Catapult automatically configures SendGrid to forward bounces to your `~/secrets/configuration.yml["company"]["email"]` to clear hard bounces every 5 days and soft bounces every 3 days.
 * Without SendGrid: Postfix will retry sending every hour for five days. Catapult cron looks for bounces and emails them to your `~/secrets/configuration.yml["company"]["email"]` daily.
+
+### Upload Limits ###
+
+The following HTTP request limits are defined for all websites:
+
+* Maximum request body size excluding the size of any files being transported in the request (`SecRequestBodyNoFilesLimit`): `128 KB`
+* Maximum request body size (`SecRequestBodyLimit`): `64 MB`
+* Maximum size of post data allowed (`post_max_size`): `64 MB`
+* Maximum size of an uploaded file (`upload_max_filesize`): `16 MB`
 
 ### Database Migrations ###
 

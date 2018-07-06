@@ -347,6 +347,14 @@ sudo systemctl restart yum-cron.service
 
 
 
+echo -e "\n> system rpmconf configuration"
+# install rpmconf
+# rpmconf --debug --clean
+# @todo - add to cron to notify of pending conf files
+sudo yum -y install rpmconf
+
+
+
 echo -e "\n> system arpwatch configuration"
 # install arpwatch
 sudo yum -y install arpwatch
