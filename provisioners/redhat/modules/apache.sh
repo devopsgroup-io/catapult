@@ -1,52 +1,54 @@
 source "/catapult/provisioners/redhat/modules/catapult.sh"
 
-# install apache
+# 80: install httpd
 sudo yum install -y httpd
 sudo systemctl enable httpd.service
 sudo systemctl start httpd.service
 
-# install mod_security
-# note enabled by default: see /etc/httpd/conf.d/mod_security.conf
-sudo yum install -y mod_security
-
-# install mod_ssl and create self-signed cert
-sudo yum install -y mod_ssl
-sudo bash /etc/ssl/certs/make-dummy-cert "/etc/ssl/certs/httpd-dummy-cert.key.cert"
-
+# 80: /etc/httpd/conf/httpd.conf customizations
+# https://httpd.apache.org/docs/2.4/mod/core.html
+sudo mkdir --parents /etc/httpd/sites-available
+sudo mkdir --parents /etc/httpd/sites-enabled
+sudo cat > /etc/httpd/conf.d/httpd_custom.conf << EOF
 # prevent the httpoxy vulnerability
 # https://www.apache.org/security/asf-httpoxy-response.txt
-if ! grep -q "RequestHeader unset Proxy early" "/etc/httpd/conf/httpd.conf"; then
-   sudo bash -c 'echo -e "\nRequestHeader unset Proxy early" >> /etc/httpd/conf/httpd.conf'
-fi
+RequestHeader unset Proxy early
 
 # do not expose server information
 # https://httpd.apache.org/docs/2.4/mod/core.html#servertokens
-if ! grep -q "ServerTokens Prod" "/etc/httpd/conf/httpd.conf"; then
-   sudo bash -c 'echo -e "\nServerTokens Prod" >> /etc/httpd/conf/httpd.conf'
-fi
+ServerTokens Prod
 
 # define the server's servername
 # suppress this - httpd: Could not reliably determine the server's fully qualified domain name, using localhost.localdomain. Set the 'ServerName' directive globally to suppress this message
-if ! grep -q "ServerName localhost" "/etc/httpd/conf/httpd.conf"; then
-   sudo bash -c 'echo -e "\nServerName localhost" >> /etc/httpd/conf/httpd.conf'
-fi
+ServerName localhost
 
 # use sites-available, sites-enabled convention. this is a debianism - but the convention is common and easy to understand
-sudo mkdir --parents /etc/httpd/sites-available
-sudo mkdir --parents /etc/httpd/sites-enabled
-if ! grep -q "IncludeOptional sites-enabled/\*.conf" "/etc/httpd/conf/httpd.conf"; then
-   sudo bash -c 'echo -e "\nIncludeOptional sites-enabled/*.conf" >> "/etc/httpd/conf/httpd.conf"'
-fi
-if ! grep -q "IncludeOptional sites-enabled/\*.conf" "/etc/httpd/conf.d/ssl.conf"; then
-   sudo bash -c 'echo -e "\nIncludeOptional sites-enabled/*.conf" >> "/etc/httpd/conf.d/ssl.conf"'
-fi
+IncludeOptional sites-enabled/*.conf
+EOF
 
-# define the default ssl protocols
-# SSLv2: FUBAR
-# SSLv3: POODLE
-if ! grep -q "SSLProtocol all -SSLv2 -SSLv3" "/etc/httpd/conf.d/ssl.conf"; then
-    sudo bash -c 'echo -e "\nSSLProtocol all -SSLv2 -SSLv3" >> /etc/httpd/conf.d/ssl.conf'
-fi
+# 443: install mod_security
+sudo yum install -y mod_security
+
+# 443: /etc/httpd/conf.d/mod_security.conf customizations
+# https://github.com/SpiderLabs/ModSecurity/wiki/Reference-Manual-%28v2.x%29
+sudo cat > /etc/httpd/conf.d/mod_security_custom.conf << EOF
+<IfModule mod_security2.c>
+    SecRequestBodyLimit 67108864
+</IfModule>
+EOF
+
+# 443: install mod_ssl and create self-signed cert
+sudo yum install -y mod_ssl
+sudo bash /etc/ssl/certs/make-dummy-cert "/etc/ssl/certs/httpd-dummy-cert.key.cert"
+
+# 443: /etc/httpd/conf/ssl.conf customizations
+# https://httpd.apache.org/docs/2.4/mod/mod_ssl.html
+sudo cat > /etc/httpd/conf.d/ssl_custom.conf << EOF
+<IfModule mod_ssl.c>
+    # define the default ssl protocols and disable: SSLv2 - FUBAR, SSLv3 - POODLE
+    SSLProtocol all -SSLv2 -SSLv3
+</IfModule>
+EOF
 
 # 80: remove the default vhost
 sudo cat /dev/null > /etc/httpd/conf.d/welcome.conf
@@ -54,20 +56,27 @@ sudo cat /dev/null > /etc/httpd/conf.d/welcome.conf
 # 443: remove the default vhost
 sed -i '/<VirtualHost _default_:443>/,$d' "/etc/httpd/conf.d/ssl.conf"
 
+# 443: renew self-signed key/cert
+sh /etc/ssl/certs/renew-dummy-cert /etc/ssl/certs/httpd-dummy-cert.key.cert
+
+# 443: support letsencrypt
+sudo mkdir --parents /var/www/dehydrated
+# initalize the domains.txt file for certificates cron job
+cat /dev/null > /catapult/provisioners/redhat/installers/dehydrated/domains.txt
+
+# 443: add support for cloudflare and report real user IP addresses
+# also helps resolve redirect loops when HSTS is enabled
+# https://www.cloudflare.com/technical-resources/
+# new versions released here https://github.com/cloudflare/mod_cloudflare
+sudo yum install -y libtool httpd-devel
+sudo apxs -a -i -c /catapult/provisioners/redhat/installers/cloudflare/mod_cloudflare.c
+
 # 80/443: create a _default_ catchall
 # if the vhost has not been linked, link the vhost
 # to test this visit the ip address of the respective environment redhat public ip via http:// or https://
 if [ ! -e /var/www/repositories/apache/_default_ ]; then
     sudo ln -s /catapult/repositories/apache/_default_ /var/www/repositories/apache/
 fi
-
-# renew self-signed key/cert
-sh /etc/ssl/certs/renew-dummy-cert /etc/ssl/certs/httpd-dummy-cert.key.cert
-
-# support letsencrypt
-sudo mkdir --parents /var/www/dehydrated
-# initalize the domains.txt file for certificates cron job
-cat /dev/null > /catapult/provisioners/redhat/installers/dehydrated/domains.txt
 
 # 80/443: create vhosts
 sudo cat > /etc/httpd/sites-enabled/_default_.conf << EOF
@@ -94,7 +103,7 @@ Alias /.well-known/acme-challenge /var/www/dehydrated
 </Directory>
 EOF
 
-# configure log rotation for apache
+# 80/443: configure log rotation for apache
 sudo cat > /etc/logrotate.d/httpd << EOF
 /var/log/httpd/*log {
     daily
@@ -109,7 +118,7 @@ sudo cat > /etc/logrotate.d/httpd << EOF
 }
 EOF
 
-# configure log rotation for apache vhosts
+# 80/443: configure log rotation for apache vhosts
 sudo cat > /etc/logrotate.d/httpd_vhosts << EOF
 /var/log/httpd/*/*log {
     daily
@@ -123,13 +132,6 @@ sudo cat > /etc/logrotate.d/httpd_vhosts << EOF
     endscript
 }
 EOF
-
-# add support for cloudflare and report real user IP addresses
-# also helps resolve redirect loops when HSTS is enabled
-# https://www.cloudflare.com/technical-resources/
-# new versions released here https://github.com/cloudflare/mod_cloudflare
-sudo yum install -y libtool httpd-devel
-sudo apxs -a -i -c /catapult/provisioners/redhat/installers/cloudflare/mod_cloudflare.c
 
 # reload apache
 sudo systemctl reload httpd.service

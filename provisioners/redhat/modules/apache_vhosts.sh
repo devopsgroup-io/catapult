@@ -95,10 +95,6 @@ EOF
         force_auth_value=""
     fi
     # handle the force_ip option
-    echo "${force_auth}"
-    echo "${force_auth_exclude}"
-    echo "${force_ip}"
-    echo "${force_ip_exclude}"
     if ([ ! -z "${force_ip}" ]); then
         if ([ ! -z "${force_ip_exclude}" ]); then
             force_ip_excludes=($(echo "${key}" | shyaml get-values force_ip_exclude))
