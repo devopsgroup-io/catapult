@@ -146,7 +146,12 @@ sestatus -v
 # restart if SELinux is enabled
 if $(sestatus | grep "SELinux status:" | grep -q "enabled"); then
     echo -e "\n> SELinux is enabled, this is normally due to a fresh install. We need to reboot to disable it, rebooting in 1 minute..."
-    echo -e "\n> Please re-run the provisioner when the machine is back up."
+    if [ $1 = "dev" ]; then
+        # required in dev to regain the localdev synced folder
+        echo -e "\n> Please run this command: vagrant reload <machine-name> --provision"
+    else
+        echo -e "\n> Please re-run the provisioner when the machine is back up."
+    fi
     /sbin/shutdown --reboot
     sleep 90
 fi

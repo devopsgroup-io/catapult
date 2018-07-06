@@ -25,8 +25,10 @@ fi
 # php.ini configuration options
 # set the timezone
 sed -i -e "s#\;date\.timezone.*#date.timezone = \"$(catapult company.timezone_redhat)\"#g" /etc/opt/rh/rh-php71/php.ini
+# increase the post_max_size
+sed -i -e "s#^post_max_size.*#post_max_size = 64M#g" /etc/opt/rh/rh-php71/php.ini
 # increase the upload_max_filesize
-sed -i -e "s#^upload_max_filesize.*#upload_max_filesize = 10M#g" /etc/opt/rh/rh-php71/php.ini
+sed -i -e "s#^upload_max_filesize.*#upload_max_filesize = 16M#g" /etc/opt/rh/rh-php71/php.ini
 # hide x-powered-by
 sed -i -e "s#^expose_php.*#expose_php = Off#g" /etc/opt/rh/rh-php71/php.ini
 # increase php memory limit for tools like composer
@@ -91,8 +93,10 @@ fi
 # php.ini configuration options
 # set the timezone
 sed -i -e "s#\;date\.timezone.*#date.timezone = \"$(catapult company.timezone_redhat)\"#g" /etc/opt/rh/rh-php70/php.ini
+# increase the post_max_size
+sed -i -e "s#^post_max_size.*#post_max_size = 64M#g" /etc/opt/rh/rh-php70/php.ini
 # increase the upload_max_filesize
-sed -i -e "s#^upload_max_filesize.*#upload_max_filesize = 10M#g" /etc/opt/rh/rh-php70/php.ini
+sed -i -e "s#^upload_max_filesize.*#upload_max_filesize = 16M#g" /etc/opt/rh/rh-php70/php.ini
 # hide x-powered-by
 sed -i -e "s#^expose_php.*#expose_php = Off#g" /etc/opt/rh/rh-php70/php.ini
 # increase php memory limit for tools like composer
@@ -158,8 +162,10 @@ fi
 # php.ini configuration options
 # set the timezone
 sed -i -e "s#\;date\.timezone.*#date.timezone = \"$(catapult company.timezone_redhat)\"#g" /etc/opt/rh/rh-php56/php.ini
+# increase the post_max_size
+sed -i -e "s#^post_max_size.*#post_max_size = 64M#g" /etc/opt/rh/rh-php56/php.ini
 # increase the upload_max_filesize
-sed -i -e "s#^upload_max_filesize.*#upload_max_filesize = 10M#g" /etc/opt/rh/rh-php56/php.ini
+sed -i -e "s#^upload_max_filesize.*#upload_max_filesize = 16M#g" /etc/opt/rh/rh-php56/php.ini
 # hide x-powered-by
 sed -i -e "s#^expose_php.*#expose_php = Off#g" /etc/opt/rh/rh-php56/php.ini
 # increase php memory limit for tools like composer
@@ -225,8 +231,10 @@ fi
 # php.ini configuration options
 # set the timezone
 sed -i -e "s#\;date\.timezone.*#date.timezone = \"$(catapult company.timezone_redhat)\"#g" /etc/php.ini
+# increase the post_max_size
+sed -i -e "s#^post_max_size.*#post_max_size = 64M#g" /etc/php.ini
 # increase the upload_max_filesize
-sed -i -e "s#^upload_max_filesize.*#upload_max_filesize = 10M#g" /etc/php.ini
+sed -i -e "s#^upload_max_filesize.*#upload_max_filesize = 16M#g" /etc/php.ini
 # hide x-powered-by
 sed -i -e "s#^expose_php.*#expose_php = Off#g" /etc/php.ini
 # increase php memory limit for tools like composer

@@ -122,7 +122,7 @@ if [ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-values-0 redha
         if [ "${kernel_running}" != "${kernel_staged}" ]; then
             echo -e "\n\n\n==> REBOOT REQUIRED STATUS: [RECOMMENDED] Red Hat kernel requires a reboot of this machine. The current running kernal is ${kernel_running} and the staged kernel is ${kernel_staged}."
             if [ $1 = "dev" ]; then
-                echo -e "Please run this command: vagrant reload <machine-name> --provision"
+                echo -e "\n> Please run this command: vagrant reload <machine-name> --provision"
                 # require a reboot in dev only
                 exit 1
             fi

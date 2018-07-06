@@ -16,10 +16,11 @@
  * Derived from mod_remoteip.c.
  * Default values for directives are hard-wired for CloudFlare defaults.
  *
- * Supported directives and defaults:
+ * Supported directives and example values (further info in README):
  *
- * CloudFlareIPHeader CF-Connecting-IP
- * CloudFlareIPTrustedProxy 204.93.173.0/24
+ * CloudFlareRemoteIPHeader CF-Connecting-IP
+ * CloudFlareRemoteIPTrustedProxy 204.93.173.0/24
+ * DenyAllButCloudFlare
  *
  */
 
@@ -56,7 +57,6 @@ static const char* CF_DEFAULT_TRUSTED_PROXY[] = {
   "190.93.240.0/20",
   "197.234.240.0/22",
   "198.41.128.0/17",
-  "199.27.128.0/21",
 /* IPv6 Address Ranges */
   "2400:cb00::/32",
   "2405:8100::/32",

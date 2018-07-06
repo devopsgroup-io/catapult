@@ -44,7 +44,7 @@ fi
 # update to specific drush version
 cd /usr/local/src/drush \
     && git fetch \
-    && git checkout --force 8.1.16 \
+    && git checkout --force 8.1.17 \
     && composer install
 drush --version
 
