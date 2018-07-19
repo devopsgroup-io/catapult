@@ -197,7 +197,7 @@ See an error or have a suggestion? Email competition@devopsgroup.io - we appreci
     - [Preventive Controls](#preventive-controls)
     - [Detective Controls](#reactive-controls)
     - [Corrective Controls](#corrective-controls)
-    - [Security Breach Notification Laws](#security-breach-notification-laws)
+    - [Data Protection](#data-protection)
         - [United States](#united-states)
         - [Europe](#europe)
 - [Compliance](#compliance)
@@ -1335,9 +1335,15 @@ Catapult enforces many security best practices that are important for you to be 
 
 * Weekly ClamAV antivirus scan of website files
 
-## Security Breach Notification Laws ##
+## Data Protection ##
 
-Catapult introduces many best practice data protection measures, however, security of personal data is ultimately your responsibility. Generally speaking, if personal information is compromised, you are required by law to notify the party. Laws vary country-by-country and state-by-state, and can be enforcable in the state or country where the individual is physically located when the data is collected. This means that, even if your website is hosted within the U.S., you could potentially be subject to another country's data protection laws.
+Catapult introduces many best practice data protection measures, however, security of personal data is ultimately your responsibility. Generally speaking, if personal information is compromised, you are required by law to notify the party. Laws vary country-by-country and state-by-state, and can be enforcable in the state or country where the individual is physically located when the data is collected. This means that, even if your website is hosted within the U.S., you could potentially be subject to another country's data protection laws. The main principles of data protection, include:
+
+* Privacy by design
+* Right to access
+* Right to be forgotten
+* Data portability
+* Breach notification
 
 ### United States ###
 
