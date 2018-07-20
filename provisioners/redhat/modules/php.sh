@@ -34,7 +34,7 @@ sed -i -e "s#^expose_php.*#expose_php = Off#g" /etc/opt/rh/rh-php71/php.ini
 # increase php memory limit for tools like composer
 sed -i -e "s#^memory_limit.*#memory_limit = 256M#g" /etc/opt/rh/rh-php71/php.ini
 # display errors on screen using the default recommendations for development and production
-if [ "$1" = "dev" ]; then
+if ([ "$1" = "dev" ] || [ "$1" = "test" ]); then
     sed -i -e "s#^display_errors.*#display_errors = On#g" /etc/opt/rh/rh-php71/php.ini
     sed -i -e "s#^error_reporting.*#error_reporting = E_ALL#g" /etc/opt/rh/rh-php71/php.ini
 else
@@ -102,7 +102,7 @@ sed -i -e "s#^expose_php.*#expose_php = Off#g" /etc/opt/rh/rh-php70/php.ini
 # increase php memory limit for tools like composer
 sed -i -e "s#^memory_limit.*#memory_limit = 256M#g" /etc/opt/rh/rh-php70/php.ini
 # display errors on screen using the default recommendations for development and production
-if [ "$1" = "dev" ]; then
+if ([ "$1" = "dev" ] || [ "$1" = "test" ]); then
     sed -i -e "s#^display_errors.*#display_errors = On#g" /etc/opt/rh/rh-php70/php.ini
     sed -i -e "s#^error_reporting.*#error_reporting = E_ALL#g" /etc/opt/rh/rh-php70/php.ini
 else
@@ -171,7 +171,7 @@ sed -i -e "s#^expose_php.*#expose_php = Off#g" /etc/opt/rh/rh-php56/php.ini
 # increase php memory limit for tools like composer
 sed -i -e "s#^memory_limit.*#memory_limit = 256M#g" /etc/opt/rh/rh-php56/php.ini
 # display errors on screen using the default recommendations for development and production
-if [ "$1" = "dev" ]; then
+if ([ "$1" = "dev" ] || [ "$1" = "test" ]); then
     sed -i -e "s#^display_errors.*#display_errors = On#g" /etc/opt/rh/rh-php56/php.ini
     sed -i -e "s#^error_reporting.*#error_reporting = E_ALL#g" /etc/opt/rh/rh-php56/php.ini
 else
@@ -240,7 +240,7 @@ sed -i -e "s#^expose_php.*#expose_php = Off#g" /etc/php.ini
 # increase php memory limit for tools like composer
 sed -i -e "s#^memory_limit.*#memory_limit = 256M#g" /etc/php.ini
 # display errors on screen using the default recommendations for development and production
-if [ "$1" = "dev" ]; then
+if ([ "$1" = "dev" ] || [ "$1" = "test" ]); then
     sed -i -e "s#^display_errors.*#display_errors = On#g" /etc/php.ini
     sed -i -e "s#^error_reporting.*#error_reporting = E_ALL#g" /etc/php.ini
 else

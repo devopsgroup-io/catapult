@@ -14,7 +14,8 @@ webroot=$(catapult websites.apache.$5.webroot)
 softwareroot=$(provisioners software.apache.${software}.softwareroot)
 
 
-# set website software email address
+
+# set website software site email address
 # set website software admin credentials, email address, and role
 if ([ ! -z "${software}" ]); then
     echo -e "* setting ${software} site email address..."
@@ -220,6 +221,7 @@ if [ "${software}" = "codeigniter2" ]; then
     fi
 
 elif [ "${software}" = "codeigniter3" ]; then
+    
     result=$(cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && php index.php migrate)
     if echo $result | grep --extended-regexp --quiet --regexp="<html" --regexp="<\?"; then
         echo -e "Migrations are not configured"

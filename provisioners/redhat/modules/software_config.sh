@@ -355,4 +355,48 @@ elif [ "${software}" = "zendframework2" ]; then
 
 fi
 
+
+# set website software logging
+if ([ ! -z "${software}" ]); then
+    echo -e "* setting ${software} logging..."
+fi
+
+if [ "${software}" = "drupal6" ]; then
+
+elif [ "${software}" = "drupal7" ]; then
+
+    if ([ "$1" = "dev" ] || [ "$1" = "test" ]); then
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush --always-set variable-set error_level 2
+    else
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush --always-set variable-set block_cache 0
+    fi
+
+elif [ "${software}" = "drupal8" ]; then
+
+    if ([ "$1" = "dev" ] || [ "$1" = "test" ]); then
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush --yes config-set system.performance error_level verbose
+    else
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush --yes config-set system.performance error_level hide
+    fi
+
+elif [ "${software}" = "elgg1" ]; then
+
+elif [ "${software}" = "elgg2" ]; then
+
+elif [ "${software}" = "joomla3" ]; then
+
+elif [ "${software}" = "mediawiki1" ]; then
+
+elif [ "${software}" = "moodle3" ]; then
+
+elif [ "${software}" = "silverstripe3" ]; then
+
+elif [ "${software}" = "suitecrm7" ]; then
+
+elif [ "${software}" = "wordpress4" ]; then
+
+
+fi
+
+
 touch "/catapult/provisioners/redhat/logs/software_config.$(catapult websites.apache.$5.domain).complete"

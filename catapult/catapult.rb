@@ -434,7 +434,7 @@ module Catapult
         if FileUtils.compare_file('secrets/configuration.yml', 'secrets/configuration.yml.compare')
           puts "\n * There were no changes to secrets/configuration.yml, no need to encrypt as this would create a new cipher to commit.\n\n"
         else
-          puts "\n * There were changes to secrets/configuration.yml, encrypting secrets/configuration.yml as secrets/configuration.yml.gpg. Please commit these changes to the develop branch for your team to get the changes.\n\n"
+          puts "\n * There were changes to secrets/configuration.yml, encrypting secrets/configuration.yml as secrets/configuration.yml.gpg. Please commit these changes to the develop branch for your team to get the changes.\n".color(Colors::YELLOW)
           # flipping from downstream to upstream requires a production build to be run to ensure latest from production
           # flipping from upstream to downstream requires a test build to be run to ensure latest from test
           @temp_configuration_decrypted = YAML.load_file('secrets/configuration.yml')
@@ -501,7 +501,7 @@ module Catapult
         if FileUtils.compare_file('secrets/id_rsa', 'secrets/id_rsa.compare')
           puts "\n * There were no changes to secrets/id_rsa, no need to encrypt as this would create a new cipher to commit.\n\n"
         else
-          puts "\n * There were changes to secrets/id_rsa, encrypting secrets/id_rsa as secrets/id_rsa.gpg. Please commit these changes to the develop branch for your team to get the changes.\n\n"
+          puts "\n * There were changes to secrets/id_rsa, encrypting secrets/id_rsa as secrets/id_rsa.gpg. Please commit these changes to the develop branch for your team to get the changes.\n".color(Colors::YELLOW)
           `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/id_rsa.gpg --armor --cipher-algo AES256 --symmetric secrets/id_rsa`
         end
         FileUtils.rm('secrets/id_rsa.compare')
@@ -510,7 +510,7 @@ module Catapult
         if FileUtils.compare_file('secrets/id_rsa.pub', 'secrets/id_rsa.pub.compare')
           puts "\n * There were no changes to secrets/id_rsa.pub, no need to encrypt as this would create a new cipher to commit.\n\n"
         else
-          puts "\n * There were changes to secrets/id_rsa.pub, encrypting secrets/id_rsa.pub as secrets/id_rsa.pub.gpg. Please commit these changes to the develop branch for your team to get the changes.\n\n"
+          puts "\n * There were changes to secrets/id_rsa.pub, encrypting secrets/id_rsa.pub as secrets/id_rsa.pub.gpg. Please commit these changes to the develop branch for your team to get the changes.\n".color(Colors::YELLOW)
           `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/id_rsa.pub.gpg --armor --cipher-algo AES256 --symmetric secrets/id_rsa.pub`
         end
         FileUtils.rm('secrets/id_rsa.pub.compare')
