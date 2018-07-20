@@ -363,6 +363,8 @@ fi
 
 if [ "${software}" = "drupal6" ]; then
 
+    : #no-op
+
 elif [ "${software}" = "drupal7" ]; then
 
     if ([ "$1" = "dev" ] || [ "$1" = "test" ]); then
@@ -381,17 +383,31 @@ elif [ "${software}" = "drupal8" ]; then
 
 elif [ "${software}" = "elgg1" ]; then
 
+    : #no-op
+
 elif [ "${software}" = "elgg2" ]; then
+
+    : #no-op
 
 elif [ "${software}" = "joomla3" ]; then
 
+    : #no-op
+
 elif [ "${software}" = "mediawiki1" ]; then
+
+    : #no-op
 
 elif [ "${software}" = "moodle3" ]; then
 
+    : #no-op
+
 elif [ "${software}" = "silverstripe3" ]; then
 
+    : #no-op
+
 elif [ "${software}" = "suitecrm7" ]; then
+
+    : #no-op
 
 elif [ "${software}" = "wordpress4" ]; then
 
