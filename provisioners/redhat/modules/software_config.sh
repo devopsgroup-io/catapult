@@ -411,6 +411,7 @@ elif [ "${software}" = "suitecrm7" ]; then
 
 elif [ "${software}" = "wordpress4" ]; then
 
+    : #no-op
 
 fi
 
