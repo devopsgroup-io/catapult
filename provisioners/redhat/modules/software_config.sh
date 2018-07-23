@@ -370,7 +370,7 @@ elif [ "${software}" = "drupal7" ]; then
     if ([ "$1" = "dev" ] || [ "$1" = "test" ]); then
         cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush --always-set variable-set error_level 2
     else
-        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush --always-set variable-set block_cache 0
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush --always-set variable-set error_level 0
     fi
 
 elif [ "${software}" = "drupal8" ]; then
