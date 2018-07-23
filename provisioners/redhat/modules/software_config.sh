@@ -376,9 +376,9 @@ elif [ "${software}" = "drupal7" ]; then
 elif [ "${software}" = "drupal8" ]; then
 
     if ([ "$1" = "dev" ] || [ "$1" = "test" ]); then
-        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush --yes config-set system.performance error_level verbose
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush --yes config-set system.logging error_level verbose
     else
-        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush --yes config-set system.performance error_level hide
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush --yes config-set system.logging error_level hide
     fi
 
 elif [ "${software}" = "elgg1" ]; then
