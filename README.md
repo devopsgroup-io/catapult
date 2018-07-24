@@ -121,8 +121,8 @@ Traditional Tooling (VMs & Shell)             | :white_check_mark:              
 Multi-Platform (Linux & Windows)              | :white_check_mark:                    | :x:                           | :x:
 Supported PHP Software                        | 17                                    | 2                             | 1
 Supported .NET Software                       | TBA                                   | :x:                           | :x:
-Minimum Bundled<br>Monthly Cost               | $40                                   | $400                          | $134
-Websites per Instance/Subscription            | Unlimited                             | 1                             | 1
+Minimum Bundled<br>Monthly Cost               | $45                                   | $400                          | $134
+Websites per instance                         | Unlimited                             | 1                             | 1
 Managed Workflow                              | Git Flow (branch-based environments)  | :x:                           | :x:
 Managed Software Workflow Model               | Upstream or Downstream                | :x:                           | :x:
 Agile Methodology Focus                       | Scrum                                 | :x:                           | :x:
@@ -340,23 +340,20 @@ Catapult is designed with a distributed services model, below are the required t
 
 Service | Product | Use Case | Monthly Cost
 --------|---------|----------|-------------
-&dagger;Cloud Hosting: Red Hat (PHP) | DigitalOcean | 6 Web and Database Servers | \*$30+
-&dagger;Cloud Hosting: Windows (.NET) | Amazon Web Services (AWS) | 6 Web and Database Servers | \*$80+
+&dagger;Cloud Hosting: Red Hat (PHP) | DigitalOcean | Web and Database Servers (6) | \*$30+
+&dagger;Cloud Hosting: Windows (.NET) | Amazon Web Services (AWS) | Web and Database Servers (6) | \*$80+
 Source Code Repositories | Atlassian Bitbucket | Private Repositories | Free
 Source Code Repositories | GitHub | Public Repositories | Free
-Continuous Integration | Amazon Web Services (AWS) | Build Server | \**$0+
-Continuous Integration | Atlassian Bamboo Server | Deployment Management | $10
+Continuous Integration | Atlassian Bamboo Server | Build Server | $15
 DNS | CloudFlare | Cloud DNS | Free
-Monitoring | New Relic Application Performance Monitoring (APM), Browser, Server, and \***Synthetics | Performance and Infrastructure Monitoring | Free
-**Total** | | | &dagger;$40+
+Monitoring | New Relic Application Performance Monitoring (APM), Browser, Server, and \**Synthetics | Performance and Infrastructure Monitoring | Free
+**Total** | | | &dagger;$45+
 
 &dagger; Only one platform (Red Hat or Windows) is required to have a full-featured infrastructure. Generally speaking, the industry standard Red Hat platform will be used.
 
 \* Depending on load, resources may need to be increased, starting at an additional [$5 per month per server](https://www.digitalocean.com/pricing/).
 
-\** New AWS customers receive 1-year free of micro services. Beyond this period, an example of running nightly builds for all environments only incur $2-3 per month.
-
-\*** New Relic customers receive a trial "pro" period ranging from 14-days to 30-days, however, there is [no free tier beyond the trial](#partnerships)
+\** New Relic customers receive a trial "pro" period ranging from 14-days to 30-days, however, there is [no free tier beyond the trial](#partnerships)
 
 ### 1. **Cloud Hosting:**
 1. **DigitalOcean** sign-up and configuration
@@ -406,38 +403,6 @@ Bitbucket provides free private repositories and GitHub provides free public rep
     2. Add your newly created `id_rsa.pub` from `~/secrets/id_rsa.pub` key in https://github.com/settings/ssh named "Catapult"
 
 ### 3. **Automated Deployments:**
-Please note that Bamboo Cloud's end-of-life is January 31, 2017. For new setups, please use the **Bamboo Server sign-up and set-up** documentation. Existing Catapult user's may still be using Bamboo Cloud, in that case, please use the **Bamboo Cloud sign-up and set-up** documentation.
-
-**Bamboo Cloud sign-up and set-up**
-
-1. Create a Bamboo Cloud account at https://www.atlassian.com/software/bamboo
-2. Sign in to your new custom Bamboo instance https://[your-name-here].atlassian.net
-3. Place your Bamboo base URL at `~/secrets/configuration.yml["company"]["bamboo_base_url"]`, the format should be https://[your-name-here].atlassian.net/builds/
-4. Click the settings gear from the top right in the header and select Elastic instances:
-    1. Click Configuration from the left
-    2. Click Edit configuration
-        1. **Amazon Web Services configuration**
-            1. Set your AWS EC2 "Bamboo" Access Key ID and Secret Access Key from `~/secrets/configuration.yml["company"]["aws_access_key"]` and `~/secrets/configuration.yml["company"]["aws_secret_key"]`
-            2. Region: `US East (Northern Virginia)`
-        2. **Automatic elastic instance management**
-            1. Elastic instance management: `Custom`
-            2. Idle agent shutdown delay: `10`
-            3. Allowed non-Bamboo instances: `1`
-            4. Maximum number of instances to start at once: `2`
-            5. Number of builds in queue threshold: `1`
-            6. Number of elastic builds in queue threshold: `1`
-            7. Average queue time threshold: `2`
-        3. Click Save
-5. Click the settings gear from the top right in the header and select Elastic instances:
-    1. Click Image configurations from the left
-        1. Disable all of the elastic images
-        2. Create elastic image configuration:
-            1. Name: `Catapult`
-            2. AMI ID: `ami-eb5b8080`
-            3. Instance type: `T2 Burstable Performance Micro`
-            4. Availability Zone: `Chosen by EC2`
-            5. Product: `Linux/UNIX`
-            6. Click Save
 
 **Bamboo Server set-up**
 
@@ -463,7 +428,6 @@ Please note that Bamboo Cloud's end-of-life is January 31, 2017. For new setups,
 To avoid having to manually configure the Bamboo project, plans, stages, jobs, and tasks configuration, you may optionally install and purchase the "Bob Swift Atlassian Add-ons - Bamboo CLI Connector" Bamboo add-on. Otherwise, the manual setup configuration steps are outlined below:
 
 1. Place your Bamboo username at `~/secrets/configuration.yml["company"]["bamboo_username"]`
-    * Normally admin for Bamboo Cloud
     * Normally root for Bamboo Server
 2. Place your Bamboo password at `~/secrets/configuration.yml["company"]["bamboo_password"]`
 3. Disable anonymous user access by clicking the gear at the top right and going to Overview
@@ -940,13 +904,11 @@ The following options are available:
 
 ## Website Development ##
 
-Performing development in a local environment is critical to reducing risk by exacting the environments that exist upstream, accomplished with Vagrant and VirtualBox.
+Website development is done on the developer's workstation using the LocalDev environment for local and realtime software development in an environment that is exactly matchinng to upstream environments.
 
 ### Website Repositories ###
 
-Repositories for websites are cloned into the Catapult instance at `~/repositories` and in the respective apache or iis folder, listed by domain name.
-
-* Repositories are linked between the host and guest for realtime development.
+Once websites are added to your configuration and you have performed a provision of your LocalDev environment, repositories for websites are cloned into your Catapult instance at `~/repositories` and into the respective `apache` or `iis` folder, listed by domain name. Website repository folders are linked between the developer's workstation (host) and the LocalDev environment (guest) for realtime development.
 
 ### Software Updates and Fresh Installs ###
 

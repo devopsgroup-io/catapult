@@ -44,11 +44,15 @@ unique_hash=$(dmidecode -s system-uuid)
 webroot=$(catapult websites.apache.$5.webroot)
 database_config_file=$(provisioners software.apache.${software}.database_config_file)
 
-# generate database config files
+
+# generate software database config files and set website software logging output
+if ([ ! -z "${software}" ]); then
+    echo -e "* generating ${software} database config file and configuring software-specific logging output..."
+fi
+
 if [ "${software}" = "codeigniter2" ]; then
 
     file="/var/www/repositories/apache/${domain}/${webroot}${softwareroot}${database_config_file}"
-    echo -e "generating ${software} ${file}..."
     if [ -f "${file}" ]; then
         sudo chmod 0777 "${file}"
     else
@@ -65,7 +69,6 @@ if [ "${software}" = "codeigniter2" ]; then
 elif [ "${software}" = "codeigniter3" ]; then
 
     file="/var/www/repositories/apache/${domain}/${webroot}${softwareroot}${database_config_file}"
-    echo -e "generating ${software} ${file}..."
     if [ -f "${file}" ]; then
         sudo chmod 0777 "${file}"
     else
@@ -82,7 +85,6 @@ elif [ "${software}" = "codeigniter3" ]; then
 elif [ "${software}" = "drupal6" ]; then
 
     file="/var/www/repositories/apache/${domain}/${webroot}${softwareroot}${database_config_file}"
-    echo -e "generating ${software} ${file}..."
     if [ -f "${file}" ]; then
         sudo chmod 0777 "${file}"
     else
@@ -96,7 +98,6 @@ elif [ "${software}" = "drupal6" ]; then
 elif [ "${software}" = "drupal7" ]; then
 
     file="/var/www/repositories/apache/${domain}/${webroot}${softwareroot}${database_config_file}"
-    echo -e "generating ${software} ${file}..."
     if [ -f "${file}" ]; then
         sudo chmod 0777 "${file}"
     else
@@ -108,10 +109,15 @@ elif [ "${software}" = "drupal7" ]; then
         /catapult/provisioners/redhat/installers/software/${software}/settings.php > "${file}"
     sudo chmod 0444 "${file}"
 
+    if ([ "$1" = "dev" ] || [ "$1" = "test" ]); then
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush --always-set variable-set error_level 2
+    else
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush --always-set variable-set error_level 0
+    fi
+
 elif [ "${software}" = "drupal8" ]; then
 
     file="/var/www/repositories/apache/${domain}/${webroot}${softwareroot}${database_config_file}"
-    echo -e "generating ${software} ${file}..."
     if [ -f "${file}" ]; then
         sudo chmod 0777 "${file}"
     else
@@ -134,10 +140,15 @@ elif [ "${software}" = "drupal8" ]; then
         sudo chmod 0444 "${file}"
     fi
 
+    if ([ "$1" = "dev" ] || [ "$1" = "test" ]); then
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush --yes config-set system.logging error_level verbose
+    else
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush --yes config-set system.logging error_level hide
+    fi
+
 elif [ "${software}" = "elgg1" ]; then
 
     file="/var/www/repositories/apache/${domain}/${webroot}${softwareroot}${database_config_file}"
-    echo -e "generating ${software} ${file}..."
     if [ -f "${file}" ]; then
         sudo chmod 0777 "${file}"
     else
@@ -155,7 +166,6 @@ elif [ "${software}" = "elgg1" ]; then
 elif [ "${software}" = "elgg2" ]; then
 
     file="/var/www/repositories/apache/${domain}/${webroot}${softwareroot}${database_config_file}"
-    echo -e "generating ${software} ${file}..."
     if [ -f "${file}" ]; then
         sudo chmod 0777 "${file}"
     else
@@ -175,7 +185,6 @@ elif [ "${software}" = "expressionengine3" ]; then
     # https://docs.expressionengine.com/latest/general/system_configuration_overrides.html
 
     file="/var/www/repositories/apache/${domain}/${webroot}${softwareroot}${database_config_file}"
-    echo -e "generating ${software} ${file}..."
     if [ -f "${file}" ]; then
         sudo chmod 0777 "${file}"
     else
@@ -201,7 +210,6 @@ elif [ "${software}" = "expressionengine3" ]; then
 elif [ "${software}" = "joomla3" ]; then
 
     file="/var/www/repositories/apache/${domain}/${webroot}${softwareroot}${database_config_file}"
-    echo -e "generating ${software} ${file}..."
     if [ -f "${file}" ]; then
         sudo chmod 0777 "${file}"
     else
@@ -220,7 +228,6 @@ elif [ "${software}" = "joomla3" ]; then
 elif [ "${software}" = "laravel5" ]; then
 
     file="/var/www/repositories/apache/${domain}/${webroot}${softwareroot}${database_config_file}"
-    echo -e "generating ${software} ${file}..."
     if [ -f "${file}" ]; then
         sudo chmod 0777 "${file}"
     else
@@ -236,7 +243,6 @@ elif [ "${software}" = "laravel5" ]; then
 elif [ "${software}" = "mediawiki1" ]; then
 
     file="/var/www/repositories/apache/${domain}/${webroot}${softwareroot}${database_config_file}"
-    echo -e "generating ${software} ${file}..."
     if [ -f "${file}" ]; then
         sudo chmod 0777 "${file}"
     else
@@ -254,7 +260,6 @@ elif [ "${software}" = "mediawiki1" ]; then
 elif [ "${software}" = "moodle3" ]; then
 
     file="/var/www/repositories/apache/${domain}/${webroot}${softwareroot}${database_config_file}"
-    echo -e "generating ${software} ${file}..."
     if [ -f "${file}" ]; then
         sudo chmod 0777 "${file}"
     else
@@ -273,7 +278,6 @@ elif [ "${software}" = "moodle3" ]; then
 elif [ "${software}" = "silverstripe3" ]; then
 
     file="/var/www/repositories/apache/${domain}/${webroot}${softwareroot}${database_config_file}"
-    echo -e "generating ${software} ${file}..."
     if [ -f "${file}" ]; then
         sudo chmod 0777 "${file}"
     else
@@ -289,7 +293,6 @@ elif [ "${software}" = "silverstripe3" ]; then
 elif [ "${software}" = "suitecrm7" ]; then
 
     file="/var/www/repositories/apache/${domain}/${webroot}${softwareroot}${database_config_file}"
-    echo -e "generating ${software} ${file}..."
     if [ -f "${file}" ]; then
         sudo chmod 0777 "${file}"
     else
@@ -305,8 +308,12 @@ elif [ "${software}" = "suitecrm7" ]; then
 
 elif [ "${software}" = "wordpress4" ]; then
 
+    if ([ "$1" = "dev" ] || [ "$1" = "test" ]); then
+        debug="true"
+    else
+        debug="false"
+    fi
     file="/var/www/repositories/apache/${domain}/${webroot}${softwareroot}${database_config_file}"
-    echo -e "generating ${software} ${file}..."
     if [ -f "${file}" ]; then
         sudo chmod 0777 "${file}"
     else
@@ -318,13 +325,13 @@ elif [ "${software}" = "wordpress4" ]; then
         --expression="s/localhost/${redhat_mysql_ip}/g" \
         --expression="s/'wp_'/'${software_dbprefix}'/g" \
         --expression="s/'put your unique phrase here'/'${unique_hash}'/g" \
+        --expression="s/false/${debug}/g" \
         /catapult/provisioners/redhat/installers/software/${software}/wp-config.php > "${file}"
     sudo chmod 0444 "${file}"
 
 elif [ "${software}" = "xenforo1" ]; then
 
     file="/var/www/repositories/apache/${domain}/${webroot}${softwareroot}${database_config_file}"
-    echo -e "generating ${software} ${file}..."
     if [ -f "${file}" ]; then
         sudo chmod 0777 "${file}"
     else
@@ -340,7 +347,6 @@ elif [ "${software}" = "xenforo1" ]; then
 elif [ "${software}" = "zendframework2" ]; then
 
     file="/var/www/repositories/apache/${domain}/${webroot}${softwareroot}${database_config_file}"
-    echo -e "generating ${software} ${file}..."
     if [ -f "${file}" ]; then
         sudo chmod 0777 "${file}"
     else
@@ -352,66 +358,6 @@ elif [ "${software}" = "zendframework2" ]; then
         --expression="s/'password'\s=>\s''/'password' => '${mysql_user_password}'/g" \
         /catapult/provisioners/redhat/installers/software/${software}/global.php > "${file}"
     sudo chmod 0444 "${file}"
-
-fi
-
-
-# set website software logging
-if ([ ! -z "${software}" ]); then
-    echo -e "* setting ${software} logging..."
-fi
-
-if [ "${software}" = "drupal6" ]; then
-
-    : #no-op
-
-elif [ "${software}" = "drupal7" ]; then
-
-    if ([ "$1" = "dev" ] || [ "$1" = "test" ]); then
-        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush --always-set variable-set error_level 2
-    else
-        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush --always-set variable-set error_level 0
-    fi
-
-elif [ "${software}" = "drupal8" ]; then
-
-    if ([ "$1" = "dev" ] || [ "$1" = "test" ]); then
-        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush --yes config-set system.logging error_level verbose
-    else
-        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush --yes config-set system.logging error_level hide
-    fi
-
-elif [ "${software}" = "elgg1" ]; then
-
-    : #no-op
-
-elif [ "${software}" = "elgg2" ]; then
-
-    : #no-op
-
-elif [ "${software}" = "joomla3" ]; then
-
-    : #no-op
-
-elif [ "${software}" = "mediawiki1" ]; then
-
-    : #no-op
-
-elif [ "${software}" = "moodle3" ]; then
-
-    : #no-op
-
-elif [ "${software}" = "silverstripe3" ]; then
-
-    : #no-op
-
-elif [ "${software}" = "suitecrm7" ]; then
-
-    : #no-op
-
-elif [ "${software}" = "wordpress4" ]; then
-
-    : #no-op
 
 fi
 
