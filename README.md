@@ -178,6 +178,7 @@ See an error or have a suggestion? Email competition@devopsgroup.io - we appreci
         - [Software Updates and Fresh Installs](#software-updates-and-fresh-installs)
         - [HTTPS and Certificates](#https-and-certificates)
         - [Forcing www](#forcing-www)
+        - [Debug Output](#debug-output)
         - [Cache Busting](#cache-busting)
         - [Progressive Web App](#progressive-web-app)
         - [Email](#email)
@@ -195,7 +196,7 @@ See an error or have a suggestion? Email competition@devopsgroup.io - we appreci
         - [Website Rollbacks](#website-rollbacks)
 - [Security](#security)
     - [Preventive Controls](#preventive-controls)
-    - [Detective Controls](#reactive-controls)
+    - [Detective Controls](#detective-controls)
     - [Corrective Controls](#corrective-controls)
     - [Data Protection](#data-protection)
         - [United States](#united-states)
@@ -1016,6 +1017,15 @@ Software | Approach | Documentation
 `wordpress4`        | Database             | http://codex.wordpress.org/Changing_The_Site_URL
 `xenforo1`          |                      |
 `zendframework2`    |                      |
+
+### Debug Output ###
+
+Debug output, unlike logging, is a configuration that outputs exceptions on-screen of your website while you're developing in LocalDev for convenience. It also aligns with the testing activies as defined in [Release Management](#release-management). Debug output is configured at two levels; PHP and software specific, the below chart provides a breakdown.
+
+| LocalDev | Test | QC | Production
+|----------|------|----|-----------
+| Verbose | Verbose | Hidden | Hidden
+
 
 ### Cache Busting ###
 
