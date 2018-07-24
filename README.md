@@ -407,16 +407,13 @@ Bitbucket provides free private repositories and GitHub provides free public rep
 **Bamboo Server set-up**
 
 1. Sign up for an Atlassian account at https://my.atlassian.com/
-2. Access your My Atlassian license section at https://my.atlassian.com/products/index
-    * Please read the Bamboo Licensing and Pricing page for more information https://www.atlassian.com/licensing/bamboo
-3a. For current Bamboo Cloud customers transitioning to Bamboo Server, you will see a Bamboo Starter License
-3b. For new Bamboo customers, please purchase a Bamboo Server license from https://www.atlassian.com/purchase/product/bamboo 
-4. It's now time to bring up your build server, please run `vagrant up ~/secrets/configuration.yml["company"]["name"]-build`
+2. Purchase the $10 Bamboo Server license from https://www.atlassian.com/purchase/product/bamboo 
+3. It's now time to bring up your build server, please run `vagrant up ~/secrets/configuration.yml["company"]["name"]-build`
     * The initial `up` will take some time for, please be patient
-5. Login to DigitalOcean to obtain the IP address of the virtual machine to access via URL
+4. Login to DigitalOcean to obtain the IP address of the virtual machine to access via URL
     * Place your Bamboo base URL at `~/secrets/configuration.yml["company"]["bamboo_base_url"]`, the format should be http://[digitalocean-ip-here]/
-6. Once your Bamboo Server instance is accessible via URL, you will be prompted with a license prompt, enter your license.
-7. You will next be prompted to enter the following information:
+5. Once your Bamboo Server instance is accessible via URL, you will be prompted with a license prompt, enter your license.
+6. You will next be prompted to enter the following information:
     * Username (required) - root
     * Password (required) - specify a complex password
     * Confirm password (required)
