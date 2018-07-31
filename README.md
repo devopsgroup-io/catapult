@@ -1029,13 +1029,21 @@ Debug output, unlike logging, is a configuration that outputs exceptions on-scre
 
 ### Cache Busting ###
 
-Caching plays a very important role in the performance of your website and enforces and recommends many [performance optimizations](#performance). Catapult generally enforces caching of files to 7 days, because of this, to ensure that a new website release is reflected in a user's browser you should consider [semantic versioning]((http://semver.org/spec/v2.0.0.html)) of website resource files. Here's an example:
+Caching plays a very important role in the performance of your website and enforces and recommends many [performance optimizations](#performance). Catapult generally enforces caching of files to 7 days, because of this, to ensure that a new website release is reflected in a user's browser you should consider [semantic versioning]((http://semver.org/spec/v2.0.0.html)) of website resource files. Here's an example of query string cache busting:
 
-`<link rel="stylesheet" href="style.min.css?v=3.4.1">`
+`<link rel="stylesheet" href="/css/style.min.css?v=3.4.1">`
 
 Ready to deploy a new release? Update the version number and the cache will be "busted":
 
-`<link rel="stylesheet" href="style.min.css?v=3.4.2">`
+`<link rel="stylesheet" href="/css/style.min.css?v=3.4.2">`
+
+A more complicated, yet effective method of cache busting is by using versioned folders. Resources with a "?" in the URL are not cached by some proxy caching servers. Here is an example of URL path cache busting:
+
+`<link rel="stylesheet" href="/css/3.4.1/style.min.css">`
+
+Ready to deploy a new release? Update the version number and the cache will be "busted":
+
+`<link rel="stylesheet" href="/css/3.4.2/style.min.css">`
 
 Each software type will vary as to the standard convention of website resource file versioning, here is a [Wordpress example](https://wordpress.stackexchange.com/a/90824) to get you started.
 
