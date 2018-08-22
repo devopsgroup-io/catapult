@@ -1350,37 +1350,59 @@ module Catapult
       @api_virtualbox = nil
     end
     # get digitalocean droplets
-    uri = URI("https://api.digitalocean.com/v2/droplets")
-    Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
-      request = Net::HTTP::Get.new uri.request_uri
-      request.add_field "Authorization", "Bearer #{@configuration["company"]["digitalocean_personal_access_token"]}"
-      response = http.request(request)
-      if response.code.to_f.between?(399,499)
-        catapult_exception("#{response.code} The DigitalOcean API could not authenticate, please verify [\"company\"][\"digitalocean_personal_access_token\"].")
-      elsif response.code.to_f.between?(500,600)
-        @api_digitalocean = nil
-        puts " * The DigitalOcean API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
-      else
-        @api_digitalocean = JSON.parse(response.body)
-      end
-    end
-    # get digitalocean available slugs
-    uri = URI("https://api.digitalocean.com/v2/sizes")
-    Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
-      request = Net::HTTP::Get.new uri.request_uri
-      request.add_field "Authorization", "Bearer #{@configuration["company"]["digitalocean_personal_access_token"]}"
-      response = http.request(request)
-      @api_digitalocean_slugs = Array.new
-      if response.code.to_f.between?(399,499)
-        catapult_exception("#{response.code} The DigitalOcean API could not authenticate, please verify [\"company\"][\"digitalocean_personal_access_token\"].")
-      elsif response.code.to_f.between?(500,600)
-        puts " * The DigitalOcean API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
-      else
-        api_digitalocean_sizes = JSON.parse(response.body)
-        api_digitalocean_sizes["sizes"].each do |size|
-          @api_digitalocean_slugs.push("#{size["slug"]}")
+    begin
+      uri = URI("https://api.digitalocean.com/v2/droplets")
+      Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
+        request = Net::HTTP::Get.new uri.request_uri
+        request.add_field "Authorization", "Bearer #{@configuration["company"]["digitalocean_personal_access_token"]}"
+        response = http.request(request)
+        if response.code.to_f.between?(399,499)
+          catapult_exception("#{response.code} The DigitalOcean API could not authenticate, please verify [\"company\"][\"digitalocean_personal_access_token\"].")
+        elsif response.code.to_f.between?(500,600)
+          @api_digitalocean = nil
+          puts " * The DigitalOcean API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
+        else
+          @api_digitalocean = JSON.parse(response.body)
         end
       end
+    rescue Net::ReadTimeout => ex
+      puts " * The DigitalOcean API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
+      puts "   - Error was: #{ex.class}".color(Colors::RED)
+    rescue Errno::ETIMEDOUT => ex
+      puts " * The DigitalOcean API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
+      puts "   - Error was: #{ex.class}".color(Colors::RED)
+    rescue Errno::ECONNREFUSED => ex
+      puts " * The DigitalOcean API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
+      puts "   - Error was: #{ex.class}".color(Colors::RED)
+    end
+    # get digitalocean available slugs
+    begin
+      uri = URI("https://api.digitalocean.com/v2/sizes")
+      Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
+        request = Net::HTTP::Get.new uri.request_uri
+        request.add_field "Authorization", "Bearer #{@configuration["company"]["digitalocean_personal_access_token"]}"
+        response = http.request(request)
+        @api_digitalocean_slugs = Array.new
+        if response.code.to_f.between?(399,499)
+          catapult_exception("#{response.code} The DigitalOcean API could not authenticate, please verify [\"company\"][\"digitalocean_personal_access_token\"].")
+        elsif response.code.to_f.between?(500,600)
+          puts " * The DigitalOcean API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
+        else
+          api_digitalocean_sizes = JSON.parse(response.body)
+          api_digitalocean_sizes["sizes"].each do |size|
+            @api_digitalocean_slugs.push("#{size["slug"]}")
+          end
+        end
+      end
+    rescue Net::ReadTimeout => ex
+      puts " * The DigitalOcean API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
+      puts "   - Error was: #{ex.class}".color(Colors::RED)
+    rescue Errno::ETIMEDOUT => ex
+      puts " * The DigitalOcean API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
+      puts "   - Error was: #{ex.class}".color(Colors::RED)
+    rescue Errno::ECONNREFUSED => ex
+      puts " * The DigitalOcean API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
+      puts "   - Error was: #{ex.class}".color(Colors::RED)
     end
     # get aws instances
     # ************* REQUEST VALUES *************
@@ -1446,21 +1468,32 @@ module Catapult
     # Create authorization header and add to request headers
     authorization_header = algorithm + ' ' + 'Credential=' + @configuration["company"]["aws_access_key"] + '/' + credential_scope + ', ' +  'SignedHeaders=' + signed_headers + ', ' + 'Signature=' + signature
     # ************* SEND THE REQUEST *************
-    uri = URI(endpoint + '?' + canonical_querystring)
-    Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
-      request = Net::HTTP::Get.new uri.request_uri
-      request.add_field "Authorization", "#{authorization_header}"
-      request.add_field "x-amz-date", "#{amzdate}"
-      request.add_field "content-type", "application/json"
-      response = http.request(request)
-      if response.code.to_f.between?(399,499)
-        catapult_exception("#{response.code} The AWS API could not authenticate, please verify [\"company\"][\"aws_access_key\"] and [\"company\"][\"aws_secret_key\"].")
-      elsif response.code.to_f.between?(500,600)
-        @api_aws = nil
-        puts " * AWS API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
-      else
-        @api_aws = Nokogiri::XML.parse(response.body)
+    begin
+      uri = URI(endpoint + '?' + canonical_querystring)
+      Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
+        request = Net::HTTP::Get.new uri.request_uri
+        request.add_field "Authorization", "#{authorization_header}"
+        request.add_field "x-amz-date", "#{amzdate}"
+        request.add_field "content-type", "application/json"
+        response = http.request(request)
+        if response.code.to_f.between?(399,499)
+          catapult_exception("#{response.code} The AWS API could not authenticate, please verify [\"company\"][\"aws_access_key\"] and [\"company\"][\"aws_secret_key\"].")
+        elsif response.code.to_f.between?(500,600)
+          @api_aws = nil
+          puts " * AWS API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
+        else
+          @api_aws = Nokogiri::XML.parse(response.body)
+        end
       end
+    rescue Net::ReadTimeout => ex
+      puts " * The AWS API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
+      puts "   - Error was: #{ex.class}".color(Colors::RED)
+    rescue Errno::ETIMEDOUT => ex
+      puts " * The AWS API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
+      puts "   - Error was: #{ex.class}".color(Colors::RED)
+    rescue Errno::ECONNREFUSED => ex
+      puts " * The AWS API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
+      puts "   - Error was: #{ex.class}".color(Colors::RED)
     end
     # loop through each environment and provider
     ######################################################################
