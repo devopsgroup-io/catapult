@@ -80,9 +80,9 @@ Catapult orchestrates the following key components of DevOps to provide you with
 
 
 
-## Supported Software ##
+## Supported Website Software ##
 
-Catapult intelligently manages the following software that has been chosen from trending usage statistics from [BuiltWith](https://trends.builtwith.com/cms) and aligns with the [CentOS 7 trunk](http://mirror.centos.org/centos/7/os/x86_64/Packages/) along with the [Software Collections trunk](https://www.softwarecollections.org/):
+Catapult intelligently manages the following website software that have been chosen from trending usage statistics from [BuiltWith](https://trends.builtwith.com/cms) and aligns with the [CentOS 7 trunk](http://mirror.centos.org/centos/7/os/x86_64/Packages/) along with the [Software Collections trunk](https://www.softwarecollections.org/):
 
 Software | [Key](#websites) | Required PHP Version | Defined PHP Version | Released | End-of-Life
 ---------|------------------|---------------------|---------------------|----------|------------
@@ -107,6 +107,8 @@ Zend Framework 2                  | `zendframework2`       | 5.3.23 | 5.4 | Sept
 Catapult additionally supports basic PHP projects that do not have a database requirement:
 
 * PHP 5.4 compatible project
+
+Catapult additionally supports static site generators, such as, [Jekyll](https://jekyllrb.com/).
 
 
 ## Competition ##
@@ -155,7 +157,7 @@ See an error or have a suggestion? Email competition@devopsgroup.io - we appreci
 - [Catapult](#catapult)
     - [Platform Overview](#platform-overview)
     - [Security Disclosure](#security-disclosure)
-    - [Supported Software](#supported-software)
+    - [Supported Website Software](#supported-website-software)
     - [Competition](#competition)
     - [Table of Contents](#table-of-contents)
 - [Setup Catapult](#setup-catapult)
