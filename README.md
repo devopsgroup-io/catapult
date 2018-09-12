@@ -1074,10 +1074,21 @@ An example of implementation would be the [WP Mail SMTP](https://wordpress.org/p
 
 The following HTTP request limits are defined for all websites:
 
+**HTTP (ModSecurity) Limits**
+
 * Maximum request body size excluding the size of any files being transported in the request (`SecRequestBodyNoFilesLimit`): `128 KB`
+   * Limits the `application/x-www-form-urlencoded` Content-Type
 * Maximum request body size (`SecRequestBodyLimit`): `64 MB`
-* Maximum size of post data allowed (`post_max_size`): `64 MB`
+   * Limits the `multi-part` Content-Type
+   
+**PHP Limits**
+
 * Maximum size of an uploaded file (`upload_max_filesize`): `16 MB`
+* Maximum size of post data allowed (`post_max_size`): `64 MB`
+
+**Troubleshooting**
+
+If you are experiencing `401` or `413` HTTP response codes it may be due to the HTTP client not supporting the HTTP 1.1 `Expect` header. This header essentially says "I've got a huge payload, but before I send it please let me know if you can handle it". This gives the endpoints time to renegotiate the client certificate before the payload is sent. The `SSLRenegBufferSize` is set to `128 KB` for security reasons, so if your payload exceeds this size it will fail if the client does not support the HTTP 1.1 `Expect` header.
 
 ### Database Migrations ###
 
