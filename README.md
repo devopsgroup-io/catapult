@@ -1088,7 +1088,7 @@ The following HTTP request limits are defined for all websites:
 
 **Troubleshooting**
 
-If you are experiencing `401` or `413` HTTP response codes it may be due to the HTTP client not supporting the HTTP 1.1 `Expect` header. This header essentially says "I've got a huge payload, but before I send it please let me know if you can handle it". This gives the endpoints time to renegotiate the client certificate before the payload is sent. The `SSLRenegBufferSize` is set to `128 KB` for security reasons, so if your payload exceeds this size it will fail if the client does not support the HTTP 1.1 `Expect` header.
+If you are experiencing `401` or `413` HTTP response codes it may be due to the HTTP client not supporting the HTTP 1.1 `Expect` header. This header essentially says "I've got a huge payload, but before I send it please let me know if you can handle it". This gives the endpoints time to renegotiate the client certificate before the payload is sent. The `SSLRenegBufferSize` is set to `128 KB` for security reasons, so if your payload exceeds this size it will fail if the client does not support the HTTP 1.1 `Expect` header. Read more [here](https://stackoverflow.com/questions/14281628/ssl-renegotiation-with-client-certificate-causes-server-buffer-overflow/15394058#15394058).
 
 ### Database Migrations ###
 
