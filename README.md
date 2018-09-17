@@ -1341,7 +1341,7 @@ Personally identifiable information (PII), in the U.S., is generally classified 
 
 ### Europe ###
 
-The General Data Protection Regulation (GDPR) is a regulation in E.U. law on data protection and privacy for all individuals within the European Union that becomes enforceable starting May 25, 2018. Article 4(1) of the GPDR defines "personal data" as any information relating to an identified or identifiable natural person ('data subject'); an identifiable natural person is one who can be identified, directly or indirectly, in particular by reference to an identifier such as a name, an identification number, location data, an online identifier or to one or more factors specific to the physical, physiological, genetic, mental, economic, cultural or social identity of that natural person. For more information, please see the [GPDR](http://eur-lex.europa.eu/legal-content/EN/TXT/?uri=celex:32016R0679).
+The General Data Protection Regulation (GDPR) is a regulation in E.U. law on data protection and privacy for all individuals within the European Union that becomes enforceable starting May 25, 2018. Article 4(1) of the GDPR defines "personal data" as any information relating to an identified or identifiable natural person ('data subject'); an identifiable natural person is one who can be identified, directly or indirectly, in particular by reference to an identifier such as a name, an identification number, location data, an online identifier or to one or more factors specific to the physical, physiological, genetic, mental, economic, cultural or social identity of that natural person. For more information, please see the [GDPR](http://eur-lex.europa.eu/legal-content/EN/TXT/?uri=celex:32016R0679).
 
 
 # Compliance #
