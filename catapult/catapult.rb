@@ -392,9 +392,12 @@ module Catapult
     # parse secrets/configuration-user.yml and catapult/installers/templates/configuration-user.yml.template file
     @configuration_user = YAML.load_file("secrets/configuration-user.yml")
     @configuration_user_template = YAML.load_file("catapult/installers/templates/configuration-user.yml.template")
-    # check for required fields
+    # validate @configuration_user_template["settings"]
     if @configuration_user["settings"]["gpg_key"] == nil || @configuration_user["settings"]["gpg_key"].match(/\s/) || @configuration_user["settings"]["gpg_key"].length < 20
       catapult_exception("Please set your team's gpg_key in secrets/configuration-user.yml - spaces are not permitted and must be at least 20 characters. Please visit https://github.com/devopsgroup-io/catapult#instance-setup for more information.")
+    end
+    if not [true,false].include?(@configuration_user["settings"]["gpg_edit"]) || @configuration_user["settings"]["gpg_edit"] == nil || @configuration_user["settings"]["gpg_edit"].match(/\s/)
+      catapult_exception("Please set gpg_edit to either true or false in secrets/configuration-user.yml.")
     end
 
 
@@ -544,6 +547,15 @@ module Catapult
         confirm = ask("You have outstanding configuration that needs to be set in configuration.yml and the gpg_edit setting in your configuration-user.yml file is set to false, would you like to set it to true? [Y/N]") { |yn| yn.limit = 1, yn.validate = /[yn]/i }
         if confirm.downcase == 'y'
           @configuration_user["settings"]["gpg_edit"] = true
+          File.open('secrets/configuration-user.yml', 'w') {|f| f.write configuration_user.to_yaml }
+          @configuration_user = YAML.load_file("secrets/configuration-user.yml")
+        end
+      end
+    else
+      if @configuration_user["settings"]["gpg_edit"] == true
+        confirm = ask("The gpg_edit setting in your configuration-user.yml file is set to true, would you like to set it to false? [Y/N]") { |yn| yn.limit = 1, yn.validate = /[yn]/i }
+        if confirm.downcase == 'y'
+          @configuration_user["settings"]["gpg_edit"] = false
           File.open('secrets/configuration-user.yml', 'w') {|f| f.write configuration_user.to_yaml }
           @configuration_user = YAML.load_file("secrets/configuration-user.yml")
         end
