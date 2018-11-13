@@ -177,7 +177,8 @@ See an error or have a suggestion? Email competition@devopsgroup.io - we appreci
         - [Websites](#websites)
     - [Website Development](#website-development)
         - [Website Repositories](#website-repositories)
-        - [Software Updates and Fresh Installs](#software-updates-and-fresh-installs)
+        - [Software Fresh Installs](#software-fresh-installs)
+        - [Software Auto Updates](#software-auto-updates)
         - [HTTPS and Certificates](#https-and-certificates)
         - [Forcing www](#forcing-www)
         - [Debug Output](#debug-output)
@@ -866,9 +867,9 @@ The following options are available:
     * required: no
     * dependency: `software:`
     * option: `software_auto_update: true`
-        * manages software core and pluggable component (plugins, modules, etc) updates to the latest compatible versions using the software's CLI tool
+        * manages software core and pluggable component (plugins, modules, etc) updates to the latest compatible versions using the software's CLI tool or similiar method
         * updates only occur in the `software_workflow` environment
-        * not all `software` is supported, see [Software Updates and Fresh Installs](#software-updates-and-fresh-installs)
+        * not all `software` is supported, see [Software Auto Updates](#software-auto-updates)
 * `software_dbprefix:`
     * required: no
     * dependency: `software:`
@@ -910,29 +911,60 @@ Website development is done on the developer's workstation using the LocalDev en
 
 Once websites are added to your configuration and you have performed a provision of your LocalDev environment, repositories for websites are cloned into your Catapult instance at `~/repositories` and into the respective `apache` or `iis` folder, listed by domain name. Website repository folders are linked between the developer's workstation (host) and the LocalDev environment (guest) for realtime development.
 
-### Software Updates and Fresh Installs ###
+### Software Fresh Installs ###
 
-Catapult enforces software configuration best practice for software fresh installs and updates. A typical software fresh install workflow would be to fork the software project on GitHub and add then add a new website entry to your `~/configuration.yml` file. Given the broad spectrum of software requirements there are minor configuration caveats worth noting:
+Catapult enforces software configuration best practice for software fresh installs. A typical software fresh install workflow would be to fork the software project on GitHub and add then add a new website entry to your `~/configuration.yml` file. Given the broad spectrum of software requirements there are minor configuration caveats worth noting:
 
-Software | `software_auto_update` Support | Install Approach | Install Notes
----------|--------------------------------|------------------|--------------
-`codeigniter2`      | [:white_check_mark:](http://www.codeigniter.com/userguide2/installation/upgrading.html) |          | Follow the [Installation Instructions](https://www.codeigniter.com/userguide2/installation/index.html).
-`codeigniter3`      | [:white_check_mark:](https://www.codeigniter.com/userguide3/installation/upgrading.html) |          | Follow the [Installation Instructions](https://www.codeigniter.com/userguide3/installation/index.html).
-`drupal6`           | :white_check_mark:                                                       | Drush    | `drush pm-download drupal-6`
-`drupal7`           | :white_check_mark:                                                       | Drush    | `drush pm-download drupal-7`
-`drupal8`           | :white_check_mark:                                                       | Drush    | `drush pm-download drupal-8`
-`elgg1`             | [:x:](http://learn.elgg.org/en/2.0/admin/upgrading.html)                 | Fork     | Follow the installation [Overview](http://learn.elgg.org/en/2.0/intro/install.html). Catapult requires the `dataroot` directory to be within the webroot, it's pertinant to create a `.gitignore` to ignore and `.htaccess` to deny access to this directory.
-`elgg2`             | [:x:](http://learn.elgg.org/en/2.0/admin/upgrading.html)                 | Fork     | Follow the installation [Overview](http://learn.elgg.org/en/2.0/intro/install.html). Catapult requires the `dataroot` directory to be within the webroot, it's pertinant to create a `.gitignore` to ignore and `.htaccess` to deny access to this directory.
-`expressionengine3` | [:x:](https://docs.expressionengine.com/latest/installation/update.html) | Download |
-`joomla3`           | [:x:](https://docs.joomla.org/J3.x:Updating_from_an_existing_version)    | Fork     |
-`laravel5`          | [:x:](https://www.laravel.com/docs/master/upgrade)                       | Composer | Follow the [Composer Create-Project](https://laravel.com/docs/5.0/installation) documentation.
-`mediawiki1`        | [:x:](https://www.mediawiki.org/wiki/Manual:Upgrading)                   | Fork     |
-`moodle3`           | :white_check_mark:                                                       | Fork     | Catapult requires the `moodledata` directory to be within the webroot, it's pertinant to create a `.gitignore` to ignore and `.htaccess` to deny access to this directory.
-`silverstripe3`     | [:x:](https://docs.silverstripe.org/en/3.4/upgrading/)                   | Composer | Follow the [Installing and Upgrading with Composer](https://docs.silverstripe.org/en/3.4/getting_started/composer/). During a fresh install, the database config file `mysite/_config.php` will need to be given 0777 permissions.
-`suitecrm7`         | [:x:](https://suitecrm.com/wiki/index.php/Upgrade)                       | Fork     |
-`wordpress4`        | :white_check_mark:                                                       | Fork     |
-`xenforo1`          | [:x:](https://xenforo.com/help/upgrades/)                                | Download |
-`zendframework2`    | :white_check_mark:                                                       | Fork     | Your best bet is to start from the [zendframework/ZendSkeletonApplication](https://github.com/zendframework/ZendSkeletonApplication) GitHub project. Catapult assumes Zend Framwork is at the root of your repo and writes a database config file at `config/autoload/global.php`, you will also need to set `webroot: public/` in your Catapult configuration.
+Software | Install Approach | Install Notes
+---------|------------------|--------------
+`codeigniter2`      |          | Follow the [Installation Instructions](https://www.codeigniter.com/userguide2/installation/index.html).
+`codeigniter3`      |          | Follow the [Installation Instructions](https://www.codeigniter.com/userguide3/installation/index.html).
+`drupal6`           | Drush    | `drush pm-download drupal-6`
+`drupal7`           | Drush    | `drush pm-download drupal-7`
+`drupal8`           | Drush    | `drush pm-download drupal-8`
+`elgg1`             | Fork     | Follow the installation [Overview](http://learn.elgg.org/en/2.0/intro/install.html). Catapult requires the `dataroot` directory to be within the webroot, it's pertinant to create a `.gitignore` to ignore and `.htaccess` to deny access to this directory.
+`elgg2`             | Fork     | Follow the installation [Overview](http://learn.elgg.org/en/2.0/intro/install.html). Catapult requires the `dataroot` directory to be within the webroot, it's pertinant to create a `.gitignore` to ignore and `.htaccess` to deny access to this directory.
+`expressionengine3` | Download |
+`joomla3`           | Fork     |
+`laravel5`          | Composer | Follow the [Composer Create-Project](https://laravel.com/docs/5.0/installation) documentation.
+`mediawiki1`        | Fork     |
+`moodle3`           | Fork     | Catapult requires the `moodledata` directory to be within the webroot, it's pertinant to create a `.gitignore` to ignore and `.htaccess` to deny access to this directory.
+`silverstripe3`     | Composer | Follow the [Installing and Upgrading with Composer](https://docs.silverstripe.org/en/3.4/getting_started/composer/). During a fresh install, the database config file `mysite/_config.php` will need to be given 0777 permissions.
+`suitecrm7`         | Fork     |
+`wordpress4`        | Fork     |
+`xenforo1`          | Download |
+`zendframework2`    | Fork     | Your best bet is to start from the [zendframework/ZendSkeletonApplication](https://github.com/zendframework/ZendSkeletonApplication) GitHub project. Catapult assumes Zend Framwork is at the root of your repo and writes a database config file at `config/autoload/global.php`, you will also need to set `webroot: public/` in your Catapult configuration.
+
+### Software Auto Updates ###
+
+The below table outlines what software is supported for the `software_auto_update` website option. When this option is set to `true`, Catapult manages software core and pluggable component (plugins, modules, etc) updates to the latest compatible versions using the software's CLI tool or similiar method.
+
+Software | `software_auto_update` Support
+---------|--------------------------------
+`codeigniter2`      | [:white_check_mark:](http://www.codeigniter.com/userguide2/installation/upgrading.html)
+`codeigniter3`      | [:white_check_mark:](https://www.codeigniter.com/userguide3/installation/upgrading.html)
+`drupal6`           | :white_check_mark:
+`drupal7`           | :white_check_mark:
+`drupal8`           | :white_check_mark:
+`elgg1`             | [:x:](http://learn.elgg.org/en/2.0/admin/upgrading.html)
+`elgg2`             | [:x:](http://learn.elgg.org/en/2.0/admin/upgrading.html)
+`expressionengine3` | [:x:](https://docs.expressionengine.com/latest/installation/update.html)
+`joomla3`           | [:x:](https://docs.joomla.org/J3.x:Updating_from_an_existing_version)
+`laravel5`          | [:x:](https://www.laravel.com/docs/master/upgrade)
+`mediawiki1`        | [:x:](https://www.mediawiki.org/wiki/Manual:Upgrading)
+`moodle3`           | :white_check_mark:
+`silverstripe3`     | [:x:](https://docs.silverstripe.org/en/3.4/upgrading/)
+`suitecrm7`         | [:x:](https://suitecrm.com/wiki/index.php/Upgrade)
+`wordpress4`        | :white_check_mark:
+`xenforo1`          | [:x:](https://xenforo.com/help/upgrades/)
+`zendframework2`    | :white_check_mark:
+
+In the scenario where an update may overwrite customizations to a file that is expected to be able to be customized (e.g. `.htaccess` or `robots.txt`), you may create an `_append` directory within the repository root of the website with files containing your customizations.
+
+* The append filenames must match the filenames that you would like to append.
+* The files must only contain the lines of content that you would like to append.
+* Please note that only files that allow for hash style comments (i.e. `# THIS IS COMMENT`)
+* Please note that only files that are in the root of the software are supported.
 
 ### HTTPS and Certificates ###
 
@@ -1206,7 +1238,7 @@ QC          | 1:00 AM
 Production  | 2:00 AM
 
 * Operating System and server software updates
-* [Website software updates](#software-updates-and-fresh-installs)
+* [Website software updates](#software-auto-updates)
 * [Website repository changesets](#software-workflow)
 * [Website software database restores](#software-workflows)
 * [Website software database migrations](#database-migrations)
