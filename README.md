@@ -963,7 +963,7 @@ In the scenario where an update may overwrite customizations to a file that is e
 
 * The append filenames must match the filenames that you would like to append.
 * The files must only contain the lines of content that you would like to append.
-* Please note that only files that allow for hash style comments (i.e. `# THIS IS COMMENT`)
+* Please note that only files that allow for hash style comments (i.e. `# THIS IS A COMMENT`).
 * Please note that only files that are in the root of the software are supported.
 
 ### HTTPS and Certificates ###
