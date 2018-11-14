@@ -101,6 +101,7 @@ Moodle 3                          | `moodle3`              | 5.6.5  | 5.6 | Nove
 SilverStripe 3                    | `silverstripe3`        | 5.3.3  | 5.4 | June 29, 2012      |
 SuiteCRM 7                        | `suitecrm7`            | 5.5    | 5.6 | October 21, 2013   |
 WordPress 4                       | `wordpress4`           | 5.2.4  | 7.0 | September 4, 2014  |
+WordPress 5                       | `wordpress5`           | 7.0.   | 7.1 | TBD                |
 XenForo 1                         | `xenforo1`             | 5.2.11 | 5.4 | March 8, 2011      |
 Zend Framework 2                  | `zendframework2`       | 5.3.23 | 5.4 | September 5, 2012  |
 
@@ -861,6 +862,7 @@ The following options are available:
     * option: `software: silverstripe3`
     * option: `software: suitecrm7`
     * option: `software: wordpress4`
+    * option: `software: wordpress5`
     * option: `software: xenforo1`
     * option: `software: zendframework2`
 * `software_auto_update:`
@@ -932,6 +934,7 @@ Software | Install Approach | Install Notes
 `silverstripe3`     | Composer | Follow the [Installing and Upgrading with Composer](https://docs.silverstripe.org/en/3.4/getting_started/composer/). During a fresh install, the database config file `mysite/_config.php` will need to be given 0777 permissions.
 `suitecrm7`         | Fork     |
 `wordpress4`        | Fork     |
+`wordpress5`        | Fork     |
 `xenforo1`          | Download |
 `zendframework2`    | Fork     | Your best bet is to start from the [zendframework/ZendSkeletonApplication](https://github.com/zendframework/ZendSkeletonApplication) GitHub project. Catapult assumes Zend Framwork is at the root of your repo and writes a database config file at `config/autoload/global.php`, you will also need to set `webroot: public/` in your Catapult configuration.
 
@@ -956,6 +959,7 @@ Software | `software_auto_update` Support
 `silverstripe3`     | [:x:](https://docs.silverstripe.org/en/3.4/upgrading/)
 `suitecrm7`         | [:x:](https://suitecrm.com/wiki/index.php/Upgrade)
 `wordpress4`        | :white_check_mark:
+`wordpress5`        | :white_check_mark:
 `xenforo1`          | [:x:](https://xenforo.com/help/upgrades/)
 `zendframework2`    | :white_check_mark:
 
@@ -1049,6 +1053,7 @@ Software | Approach | Documentation
 `silverstripe3`     | `mysite/_config.php` | http://api.silverstripe.org/3.1/class-Director.html -> http://stackoverflow.com/a/26865882
 `suitecrm7`         |                      | 
 `wordpress4`        | Database             | http://codex.wordpress.org/Changing_The_Site_URL
+`wordpress5`        | Database             | http://codex.wordpress.org/Changing_The_Site_URL
 `xenforo1`          |                      |
 `zendframework2`    |                      |
 
@@ -1142,6 +1147,7 @@ Software | Tool | Command | Documentation
 `silverstripe3`     | MigrationTask   | `php framework/cli-script.php dev/tasks/MigrationTask` | http://api.silverstripe.org/3.3/class-MigrationTask.html
 `suitecrm7`         |                 |                                                        |
 `wordpress4`        | WP-CLI          | `wp-cli core update-db`                                | http://codex.wordpress.org/Creating_Tables_with_Plugins#Adding_an_Upgrade_Function
+`wordpress5`        | WP-CLI          | `wp-cli core update-db`                                | http://codex.wordpress.org/Creating_Tables_with_Plugins#Adding_an_Upgrade_Function
 `xenforo1`          |                 |                                                        |
 `zendframework2`    |                 |                                                        |
 
