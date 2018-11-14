@@ -68,4 +68,10 @@ if [ ! -z "$(provisioners_array software.apache.${software}.file_stores)" ]; the
     done
 fi
 
+# for directories that may have been just created or removed by git clean if empty, again, set ownership of software [directories and files]
+if [ "$1" != "dev" ]; then
+    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" \
+        && chown -R root:apache .
+fi
+
 touch "/catapult/provisioners/redhat/logs/git_permissions.$(catapult websites.apache.$5.domain).complete"
