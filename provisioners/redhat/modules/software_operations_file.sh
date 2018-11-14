@@ -366,7 +366,6 @@ if [ -e "/var/www/repositories/apache/${domain}/_append/" ]; then
                 append=$(<$file)
                 echo -e "${append}"
 sudo cat >> "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}${file_basename}" << EOF
-
 # CATAPULT APPEND START
 ${append}
 # CATAPULT APPEND END
