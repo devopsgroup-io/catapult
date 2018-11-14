@@ -282,12 +282,20 @@ software:
       version: [7]
     wordpress4:
       repo: "https://github.com/WordPress/WordPress.git"
-      branch: "4.5-branch"
+      branch: "4.9-branch"
       database_config_file: "wp-config.php"
       file_store_containers: ["wp-content"]
       file_stores: ["wp-content/languages","wp-content/uploads"]
       php_version: "7.0"
       version: [4]
+    wordpress5:
+      repo: "https://github.com/WordPress/WordPress.git"
+      branch: "5.0-branch"
+      database_config_file: "wp-config.php"
+      file_store_containers: ["wp-content"]
+      file_stores: ["wp-content/languages","wp-content/uploads"]
+      php_version: "7.1"
+      version: [5]
     xenforo1:
       repo: PRIVATE
       database_config_file: "sites/default/settings.php"
