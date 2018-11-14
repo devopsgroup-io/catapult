@@ -432,6 +432,16 @@ EOF
         Require all denied
     </Directory>
 
+    # deny access to _append folder
+    <Directory "/var/www/repositories/apache/${domain}/_append">
+        Require all denied
+    </Directory>
+
+    # deny access to _cert folder
+    <Directory "/var/www/repositories/apache/${domain}/_cert">
+        Require all denied
+    </Directory>
+
     # deny access to _sql folder
     <Directory "/var/www/repositories/apache/${domain}/_sql">
         Require all denied
