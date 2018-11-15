@@ -368,34 +368,36 @@ else
 fi
 
 # software file append feature
-# includes filenames beginning with a '.' in the results of filename expansion
-shopt -s dotglob
-if [ -e "/var/www/repositories/apache/${domain}/_append/" ]; then
-    echo -e "> detected an _append directory..."
-    for file in /var/www/repositories/apache/${domain}/_append/*; do
-        # ensure we're dealing with a file
-        if [ -e "$file" ]; then
-            echo -e "> verifying _append file $file..."
-            file_basename=$(basename $file)
-            if [ -e "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}${file_basename}" ]; then
-                echo -e "- found the matching _append file /var/www/repositories/apache/${domain}/${webroot}${softwareroot}${file_basename}..."
-                echo -e "- removing any existing _append from /var/www/repositories/apache/${domain}/${webroot}${softwareroot}${file_basename}..."
-                sed -i '/# CATAPULT APPEND START/,/# CATAPULT APPEND END/d' "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}${file_basename}"
-                echo -e "- adding _append to /var/www/repositories/apache/${domain}/${webroot}${softwareroot}${file_basename}..."
-                append=$(<$file)
-                echo -e "${append}"
+if ([ "${1}" = "production" ] && [ "${software_workflow}" = "downstream" ]) || ([ "${1}" = "test" ] && [ "${software_workflow}" = "upstream" ]); then
+    # includes filenames beginning with a '.' in the results of filename expansion
+    shopt -s dotglob
+    if [ -e "/var/www/repositories/apache/${domain}/_append/" ]; then
+        echo -e "> detected an _append directory..."
+        for file in /var/www/repositories/apache/${domain}/_append/*; do
+            # ensure we're dealing with a file
+            if [ -e "$file" ]; then
+                echo -e "> verifying _append file $file..."
+                file_basename=$(basename $file)
+                if [ -e "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}${file_basename}" ]; then
+                    echo -e "- found the matching _append file /var/www/repositories/apache/${domain}/${webroot}${softwareroot}${file_basename}..."
+                    echo -e "- removing any existing _append from /var/www/repositories/apache/${domain}/${webroot}${softwareroot}${file_basename}..."
+                    sed -i '/# CATAPULT APPEND START/,/# CATAPULT APPEND END/d' "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}${file_basename}"
+                    echo -e "- adding _append to /var/www/repositories/apache/${domain}/${webroot}${softwareroot}${file_basename}..."
+                    append=$(<$file)
+                    echo -e "${append}"
 sudo cat >> "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}${file_basename}" << EOF
 # CATAPULT APPEND START
 ${append}
 # CATAPULT APPEND END
 EOF
+                fi
             fi
-        fi
-    done
-else
-    echo -e "> did not detect an _append directory, skipping..."
+        done
+    else
+        echo -e "> did not detect an _append directory, skipping..."
+    fi
+    # excludes filenames beginning with a '.' in the results of filename expansion
+    shopt -u dotglob
 fi
-# excludes filenames beginning with a '.' in the results of filename expansion
-shopt -u dotglob
 
 touch "/catapult/provisioners/redhat/logs/software_operations_file.$(catapult websites.apache.$5.domain).complete"
