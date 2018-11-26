@@ -55,12 +55,14 @@ if hash composer 2>/dev/null && hash drush 2>/dev/null && hash wp-cli 2>/dev/nul
             echo -e "\nSUPPORTED SOFTWARE VERSION DETECTED: ${version}\n"
 
             if [ "${software_auto_update}" = "true" ]; then
-                if [ "${version}" != "3.1.6" ]; then
+                if [ "${version}" != "3.1.9" ]; then
                     # https://www.codeigniter.com/userguide3/installation/upgrading.html
                     git clone https://github.com/bcit-ci/CodeIgniter "/catapult/provisioners/redhat/installers/temp/${domain}/codeigniter"
-                    cd "/catapult/provisioners/redhat/installers/temp/${domain}/codeigniter" && git checkout tags/3.1.6
+                    cd "/catapult/provisioners/redhat/installers/temp/${domain}/codeigniter" && git checkout tags/3.1.9
                     # upgrading from 3.0.0 to 3.0.1
                     yes | cp -rf /catapult/provisioners/redhat/installers/temp/$domain/codeigniter/application/views/errors/cli/* "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}/application/views/errors/cli"
+                    # upgrading from 3.1.8 to 3.1.9
+                    yes | cp -rf /catapult/provisioners/redhat/installers/temp/$domain/codeigniter/application/config/mimes.php "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}/application/config/mimes.php"
                     # upgrading constant
                     yes | cp -rf /catapult/provisioners/redhat/installers/temp/$domain/codeigniter/system/* "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}/system"
                     cd "/catapult" && rm -rf "/catapult/provisioners/redhat/installers/temp/${domain}/codeigniter"
