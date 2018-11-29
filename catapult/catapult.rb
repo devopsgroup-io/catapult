@@ -90,6 +90,16 @@ module Catapult
     end
 
 
+    # check for an internet connection
+    require "resolv"
+    dns_resolver = Resolv::DNS.new()
+    begin
+      dns_resolver.getaddress("google.com")
+    rescue Resolv::ResolvError => e
+      catapult_exception("Please check your internet connection, unable to reach google.com")
+    end
+
+
     # handle different workstation operating systems and install required gems
     # windows
     if (RbConfig::CONFIG['host_os'] =~ /mswin|msys|mingw|cygwin|bccwin|wince|emc/)
@@ -150,15 +160,6 @@ module Catapult
       catapult_exception("Wating took longer than expected. A .lock file is present in this directory, indicating that another Catapult process may have hung or ended unexpectedly. Once verifying that no conflict exists, remove the .lock file and try again.")
     end
     FileUtils.touch(@lock_file_unique)
-
-
-    # check for an internet connection
-    dns_resolver = Resolv::DNS.new()
-    begin
-      dns_resolver.getaddress("google.com")
-    rescue Resolv::ResolvError => e
-      catapult_exception("Please check your internet connection, unable to reach google.com")
-    end
 
 
     # require vm name on up and provision
@@ -1962,295 +1963,319 @@ module Catapult
 
 
     # validate @configuration["websites"]
-    puts "\nVerification of configuration[\"websites\"]:".color(Colors::WHITE)
-    # validate @configuration["websites"]
-    @configuration["websites"].each do |service,data|
-      # create array of domains to later validate domain alpha order per service
-      domains = Array.new
-      domains_sorted = Array.new
-      unless @configuration["websites"]["#{service}"] == nil
-        puts "\n[#{service}] #{@configuration["websites"]["#{service}"].nil? ? "0" : @configuration["websites"]["#{service}"].length} total"
-        puts "[domain]".ljust(40) + "[repo]".ljust(12) + "[repo write access]".ljust(20) + "[develop]".ljust(16) + "[release]".ljust(16) + "[master]".ljust(16) + "[bamboo service]".ljust(18)
-        puts "\n"
-        @configuration["websites"]["#{service}"].each do |instance|
-          # start new row
-          row = Array.new
-          # get domain
-          row.push(" * #{instance["domain"]}".slice!(0, 39).ljust(39))
-          # validate the domain to ensure it only includes the domain and not protocol
-          if instance["domain"].include? "://"
-            catapult_exception("There is an error in your secrets/configuration.yml file.\nThe domain for websites => #{service} => domain => #{instance["domain"]} is invalid, it must not include http:// or https://.")
-          end
-          # validate the domain_tld_override to ensure only valid characters
-          if not instance["domain"] =~ /^[0-9a-zA-Z\-\.]*$/
-            catapult_exception("There is an error in your secrets/configuration.yml file.\nThe domain for websites => #{service} => domain => #{instance["domain"]} must only contain numbers, letters, hyphens, and periods.")
-          end
-          # validate the domain depth
-          domain_depth = instance["domain"].split(".")
-          if domain_depth.count > 3
-            catapult_exception("There is an error in your secrets/configuration.yml file.\nThe domain for websites => #{service} => domain => #{instance["domain"]} is invalid, there is a maximum of one subdomain.")
-          end
-          unless instance["domain_tld_override"] == nil
-            # validate the domain_tld_override to ensure it only includes the domain and not protocol
-            if instance["domain_tld_override"].include? "://"
-              catapult_exception("There is an error in your secrets/configuration.yml file.\nThe domain_tld_override for websites => #{service} => domain => #{instance["domain"]} is invalid, it must not include http:// or https://.")
+    if ["provision","status"].include?(ARGV[0])
+      puts "\nVerification of configuration[\"websites\"]:".color(Colors::WHITE)
+      # validate @configuration["websites"]
+      @configuration["websites"].each do |service,data|
+        # create array of domains to later validate domain alpha order per service
+        domains = Array.new
+        domains_sorted = Array.new
+        unless @configuration["websites"]["#{service}"] == nil
+          puts "\n[#{service}] #{@configuration["websites"]["#{service}"].nil? ? "0" : @configuration["websites"]["#{service}"].length} total"
+          puts "[domain]".ljust(40) + "[repo]".ljust(12) + "[repo write access]".ljust(20) + "[develop]".ljust(16) + "[release]".ljust(16) + "[master]".ljust(16) + "[bamboo service]".ljust(18)
+          puts "\n"
+          @configuration["websites"]["#{service}"].each do |instance|
+            # start new row
+            row = Array.new
+            # get domain
+            row.push(" * #{instance["domain"]}".slice!(0, 39).ljust(39))
+            # validate the domain to ensure it only includes the domain and not protocol
+            if instance["domain"].include? "://"
+              catapult_exception("There is an error in your secrets/configuration.yml file.\nThe domain for websites => #{service} => domain => #{instance["domain"]} is invalid, it must not include http:// or https://.")
             end
             # validate the domain_tld_override to ensure only valid characters
-            if not instance["domain_tld_override"] =~ /^[0-9a-zA-Z\-\.]*$/
-              catapult_exception("There is an error in your secrets/configuration.yml file.\nThe domain_tld_override for websites => #{service} => domain => #{instance["domain"]} must only contain numbers, letters, hyphens, and periods.")
+            if not instance["domain"] =~ /^[0-9a-zA-Z\-\.]*$/
+              catapult_exception("There is an error in your secrets/configuration.yml file.\nThe domain for websites => #{service} => domain => #{instance["domain"]} must only contain numbers, letters, hyphens, and periods.")
             end
-            # validate the domain_tld_override depth
-            domain_tld_override_depth = instance["domain_tld_override"].split(".")
-            if domain_tld_override_depth.count != 2
-              catapult_exception("There is an error in your secrets/configuration.yml file.\nThe domain_tld_override for websites => #{service} => domain => #{instance["domain"]} is invalid, it must only be one domain level (company.com).")
+            # validate the domain depth
+            domain_depth = instance["domain"].split(".")
+            if domain_depth.count > 3
+              catapult_exception("There is an error in your secrets/configuration.yml file.\nThe domain for websites => #{service} => domain => #{instance["domain"]} is invalid, there is a maximum of one subdomain.")
             end
-          end
-          # there is a maximum domain (including domain_tld_override) length of 53 characters
-          # max mysql database name length of 64 - 11 for longest prefix of production_ = 53
-          # max mssql database name length of 128
-          if (instance["domain"].length + (instance["domain_tld_override"].nil? ? 0 : instance["domain_tld_override"].length)) > 53
-            catapult_exception("There is an error in your secrets/configuration.yml file.\nThe combination of domain and domain_tld_override for websites => #{service} => domain => #{instance["domain"]} must not exceed 53 characters in length.")
-          end
-          # validate force_auth
-          unless instance["force_auth"] == nil
-            if instance["force_auth"].length < 10 || instance["force_auth"].length > 20
-              catapult_exception("There is an error in your secrets/configuration.yml file.\nThe force_auth for websites => #{service} => domain => #{instance["domain"]} must be 10 to 20 characters in length.")
-            end
-            if not instance["force_auth"] =~ /^[0-9a-zA-Z]*$/
-              catapult_exception("There is an error in your secrets/configuration.yml file.\nThe force_auth for websites => #{service} => domain => #{instance["domain"]} must only contain numbers, lowercase letters, and uppercase letters.")
-            end
-          end
-          # validate force_auth_exclude
-          unless instance["force_auth_exclude"] == nil
-            # this can only be used with force_auth
-            if instance["force_auth"] == nil
-              catapult_exception("There is an error in your secrets/configuration.yml file.\nThe force_auth_exclude for websites => #{service} => domain => #{instance["domain"]} requires force_auth to be set.")
-            end
-            # only test, qc, and production are valid values
-            @force_auth_exclude_valid_values = true
-            instance["force_auth_exclude"].each do |value|
-              if not ["dev","test","qc","production"].include?("#{value}")
-                @force_auth_exclude_valid_values = false
+            unless instance["domain_tld_override"] == nil
+              # validate the domain_tld_override to ensure it only includes the domain and not protocol
+              if instance["domain_tld_override"].include? "://"
+                catapult_exception("There is an error in your secrets/configuration.yml file.\nThe domain_tld_override for websites => #{service} => domain => #{instance["domain"]} is invalid, it must not include http:// or https://.")
+              end
+              # validate the domain_tld_override to ensure only valid characters
+              if not instance["domain_tld_override"] =~ /^[0-9a-zA-Z\-\.]*$/
+                catapult_exception("There is an error in your secrets/configuration.yml file.\nThe domain_tld_override for websites => #{service} => domain => #{instance["domain"]} must only contain numbers, letters, hyphens, and periods.")
+              end
+              # validate the domain_tld_override depth
+              domain_tld_override_depth = instance["domain_tld_override"].split(".")
+              if domain_tld_override_depth.count != 2
+                catapult_exception("There is an error in your secrets/configuration.yml file.\nThe domain_tld_override for websites => #{service} => domain => #{instance["domain"]} is invalid, it must only be one domain level (company.com).")
               end
             end
-            unless @force_auth_exclude_valid_values
-              catapult_exception("There is an error in your secrets/configuration.yml file.\nThe force_auth_exclude for websites => #{service} => domain => #{instance["domain"]} is invalid, it must only include one, some, or all of the following [\"dev\",\"test\",\"qc\",\"production\"].")
+            # there is a maximum domain (including domain_tld_override) length of 53 characters
+            # max mysql database name length of 64 - 11 for longest prefix of production_ = 53
+            # max mssql database name length of 128
+            if (instance["domain"].length + (instance["domain_tld_override"].nil? ? 0 : instance["domain_tld_override"].length)) > 53
+              catapult_exception("There is an error in your secrets/configuration.yml file.\nThe combination of domain and domain_tld_override for websites => #{service} => domain => #{instance["domain"]} must not exceed 53 characters in length.")
             end
-          end
-          # validate force_https
-          unless instance["force_https"] == nil
-            unless ["true"].include?("#{instance["force_https"]}")
-              catapult_exception("There is an error in your secrets/configuration.yml file.\nThe force_https for websites => #{service} => domain => #{instance["domain"]} is invalid, it must be true or removed.")
-            end
-          end
-          # validate force_ip
-          unless instance["force_ip"] == nil
-            # validate both IPv4 and IPv6 adressess
-            instance["force_ip"].each do |value|
-              if not (value =~ Resolv::IPv4::Regex || value =~ Resolv::IPv6::Regex)
-                catapult_exception("There is an error in your secrets/configuration.yml file.\nThe force_ip for websites => #{service} => domain => #{instance["domain"]} is invalid, it must be an array of valid IPv4 or IPv6 address.")
+            # validate force_auth
+            unless instance["force_auth"] == nil
+              if instance["force_auth"].length < 10 || instance["force_auth"].length > 20
+                catapult_exception("There is an error in your secrets/configuration.yml file.\nThe force_auth for websites => #{service} => domain => #{instance["domain"]} must be 10 to 20 characters in length.")
+              end
+              if not instance["force_auth"] =~ /^[0-9a-zA-Z]*$/
+                catapult_exception("There is an error in your secrets/configuration.yml file.\nThe force_auth for websites => #{service} => domain => #{instance["domain"]} must only contain numbers, lowercase letters, and uppercase letters.")
               end
             end
-          end
-          # validate force_ip_exclude
-          unless instance["force_ip_exclude"] == nil
-            # this can only be used with force_ip
-            if instance["force_ip"] == nil
-              catapult_exception("There is an error in your secrets/configuration.yml file.\nThe force_ip_exclude for websites => #{service} => domain => #{instance["domain"]} requires force_ip to be set.")
-            end
-            # only test, qc, and production are valid values
-            @force_ip_exclude_valid_values = true
-            instance["force_ip_exclude"].each do |value|
-              if not ["dev","test","qc","production"].include?("#{value}")
-                @force_ip_exclude_valid_values = false
+            # validate force_auth_exclude
+            unless instance["force_auth_exclude"] == nil
+              # this can only be used with force_auth
+              if instance["force_auth"] == nil
+                catapult_exception("There is an error in your secrets/configuration.yml file.\nThe force_auth_exclude for websites => #{service} => domain => #{instance["domain"]} requires force_auth to be set.")
+              end
+              # only test, qc, and production are valid values
+              @force_auth_exclude_valid_values = true
+              instance["force_auth_exclude"].each do |value|
+                if not ["dev","test","qc","production"].include?("#{value}")
+                  @force_auth_exclude_valid_values = false
+                end
+              end
+              unless @force_auth_exclude_valid_values
+                catapult_exception("There is an error in your secrets/configuration.yml file.\nThe force_auth_exclude for websites => #{service} => domain => #{instance["domain"]} is invalid, it must only include one, some, or all of the following [\"dev\",\"test\",\"qc\",\"production\"].")
               end
             end
-            unless @force_ip_exclude_valid_values
-              catapult_exception("There is an error in your secrets/configuration.yml file.\nThe force_ip_exclude for websites => #{service} => domain => #{instance["domain"]} is invalid, it must only include one, some, or all of the following [\"dev\",\"test\",\"qc\",\"production\"].")
+            # validate force_https
+            unless instance["force_https"] == nil
+              unless ["true"].include?("#{instance["force_https"]}")
+                catapult_exception("There is an error in your secrets/configuration.yml file.\nThe force_https for websites => #{service} => domain => #{instance["domain"]} is invalid, it must be true or removed.")
+              end
             end
-          end
-          # validate software
-          unless instance["software"] == nil
-            # create an array of available software
-            provisioners_software = Array.new
-            unless @provisioners["software"]["#{service}"] == nil
-              @provisioners["software"]["#{service}"].each { |i, v| provisioners_software.push(i) }
+            # validate force_ip
+            unless instance["force_ip"] == nil
+              # validate both IPv4 and IPv6 adressess
+              instance["force_ip"].each do |value|
+                if not (value =~ Resolv::IPv4::Regex || value =~ Resolv::IPv6::Regex)
+                  catapult_exception("There is an error in your secrets/configuration.yml file.\nThe force_ip for websites => #{service} => domain => #{instance["domain"]} is invalid, it must be an array of valid IPv4 or IPv6 address.")
+                end
+              end
+            end
+            # validate force_ip_exclude
+            unless instance["force_ip_exclude"] == nil
+              # this can only be used with force_ip
+              if instance["force_ip"] == nil
+                catapult_exception("There is an error in your secrets/configuration.yml file.\nThe force_ip_exclude for websites => #{service} => domain => #{instance["domain"]} requires force_ip to be set.")
+              end
+              # only test, qc, and production are valid values
+              @force_ip_exclude_valid_values = true
+              instance["force_ip_exclude"].each do |value|
+                if not ["dev","test","qc","production"].include?("#{value}")
+                  @force_ip_exclude_valid_values = false
+                end
+              end
+              unless @force_ip_exclude_valid_values
+                catapult_exception("There is an error in your secrets/configuration.yml file.\nThe force_ip_exclude for websites => #{service} => domain => #{instance["domain"]} is invalid, it must only include one, some, or all of the following [\"dev\",\"test\",\"qc\",\"production\"].")
+              end
             end
             # validate software
-            unless provisioners_software.include?("#{instance["software"]}")
-              catapult_exception("There is an error in your secrets/configuration.yml file.\nThe software for websites => #{service} => domain => #{instance["domain"]} is invalid, it must be one of the following #{provisioners_software.join(", ")}.")
-            end
-            # validate software_auto_update
-            unless instance["software_auto_update"] == nil
-              if instance["software_auto_update"].to_s != "true"
-                catapult_exception("There is an error in your secrets/configuration.yml file.\nThe software_auto_update for websites => #{service} => domain => #{instance["domain"]} is invalid, it must be \"true\" or not set.")
+            unless instance["software"] == nil
+              # create an array of available software
+              provisioners_software = Array.new
+              unless @provisioners["software"]["#{service}"] == nil
+                @provisioners["software"]["#{service}"].each { |i, v| provisioners_software.push(i) }
               end
-            end
-            # validate software_dbprefix
-            unless instance["software_dbprefix"] == nil
-              if not instance["software_dbprefix"] =~ /^[0-9a-zA-Z\_]*$/
-                catapult_exception("There is an error in your secrets/configuration.yml file.\nThe software_dbprefix for websites => #{service} => domain => #{instance["domain"]} is invalid, it must only contain numbers, letters, and underscores.")
+              # validate software
+              unless provisioners_software.include?("#{instance["software"]}")
+                catapult_exception("There is an error in your secrets/configuration.yml file.\nThe software for websites => #{service} => domain => #{instance["domain"]} is invalid, it must be one of the following #{provisioners_software.join(", ")}.")
               end
-            end
-            # validate software_dbtable_retain
-            unless instance["software_dbtable_retain"] == nil
-              if not instance["software_dbtable_retain"].kind_of?(Array)
-                catapult_exception("There is an error in your secrets/configuration.yml file.\nThe software_dbtable_retain for websites => #{service} => domain => #{instance["domain"]} is invalid, it must be an array in the following example format [\"comments\",\"commentmeta\"].")
-              end
-            end
-            # validate software_workflow
-            unless ["downstream","upstream"].include?("#{instance["software_workflow"]}")
-              catapult_exception("There is an error in your secrets/configuration.yml file.\nThe software_workflow for websites => #{service} => domain => #{instance["domain"]} is invalid, it must be one of the following [\"downstream\",\"upstream\"].")
-            end
-          end
-          # validate webroot
-          unless instance["webroot"] == nil
-            unless "#{instance["webroot"]}"[-1,1] == "/"
-              catapult_exception("There is an error in your secrets/configuration.yml file.\nThe webroot for websites => #{service} => domain => #{instance["domain"]} is invalid, it must include a trailing slash.")
-            end
-          end
-          # create array of domains to later validate repo alpha order per service
-          domains.push("#{instance["domain"]}")
-          domains_sorted.push("#{instance["domain"]}")
-          # validate repo uri
-          if instance["repo"].include? "git@"
-            # instance["repo"] => git@github.com:devopsgroup-io/devopsgroup-io(.git)
-            repo_split_1 = instance["repo"].split("@")
-            # repo_split_1[0] => git
-            # repo_split_1[1] => github.com:devopsgroup-io/devopsgroup-io(.git)
-            repo_split_2 = repo_split_1[1].split(":")
-            # repo_split_2[0] => github.com
-            # repo_split_2[1] => devopsgroup-io/devopsgroup-io(.git)
-            repo_split_3 = repo_split_2[1].split(".git")
-            # repo_split_3[0] => devopsgroup-io/devopsgroup-io
-            # if there is a .git on the end, repo_split_3[0] will have a value, otherwise set equal to repo_split_2[1]
-            if repo_split_3[0]
-              repo_split_2[1] = repo_split_3[0]
-            end
-            repo_split_4 = repo_split_3[0].split("/")
-            # repo_split_4[0] => devopsgroup-io
-            # repo_split_4[1] => devopsgroup-io
-          else
-            # instance["repo"] => https://github.com/seth-reeser/catapult(.git)
-            repo_split_1 = instance["repo"].split("://")
-            # repo_split_1[0] => https
-            # repo_split_1[1] => github.com/seth-reeser/catapult(.git)
-            repo_split_2 = repo_split_1[1].split("/", 2)
-            # repo_split_2[0] => github.com
-            # repo_split_2[1] => seth-reeser/catapult(.git)
-            repo_split_3 = repo_split_2[1].split(".git")
-            # repo_split_3[0] => devopsgroup-io/devopsgroup-io
-            # if there is a .git on the end, repo_split_3[0] will have a value, otherwise set equal to repo_split_2[1]
-            if repo_split_3[0]
-              repo_split_2[1] = repo_split_3[0]
-            end
-            repo_split_4 = repo_split_3[0].split("/")
-            # repo_split_4[0] => devopsgroup-io
-            # repo_split_4[1] => devopsgroup-io
-          end
-          # validate repo uri
-          unless "#{service}" == "catapult"
-            # validate repo is an ssh uri
-            unless "#{repo_split_1[0]}" == "git"
-              catapult_exception("There is an error in your secrets/configuration.yml file.\nThe repo for websites => #{service} => domain => #{instance["domain"]} is invalid, the format must be git@github.com:devopsgroup-io/devopsgroup-io.git")
-            end
-            # validate repo hosted at bitbucket.org or github.com
-            unless "#{repo_split_2[0]}" == "bitbucket.org" || "#{repo_split_2[0]}" == "github.com"
-              catapult_exception("There is an error in your secrets/configuration.yml file.\nThe repo for websites => #{service} => domain => #{instance["domain"]} is invalid, it must either be a bitbucket.org or github.com repository.")
-            end
-          end
-          # validate repo exists
-          if "#{repo_split_2[0]}" == "bitbucket.org"
-            @api_bitbucket_repo_access = false
-            uri = URI("https://api.bitbucket.org/2.0/repositories/#{repo_split_3[0]}")
-            Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
-              request = Net::HTTP::Get.new uri.request_uri
-              request.basic_auth "#{@configuration["company"]["bitbucket_username"]}", "#{@configuration["company"]["bitbucket_password"]}"
-              response = http.request(request)
-              if response.code.to_f == 404
-                # create the repo if it does not exist
-                confirm = ask("The Bitbucket repository #{repo_split_3[0]} does not exist, would you like to create it? [Y/N]") { |yn| yn.limit = 1, yn.validate = /[yn]/i }
-                if confirm.downcase == 'y'
-                  uri = URI("https://api.bitbucket.org/2.0/repositories/#{repo_split_3[0]}")
-                  Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
-                    request = Net::HTTP::Post.new uri.request_uri
-                    request.basic_auth "#{@configuration["company"]["bitbucket_username"]}", "#{@configuration["company"]["bitbucket_password"]}"
-                    request.add_field "Content-Type", "application/json"
-                    request.body = ""\
-                      "{"\
-                        "\"scm\":\"git\","\
-                        "\"is_private\":\"true\","\
-                        "\"fork_policy\":\"no_public_forks\""\
-                      "}"
-                    response = http.request(request)
-                    if response.code.to_f.between?(500,600)
-                      puts "   - The Bitbucket API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
-                    elsif response.code.to_f.between?(399,499)
-                      catapult_exception("Unable to create the Bitbucket repository, please try again or manually create it.")
-                    end
-                  end
-                else
-                  catapult_exception("The Bitbucket repo #{instance["repo"]} must exist before continuing")
+              # validate software_auto_update
+              unless instance["software_auto_update"] == nil
+                if instance["software_auto_update"].to_s != "true"
+                  catapult_exception("There is an error in your secrets/configuration.yml file.\nThe software_auto_update for websites => #{service} => domain => #{instance["domain"]} is invalid, it must be \"true\" or not set.")
                 end
-              elsif response.code.to_f.between?(399,600)
-                puts "   - The Bitbucket API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
               end
-            end
-          end
-          if "#{repo_split_2[0]}" == "github.com"
-            uri = URI("https://api.github.com/repos/#{repo_split_3[0]}")
-            Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
-              request = Net::HTTP::Get.new uri.request_uri
-              request.basic_auth "#{@configuration["company"]["github_username"]}", "#{@configuration["company"]["github_password"]}"
-              response = http.request(request)
-              if response.code.to_f == 404
-                # create the repo if it does not exist
-                confirm = ask("The GitHub repository #{repo_split_3[0]} does not exist, would you like to create it? [Y/N]") { |yn| yn.limit = 1, yn.validate = /[yn]/i }
-                if confirm.downcase == 'y'
-                  uri = URI("ttps://api.github.com/repos")
-                  Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
-                    request = Net::HTTP::Post.new uri.request_uri
-                    request.basic_auth "#{@configuration["company"]["github_username"]}", "#{@configuration["company"]["github_password"]}"
-                    request.add_field "Content-Type", "application/json"
-                    request.body = ""\
-                      "{"\
-                        "\"name\":\"#{repo_split_4[1]}\","\
-                        "\"auto_init\":true"\
-                      "}"
-                    response = http.request(request)
-                    if response.code.to_f.between?(500,600)
-                      puts "   - The GitHub API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
-                    elsif response.code.to_f.between?(399,499)
-                      catapult_exception("Unable to create the GitHub repository, please try again or manually create it.")
-                    end
-                  end
-                else
-                  catapult_exception("The GitHub repo #{instance["repo"]} must exist before continuing")
+              # validate software_dbprefix
+              unless instance["software_dbprefix"] == nil
+                if not instance["software_dbprefix"] =~ /^[0-9a-zA-Z\_]*$/
+                  catapult_exception("There is an error in your secrets/configuration.yml file.\nThe software_dbprefix for websites => #{service} => domain => #{instance["domain"]} is invalid, it must only contain numbers, letters, and underscores.")
                 end
-              elsif response.code.to_f.between?(399,600)
-                puts "   - The GitHub API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
+              end
+              # validate software_dbtable_retain
+              unless instance["software_dbtable_retain"] == nil
+                if not instance["software_dbtable_retain"].kind_of?(Array)
+                  catapult_exception("There is an error in your secrets/configuration.yml file.\nThe software_dbtable_retain for websites => #{service} => domain => #{instance["domain"]} is invalid, it must be an array in the following example format [\"comments\",\"commentmeta\"].")
+                end
+              end
+              # validate software_workflow
+              unless ["downstream","upstream"].include?("#{instance["software_workflow"]}")
+                catapult_exception("There is an error in your secrets/configuration.yml file.\nThe software_workflow for websites => #{service} => domain => #{instance["domain"]} is invalid, it must be one of the following [\"downstream\",\"upstream\"].")
               end
             end
-          end
-          # validate repo access
-          if "#{repo_split_2[0]}" == "bitbucket.org"
-            @api_bitbucket_repo_access = false
-            if @api_bitbucket_repo_access === false
-              uri = URI("https://api.bitbucket.org/1.0/group-privileges/#{repo_split_3[0]}")
+            # validate webroot
+            unless instance["webroot"] == nil
+              unless "#{instance["webroot"]}"[-1,1] == "/"
+                catapult_exception("There is an error in your secrets/configuration.yml file.\nThe webroot for websites => #{service} => domain => #{instance["domain"]} is invalid, it must include a trailing slash.")
+              end
+            end
+            # create array of domains to later validate repo alpha order per service
+            domains.push("#{instance["domain"]}")
+            domains_sorted.push("#{instance["domain"]}")
+            # validate repo uri
+            if instance["repo"].include? "git@"
+              # instance["repo"] => git@github.com:devopsgroup-io/devopsgroup-io(.git)
+              repo_split_1 = instance["repo"].split("@")
+              # repo_split_1[0] => git
+              # repo_split_1[1] => github.com:devopsgroup-io/devopsgroup-io(.git)
+              repo_split_2 = repo_split_1[1].split(":")
+              # repo_split_2[0] => github.com
+              # repo_split_2[1] => devopsgroup-io/devopsgroup-io(.git)
+              repo_split_3 = repo_split_2[1].split(".git")
+              # repo_split_3[0] => devopsgroup-io/devopsgroup-io
+              # if there is a .git on the end, repo_split_3[0] will have a value, otherwise set equal to repo_split_2[1]
+              if repo_split_3[0]
+                repo_split_2[1] = repo_split_3[0]
+              end
+              repo_split_4 = repo_split_3[0].split("/")
+              # repo_split_4[0] => devopsgroup-io
+              # repo_split_4[1] => devopsgroup-io
+            else
+              # instance["repo"] => https://github.com/seth-reeser/catapult(.git)
+              repo_split_1 = instance["repo"].split("://")
+              # repo_split_1[0] => https
+              # repo_split_1[1] => github.com/seth-reeser/catapult(.git)
+              repo_split_2 = repo_split_1[1].split("/", 2)
+              # repo_split_2[0] => github.com
+              # repo_split_2[1] => seth-reeser/catapult(.git)
+              repo_split_3 = repo_split_2[1].split(".git")
+              # repo_split_3[0] => devopsgroup-io/devopsgroup-io
+              # if there is a .git on the end, repo_split_3[0] will have a value, otherwise set equal to repo_split_2[1]
+              if repo_split_3[0]
+                repo_split_2[1] = repo_split_3[0]
+              end
+              repo_split_4 = repo_split_3[0].split("/")
+              # repo_split_4[0] => devopsgroup-io
+              # repo_split_4[1] => devopsgroup-io
+            end
+            # validate repo uri
+            unless "#{service}" == "catapult"
+              # validate repo is an ssh uri
+              unless "#{repo_split_1[0]}" == "git"
+                catapult_exception("There is an error in your secrets/configuration.yml file.\nThe repo for websites => #{service} => domain => #{instance["domain"]} is invalid, the format must be git@github.com:devopsgroup-io/devopsgroup-io.git")
+              end
+              # validate repo hosted at bitbucket.org or github.com
+              unless "#{repo_split_2[0]}" == "bitbucket.org" || "#{repo_split_2[0]}" == "github.com"
+                catapult_exception("There is an error in your secrets/configuration.yml file.\nThe repo for websites => #{service} => domain => #{instance["domain"]} is invalid, it must either be a bitbucket.org or github.com repository.")
+              end
+            end
+            # validate repo exists
+            if "#{repo_split_2[0]}" == "bitbucket.org"
+              @api_bitbucket_repo_access = false
+              uri = URI("https://api.bitbucket.org/2.0/repositories/#{repo_split_3[0]}")
               Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
                 request = Net::HTTP::Get.new uri.request_uri
                 request.basic_auth "#{@configuration["company"]["bitbucket_username"]}", "#{@configuration["company"]["bitbucket_password"]}"
                 response = http.request(request)
                 if response.code.to_f == 404
-                  catapult_exception("The Bitbucket repo #{instance["repo"]} does not exist")
+                  # create the repo if it does not exist
+                  confirm = ask("The Bitbucket repository #{repo_split_3[0]} does not exist, would you like to create it? [Y/N]") { |yn| yn.limit = 1, yn.validate = /[yn]/i }
+                  if confirm.downcase == 'y'
+                    uri = URI("https://api.bitbucket.org/2.0/repositories/#{repo_split_3[0]}")
+                    Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
+                      request = Net::HTTP::Post.new uri.request_uri
+                      request.basic_auth "#{@configuration["company"]["bitbucket_username"]}", "#{@configuration["company"]["bitbucket_password"]}"
+                      request.add_field "Content-Type", "application/json"
+                      request.body = ""\
+                        "{"\
+                          "\"scm\":\"git\","\
+                          "\"is_private\":\"true\","\
+                          "\"fork_policy\":\"no_public_forks\""\
+                        "}"
+                      response = http.request(request)
+                      if response.code.to_f.between?(500,600)
+                        puts "   - The Bitbucket API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
+                      elsif response.code.to_f.between?(399,499)
+                        catapult_exception("Unable to create the Bitbucket repository, please try again or manually create it.")
+                      end
+                    end
+                  else
+                    catapult_exception("The Bitbucket repo #{instance["repo"]} must exist before continuing")
+                  end
                 elsif response.code.to_f.between?(399,600)
                   puts "   - The Bitbucket API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
-                else
-                  api_bitbucket_repo_group_privileges = JSON.parse(response.body)
-                  api_bitbucket_repo_group_privileges.each do |group|
-                    if group["privilege"] == "admin" || group["privilege"] == "write"
-                      group["group"]["members"].each do |member|
-                        if member["username"] == "#{@configuration["company"]["bitbucket_username"]}"
+                end
+              end
+            end
+            if "#{repo_split_2[0]}" == "github.com"
+              uri = URI("https://api.github.com/repos/#{repo_split_3[0]}")
+              Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
+                request = Net::HTTP::Get.new uri.request_uri
+                request.basic_auth "#{@configuration["company"]["github_username"]}", "#{@configuration["company"]["github_password"]}"
+                response = http.request(request)
+                if response.code.to_f == 404
+                  # create the repo if it does not exist
+                  confirm = ask("The GitHub repository #{repo_split_3[0]} does not exist, would you like to create it? [Y/N]") { |yn| yn.limit = 1, yn.validate = /[yn]/i }
+                  if confirm.downcase == 'y'
+                    uri = URI("ttps://api.github.com/repos")
+                    Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
+                      request = Net::HTTP::Post.new uri.request_uri
+                      request.basic_auth "#{@configuration["company"]["github_username"]}", "#{@configuration["company"]["github_password"]}"
+                      request.add_field "Content-Type", "application/json"
+                      request.body = ""\
+                        "{"\
+                          "\"name\":\"#{repo_split_4[1]}\","\
+                          "\"auto_init\":true"\
+                        "}"
+                      response = http.request(request)
+                      if response.code.to_f.between?(500,600)
+                        puts "   - The GitHub API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
+                      elsif response.code.to_f.between?(399,499)
+                        catapult_exception("Unable to create the GitHub repository, please try again or manually create it.")
+                      end
+                    end
+                  else
+                    catapult_exception("The GitHub repo #{instance["repo"]} must exist before continuing")
+                  end
+                elsif response.code.to_f.between?(399,600)
+                  puts "   - The GitHub API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
+                end
+              end
+            end
+            # validate repo access
+            if "#{repo_split_2[0]}" == "bitbucket.org"
+              @api_bitbucket_repo_access = false
+              if @api_bitbucket_repo_access === false
+                uri = URI("https://api.bitbucket.org/1.0/group-privileges/#{repo_split_3[0]}")
+                Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
+                  request = Net::HTTP::Get.new uri.request_uri
+                  request.basic_auth "#{@configuration["company"]["bitbucket_username"]}", "#{@configuration["company"]["bitbucket_password"]}"
+                  response = http.request(request)
+                  if response.code.to_f == 404
+                    catapult_exception("The Bitbucket repo #{instance["repo"]} does not exist")
+                  elsif response.code.to_f.between?(399,600)
+                    puts "   - The Bitbucket API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
+                  else
+                    api_bitbucket_repo_group_privileges = JSON.parse(response.body)
+                    api_bitbucket_repo_group_privileges.each do |group|
+                      if group["privilege"] == "admin" || group["privilege"] == "write"
+                        group["group"]["members"].each do |member|
+                          if member["username"] == "#{@configuration["company"]["bitbucket_username"]}"
+                            @api_bitbucket_repo_access = true
+                          end
+                        end
+                      end
+                    end
+                  end
+                end
+              end
+              if @api_bitbucket_repo_access === false
+                uri = URI("https://api.bitbucket.org/1.0/privileges/#{repo_split_3[0]}")
+                Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
+                  request = Net::HTTP::Get.new uri.request_uri
+                  request.basic_auth "#{@configuration["company"]["bitbucket_username"]}", "#{@configuration["company"]["bitbucket_password"]}"
+                  response = http.request(request)
+                  if response.code.to_f == 404
+                    catapult_exception("The Bitbucket repo #{instance["repo"]} does not exist")
+                  elsif response.code.to_f.between?(399,600)
+                    puts "   - The Bitbucket API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
+                  else
+                    api_bitbucket_repo_privileges = JSON.parse(response.body)
+                    api_bitbucket_repo_privileges.each do |member|
+                      if member["privilege"] == "admin" || member["privilege"] == "write"
+                        if member["user"]["username"] == "#{@configuration["company"]["bitbucket_username"]}"
                           @api_bitbucket_repo_access = true
                         end
                       end
@@ -2258,216 +2283,225 @@ module Catapult
                   end
                 end
               end
-            end
-            if @api_bitbucket_repo_access === false
-              uri = URI("https://api.bitbucket.org/1.0/privileges/#{repo_split_3[0]}")
-              Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
-                request = Net::HTTP::Get.new uri.request_uri
-                request.basic_auth "#{@configuration["company"]["bitbucket_username"]}", "#{@configuration["company"]["bitbucket_password"]}"
-                response = http.request(request)
-                if response.code.to_f == 404
-                  catapult_exception("The Bitbucket repo #{instance["repo"]} does not exist")
-                elsif response.code.to_f.between?(399,600)
-                  puts "   - The Bitbucket API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
-                else
-                  api_bitbucket_repo_privileges = JSON.parse(response.body)
-                  api_bitbucket_repo_privileges.each do |member|
-                    if member["privilege"] == "admin" || member["privilege"] == "write"
-                      if member["user"]["username"] == "#{@configuration["company"]["bitbucket_username"]}"
+              if @api_bitbucket_repo_access === false
+                uri = URI("https://api.bitbucket.org/2.0/repositories/#{repo_split_3[0]}")
+                Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
+                  request = Net::HTTP::Get.new uri.request_uri
+                  request.basic_auth "#{@configuration["company"]["bitbucket_username"]}", "#{@configuration["company"]["bitbucket_password"]}"
+                  response = http.request(request)
+                  if response.code.to_f == 404
+                    catapult_exception("The Bitbucket repo #{instance["repo"]} does not exist")
+                  elsif response.code.to_f.between?(399,600)
+                    puts "   - The Bitbucket API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
+                  else
+                    api_bitbucket_repo_repositories = JSON.parse(response.body)
+                    if response.code.to_f == 200
+                      if api_bitbucket_repo_repositories["owner"]["username"] == "#{@configuration["company"]["bitbucket_username"]}"
                         @api_bitbucket_repo_access = true
                       end
                     end
                   end
                 end
               end
+              if @api_bitbucket_repo_access === false
+                catapult_exception("Your Bitbucket user #{@configuration["company"]["bitbucket_username"]} does not have write access to the Bitbucket repo #{instance["repo"]}.")
+              elsif @api_bitbucket_repo_access === true
+                # get repo type
+                row.push("bitbucket".ljust(11))
+                # get repo user access
+                row.push("#{@configuration["company"]["bitbucket_username"]}".slice!(0, 19).ljust(19))
+              end
             end
-            if @api_bitbucket_repo_access === false
-              uri = URI("https://api.bitbucket.org/2.0/repositories/#{repo_split_3[0]}")
+            if "#{repo_split_2[0]}" == "github.com"
+              uri = URI("https://api.github.com/repos/#{repo_split_3[0]}/collaborators/#{@configuration["company"]["github_username"]}")
+              Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
+                request = Net::HTTP::Get.new uri.request_uri
+                request.basic_auth "#{@configuration["company"]["github_username"]}", "#{@configuration["company"]["github_password"]}"
+                response = http.request(request)
+                if response.code.to_f == 404
+                  catapult_exception("The GitHub repo #{instance["repo"]} does not exist")
+                elsif response.code.to_f.between?(399,600)
+                  puts "   - The GitHub API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
+                else
+                  if response.code.to_f == 204
+                    # get repo type
+                    row.push("github".ljust(11))
+                    # get repo user access
+                    row.push("#{@configuration["company"]["github_username"]}".slice!(0, 19).ljust(19))
+                  else
+                    catapult_exception("Your GitHub user #{@configuration["company"]["github_username"]} does not have write access to the GitHub repo #{instance["repo"]}.")
+                  end
+                end
+              end
+            end
+            # validate repo contents
+            if "#{repo_split_2[0]}" == "bitbucket.org"
+              uri = URI("https://api.bitbucket.org/2.0/repositories/#{repo_split_3[0]}/commits")
               Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
                 request = Net::HTTP::Get.new uri.request_uri
                 request.basic_auth "#{@configuration["company"]["bitbucket_username"]}", "#{@configuration["company"]["bitbucket_password"]}"
                 response = http.request(request)
-                if response.code.to_f == 404
-                  catapult_exception("The Bitbucket repo #{instance["repo"]} does not exist")
-                elsif response.code.to_f.between?(399,600)
+                if response.code.to_f.between?(399,600)
                   puts "   - The Bitbucket API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
                 else
-                  api_bitbucket_repo_repositories = JSON.parse(response.body)
-                  if response.code.to_f == 200
-                    if api_bitbucket_repo_repositories["owner"]["username"] == "#{@configuration["company"]["bitbucket_username"]}"
-                      @api_bitbucket_repo_access = true
+                  api_bitbucket_repo_contents = JSON.parse(response.body)
+                  if api_bitbucket_repo_contents["size"] === 0
+                    catapult_exception("The Bitbucket repo #{instance["repo"]} is empty, please initialize with a README or similar file.")
+                  end
+                end
+              end
+            end
+            if "#{repo_split_2[0]}" == "github.com"
+              uri = URI("https://api.github.com/repos/#{repo_split_3[0]}/contributors")
+              Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
+                request = Net::HTTP::Get.new uri.request_uri
+                request.basic_auth "#{@configuration["company"]["github_username"]}", "#{@configuration["company"]["github_password"]}"
+                response = http.request(request)
+                if response.code.to_f.between?(399,600)
+                  puts "   - The GitHub API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
+                elsif response.code.to_f == 204
+                  catapult_exception("The GitHub repo #{instance["repo"]} is empty, please initialize with a README or similar file.")
+                end
+              end
+            end
+            # validate repo branches
+            if "#{repo_split_2[0]}" == "bitbucket.org"
+              uri = URI("https://api.bitbucket.org/1.0/repositories/#{repo_split_3[0]}/branches")
+              Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
+                request = Net::HTTP::Get.new uri.request_uri
+                request.basic_auth "#{@configuration["company"]["bitbucket_username"]}", "#{@configuration["company"]["bitbucket_password"]}"
+                response = http.request(request)
+                if response.code.to_f.between?(399,600)
+                  puts "   - The Bitbucket API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
+                else
+                  api_bitbucket_repo_branches = JSON.parse(response.body)
+                  @api_bitbucket_repo_develop = false
+                  @api_bitbucket_repo_release = false
+                  @api_bitbucket_repo_master = false
+                  api_bitbucket_repo_branches.each do |branch, array|
+                    if branch == "master"
+                      @api_bitbucket_repo_master = true
+                    end
+                    if branch == "release"
+                      @api_bitbucket_repo_release = true
+                    end
+                    if branch == "develop"
+                      @api_bitbucket_repo_develop = true
                     end
                   end
+                  unless @api_bitbucket_repo_master
+                    catapult_exception("Cannot find the master branch for #{repo_split_3[0]} Bitbucket repository, please create it.")
+                  else
+                    row.push("exists".ljust(15))
+                  end
+                  unless @api_bitbucket_repo_release
+                    catapult_exception("Cannot find the release branch for #{repo_split_3[0]} Bitbucket repository, please create it.")
+                  else
+                    row.push("exists".ljust(15))
+                  end
+                  unless @api_bitbucket_repo_develop
+                    catapult_exception("Cannot find the develop branch for #{repo_split_3[0]} Bitbucket repository, please create it.")
+                  else
+                    row.push("exists".ljust(15))
+                  end
                 end
               end
             end
-            if @api_bitbucket_repo_access === false
-              catapult_exception("Your Bitbucket user #{@configuration["company"]["bitbucket_username"]} does not have write access to the Bitbucket repo #{instance["repo"]}.")
-            elsif @api_bitbucket_repo_access === true
-              # get repo type
-              row.push("bitbucket".ljust(11))
-              # get repo user access
-              row.push("#{@configuration["company"]["bitbucket_username"]}".slice!(0, 19).ljust(19))
-            end
-          end
-          if "#{repo_split_2[0]}" == "github.com"
-            uri = URI("https://api.github.com/repos/#{repo_split_3[0]}/collaborators/#{@configuration["company"]["github_username"]}")
-            Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
-              request = Net::HTTP::Get.new uri.request_uri
-              request.basic_auth "#{@configuration["company"]["github_username"]}", "#{@configuration["company"]["github_password"]}"
-              response = http.request(request)
-              if response.code.to_f == 404
-                catapult_exception("The GitHub repo #{instance["repo"]} does not exist")
-              elsif response.code.to_f.between?(399,600)
-                puts "   - The GitHub API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
-              else
-                if response.code.to_f == 204
-                  # get repo type
-                  row.push("github".ljust(11))
-                  # get repo user access
-                  row.push("#{@configuration["company"]["github_username"]}".slice!(0, 19).ljust(19))
+            if "#{repo_split_2[0]}" == "github.com"
+              uri = URI("https://api.github.com/repos/#{repo_split_3[0]}/branches")
+              Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
+                request = Net::HTTP::Get.new uri.request_uri
+                request.basic_auth "#{@configuration["company"]["github_username"]}", "#{@configuration["company"]["github_password"]}"
+                response = http.request(request)
+                if response.code.to_f.between?(399,600)
+                  puts "   - The GitHub API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
                 else
-                  catapult_exception("Your GitHub user #{@configuration["company"]["github_username"]} does not have write access to the GitHub repo #{instance["repo"]}.")
+                  api_github_repo_branches = JSON.parse(response.body)
+                  @api_github_repo_develop = false
+                  @api_github_repo_release = false
+                  @api_github_repo_master = false
+                  api_github_repo_branches.each do |branch|
+                    if branch["name"] == "master"
+                      @api_github_repo_master = true
+                    end
+                    if branch["name"] == "release"
+                      @api_github_repo_release = true
+                    end
+                    if branch["name"] == "develop"
+                      @api_github_repo_develop = true
+                    end
+                  end
+                  unless @api_github_repo_master
+                    catapult_exception("Cannot find the master branch for #{repo_split_3[0]} GitHub repository, please create it.")
+                  else
+                    row.push("exists".ljust(15))
+                  end
+                  unless @api_github_repo_release
+                    catapult_exception("Cannot find the release branch for #{repo_split_3[0]} GitHub repository, please create it.")
+                  else
+                    row.push("exists".ljust(15))
+                  end
+                  unless @api_github_repo_develop
+                    catapult_exception("Cannot find the develop branch for #{repo_split_3[0]} GitHub repository, please create it.")
+                  else
+                    row.push("exists".ljust(15))
+                  end
                 end
               end
             end
-          end
-          # validate repo contents
-          if "#{repo_split_2[0]}" == "bitbucket.org"
-            uri = URI("https://api.bitbucket.org/2.0/repositories/#{repo_split_3[0]}/commits")
-            Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
-              request = Net::HTTP::Get.new uri.request_uri
-              request.basic_auth "#{@configuration["company"]["bitbucket_username"]}", "#{@configuration["company"]["bitbucket_password"]}"
-              response = http.request(request)
-              if response.code.to_f.between?(399,600)
-                puts "   - The Bitbucket API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
-              else
-                api_bitbucket_repo_contents = JSON.parse(response.body)
-                if api_bitbucket_repo_contents["size"] === 0
-                  catapult_exception("The Bitbucket repo #{instance["repo"]} is empty, please initialize with a README or similar file.")
-                end
-              end
-            end
-          end
-          if "#{repo_split_2[0]}" == "github.com"
-            uri = URI("https://api.github.com/repos/#{repo_split_3[0]}/contributors")
-            Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
-              request = Net::HTTP::Get.new uri.request_uri
-              request.basic_auth "#{@configuration["company"]["github_username"]}", "#{@configuration["company"]["github_password"]}"
-              response = http.request(request)
-              if response.code.to_f.between?(399,600)
-                puts "   - The GitHub API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
-              elsif response.code.to_f == 204
-                catapult_exception("The GitHub repo #{instance["repo"]} is empty, please initialize with a README or similar file.")
-              end
-            end
-          end
-          # validate repo branches
-          if "#{repo_split_2[0]}" == "bitbucket.org"
-            uri = URI("https://api.bitbucket.org/1.0/repositories/#{repo_split_3[0]}/branches")
-            Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
-              request = Net::HTTP::Get.new uri.request_uri
-              request.basic_auth "#{@configuration["company"]["bitbucket_username"]}", "#{@configuration["company"]["bitbucket_password"]}"
-              response = http.request(request)
-              if response.code.to_f.between?(399,600)
-                puts "   - The Bitbucket API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
-              else
-                api_bitbucket_repo_branches = JSON.parse(response.body)
-                @api_bitbucket_repo_develop = false
-                @api_bitbucket_repo_release = false
-                @api_bitbucket_repo_master = false
-                api_bitbucket_repo_branches.each do |branch, array|
-                  if branch == "master"
-                    @api_bitbucket_repo_master = true
-                  end
-                  if branch == "release"
-                    @api_bitbucket_repo_release = true
-                  end
-                  if branch == "develop"
-                    @api_bitbucket_repo_develop = true
-                  end
-                end
-                unless @api_bitbucket_repo_master
-                  catapult_exception("Cannot find the master branch for #{repo_split_3[0]} Bitbucket repository, please create it.")
+            # create bamboo service per bitbucket repo
+            if "#{repo_split_2[0]}" == "bitbucket.org"
+              # the bitbucket api offers no patch for service hooks, so we first need to check if the bitbucket bamboo service hooks exist
+              uri = URI("https://api.bitbucket.org/1.0/repositories/#{repo_split_3[0]}/services")
+              Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
+                request = Net::HTTP::Get.new uri.request_uri
+                request.basic_auth "#{@configuration["company"]["bitbucket_username"]}", "#{@configuration["company"]["bitbucket_password"]}"
+                response = http.request(request)
+                if response.code.to_f.between?(399,600)
+                  puts "   - The Bitbucket API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
                 else
-                  row.push("exists".ljust(15))
-                end
-                unless @api_bitbucket_repo_release
-                  catapult_exception("Cannot find the release branch for #{repo_split_3[0]} Bitbucket repository, please create it.")
-                else
-                  row.push("exists".ljust(15))
-                end
-                unless @api_bitbucket_repo_develop
-                  catapult_exception("Cannot find the develop branch for #{repo_split_3[0]} Bitbucket repository, please create it.")
-                else
-                  row.push("exists".ljust(15))
-                end
-              end
-            end
-          end
-          if "#{repo_split_2[0]}" == "github.com"
-            uri = URI("https://api.github.com/repos/#{repo_split_3[0]}/branches")
-            Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
-              request = Net::HTTP::Get.new uri.request_uri
-              request.basic_auth "#{@configuration["company"]["github_username"]}", "#{@configuration["company"]["github_password"]}"
-              response = http.request(request)
-              if response.code.to_f.between?(399,600)
-                puts "   - The GitHub API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
-              else
-                api_github_repo_branches = JSON.parse(response.body)
-                @api_github_repo_develop = false
-                @api_github_repo_release = false
-                @api_github_repo_master = false
-                api_github_repo_branches.each do |branch|
-                  if branch["name"] == "master"
-                    @api_github_repo_master = true
-                  end
-                  if branch["name"] == "release"
-                    @api_github_repo_release = true
-                  end
-                  if branch["name"] == "develop"
-                    @api_github_repo_develop = true
-                  end
-                end
-                unless @api_github_repo_master
-                  catapult_exception("Cannot find the master branch for #{repo_split_3[0]} GitHub repository, please create it.")
-                else
-                  row.push("exists".ljust(15))
-                end
-                unless @api_github_repo_release
-                  catapult_exception("Cannot find the release branch for #{repo_split_3[0]} GitHub repository, please create it.")
-                else
-                  row.push("exists".ljust(15))
-                end
-                unless @api_github_repo_develop
-                  catapult_exception("Cannot find the develop branch for #{repo_split_3[0]} GitHub repository, please create it.")
-                else
-                  row.push("exists".ljust(15))
-                end
-              end
-            end
-          end
-          # create bamboo service per bitbucket repo
-          if "#{repo_split_2[0]}" == "bitbucket.org"
-            # the bitbucket api offers no patch for service hooks, so we first need to check if the bitbucket bamboo service hooks exist
-            uri = URI("https://api.bitbucket.org/1.0/repositories/#{repo_split_3[0]}/services")
-            Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
-              request = Net::HTTP::Get.new uri.request_uri
-              request.basic_auth "#{@configuration["company"]["bitbucket_username"]}", "#{@configuration["company"]["bitbucket_password"]}"
-              response = http.request(request)
-              if response.code.to_f.between?(399,600)
-                puts "   - The Bitbucket API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
-              else
-                api_bitbucket_services = JSON.parse(response.body)
-                @api_bitbucket_services_bamboo_cat_test = 0
-                api_bitbucket_services.each do |service|
-                  if service["service"]["type"] == "Bamboo"
-                    service["service"]["fields"].each do |field|
-                      if field["name"] == "Plan Key"
-                        if field["value"] == "CAT-TEST"
-                          @api_bitbucket_services_bamboo_cat_test = @api_bitbucket_services_bamboo_cat_test + 1
-                          # remove potential duplicates
-                          if @api_bitbucket_services_bamboo_cat_test > 1
+                  api_bitbucket_services = JSON.parse(response.body)
+                  @api_bitbucket_services_bamboo_cat_test = 0
+                  api_bitbucket_services.each do |service|
+                    if service["service"]["type"] == "Bamboo"
+                      service["service"]["fields"].each do |field|
+                        if field["name"] == "Plan Key"
+                          if field["value"] == "CAT-TEST"
+                            @api_bitbucket_services_bamboo_cat_test = @api_bitbucket_services_bamboo_cat_test + 1
+                            # remove potential duplicates
+                            if @api_bitbucket_services_bamboo_cat_test > 1
+                              uri = URI("https://api.bitbucket.org/1.0/repositories/#{repo_split_3[0]}/services/#{service["id"]}")
+                              Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
+                                request = Net::HTTP::Delete.new uri.request_uri
+                                request.basic_auth "#{@configuration["company"]["bitbucket_username"]}", "#{@configuration["company"]["bitbucket_password"]}"
+                                response = http.request(request)
+                                if response.code.to_f.between?(399,600)
+                                  catapult_exception("Unable to configure Bitbucket Bamboo service for websites => #{service} => domain => #{instance["domain"]}. Ensure the github_username defined in secrets/configuration.yml has correct access to the repository.")
+                                end
+                              end
+                            # update existing
+                            else
+                              uri = URI("https://api.bitbucket.org/1.0/repositories/#{repo_split_3[0]}/services/#{service["id"]}")
+                              Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
+                                request = Net::HTTP::Put.new uri.request_uri
+                                request.basic_auth "#{@configuration["company"]["bitbucket_username"]}", "#{@configuration["company"]["bitbucket_password"]}"
+                                request.body = URI::encode\
+                                  (""\
+                                    "type=Bamboo"\
+                                    "&URL=#{@configuration["company"]["bamboo_base_url"]}"\
+                                    "&Plan Key=CAT-TEST"\
+                                    "&Username=#{@configuration["company"]["bamboo_username"]}"\
+                                    "&Password=#{@configuration["company"]["bamboo_password"]}"\
+                                  "")
+                                response = http.request(request)
+                                if response.code.to_f.between?(399,600)
+                                  catapult_exception("Unable to configure Bitbucket Bamboo service for websites => #{service} => domain => #{instance["domain"]}. Ensure the github_username defined in secrets/configuration.yml has correct access to the repository.")
+                                end
+                              end
+                            end
+                          end
+                          # remove known service plans we no longer want
+                          if field["value"] == "CAT-QC"
                             uri = URI("https://api.bitbucket.org/1.0/repositories/#{repo_split_3[0]}/services/#{service["id"]}")
                             Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
                               request = Net::HTTP::Delete.new uri.request_uri
@@ -2477,103 +2511,72 @@ module Catapult
                                 catapult_exception("Unable to configure Bitbucket Bamboo service for websites => #{service} => domain => #{instance["domain"]}. Ensure the github_username defined in secrets/configuration.yml has correct access to the repository.")
                               end
                             end
-                          # update existing
-                          else
-                            uri = URI("https://api.bitbucket.org/1.0/repositories/#{repo_split_3[0]}/services/#{service["id"]}")
-                            Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
-                              request = Net::HTTP::Put.new uri.request_uri
-                              request.basic_auth "#{@configuration["company"]["bitbucket_username"]}", "#{@configuration["company"]["bitbucket_password"]}"
-                              request.body = URI::encode\
-                                (""\
-                                  "type=Bamboo"\
-                                  "&URL=#{@configuration["company"]["bamboo_base_url"]}"\
-                                  "&Plan Key=CAT-TEST"\
-                                  "&Username=#{@configuration["company"]["bamboo_username"]}"\
-                                  "&Password=#{@configuration["company"]["bamboo_password"]}"\
-                                "")
-                              response = http.request(request)
-                              if response.code.to_f.between?(399,600)
-                                catapult_exception("Unable to configure Bitbucket Bamboo service for websites => #{service} => domain => #{instance["domain"]}. Ensure the github_username defined in secrets/configuration.yml has correct access to the repository.")
-                              end
-                            end
-                          end
-                        end
-                        # remove known service plans we no longer want
-                        if field["value"] == "CAT-QC"
-                          uri = URI("https://api.bitbucket.org/1.0/repositories/#{repo_split_3[0]}/services/#{service["id"]}")
-                          Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
-                            request = Net::HTTP::Delete.new uri.request_uri
-                            request.basic_auth "#{@configuration["company"]["bitbucket_username"]}", "#{@configuration["company"]["bitbucket_password"]}"
-                            response = http.request(request)
-                            if response.code.to_f.between?(399,600)
-                              catapult_exception("Unable to configure Bitbucket Bamboo service for websites => #{service} => domain => #{instance["domain"]}. Ensure the github_username defined in secrets/configuration.yml has correct access to the repository.")
-                            end
                           end
                         end
                       end
                     end
                   end
-                end
-                # create the service if it does not exist
-                unless @api_bitbucket_services_bamboo_cat_test > 0
-                  uri = URI("https://api.bitbucket.org/1.0/repositories/#{repo_split_3[0]}/services")
-                  Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
-                    request = Net::HTTP::Post.new uri.request_uri
-                    request.basic_auth "#{@configuration["company"]["bitbucket_username"]}", "#{@configuration["company"]["bitbucket_password"]}"
-                    request.body = URI::encode\
-                      (""\
-                        "type=Bamboo"\
-                        "&URL=#{@configuration["company"]["bamboo_base_url"]}"\
-                        "&Plan Key=CAT-TEST"\
-                        "&Username=#{@configuration["company"]["bamboo_username"]}"\
-                        "&Password=#{@configuration["company"]["bamboo_password"]}"\
-                      "")
-                    response = http.request(request)
-                    if response.code.to_f.between?(399,600)
-                      catapult_exception("Unable to configure Bitbucket Bamboo service for websites => #{service} => domain => #{instance["domain"]}. Ensure the github_username defined in secrets/configuration.yml has correct access to the repository.")
+                  # create the service if it does not exist
+                  unless @api_bitbucket_services_bamboo_cat_test > 0
+                    uri = URI("https://api.bitbucket.org/1.0/repositories/#{repo_split_3[0]}/services")
+                    Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
+                      request = Net::HTTP::Post.new uri.request_uri
+                      request.basic_auth "#{@configuration["company"]["bitbucket_username"]}", "#{@configuration["company"]["bitbucket_password"]}"
+                      request.body = URI::encode\
+                        (""\
+                          "type=Bamboo"\
+                          "&URL=#{@configuration["company"]["bamboo_base_url"]}"\
+                          "&Plan Key=CAT-TEST"\
+                          "&Username=#{@configuration["company"]["bamboo_username"]}"\
+                          "&Password=#{@configuration["company"]["bamboo_password"]}"\
+                        "")
+                      response = http.request(request)
+                      if response.code.to_f.between?(399,600)
+                        catapult_exception("Unable to configure Bitbucket Bamboo service for websites => #{service} => domain => #{instance["domain"]}. Ensure the github_username defined in secrets/configuration.yml has correct access to the repository.")
+                      end
                     end
                   end
                 end
               end
             end
-          end
-          # create bamboo service per github repo
-          if "#{repo_split_2[0]}" == "github.com"
-            uri = URI("https://api.github.com/repos/#{repo_split_3[0]}/hooks")
-            Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
-              request = Net::HTTP::Post.new uri.request_uri
-              request.basic_auth "#{@configuration["company"]["github_username"]}", "#{@configuration["company"]["github_password"]}"
-              request.add_field "Content-Type", "application/json"
-              request.body = ""\
-                "{"\
-                  "\"name\":\"bamboo\","\
-                  "\"active\":true,"\
-                  "\"config\":"\
-                    "{"\
-                      "\"base_url\":\"#{@configuration["company"]["bamboo_base_url"]}\","\
-                      "\"build_key\":\"develop:CAT-TEST\","\
-                      "\"username\":\"#{@configuration["company"]["bamboo_username"]}\","\
-                      "\"password\":\"#{@configuration["company"]["bamboo_password"]}\""\
-                    "}"\
-                "}"
-              response = http.request(request)
-              if response.code.to_f.between?(500,600)
-                puts "   - The GitHub API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
-              elsif response.code.to_f.between?(399,499)
-                catapult_exception("Unable to configure GitHub Bamboo service for websites => #{service} => domain => #{instance["domain"]}. Ensure the github_username defined in secrets/configuration.yml has correct access to the repository.")
+            # create bamboo service per github repo
+            if "#{repo_split_2[0]}" == "github.com"
+              uri = URI("https://api.github.com/repos/#{repo_split_3[0]}/hooks")
+              Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
+                request = Net::HTTP::Post.new uri.request_uri
+                request.basic_auth "#{@configuration["company"]["github_username"]}", "#{@configuration["company"]["github_password"]}"
+                request.add_field "Content-Type", "application/json"
+                request.body = ""\
+                  "{"\
+                    "\"name\":\"bamboo\","\
+                    "\"active\":true,"\
+                    "\"config\":"\
+                      "{"\
+                        "\"base_url\":\"#{@configuration["company"]["bamboo_base_url"]}\","\
+                        "\"build_key\":\"develop:CAT-TEST\","\
+                        "\"username\":\"#{@configuration["company"]["bamboo_username"]}\","\
+                        "\"password\":\"#{@configuration["company"]["bamboo_password"]}\""\
+                      "}"\
+                  "}"
+                response = http.request(request)
+                if response.code.to_f.between?(500,600)
+                  puts "   - The GitHub API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
+                elsif response.code.to_f.between?(399,499)
+                  catapult_exception("Unable to configure GitHub Bamboo service for websites => #{service} => domain => #{instance["domain"]}. Ensure the github_username defined in secrets/configuration.yml has correct access to the repository.")
+                end
               end
             end
+            row.push("configured".ljust(17))
+
+            puts row.join(" ")
+
           end
-          row.push("configured".ljust(17))
-
-          puts row.join(" ")
-
         end
-      end
-      # ensure domains are in alpha order
-      domains_sorted = domains_sorted.sort
-      if domains != domains_sorted
-        catapult_exception("There is an error in your secrets/configuration.yml file.\nThe domains in secrets/configuration.yml are not in alpha order for websites => #{service} - please adjust.")
+        # ensure domains are in alpha order
+        domains_sorted = domains_sorted.sort
+        if domains != domains_sorted
+          catapult_exception("There is an error in your secrets/configuration.yml file.\nThe domains in secrets/configuration.yml are not in alpha order for websites => #{service} - please adjust.")
+        end
       end
     end
 
@@ -2657,7 +2660,7 @@ module Catapult
                 environment = "#{environment}."
               end
               begin
-                def Command::http_repsonse(uri_str, limit = 10)
+                def Command::http_response(uri_str, limit = 10)
                   if limit == 0
                     row.push("loop")
                   else
@@ -2673,7 +2676,7 @@ module Catapult
                       end
                     when Net::HTTPRedirection then
                       location = response['location']
-                      http_repsonse(location, limit - 1)
+                      http_response(location, limit - 1)
                     else
                       if response.code.to_f.between?(200,399)
                         return response.code.ljust(4).color(Colors::GREEN)
@@ -2686,9 +2689,9 @@ module Catapult
                   end
                 end
                 if instance["domain_tld_override"] == nil
-                  row.push(http_repsonse("http://#{environment}#{instance["domain"]}"))
+                  row.push(http_response("http://#{environment}#{instance["domain"]}"))
                 else
-                  row.push(http_repsonse("http://#{environment}#{instance["domain"]}.#{instance["domain_tld_override"]}"))
+                  row.push(http_response("http://#{environment}#{instance["domain"]}.#{instance["domain_tld_override"]}"))
                 end
               rescue SocketError
                 row.push("down".ljust(4).color(Colors::RED))
