@@ -24,7 +24,7 @@ for domain in "${domains[@]}"; do
     IFS=. read -a domain_levels <<< "${domain}"
 
     # try and create the zone and let cloudflare handle if it already exists
-    cloudflare_zone=$(curl --silent --show-error --connect-timeout 5 --max-time 5 --write-out "HTTPSTATUS:%{http_code}" --request POST "https://api.cloudflare.com/client/v4/zones" \
+    cloudflare_zone=$(curl --silent --show-error --connect-timeout 5 --max-time 10 --write-out "HTTPSTATUS:%{http_code}" --request POST "https://api.cloudflare.com/client/v4/zones" \
     --header "X-Auth-Email: $(catapult company.cloudflare_email)" \
     --header "X-Auth-Key: $(catapult company.cloudflare_api_key)" \
     --header "Content-Type: application/json" \

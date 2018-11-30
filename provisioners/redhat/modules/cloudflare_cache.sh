@@ -18,7 +18,7 @@ for domain in "${domains[@]}"; do
     IFS=. read -a domain_levels <<< "${domain}"
 
     # determine if cloudflare zone exists
-    cloudflare_zone=$(curl --silent --show-error --connect-timeout 5 --max-time 5 --write-out "HTTPSTATUS:%{http_code}" --request GET "https://api.cloudflare.com/client/v4/zones?name=${domain_levels[-2]}.${domain_levels[-1]}" \
+    cloudflare_zone=$(curl --silent --show-error --connect-timeout 5 --max-time 10 --write-out "HTTPSTATUS:%{http_code}" --request GET "https://api.cloudflare.com/client/v4/zones?name=${domain_levels[-2]}.${domain_levels[-1]}" \
     --header "X-Auth-Email: $(catapult company.cloudflare_email)" \
     --header "X-Auth-Key: $(catapult company.cloudflare_api_key)" \
     --header "Content-Type: application/json")
@@ -34,7 +34,7 @@ for domain in "${domains[@]}"; do
     elif [ "$(echo "${cloudflare_zone}" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["result"]')" != "[]" ]; then
 
         cloudflare_zone_id=$(echo "${cloudflare_zone}" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["result"][0]["id"]')
-        cloudflare_zone_cache=$(curl --silent --show-error --connect-timeout 5 --max-time 5 --write-out "HTTPSTATUS:%{http_code}" --request DELETE "https://api.cloudflare.com/client/v4/zones/${cloudflare_zone_id}/purge_cache" \
+        cloudflare_zone_cache=$(curl --silent --show-error --connect-timeout 5 --max-time 10 --write-out "HTTPSTATUS:%{http_code}" --request DELETE "https://api.cloudflare.com/client/v4/zones/${cloudflare_zone_id}/purge_cache" \
         --header "X-Auth-Email: $(catapult company.cloudflare_email)" \
         --header "X-Auth-Key: $(catapult company.cloudflare_api_key)" \
         --header "Content-Type: application/json" \

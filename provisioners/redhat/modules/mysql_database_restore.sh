@@ -94,6 +94,7 @@ if ([ ! -z "${software}" ]); then
                     # for software without a cli tool for database url reference replacements, use sed to pre-process sql file and replace url references
                     if ([ "${software}" = "codeigniter2" ] \
                      || [ "${software}" = "codeigniter3" ] \
+                     || [ "${software}" = "concrete58" ] \
                      || [ "${software}" = "drupal6" ] \
                      || [ "${software}" = "drupal7" ] \
                      || [ "${software}" = "drupal8" ] \
