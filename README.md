@@ -87,7 +87,8 @@ Catapult intelligently manages the following website software that have been cho
 Software | [Key](#websites) | Required PHP Version | Defined PHP Version | Released | End-of-Life
 ---------|------------------|---------------------|---------------------|----------|------------
 CodeIgniter 2                     | `codeigniter2`         | 5.1.6  | 5.4 | January 28, 2011   | [October 31, 2015](http://forum.codeigniter.com/thread-61357.html)
-CodeIgniter 3                     | `codeigniter3`         | 5.6    | 5.6 | March 30, 2015     | 
+CodeIgniter 3                     | `codeigniter3`         | 5.6    | 5.6 | March 30, 2015     |
+concrete5 8                       | `concrete58`           | 5.5.9  | 7.1 | December 1, 2016   |
 Drupal 6                          | `drupal6`              | 5.4    | 5.4 | February 13, 2008  | [February 24, 2016](https://www.drupal.org/drupal-6-eol)
 Drupal 7                          | `drupal7`              | 5.2.5  | 5.6 | January 5, 2011    |
 Drupal 8                          | `drupal8`              | 5.5.9  | 7.1 | November 19, 2015  |
@@ -850,6 +851,7 @@ The following options are available:
         * manages software admininistrator account integrity
     * option: `software: codeigniter2`
     * option: `software: codeigniter3`
+    * option: `software: concrete58`
     * option: `software: drupal6`
     * option: `software: drupal7`
     * option: `software: drupal8`
@@ -921,6 +923,7 @@ Software | Install Approach | Install Notes
 ---------|------------------|--------------
 `codeigniter2`      |          | Follow the [Installation Instructions](https://www.codeigniter.com/userguide2/installation/index.html).
 `codeigniter3`      |          | Follow the [Installation Instructions](https://www.codeigniter.com/userguide3/installation/index.html).
+`concrete58`        | Download | Download [concrete5](https://www.concrete5.org/download).
 `drupal6`           | Drush    | `drush pm-download drupal-6`
 `drupal7`           | Drush    | `drush pm-download drupal-7`
 `drupal8`           | Drush    | `drush pm-download drupal-8`
@@ -946,6 +949,7 @@ Software | `software_auto_update` Support
 ---------|--------------------------------
 `codeigniter2`      | [:white_check_mark:](http://www.codeigniter.com/userguide2/installation/upgrading.html)
 `codeigniter3`      | [:white_check_mark:](https://www.codeigniter.com/userguide3/installation/upgrading.html)
+`concrete58`        | [:white_check_mark:](https://documentation.concrete5.org/developers/installation/upgrading-concrete5)
 `drupal6`           | :white_check_mark:
 `drupal7`           | :white_check_mark:
 `drupal8`           | :white_check_mark:
@@ -1039,8 +1043,9 @@ For `software` that does not have specific documentation, please follow this gen
 
 Software | Approach | Documentation
 ---------|----------|--------------
-`codeigniter2`      |                      |
-`codeigniter3`      |                      |
+`codeigniter2`      | `.htaccess`          |
+`codeigniter3`      | `.htaccess`          |
+`concrete58`        | `.htaccess`          |
 `drupal6`           | `.htaccess`          |
 `drupal7`           | `.htaccess`          |
 `drupal8`           | `.htaccess`          |
@@ -1135,6 +1140,7 @@ Software | Tool | Command | Documentation
 ---------|------|---------|--------------
 `codeigniter2`      | Migrations      | `php index.php migrate`                                | https://ellislab.com/codeigniter/user-guide/libraries/migration.html
 `codeigniter3`      | Migrations      | `php index.php migrate`                                | https://www.codeigniter.com/user_guide/libraries/migration.html
+`concrete58`        | Symfony         | `concrete5 migrations:migrate`                         | https://symfony.com/doc/current/bundles/DoctrineMigrationsBundle/index.html
 `drupal6`           | Drush           | `drush updatedb -y`                                    | https://www.drupal.org/node/150215
 `drupal7`           | Drush           | `drush updatedb -y`                                    | https://www.drupal.org/node/150215
 `drupal8`           | Drush           | `drush updatedb -y`                                    | https://www.drupal.org/docs/8/api/update-api/introduction-to-update-api-for-drupal-8

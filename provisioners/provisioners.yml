@@ -190,6 +190,14 @@ software:
       file_stores: ["uploads"]
       php_version: "5.6"
       version: [3]
+    concrete58:
+      repo: "https://github.com/concrete5/concrete5"
+      branch: "master"
+      database_config_file: "application/config/database.php"
+      file_store_containers: ["application/files","application/config","packages","updates"]
+      file_stores: ["application/files"]
+      php_version: "7.1"
+      version: [8]
     drupal6:
       repo: "https://git.drupal.org/project/drupal.git"
       branch: "6.x"

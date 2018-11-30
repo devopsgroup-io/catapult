@@ -82,6 +82,36 @@ elif [ "${software}" = "codeigniter3" ]; then
         /catapult/provisioners/redhat/installers/software/${software}/database.php > "${file}"
     sudo chmod 0444 "${file}"
 
+elif [ "${software}" = "concrete58" ]; then
+
+    # set correct php version for concrete5 cli
+    sed --in-place --expression "s#\#\!/usr/bin/env\sphp#\#\!/usr/bin/env /opt/rh/rh-php71/root/usr/bin/php#g" "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}/concrete/bin/concrete5"
+
+    # if concrete5 is not installed, then site_install.php and site_install_user.php are used
+    # if concrete5 is installed, then database.php is used
+    file="/var/www/repositories/apache/${domain}/${webroot}${softwareroot}${database_config_file}"
+    file_site_install="/var/www/repositories/apache/${domain}/${webroot}${softwareroot}/application/config/site_install.php"
+    file_site_install_user="/var/www/repositories/apache/${domain}/${webroot}${softwareroot}/application/config/site_install_user.php"
+    if [ -f "${file}" ]; then
+        sudo chmod 0777 "${file}"
+        sed --expression="s/database_name_here/${1}_${domain_valid_db_name}/g" \
+            --expression="s/username_here/${mysql_user}/g" \
+            --expression="s/password_here/${mysql_user_password}/g" \
+            --expression="s/localhost/${redhat_mysql_ip}/g" \
+            /catapult/provisioners/redhat/installers/software/${software}/database.php > "${file}"
+        sudo chmod 0444 "${file}"
+    else
+        mkdir --parents $(dirname "${file_site_install}")
+        sed --expression="s/database_name_here/${1}_${domain_valid_db_name}/g" \
+            --expression="s/username_here/${mysql_user}/g" \
+            --expression="s/password_here/${mysql_user_password}/g" \
+            --expression="s/localhost/${redhat_mysql_ip}/g" \
+            /catapult/provisioners/redhat/installers/software/${software}/site_install.php > "${file_site_install}"
+        cp "${file_site_install}" "${file_site_install_user}"
+        sudo chmod 0444 "${file_site_install}"
+        sudo chmod 0444 "${file_site_install_user}"
+    fi
+
 elif [ "${software}" = "drupal6" ]; then
 
     file="/var/www/repositories/apache/${domain}/${webroot}${softwareroot}${database_config_file}"
