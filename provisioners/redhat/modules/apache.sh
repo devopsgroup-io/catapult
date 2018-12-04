@@ -24,6 +24,22 @@ ServerName localhost
 
 # use sites-available, sites-enabled convention. this is a debianism - but the convention is common and easy to understand
 IncludeOptional sites-enabled/*.conf
+
+# prevent proxy timeouts
+# https://forum.remirepo.net/viewtopic.php?id=3240
+# specifically necessary for concrete5 install (long running php script with multiple XHR requests)
+<Proxy fcgi://127.0.0.1:9710>
+    ProxySet timeout=300
+</Proxy>
+<Proxy fcgi://127.0.0.1:9700>
+    ProxySet timeout=300
+</Proxy>
+<Proxy fcgi://127.0.0.1:9560>
+    ProxySet timeout=300
+</Proxy>
+<Proxy fcgi://127.0.0.1:9540>
+    ProxySet timeout=300
+</Proxy>
 EOF
 
 # 443: install mod_security
