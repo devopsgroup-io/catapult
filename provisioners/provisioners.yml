@@ -107,12 +107,12 @@ redhat:
       multithreading_persistent: false
       persistent: true
     software_config:
-      description: "Manages software database configuration files."
+      description: "Manages software database configuration files, logging, and debug output."
       multithreading: true
       multithreading_persistent: false
       persistent: true
     software_operations_file:
-      description: "Manages software file operations, including: software validation and automatic software updates."
+      description: "Manages software file operations, including: software validation, automatic updates, and file appends."
       multithreading: true
       multithreading_persistent: true
       persistent: true
@@ -194,7 +194,7 @@ software:
       repo: "https://github.com/concrete5/concrete5"
       branch: "master"
       database_config_file: "application/config/database.php"
-      file_store_containers: ["application/files","application/config","packages","updates"]
+      file_store_containers: ["application/config","application/files","application/languages","packages","updates"]
       file_stores: ["application/files"]
       php_version: "7.1"
       version: [8]
