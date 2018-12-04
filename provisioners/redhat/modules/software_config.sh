@@ -85,6 +85,7 @@ elif [ "${software}" = "codeigniter3" ]; then
 elif [ "${software}" = "concrete58" ]; then
 
     # set correct php version for concrete5 cli
+    sudo chmod 744 "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}/concrete/bin/concrete5"
     sed --in-place --expression "s#\#\!/usr/bin/env\sphp#\#\!/usr/bin/env /opt/rh/rh-php71/root/usr/bin/php#g" "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}/concrete/bin/concrete5"
 
     # if concrete5 is not installed, then site_install.php and site_install_user.php are used

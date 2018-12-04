@@ -24,7 +24,7 @@ fi
 
 if [ "${software}" = "concrete58" ]; then
 
-    cd "/var/www/repositories/apache/${domain}/${webroot}" && sudo concrete/bin/concrete5 c5:exec /catapult/provisioners/redhat/installers/software/concrete58/password_reset.php $(catapult environments.${1}.software.admin_password) --no-interaction
+    cd "/var/www/repositories/apache/${domain}/${webroot}" && concrete/bin/concrete5 c5:exec /catapult/provisioners/redhat/installers/software/concrete58/password_reset.php $(catapult environments.${1}.software.admin_password) --no-interaction
     mysql --defaults-extra-file=$dbconf ${1}_${domain_valid_db_name} -e "
         INSERT INTO ${software_dbprefix}Users (uName, uEmail, uIsActive)
         VALUES ('admin', '$(catapult company.email)', '1')
@@ -251,8 +251,8 @@ elif [ "${software}" = "codeigniter3" ]; then
 
 elif [ "${software}" = "concrete58" ]; then
 
-    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && sudo concrete/bin/concrete5 migrations:migrate --no-interaction
-    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && sudo concrete/bin/concrete5 c5:clear-cache --no-interaction --allow-as-root
+    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && concrete/bin/concrete5 migrations:migrate --no-interaction
+    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && concrete/bin/concrete5 c5:clear-cache --no-interaction --allow-as-root
 
 elif [ "${software}" = "drupal6" ]; then
 
