@@ -68,6 +68,7 @@ curl --output /etc/yum.repos.d/rhscl-centos-release-scl-epel-7.repo wget https:/
 sudo yum install -y centos-release-scl
 # These extensions are available from » PECL. They may require external libraries. More PECL extensions exist but they are not documented in the PHP manual yet.
 sudo yum install -y sclo-php71-php-pecl-geoip
+sudo yum install -y sclo-php71-php-pecl-imagick
 sudo yum install -y sclo-php71-php-pecl-uploadprogress
 
 #################
@@ -136,6 +137,7 @@ curl --output /etc/yum.repos.d/rhscl-centos-release-scl-epel-7.repo wget https:/
 sudo yum install -y centos-release-scl
 # These extensions are available from » PECL. They may require external libraries. More PECL extensions exist but they are not documented in the PHP manual yet.
 sudo yum install -y sclo-php70-php-pecl-geoip
+sudo yum install -y sclo-php70-php-pecl-imagick
 sudo yum install -y sclo-php70-php-pecl-uploadprogress
 
 
@@ -205,6 +207,7 @@ curl --output /etc/yum.repos.d/rhscl-centos-release-scl-epel-7.repo wget https:/
 sudo yum install -y centos-release-scl
 # These extensions are available from » PECL. They may require external libraries. More PECL extensions exist but they are not documented in the PHP manual yet.
 sudo yum install -y sclo-php56-php-pecl-geoip
+sudo yum install -y sclo-php56-php-pecl-imagick
 sudo yum install -y sclo-php56-php-pecl-uploadprogress
 
 
@@ -296,6 +299,12 @@ sudo yum install -y geoip-devel
 # this is a beta release but includes a 3 year gap of bug fixes and new functions
 sudo pecl install geoip-1.1.0
 echo autodetect | sudo pecl upgrade geoip
+#################
+# pecl extension: imagick
+# http://pecl.php.net/package/imagick
+sudo yum install -y ImageMagick
+sudo yum install -y ImageMagick-devel
+echo autodetect | sudo pecl upgrade imagick
 #################
 # pecl extension: uploadprogress
 # http://pecl.php.net/package/uploadprogress

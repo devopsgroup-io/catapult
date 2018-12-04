@@ -169,7 +169,31 @@ if ([ ! -z "${software}" ]); then
     echo -e "* setting ${software} performance settings..."
 fi
 
-if [ "${software}" = "drupal6" ]; then
+if [ "${software}" = "concrete58" ]; then
+
+    if [ "$1" = "dev" ]; then
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && concrete/bin/concrete5 c5:config set concrete.cache.assets 0 --allow-as-root
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && concrete/bin/concrete5 c5:config set concrete.cache.blocks 0 --allow-as-root
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && concrete/bin/concrete5 c5:config set concrete.cache.enabled 0 --allow-as-root
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && concrete/bin/concrete5 c5:config set concrete.cache.full_page_lifeteime default --allow-as-root
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && concrete/bin/concrete5 c5:config set concrete.cache.overrides 0 --allow-as-root
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && concrete/bin/concrete5 c5:config set concrete.cache.pages 0 --allow-as-root
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && concrete/bin/concrete5 c5:config set concrete.cache.theme_css 0 --allow-as-root
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && concrete/bin/concrete5 c5:config set concrete.theme.compress_preprocessor_output 0 --allow-as-root
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && concrete/bin/concrete5 c5:config set concrete.theme.generate_less_sourcemap 1 --allow-as-root
+    else
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && concrete/bin/concrete5 c5:config set concrete.cache.assets 1 --allow-as-root
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && concrete/bin/concrete5 c5:config set concrete.cache.blocks 1 --allow-as-root
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && concrete/bin/concrete5 c5:config set concrete.cache.enabled 1 --allow-as-root
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && concrete/bin/concrete5 c5:config set concrete.cache.full_page_lifeteime default --allow-as-root
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && concrete/bin/concrete5 c5:config set concrete.cache.overrides 1 --allow-as-root
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && concrete/bin/concrete5 c5:config set concrete.cache.pages all --allow-as-root
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && concrete/bin/concrete5 c5:config set concrete.cache.theme_css 1 --allow-as-root
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && concrete/bin/concrete5 c5:config set concrete.theme.compress_preprocessor_output 1 --allow-as-root
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && concrete/bin/concrete5 c5:config set concrete.theme.generate_less_sourcemap 0 --allow-as-root
+    fi
+
+elif [ "${software}" = "drupal6" ]; then
 
     if [ "$1" = "dev" ]; then
         cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush --always-set variable-set block_cache 0
@@ -252,6 +276,16 @@ elif [ "${software}" = "codeigniter3" ]; then
 elif [ "${software}" = "concrete58" ]; then
 
     cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && concrete/bin/concrete5 migrations:migrate --no-interaction
+    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && concrete/bin/concrete5 c5:job index_search --no-interaction
+    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && concrete/bin/concrete5 c5:job index_search_all --no-interaction
+    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && concrete/bin/concrete5 c5:job check_automated_groups --no-interaction
+    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && concrete/bin/concrete5 c5:job generate_sitemap --no-interaction
+    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && concrete/bin/concrete5 c5:job process_email --no-interaction
+    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && concrete/bin/concrete5 c5:job remove_old_page_versions --no-interaction
+    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && concrete/bin/concrete5 c5:job update_gatherings --no-interaction
+    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && concrete/bin/concrete5 c5:job update_statistics --no-interaction
+    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && concrete/bin/concrete5 c5:job fill_thumbnails_table --no-interaction
+    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && concrete/bin/concrete5 c5:job deactivate_users --no-interaction
     cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && concrete/bin/concrete5 c5:clear-cache --no-interaction --allow-as-root
 
 elif [ "${software}" = "drupal6" ]; then

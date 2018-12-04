@@ -45,7 +45,8 @@ webroot=$(catapult websites.apache.$5.webroot)
 database_config_file=$(provisioners software.apache.${software}.database_config_file)
 
 
-# generate software database config files and set website software logging output
+# generate software database config files
+# set website software logging and debug output
 if ([ ! -z "${software}" ]); then
     echo -e "* generating ${software} database config file and configuring software-specific logging output..."
 fi
@@ -111,6 +112,18 @@ elif [ "${software}" = "concrete58" ]; then
         cp "${file_site_install}" "${file_site_install_user}"
         sudo chmod 0444 "${file_site_install}"
         sudo chmod 0444 "${file_site_install_user}"
+    fi
+
+    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && concrete/bin/concrete5 c5:config set concrete.log.emails 1 --allow-as-root
+    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && concrete/bin/concrete5 c5:config set concrete.log.errors 1 --allow-as-root
+    if ([ "$1" = "dev" ] || [ "$1" = "test" ]); then
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && concrete/bin/concrete5 c5:config set concrete.debug.display_errors 1 --allow-as-root
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && concrete/bin/concrete5 c5:config set concrete.debug.detail debug --allow-as-root
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && concrete/bin/concrete5 c5:config set concrete.debug.error_reporting 1 --allow-as-root
+    else
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && concrete/bin/concrete5 c5:config set concrete.debug.display_errors 0 --allow-as-root
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && concrete/bin/concrete5 c5:config set concrete.debug.detail message --allow-as-root
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && concrete/bin/concrete5 c5:config set concrete.debug.error_reporting 0 --allow-as-root
     fi
 
 elif [ "${software}" = "drupal6" ]; then
