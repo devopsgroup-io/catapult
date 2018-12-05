@@ -172,7 +172,7 @@ elif [ "${software}" = "drupal8" ]; then
     sed --expression="s/\$databases\s=\s\[\];/${connectionstring}/g" \
         --expression="s/\$settings\['hash_salt'\]\s=\s'';/\$settings['hash_salt'] = '${unique_hash}';/g" \
         --expression="s~\$config_directories\s=\s\[\];~\$config_directories = [CONFIG_SYNC_DIRECTORY => '\\/var\\/www\\/repositories\\/apache\\/${domain}\\/${webroot}sites\\/default\\/files\\/sync'];~g" \
-        --expression="s/\$settings\['trusted_host_patterns'\]\s=\s\[\];/\$settings['trusted_host_patterns'] = ['^(http|https)?:\\\\\/\\\\\/(www\\\.)?(dev\\\.|test\\\.|qc\\\.)?${domain_valid_regex}'];/g" \
+        --expression="s/\$settings\['trusted_host_patterns'\]\s=\s\[\];/\$settings['trusted_host_patterns'] = ['^${domain_valid_regex}','^.+\\\.${domain_valid_regex}'];/g" \
         /catapult/provisioners/redhat/installers/software/${software}/settings.php > "${file}"
 
     # create the drupal 8 sync directory
