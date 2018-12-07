@@ -108,6 +108,7 @@ if ([ ! -z "${software}" ]); then
                      || [ "${software}" = "silverstripe3" ] \
                      || [ "${software}" = "suitecrm7" ] \
                      || [ "${software}" = "xenforo1" ] \
+                     || [ "${software}" = "xenforo2" ] \
                      || [ "${software}" = "zendframework2" ]); then
                         echo -e "\t* replacing URLs in the database to align with the enivronment..."
                         replacements=$(grep --extended-regexp --only-matching --regexp=":\/\/(www\.)?(dev\.|test\.|qc\.)?(${domain_url_replace})" "/var/www/repositories/apache/${domain}/_sql/$(basename "$file")" | wc --lines)

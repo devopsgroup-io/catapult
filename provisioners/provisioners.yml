@@ -171,6 +171,9 @@ windows:
     mssql:
       modules: ["time","system","git_clean","git","mssql"]
 
+# file_store_containers: directories that the software needs write access to
+# file_stores: directories that will grow over time with user-generated content (may be duplicitive with the above)
+
 software:
   apache:
     codeigniter2:
@@ -306,11 +309,18 @@ software:
       version: [5]
     xenforo1:
       repo: PRIVATE
-      database_config_file: "sites/default/settings.php"
+      database_config_file: "config.php"
       file_store_containers: ["data","internal_data"]
       file_stores: ["data","internal_data"]
       php_version: "5.4"
       version: [1]
+    xenforo2:
+      repo: PRIVATE
+      database_config_file: "src/config.php"
+      file_store_containers: ["data","internal_data","src"]
+      file_stores: ["data","internal_data"]
+      php_version: "7.1"
+      version: [2]
     zendframework2:
       repo: "https://github.com/zendframework/zendframework.git"
       tag: "release-2.4.10"
