@@ -84,7 +84,7 @@ Catapult orchestrates the following key components of DevOps to provide you with
 
 Catapult intelligently manages the following website software that have been chosen from trending usage statistics from [BuiltWith](https://trends.builtwith.com/cms) and aligns with the [CentOS 7 trunk](http://mirror.centos.org/centos/7/os/x86_64/Packages/) along with the [Software Collections trunk](https://www.softwarecollections.org/):
 
-Software | [Key](#websites) | Required PHP Version | Defined PHP Version | Released | End-of-Life
+Software | [Key](#websites) | Required PHP Version | Running PHP Version | Released | End-of-Life
 ---------|------------------|---------------------|---------------------|----------|------------
 CodeIgniter 2                     | `codeigniter2`         | 5.1.6  | 5.4 | January 28, 2011   | [October 31, 2015](http://forum.codeigniter.com/thread-61357.html)
 CodeIgniter 3                     | `codeigniter3`         | 5.6    | 5.6 | March 30, 2015     |
@@ -102,13 +102,14 @@ Moodle 3                          | `moodle3`              | 5.6.5  | 5.6 | Nove
 SilverStripe 3                    | `silverstripe3`        | 5.3.3  | 5.4 | June 29, 2012      |
 SuiteCRM 7                        | `suitecrm7`            | 5.5    | 5.6 | October 21, 2013   |
 WordPress 4                       | `wordpress4`           | 5.2.4  | 7.0 | September 4, 2014  |
-WordPress 5                       | `wordpress5`           | 7.0.   | 7.1 | TBD                |
+WordPress 5                       | `wordpress5`           | 5.2.4  | 7.1 | December 6, 2018   |
 XenForo 1                         | `xenforo1`             | 5.2.11 | 5.4 | March 8, 2011      |
+XenForo 2                         | `xenforo2`             | 5.4.0  | 7.1 | November 28, 2017  |
 Zend Framework 2                  | `zendframework2`       | 5.3.23 | 5.4 | September 5, 2012  |
 
-Catapult additionally supports basic PHP projects that do not have a database requirement:
+Catapult additionally supports PHP projects that do not have a database requirement:
 
-* PHP 5.4 compatible project
+* When an above software type is not defined, the default PHP version that is used is PHP v5.4. This is not configurable.
 
 Catapult additionally supports static site generators, such as, [Jekyll](https://jekyllrb.com/).
 
@@ -123,7 +124,7 @@ Source                                        | Open                            
 Subscription Feature Set                      | Bundled                               | Separated                     | Separated
 Traditional Tooling (VMs & Shell)             | :white_check_mark:                    | :x:                           | :x:
 Multi-Platform (Linux & Windows)              | :white_check_mark:                    | :x:                           | :x:
-Supported PHP Software                        | 17                                    | 2                             | 1
+Supported PHP Software                        | 20+                                   | 2                             | 1
 Supported .NET Software                       | TBA                                   | :x:                           | :x:
 Minimum Bundled<br>Monthly Cost               | $45                                   | $400                          | $134
 Websites per instance                         | Unlimited                             | 1                             | 1
@@ -866,6 +867,7 @@ The following options are available:
     * option: `software: wordpress4`
     * option: `software: wordpress5`
     * option: `software: xenforo1`
+    * option: `software: xenforo2`
     * option: `software: zendframework2`
 * `software_auto_update:`
     * required: no
@@ -939,6 +941,7 @@ Software | Install Approach | Install Notes
 `wordpress4`        | Fork     |
 `wordpress5`        | Fork     |
 `xenforo1`          | Download |
+`xenforo2`          | Download |
 `zendframework2`    | Fork     | Your best bet is to start from the [zendframework/ZendSkeletonApplication](https://github.com/zendframework/ZendSkeletonApplication) GitHub project. Catapult assumes Zend Framwork is at the root of your repo and writes a database config file at `config/autoload/global.php`, you will also need to set `webroot: public/` in your Catapult configuration.
 
 ### Software Auto Updates ###
@@ -965,6 +968,7 @@ Software | `software_auto_update` Support
 `wordpress4`        | :white_check_mark:
 `wordpress5`        | :white_check_mark:
 `xenforo1`          | [:x:](https://xenforo.com/help/upgrades/)
+`xenforo2`          | :white_check_mark:
 `zendframework2`    | :white_check_mark:
 
 In the scenario where an update may overwrite customizations to a file that is expected to be able to be customized (e.g. `.htaccess` or `robots.txt`), you may create an `_append` directory within the repository root of the website with files containing your customizations.
@@ -1060,6 +1064,7 @@ Software | Approach | Documentation
 `wordpress4`        | Database             | http://codex.wordpress.org/Changing_The_Site_URL
 `wordpress5`        | Database             | http://codex.wordpress.org/Changing_The_Site_URL
 `xenforo1`          |                      |
+`xenforo2`          |                      |
 `zendframework2`    |                      |
 
 ### Debug Output ###
@@ -1155,6 +1160,7 @@ Software | Tool | Command | Documentation
 `wordpress4`        | WP-CLI          | `wp-cli core update-db`                                | http://codex.wordpress.org/Creating_Tables_with_Plugins#Adding_an_Upgrade_Function
 `wordpress5`        | WP-CLI          | `wp-cli core update-db`                                | http://codex.wordpress.org/Creating_Tables_with_Plugins#Adding_an_Upgrade_Function
 `xenforo1`          |                 |                                                        |
+`xenforo2`          |                 |                                                        |
 `zendframework2`    |                 |                                                        |
 
 ### Refreshing Databases ###

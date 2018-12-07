@@ -370,6 +370,18 @@ elif [ "${software}" = "xenforo1" ]; then
 
     echo "nothing to perform, skipping..."
 
+elif [ "${software}" = "xenforo2" ]; then
+
+    # @todo need to enable development mode
+    #cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && php cmd.php xf-dev:recompile
+    #cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && php cmd.php xf-dev:recompile-phrases
+    #cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && php cmd.php xf-dev:recompile-style-properties
+    #cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && php cmd.php xf-dev:recompile-templates
+    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && php cmd.php xf-rebuild:forums
+    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && php cmd.php xf-rebuild:search
+    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && php cmd.php xf-rebuild:threads
+    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && php cmd.php xf-rebuild:users
+
 elif [ "${software}" = "zendframework2" ]; then
 
     echo "nothing to perform, skipping..."

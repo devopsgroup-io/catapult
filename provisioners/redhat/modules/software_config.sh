@@ -411,6 +411,21 @@ elif [ "${software}" = "xenforo1" ]; then
         /catapult/provisioners/redhat/installers/software/${software}/config.php > "${file}"
     sudo chmod 0444 "${file}"
 
+elif [ "${software}" = "xenforo2" ]; then
+
+    file="/var/www/repositories/apache/${domain}/${webroot}${softwareroot}${database_config_file}"
+    if [ -f "${file}" ]; then
+        sudo chmod 0777 "${file}"
+    else
+        mkdir --parents $(dirname "${file}")
+    fi
+    sed --expression="s/\$config\['db'\]\['host'\]\s=\s'localhost';/\$config\['db'\]\['host'\] = '${redhat_mysql_ip}';/g" \
+        --expression="s/\$config\['db'\]\['username'\]\s=\s'';/\$config\['db'\]\['username'\] = '${mysql_user}';/g" \
+        --expression="s/\$config\['db'\]\['password'\]\s=\s'';/\$config\['db'\]\['password'\] = '${mysql_user_password}';/g" \
+        --expression="s/\$config\['db'\]\['dbname'\]\s=\s'';/\$config\['db'\]\['dbname'\] = '${1}_${domain_valid_db_name}';/g" \
+        /catapult/provisioners/redhat/installers/software/${software}/config.php > "${file}"
+    sudo chmod 0444 "${file}"
+
 elif [ "${software}" = "zendframework2" ]; then
 
     file="/var/www/repositories/apache/${domain}/${webroot}${softwareroot}${database_config_file}"
