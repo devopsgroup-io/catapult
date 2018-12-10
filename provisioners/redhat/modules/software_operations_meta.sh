@@ -148,7 +148,7 @@ elif [ "${software}" = "wordpress4" ]; then
         VALUES ('1', 'admin', MD5('$(catapult environments.${1}.software.wordpress.admin_password)'), 'admin', '$(catapult company.email)', '0', 'admin')
         ON DUPLICATE KEY UPDATE user_login='admin', user_pass=MD5('$(catapult environments.${1}.software.wordpress.admin_password)'), user_nicename='admin', user_email='$(catapult company.email)', user_status='0', display_name='admin';
     "
-    wp-cli --allow-root --path="/var/www/repositories/apache/${domain}/${webroot}" user add-role 1 administrator
+    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && wp-cli --allow-root user add-role 1 administrator
 
 elif [ "${software}" = "wordpress5" ]; then
     
@@ -159,7 +159,23 @@ elif [ "${software}" = "wordpress5" ]; then
         VALUES ('1', 'admin', MD5('$(catapult environments.${1}.software.wordpress.admin_password)'), 'admin', '$(catapult company.email)', '0', 'admin')
         ON DUPLICATE KEY UPDATE user_login='admin', user_pass=MD5('$(catapult environments.${1}.software.wordpress.admin_password)'), user_nicename='admin', user_email='$(catapult company.email)', user_status='0', display_name='admin';
     "
-    wp-cli --allow-root --path="/var/www/repositories/apache/${domain}/${webroot}" user add-role 1 administrator
+    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && wp-cli --allow-root user add-role 1 administrator
+
+elif [ "${software}" = "xenforo2" ]; then
+
+    mysql --defaults-extra-file=$dbconf ${1}_${domain_valid_db_name} -e "
+        UPDATE xf_user_authenticate
+        SET data = BINARY
+            CONCAT(
+                CONCAT(
+                    CONCAT('a:3:{s:4:\"hash\";s:40:\"', SHA1(CONCAT(SHA1('$(catapult environments.${1}.software.admin_password)'), SHA1('salt')))),
+                    CONCAT('\";s:4:\"salt\";s:40:\"', SHA1('salt'))
+                ),
+                '\";s:8:\"hashFunc\";s:4:\"sha1\";}'
+            ),
+        scheme_class = 'XenForo_Authentication_Core'
+        WHERE user_id = 1;
+    "
 
 fi
 

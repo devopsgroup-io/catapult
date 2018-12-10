@@ -358,7 +358,7 @@ if hash composer 2>/dev/null && hash drush 2>/dev/null && hash wp-cli 2>/dev/nul
 
     elif [ "${software}" = "xenforo2" ]; then
 
-        version=$(cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && cat library/XenForo/Application.php 2>/dev/null | grep "public static \$version =" | grep --extended-regexp --only-matching --regexp="[0-9]\.[0-9][0-9]?[0-9]?(\.[0-9][0-9]?[0-9]?)?" || echo "0")
+        version=$(cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && cat src/XF.php 2>/dev/null | grep "public static \$version =" | grep --extended-regexp --only-matching --regexp="[0-9]\.[0-9][0-9]?[0-9]?(\.[0-9][0-9]?[0-9]?)?" || echo "0")
 
         if [[ "${softwareversion_array[@]}" =~ "$(grep --only-matching --regexp="^[0-9]" <<< "${version}")" ]]; then
             echo -e "\nSUPPORTED SOFTWARE VERSION DETECTED: ${version}\n"
