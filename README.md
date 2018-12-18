@@ -246,16 +246,16 @@ Catapult is controlled via Vagrant and the command line of a developer's worksta
 1. **Vagrant**
     * **Using macOS?**
         1. Ensure Xcode Command Line Tools are installed by running `xcode-select --install` from Terminal
-        2. Download and install the latest version of Vagrant v1 from https://releases.hashicorp.com/vagrant/
+        2. Download and install the latest version of Vagrant v2.x from https://releases.hashicorp.com/vagrant/
     * **Using Windows?**
-        1. Download and install the latest version of Vagrant v1 from https://releases.hashicorp.com/vagrant/
+        1. Download and install the latest version of Vagrant v2.x from https://releases.hashicorp.com/vagrant/
     * **Using Linux (Debian, Ubuntu)?**
-        1. Download the latest version of Vagrant v1 respective to your architecture from https://releases.hashicorp.com/vagrant/ by running e.g. `wget https://releases.hashicorp.com/vagrant/1.9.8/vagrant_1.9.8_x86_64.deb`
-        2. Install Vagrant using dpkg e.g. `sudo dpkg --install vagrant_1.9.8_x86_64.deb`
+        1. Download the latest version of Vagrant v2.x respective to your architecture from https://releases.hashicorp.com/vagrant/ by running e.g. `wget https://releases.hashicorp.com/vagrant/2.2.2/vagrant_2.2.2_x86_64.deb`
+        2. Install Vagrant using dpkg e.g. `sudo dpkg --install vagrant_2.2.2_x86_64.deb`
         3. Install Network File System (NFS) `sudo apt-get install nfs-kernel-server`
     * **Using Linux (Fedora, Red Hat, Suse)?**
-        1. Download the latest version of Vagrant v1 respective to your architecture from https://releases.hashicorp.com/vagrant/ by running e.g. `wget https://releases.hashicorp.com/vagrant/1.9.8/vagrant_1.9.8_x86_64.rpm`
-        2. Install Vagrant using yum e.g. `sudo yum install vagrant_1.9.8_x86_64.rpm`
+        1. Download the latest version of Vagrant v2.x respective to your architecture from https://releases.hashicorp.com/vagrant/ by running e.g. `wget https://releases.hashicorp.com/vagrant/2.2.2/vagrant_2.2.2_x86_64.rpm`
+        2. Install Vagrant using yum e.g. `sudo yum install vagrant_2.2.2_x86_64.rpm`
 2. **Vagrant Plugins**
     1. Open your command line and install the following Vagrant plugins:
         1. `vagrant plugin install vagrant-aws`
@@ -268,13 +268,13 @@ Catapult is controlled via Vagrant and the command line of a developer's worksta
             * [![Gem](https://img.shields.io/gem/dt/vagrant-vbguest.svg)](https://rubygems.org/gems/vagrant-vbguest)
 3. **VirtualBox**
     * **Using macOS?**
-        1. Download and install the latest version of VirtualBox v5.1 from https://www.virtualbox.org/wiki/Downloads
+        1. Download and install the latest version of VirtualBox v5.2 from https://www.virtualbox.org/wiki/Downloads
     * **Using Windows?**
-        1. Download and install the latest version of VirtualBox v5.1 from https://www.virtualbox.org/wiki/Downloads
+        1. Download and install the latest version of VirtualBox v5.2 from https://www.virtualbox.org/wiki/Downloads
     * **Using Linux (Debian, Ubuntu)?**
-        1. Download and install the latest version of VirtualBox v5.1 using Advanced Packaging Tool (APT) `sudo apt-get install virtualbox`
+        1. Download and install the latest version of VirtualBox v5.2 using Advanced Packaging Tool (APT) `sudo apt-get install virtualbox`
     * **Using Linux (Fedora, Red Hat, Suse)?**
-        1. Download and install the latest version of VirtualBox v5.1 using Yellowdog Updater, Modifed (yum) `sudo yum install virtualbox`
+        1. Download and install the latest version of VirtualBox v5.2 using Yellowdog Updater, Modifed (yum) `sudo yum install virtualbox`
 4. **GPG2**
     * **Using macOS?**
         1. Download and install GPG Suite from https://gpgtools.org
