@@ -368,6 +368,14 @@ if ([ "${4}" == "apache" ]); then
     /usr/bin/newrelic-install install
     # ensure new relic daemon is started with latest configuration
     /etc/init.d/newrelic-daemon start
+    if [ -f /tmp/.newrelic.sock ]; then
+        sudo rm -f /tmp/.newrelic.sock
+        sudo systemctl restart rh-php71-php-fpm
+        sudo systemctl restart rh-php70-php-fpm
+        sudo systemctl restart rh-php56-php-fpm
+        sudo systemctl restart php-fpm
+        /etc/init.d/newrelic-daemon restart
+    fi
     /etc/init.d/newrelic-daemon reload
     /etc/init.d/newrelic-daemon status
     tail /var/log/newrelic/newrelic-daemon.log
