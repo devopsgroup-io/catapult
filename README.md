@@ -790,12 +790,13 @@ The following options are available:
     * required: yes
     * example: `domain: example.com`
     * example: `domain: subdomain.example.com`
-        * one subdomain level is supported for this root domain entry (`subdomain.example.com`)
         * this root domain entry is the Production canonical domain name without `www.`
             * a `www.` subdomain is created for you
             * the key for all management orchestration of this website
+        * one subdomain level is supported for this root domain entry (`subdomain.example.com`)
         * manages DNS of LocalDev (via hosts file) and Test, QC, Production (via CloudFlare)
             * `dev.example.com`, `test.example.com`, `qc.example.com`, `example.com`
+            * `www.dev.example.com`, `www.test.example.com`, `www.qc.example.com`, `www.example.com`
 * `domain_tld_override:`
     * required: no
     * example: `domain_tld_override: mycompany.com`
@@ -803,6 +804,7 @@ The following options are available:
             * useful when you cannot or do not wish to host the Test/QC website at the `domain`
         * appends the `domain_tld_override` for Environments
             * `dev.example.com.mycompany.com`, `test.example.com.mycompany.com`, `qc.example.com.mycompany.com`, `example.com.mycompany.com`
+            * `www.dev.example.com.mycompany.com`, `www.test.example.com.mycompany.com`, `www.qc.example.com.mycompany.com`, `www.example.com.mycompany.com`
         * PLEASE NOTE: When removing this option from a website with `software:`, you need to manually replace URLs in the database respective to the `software_workflow:` option.
             * ie `vagrant ssh mycompany.com-test-redhat-mysql`
             * `wp-cli --allow-root --path="/var/www/repositories/apache/example.com/(webroot if applicable)" search-replace ":\/\/(www\.)?(dev\.|test\.)?(example\.com\.mycompany\.com)" "://example.com" --regex`

@@ -333,26 +333,40 @@ if ([ "${4}" == "apache" ]); then
     # NEW RELIC PHP APM
     #################
     # add the new relic yum repository
-    rpm --hash --upgrade --verbose https://download.newrelic.com/pub/newrelic/el5/i386/newrelic-repo-5-3.noarch.rpm
+    rpm --hash --upgrade --verbose https://yum.newrelic.com/pub/newrelic/el5/x86_64/newrelic-repo-5-3.noarch.rpm
     # install the new relic apm php package
     sudo yum install -y newrelic-php5
+    sudo yum update -y newrelic-php5
     # set the apm php appname
     sed --in-place --expression "s#newrelic\.appname.*#newrelic.appname = \"$(catapult company.name | tr '[:upper:]' '[:lower:]')-${1}-redhat\"#g" "/etc/php.d/newrelic.ini"
 
-    # manually configure rh-php70
+    # manually configure custom php versions
     rm --force --recursive "/usr/share/newrelic"
     mkdir "/usr/share/newrelic"
     # https://download.newrelic.com/php_agent/release/
-    cd "/usr/share/newrelic" && gzip --decompress --stdout "/catapult/provisioners/redhat/installers/newrelic/newrelic-php5-7.6.0.201-linux.tar.gz" | tar xf -
+    cd "/usr/share/newrelic" && gzip --decompress --stdout "/catapult/provisioners/redhat/installers/newrelic/newrelic-php5-8.4.0.231-linux.tar.gz" | tar xf -
+    sed --in-place --expression "s#newrelic\.appname.*#newrelic.appname = \"$(catapult company.name | tr '[:upper:]' '[:lower:]')-${1}-redhat\"#g" "/usr/share/newrelic/newrelic-php5-8.4.0.231-linux/scripts/newrelic.ini.template"
+    sed --in-place --expression "s#;newrelic\.daemon.\port.*#newrelic.daemon.port = \"@newrelic-daemon\"#g" "/usr/share/newrelic/newrelic-php5-8.4.0.231-linux/scripts/newrelic.ini.template"
+    sed --in-place --expression "s/\"REPLACE_WITH_REAL_KEY\"/\"$(catapult company.newrelic_license_key)\"/g" "/usr/share/newrelic/newrelic-php5-8.4.0.231-linux/scripts/newrelic.ini.template"
+    # rh-php71
+    rm --force "/opt/rh/rh-php71/root/usr/lib64/php/modules/newrelic.so"
+    cp "/usr/share/newrelic/newrelic-php5-8.4.0.231-linux/agent/x64/newrelic-20170718.so" "/opt/rh/rh-php71/root/usr/lib64/php/modules/newrelic.so"
+    cp "/usr/share/newrelic/newrelic-php5-8.4.0.231-linux/scripts/newrelic.ini.template" "/etc/opt/rh/rh-php71/php.d/newrelic.ini"
+    # rh-php70
     rm --force "/opt/rh/rh-php70/root/usr/lib64/php/modules/newrelic.so"
-    cp "/usr/share/newrelic/newrelic-php5-7.6.0.201-linux/agent/x64/newrelic-20151012.so" "/opt/rh/rh-php70/root/usr/lib64/php/modules/newrelic.so"
-    sed --in-place --expression "s/\"REPLACE_WITH_REAL_KEY\"/\"$(catapult company.newrelic_license_key)\"/g" "/usr/share/newrelic/newrelic-php5-7.6.0.201-linux/scripts/newrelic.ini.template"
-    sed --in-place --expression "s#newrelic\.appname.*#newrelic.appname = \"$(catapult company.name | tr '[:upper:]' '[:lower:]')-${1}-redhat\"#g" "/usr/share/newrelic/newrelic-php5-7.6.0.201-linux/scripts/newrelic.ini.template"
-    cp "/usr/share/newrelic/newrelic-php5-7.6.0.201-linux/scripts/newrelic.ini.template" "/etc/opt/rh/rh-php70/php.d/newrelic.ini"
+    cp "/usr/share/newrelic/newrelic-php5-8.4.0.231-linux/agent/x64/newrelic-20170718.so" "/opt/rh/rh-php70/root/usr/lib64/php/modules/newrelic.so"
+    cp "/usr/share/newrelic/newrelic-php5-8.4.0.231-linux/scripts/newrelic.ini.template" "/etc/opt/rh/rh-php70/php.d/newrelic.ini"
+    # rh-php56
+    rm --force "/opt/rh/rh-php56/root/usr/lib64/php/modules/newrelic.so"
+    cp "/usr/share/newrelic/newrelic-php5-8.4.0.231-linux/agent/x64/newrelic-20170718.so" "/opt/rh/rh-php56/root/usr/lib64/php/modules/newrelic.so"
+    cp "/usr/share/newrelic/newrelic-php5-8.4.0.231-linux/scripts/newrelic.ini.template" "/etc/opt/rh/rh-php56/php.d/newrelic.ini"
 
-    # apm php installed but we need to set configuration
-    NR_INSTALL_PHPLIST="/usr/bin:/opt/rh/rh-php56/root/usr/bin:/opt/rh/rh-php70/root/usr/bin:/opt/rh/rh-php71/root/usr/bin", NR_INSTALL_SILENT="true", NR_INSTALL_KEY="$(catapult company.newrelic_license_key)" /usr/bin/newrelic-install install
-    # ensure newrelic daemon is started with latest configuration
+    # new relic apm php installed but we need to set configuration
+    NR_INSTALL_PHPLIST="/usr/bin:/opt/rh/rh-php56/root/usr/bin:/opt/rh/rh-php70/root/usr/bin:/opt/rh/rh-php71/root/usr/bin"; export NR_INSTALL_PHPLIST
+    NR_INSTALL_SILENT="true"; export NR_INSTALL_SILENT
+    NR_INSTALL_KEY="$(catapult company.newrelic_license_key)"; export NR_INSTALL_KEY
+    /usr/bin/newrelic-install install
+    # ensure new relic daemon is started with latest configuration
     /etc/init.d/newrelic-daemon start
     /etc/init.d/newrelic-daemon reload
     /etc/init.d/newrelic-daemon status

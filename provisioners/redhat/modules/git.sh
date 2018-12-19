@@ -56,6 +56,10 @@ if [ -d "/var/www/repositories/apache/${domain}/.git" ]; then
             if ! grep -q "${webroot}${softwareroot}${database_config_file}" "/var/www/repositories/apache/${domain}/.gitignore"; then
                sudo bash -c "echo \"${webroot}${softwareroot}${database_config_file}\" >> \"/var/www/repositories/apache/${domain}/.gitignore\""
             fi
+            # manage the new relic ini file entry in the .gitignore file
+            if ! grep -q "${webroot}${softwareroot}.user.ini" "/var/www/repositories/apache/${domain}/.gitignore"; then
+               sudo bash -c "echo \"${webroot}${softwareroot}.user.ini\" >> \"/var/www/repositories/apache/${domain}/.gitignore\""
+            fi
             # add everything in the repository to the git index (keep in mind untracked file stores)
             cd "/var/www/repositories/apache/${domain}" \
                 && git add --all :/
