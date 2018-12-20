@@ -95,7 +95,7 @@ Drupal 8                          | `drupal8`              | 5.5.9  | 7.1 | Nove
 Elgg 1                            | `elgg1`                | 5.4    | 5.4 | August 20, 2008    |
 Elgg 2                            | `elgg2`                | 5.6    | 5.6 | December 14, 2015  |
 ExpressionEngine 3                | `expressionengine3`    | 5.3.10 | 5.4 | October 13, 2015   |
-Joomla 3                          | `joomla3`              | 5.3.10 | 5.6 | September 27, 2012 |
+Joomla 3                          | `joomla3`              | 5.3.10 | 7.1 | September 27, 2012 |
 Laravel 5                         | `laravel5`             | 7.0.0  | 7.0 | February 4, 2015   |
 MediaWiki 1                       | `mediawiki1`           | 5.5.9  | 5.6 | December 8, 2003   |
 Moodle 3                          | `moodle3`              | 5.6.5  | 5.6 | November 16, 2015  |
