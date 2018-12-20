@@ -371,11 +371,11 @@ if ([ "${4}" == "apache" ]); then
     /etc/init.d/newrelic-daemon start
     if [ -f /tmp/.newrelic.sock ]; then
         sudo rm -f /tmp/.newrelic.sock
+        /etc/init.d/newrelic-daemon restart
         sudo systemctl restart rh-php71-php-fpm
         sudo systemctl restart rh-php70-php-fpm
         sudo systemctl restart rh-php56-php-fpm
         sudo systemctl restart php-fpm
-        /etc/init.d/newrelic-daemon restart
     fi
     /etc/init.d/newrelic-daemon reload
     /etc/init.d/newrelic-daemon status
