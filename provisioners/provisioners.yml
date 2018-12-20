@@ -248,7 +248,7 @@ software:
       branch: "3.6.x"
       database_config_file: "configuration.php"
       file_store_containers: ["administrator/cache","cache","logs","tmp"]
-      php_version: "5.6"
+      php_version: "7.1"
       version: [3]
     laravel5:
       repo: "https://github.com/laravel/laravel.git"
