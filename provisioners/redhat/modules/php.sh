@@ -337,8 +337,9 @@ if ([ "${4}" == "apache" ]); then
     # install the new relic apm php package
     sudo yum install -y newrelic-php5
     sudo yum update -y newrelic-php5
-    # set the apm php appname
+    # set base newrelic.ini configuration
     sed --in-place --expression "s#newrelic\.appname.*#newrelic.appname = \"$(catapult company.name | tr '[:upper:]' '[:lower:]')-${1}-redhat\"#g" "/etc/php.d/newrelic.ini"
+    sed --in-place --expression "s#;newrelic\.daemon.\port.*#newrelic.daemon.port = \"@newrelic-daemon\"#g" "/etc/php.d/newrelic.ini"
 
     # manually configure custom php versions
     rm --force --recursive "/usr/share/newrelic"
