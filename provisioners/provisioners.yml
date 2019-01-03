@@ -191,7 +191,7 @@ software:
       database_config_file: "application/config/database.php"
       file_store_containers: ["application/cache","application/logs","uploads"]
       file_stores: ["uploads"]
-      php_version: "5.6"
+      php_version: "7.1"
       version: [3]
     concrete58:
       repo: "https://github.com/concrete5/concrete5"
@@ -214,7 +214,7 @@ software:
       branch: "7.x"
       database_config_file: "sites/default/settings.php"
       file_stores: ["sites/default/files"]
-      php_version: "5.6"
+      php_version: "7.1"
       version: [7]
     drupal8:
       repo: "https://git.drupal.org/project/drupal.git"
@@ -228,14 +228,14 @@ software:
       branch: "1.12"
       database_config_file: "engine/settings.php"
       file_store_containers: ["dataroot"]
-      php_version: "5.6"
+      php_version: "7.1"
       version: [1]
     elgg2:
       repo: "https://github.com/Elgg/Elgg.git"
       branch: "2.3"
       database_config_file: "elgg-config/settings.php"
       file_store_containers: ["dataroot"]
-      php_version: "5.6"
+      php_version: "7.1"
       version: [2]
     expressionengine3:
       repo: PRIVATE
@@ -265,7 +265,7 @@ software:
       database_config_file: "LocalSettings.php"
       file_store_containers: ["images"]
       file_stores: ["images"]
-      php_version: "5.6"
+      php_version: "7.1"
       version: [1]
     moodle3:
       repo: "https://github.com/moodle/moodle.git"
@@ -281,7 +281,7 @@ software:
       database_config_file: "mysite/_config.php"
       file_store_containers: ["assets"]
       file_stores: ["assets/Uploads"]
-      php_version: "5.6"
+      php_version: "7.1"
       version: [3]
     suitecrm7:
       repo: "https://github.com/salesagility/SuiteCRM.git"
@@ -289,7 +289,7 @@ software:
       database_config_file: "config_override.php"
       file_store_containers: ["cache","custom","data","modules","upload","themes","tmp"]
       file_stores: ["uploads"]
-      php_version: "5.6"
+      php_version: "7.1"
       version: [7]
     wordpress4:
       repo: "https://github.com/WordPress/WordPress.git"
