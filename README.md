@@ -87,20 +87,20 @@ Catapult intelligently manages the following website software that have been cho
 Software | [Key](#websites) | Required PHP Version | Running PHP Version | Released | End-of-Life
 ---------|------------------|---------------------|---------------------|----------|------------
 CodeIgniter 2                     | `codeigniter2`         | 5.1.6  | 5.4 | January 28, 2011   | [October 31, 2015](http://forum.codeigniter.com/thread-61357.html)
-CodeIgniter 3                     | `codeigniter3`         | 5.6    | 5.6 | March 30, 2015     |
+CodeIgniter 3                     | `codeigniter3`         | 5.6    | 7.1 | March 30, 2015     |
 concrete5 8                       | `concrete58`           | 5.5.9  | 7.1 | December 1, 2016   |
 Drupal 6                          | `drupal6`              | 5.4    | 5.4 | February 13, 2008  | [February 24, 2016](https://www.drupal.org/drupal-6-eol)
-Drupal 7                          | `drupal7`              | 5.2.5  | 5.6 | January 5, 2011    |
+Drupal 7                          | `drupal7`              | 5.2.5  | 7.1 | January 5, 2011    |
 Drupal 8                          | `drupal8`              | 5.5.9  | 7.1 | November 19, 2015  |
 Elgg 1                            | `elgg1`                | 5.4    | 5.4 | August 20, 2008    |
-Elgg 2                            | `elgg2`                | 5.6    | 5.6 | December 14, 2015  |
+Elgg 2                            | `elgg2`                | 5.6    | 7.1 | December 14, 2015  |
 ExpressionEngine 3                | `expressionengine3`    | 5.3.10 | 5.4 | October 13, 2015   |
 Joomla 3                          | `joomla3`              | 5.3.10 | 7.1 | September 27, 2012 |
 Laravel 5                         | `laravel5`             | 7.0.0  | 7.0 | February 4, 2015   |
-MediaWiki 1                       | `mediawiki1`           | 5.5.9  | 5.6 | December 8, 2003   |
-Moodle 3                          | `moodle3`              | 5.6.5  | 5.6 | November 16, 2015  |
+MediaWiki 1                       | `mediawiki1`           | 5.5.9  | 7.1 | December 8, 2003   |
+Moodle 3                          | `moodle3`              | 5.6.5  | 7.1 | November 16, 2015  |
 SilverStripe 3                    | `silverstripe3`        | 5.3.3  | 5.4 | June 29, 2012      |
-SuiteCRM 7                        | `suitecrm7`            | 5.5    | 5.6 | October 21, 2013   |
+SuiteCRM 7                        | `suitecrm7`            | 5.5    | 7.1 | October 21, 2013   |
 WordPress 4                       | `wordpress4`           | 5.2.4  | 7.0 | September 4, 2014  |
 WordPress 5                       | `wordpress5`           | 5.2.4  | 7.1 | December 6, 2018   |
 XenForo 1                         | `xenforo1`             | 5.2.11 | 5.4 | March 8, 2011      |
