@@ -131,12 +131,13 @@ EOF
     else
         force_ip_value=""
     fi
-    # handle ssl certificates
-    # if there is a specified custom certificate available
+    # handle https certificates
+    # if there is a specified custom certificate available and it does not expire within the next 86400 seconds (1 day)
     if ([ -f "/var/www/repositories/apache/${domain}/_cert/${domainvalidcertname}/${domainvalidcertname}.ca-bundle" ] \
      && [ -f "/var/www/repositories/apache/${domain}/_cert/${domainvalidcertname}/${domainvalidcertname}.crt" ] \
      && [ -f "/var/www/repositories/apache/${domain}/_cert/${domainvalidcertname}/server.csr" ] \
-     && [ -f "/var/www/repositories/apache/${domain}/_cert/${domainvalidcertname}/server.key" ]); then
+     && [ -f "/var/www/repositories/apache/${domain}/_cert/${domainvalidcertname}/server.key" ] \
+     && [ $(openssl x509 -checkend 86400 -noout -in "/var/www/repositories/apache/${domain}/_cert/${domainvalidcertname}/${domainvalidcertname}.crt") ]); then
         https_certificates="
         SSLCertificateFile /var/www/repositories/apache/${domain}/_cert/${domainvalidcertname}/${domainvalidcertname}.crt
         SSLCertificateKeyFile /var/www/repositories/apache/${domain}/_cert/${domainvalidcertname}/server.key
@@ -270,7 +271,7 @@ EOF
             # help old browsers
             BrowserMatch "MSIE [2-5]" nokeepalive ssl-unclean-shutdown downgrade-1.0 force-response-1.0
 
-            # set the ssl certificates
+            # set the https certificates
             ${https_certificates}
 
             # force http basic auth if configured
@@ -456,6 +457,8 @@ EOF
     fi
 
     # set a .user.ini file for php-fpm to read
+    sudo mkdir --parents /var/www/repositories/apache/${domain}/${webroot}
+    sudo touch /var/www/repositories/apache/${domain}/${webroot}/.user.ini
     sudo cat > /var/www/repositories/apache/${domain}/${webroot}/.user.ini << EOF
 newrelic.appname="${domain_environment};$(catapult company.name | tr '[:upper:]' '[:lower:]')-${1}-redhat"
 EOF
