@@ -28,13 +28,13 @@ IncludeOptional sites-enabled/*.conf
 # prevent proxy timeouts
 # https://forum.remirepo.net/viewtopic.php?id=3240
 # specifically necessary for concrete5 install (long running php script with multiple XHR requests)
+<Proxy fcgi://127.0.0.1:9720>
+    ProxySet timeout=300
+</Proxy>
 <Proxy fcgi://127.0.0.1:9710>
     ProxySet timeout=300
 </Proxy>
 <Proxy fcgi://127.0.0.1:9700>
-    ProxySet timeout=300
-</Proxy>
-<Proxy fcgi://127.0.0.1:9560>
     ProxySet timeout=300
 </Proxy>
 <Proxy fcgi://127.0.0.1:9540>

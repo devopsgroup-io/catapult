@@ -107,11 +107,10 @@ XenForo 1                         | `xenforo1`             | 5.2.11 | 5.4 | Marc
 XenForo 2                         | `xenforo2`             | 5.4.0  | 7.1 | November 28, 2017  |
 Zend Framework 2                  | `zendframework2`       | 5.3.23 | 5.4 | September 5, 2012  |
 
-Catapult additionally supports PHP projects that do not have a database requirement:
+If you do not see your website software listed, Catapult supports basic PHP projects that do not have a database requirement.
 
-* When an above software type is not defined, the default PHP version that is used is PHP v5.4. This is not configurable.
-
-Catapult additionally supports static site generators, such as, [Jekyll](https://jekyllrb.com/).
+* When an above software type is not defined, the default PHP version that is used is PHP 5.4. This is not configurable.
+* PHP-less static site generators, such as, [Jekyll](https://jekyllrb.com/), are supported.
 
 
 ## Competition ##
