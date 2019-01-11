@@ -179,7 +179,13 @@ EOF
         force_https_hsts="# HSTS is only enabled when force_https=true"
     fi
     # handle the software php_version setting
-    if [ "${software_php_version}" = "7.1" ]; then
+    if [ "${software_php_version}" = "7.2" ]; then
+        software_php_version_value="
+        <FilesMatch \.php$>
+            SetHandler \"proxy:fcgi://127.0.0.1:9720\"
+        </FilesMatch>
+        "
+    elif [ "${software_php_version}" = "7.1" ]; then
         software_php_version_value="
         <FilesMatch \.php$>
             SetHandler \"proxy:fcgi://127.0.0.1:9710\"
@@ -189,12 +195,6 @@ EOF
         software_php_version_value="
         <FilesMatch \.php$>
             SetHandler \"proxy:fcgi://127.0.0.1:9700\"
-        </FilesMatch>
-        "
-    elif [ "${software_php_version}" = "5.6" ]; then
-        software_php_version_value="
-        <FilesMatch \.php$>
-            SetHandler \"proxy:fcgi://127.0.0.1:9560\"
         </FilesMatch>
         "
     elif [ "${software_php_version}" = "5.4" ]; then
