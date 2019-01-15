@@ -240,6 +240,7 @@ software:
     expressionengine3:
       repo: PRIVATE
       database_config_file: "system/user/config/config.php"
+      eol: "2018-12-14"
       file_store_containers: ["system/user/cache","system/user/templates","images/avatars","images/captchas","images/member_photos","images/pm_attachments","images/signature_attachments","images/uploads"]
       php_version: "5.4"
       version: [3]
@@ -256,7 +257,7 @@ software:
       database_config_file: "config/database.php"
       file_store_containers: ["bootstrap/cache","resources","storage"]
       file_stores: ["resources","storage"]
-      php_version: "7.0"
+      php_version: "7.1"
       softwareroot: "../"
       version: [5]
     mediawiki1:
@@ -273,7 +274,7 @@ software:
       database_config_file: "config.php"
       file_store_containers: ["moodledata"]
       file_stores: ["moodledata/filedir"]
-      php_version: "7.0"
+      php_version: "7.1"
       version: [3]
     silverstripe3:
       repo: "https://github.com/silverstripe/silverstripe-installer"
@@ -287,6 +288,7 @@ software:
       repo: "https://github.com/salesagility/SuiteCRM.git"
       branch: "7.5.x"
       database_config_file: "config_override.php"
+      eol: "2019-11-15"
       file_store_containers: ["cache","custom","data","modules","upload","themes","tmp"]
       file_stores: ["uploads"]
       php_version: "7.1"
@@ -297,7 +299,7 @@ software:
       database_config_file: "wp-config.php"
       file_store_containers: ["wp-content"]
       file_stores: ["wp-content/languages","wp-content/uploads"]
-      php_version: "7.0"
+      php_version: "7.1"
       version: [4]
     wordpress5:
       repo: "https://github.com/WordPress/WordPress.git"
@@ -310,6 +312,7 @@ software:
     xenforo1:
       repo: PRIVATE
       database_config_file: "config.php"
+      eol: "2019-12-31"
       file_store_containers: ["data","internal_data"]
       file_stores: ["data","internal_data"]
       php_version: "5.4"

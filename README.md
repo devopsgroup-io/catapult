@@ -82,7 +82,7 @@ Catapult orchestrates the following key components of DevOps to provide you with
 
 ## Supported Website Software ##
 
-Catapult intelligently manages the following website software that have been chosen from trending usage statistics from [BuiltWith](https://trends.builtwith.com/cms) and aligns with the [CentOS 7 trunk](http://mirror.centos.org/centos/7/os/x86_64/Packages/) along with the [Software Collections trunk](https://www.softwarecollections.org/):
+Catapult intelligently manages the following website software that have been chosen from trending usage statistics from [BuiltWith](https://trends.builtwith.com/cms) and aligns with the [CentOS 7](http://mirror.centos.org/centos/7/os/x86_64/Packages/) and [Software Collections](https://www.softwarecollections.org/) trunks:
 
 Software | [Key](#websites) | Required PHP Version | Running PHP Version | Released | End-of-Life
 ---------|------------------|---------------------|---------------------|----------|------------
@@ -94,16 +94,16 @@ Drupal 7                          | `drupal7`              | 5.2.5  | 7.1 | Janu
 Drupal 8                          | `drupal8`              | 5.5.9  | 7.1 | November 19, 2015  |
 Elgg 1                            | `elgg1`                | 5.4    | 5.4 | August 20, 2008    |
 Elgg 2                            | `elgg2`                | 5.6    | 7.1 | December 14, 2015  |
-ExpressionEngine 3                | `expressionengine3`    | 5.3.10 | 5.4 | October 13, 2015   |
+ExpressionEngine 3                | `expressionengine3`    | 5.3.10 | 5.4 | October 13, 2015   | [December 14, 2018](https://expressionengine.com/blog/version-3-end-of-life)
 Joomla 3                          | `joomla3`              | 5.3.10 | 7.1 | September 27, 2012 |
-Laravel 5                         | `laravel5`             | 7.0.0  | 7.0 | February 4, 2015   |
+Laravel 5                         | `laravel5`             | 7.0.0  | 7.1 | February 4, 2015   |
 MediaWiki 1                       | `mediawiki1`           | 5.5.9  | 7.1 | December 8, 2003   |
 Moodle 3                          | `moodle3`              | 5.6.5  | 7.1 | November 16, 2015  |
 SilverStripe 3                    | `silverstripe3`        | 5.3.3  | 5.4 | June 29, 2012      |
-SuiteCRM 7                        | `suitecrm7`            | 5.5    | 7.1 | October 21, 2013   |
-WordPress 4                       | `wordpress4`           | 5.2.4  | 7.0 | September 4, 2014  |
+SuiteCRM 7                        | `suitecrm7`            | 5.5    | 7.1 | October 21, 2013   | [November 15, 2019](http://support.sugarcrm.com/Resources/Supported_Versions/)
+WordPress 4                       | `wordpress4`           | 5.2.4  | 7.1 | September 4, 2014  |
 WordPress 5                       | `wordpress5`           | 5.2.4  | 7.1 | December 6, 2018   |
-XenForo 1                         | `xenforo1`             | 5.2.11 | 5.4 | March 8, 2011      |
+XenForo 1                         | `xenforo1`             | 5.2.11 | 5.4 | March 8, 2011      | [December 31, 2019](https://xenforo.com/community/threads/xenforo-1-5-end-of-life-schedule.157679/)
 XenForo 2                         | `xenforo2`             | 5.4.0  | 7.1 | November 28, 2017  |
 Zend Framework 2                  | `zendframework2`       | 5.3.23 | 5.4 | September 5, 2012  |
 
@@ -111,6 +111,8 @@ If you do not see your website software listed, Catapult supports basic PHP proj
 
 * When an above software type is not defined, the default PHP version that is used is PHP 5.4. This is not configurable.
 * PHP-less static site generators, such as, [Jekyll](https://jekyllrb.com/), are supported.
+
+### PHP Versions ###
 
 Catapult maintains a high level of integrity when it comes to PHP versions, through maintaining security, backwards compatibility, performance, and new features. Below is an overview of the PHP versions used in Catapult and when you can expect these versions to be End-of-Life (EOL). We will bump to the next highest version of PHP in the list when nearing the EOL - this provides ample time for support of the newer PHP version by the software. In cases where a software version is sunsetting, the CentOS Long-term Support (LTS) version of PHP is used.
 
@@ -120,6 +122,9 @@ PHP Version | End-of-Life | Maintainer | Updater
 7.1 | December 1, 2019 | [SCLO](https://www.softwarecollections.org/en/scls/rhscl/rh-php71/) | [RedHat](https://developers.redhat.com/products/softwarecollections/overview/)
 7.2 | November 30, 2020 | [SCLO](https://www.softwarecollections.org/en/scls/rhscl/rh-php72/) | [RedHat](https://developers.redhat.com/products/softwarecollections/overview/)
 
+### End-of-Life (EOL) ###
+
+Catapult tracks vendor announced EOL dates for website software and a red EOL date will be displayed during `vagrant status` if one of your website's software is EOL. Currently Catapult has no plan to block Catapult supported software that is past its EOL date - it is up to you to move to the next major supported version.
 
 ## Competition ##
 
