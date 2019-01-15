@@ -112,6 +112,14 @@ If you do not see your website software listed, Catapult supports basic PHP proj
 * When an above software type is not defined, the default PHP version that is used is PHP 5.4. This is not configurable.
 * PHP-less static site generators, such as, [Jekyll](https://jekyllrb.com/), are supported.
 
+Catapult maintains a high level of integrity when it comes to PHP versions, through maintaining security, backwards compatibility, performance, and new features. Below is an overview of the PHP versions used in Catapult and when you can expect these versions to be End-of-Life (EOL). We will bump to the next highest version of PHP in the list when nearing the EOL - this provides ample time for support of the newer PHP version by the software. In cases where a software version is sunsetting, the CentOS Long-term Support (LTS) version of PHP is used.
+
+PHP Version | End-of-Life | Maintainer | Updater
+------------|-------------|------------|--------
+5.4 | June 30, 2024 | [CentOS](https://wiki.centos.org/FAQ/General#head-fe8a0be91ee3e7dea812e8694491e1dde5b75e6d) | [RedHat](https://access.redhat.com/security/updates/backporting)
+7.1 | December 1, 2019 | [SCLO](https://www.softwarecollections.org/en/scls/rhscl/rh-php71/) | [RedHat](https://developers.redhat.com/products/softwarecollections/overview/)
+7.2 | November 30, 2020 | [SCLO](https://www.softwarecollections.org/en/scls/rhscl/rh-php72/) | [RedHat](https://developers.redhat.com/products/softwarecollections/overview/)
+
 
 ## Competition ##
 
