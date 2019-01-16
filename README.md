@@ -63,7 +63,7 @@ Catapult orchestrates the following key components of DevOps to provide you with
         * VirtualBox - Red Hat and Windows
     * **Cloud**
         * DigitalOcean - Red Hat
-        * AWS - Windows
+        * Amazon Web Services (AWS) - Windows
 * **DNS Management**
     * **Local**
         * vagrant-hostmanager
@@ -359,8 +359,8 @@ Catapult is designed with a distributed services model, below are the required t
 
 Service | Product | Use Case | Monthly Cost
 --------|---------|----------|-------------
-&dagger;Cloud Hosting: Red Hat (PHP) | DigitalOcean | Web and Database Servers (6) | \*$30+
-&dagger;Cloud Hosting: Windows (.NET) | Amazon Web Services (AWS) | Web and Database Servers (6) | \*$80+
+&dagger;Cloud Hosting: Red Hat (PHP) | DigitalOcean Droplets | Web and Database Servers (6) | \*$30+
+&dagger;Cloud Hosting: Windows (.NET) | Amazon Web Services (AWS) EC2 | Web and Database Servers (6) | \*$80+
 Source Code Repositories | Atlassian Bitbucket | Private Repositories | Free
 Source Code Repositories | GitHub | Public Repositories | Free
 Continuous Integration | Atlassian Bamboo Server | Build Server | $15
