@@ -79,6 +79,20 @@ module Catapult
       end
     end
 
+    # function: format bytes to megabytes and color code response based on soft and hard repo size limits
+    def Command::format_repo_size(repo_size)
+      repo_size = (((repo_size.to_f / 1024 / 1024 * 100).round / 100.0).round)
+      if repo_size == 0
+        return ("<1mb".rjust(11))
+      elsif repo_size < 1000
+        return ("#{repo_size}mb".rjust(11))
+      elsif repo_size < 1400
+        return ("#{repo_size}mb".rjust(11)).color(Colors::YELLOW)
+      else
+        return ("#{repo_size}mb".rjust(11)).color(Colors::RED)
+      end
+    end
+
 
     # define the minimum vagrant version
     Vagrant.require_version "> 1.4.0"
@@ -1972,7 +1986,7 @@ module Catapult
         domains_sorted = Array.new
         unless @configuration["websites"]["#{service}"] == nil
           puts "\n[#{service}] #{@configuration["websites"]["#{service}"].nil? ? "0" : @configuration["websites"]["#{service}"].length} total"
-          puts "[domain]".ljust(40) + "[repo]".ljust(12) + "[repo write access]".ljust(20) + "[develop]".ljust(16) + "[release]".ljust(16) + "[master]".ljust(16) + "[bamboo service]".ljust(18)
+          puts "[domain]".ljust(40) + "[repo]".ljust(12) + "[repo size]".ljust(12) + "[repo write access]".ljust(20) + "[develop]".ljust(16) + "[release]".ljust(16) + "[master]".ljust(16) + "[bamboo service]".ljust(18)
           puts "\n"
           @configuration["websites"]["#{service}"].each do |instance|
             # start new row
@@ -2169,6 +2183,7 @@ module Catapult
                 request = Net::HTTP::Get.new uri.request_uri
                 request.basic_auth "#{@configuration["company"]["bitbucket_username"]}", "#{@configuration["company"]["bitbucket_password"]}"
                 response = http.request(request)
+
                 if response.code.to_f == 404
                   # create the repo if it does not exist
                   confirm = ask("The Bitbucket repository #{repo_split_3[0]} does not exist, would you like to create it? [Y/N]") { |yn| yn.limit = 1, yn.validate = /[yn]/i }
@@ -2197,6 +2212,8 @@ module Catapult
                 elsif response.code.to_f.between?(399,600)
                   puts "   - The Bitbucket API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
                 end
+                # get repo size
+                @api_bitbucket_repo_size = JSON.parse(response.body)["size"]
               end
             end
             if "#{repo_split_2[0]}" == "github.com"
@@ -2232,9 +2249,11 @@ module Catapult
                 elsif response.code.to_f.between?(399,600)
                   puts "   - The GitHub API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
                 end
+                # get repo size
+                @api_github_repo_size = JSON.parse(response.body)["size"]
               end
             end
-            # validate repo access
+            # validate repo access 
             if "#{repo_split_2[0]}" == "bitbucket.org"
               @api_bitbucket_repo_access = false
               if @api_bitbucket_repo_access === false
@@ -2308,6 +2327,8 @@ module Catapult
               elsif @api_bitbucket_repo_access === true
                 # get repo type
                 row.push("bitbucket".ljust(11))
+                # get repo size
+                row.push(format_repo_size(@api_bitbucket_repo_size))
                 # get repo user access
                 row.push("#{@configuration["company"]["bitbucket_username"]}".slice!(0, 19).ljust(19))
               end
@@ -2326,6 +2347,8 @@ module Catapult
                   if response.code.to_f == 204
                     # get repo type
                     row.push("github".ljust(11))
+                    # get repo size
+                    row.push(format_repo_size(@api_github_repo_size))
                     # get repo user access
                     row.push("#{@configuration["company"]["github_username"]}".slice!(0, 19).ljust(19))
                   else
