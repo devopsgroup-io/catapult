@@ -55,7 +55,7 @@ Vagrant.configure("2") do |config|
     config.hostmanager.aliases = Catapult::Command.dev_redhat_hosts
     # disable the default vagrant share
     config.vm.synced_folder ".", "/vagrant", disabled: true
-    config.vm.synced_folder ".", "/catapult", type: "nfs"
+    config.vm.synced_folder ".", "/catapult", mount_options: ["nolock,vers=3,udp,noatime,fsc,actimeo=1"], type: "nfs"
     # sync the repositories folder for local access from the host
     config.vm.synced_folder "repositories", "/var/www/repositories", type: "nfs"
     # configure the provisioner
