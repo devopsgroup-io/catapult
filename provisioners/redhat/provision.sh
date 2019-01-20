@@ -16,6 +16,8 @@ hostnamectl status
 
 echo -e "\n\n\n==> INSTALLING MINIMAL DEPENDENCIES"
 
+# clean the yum cache directory
+sudo yum clean all -y --verbose
 # update packages
 sudo yum update -y --skip-broken
 
