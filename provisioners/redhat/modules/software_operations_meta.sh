@@ -397,6 +397,7 @@ elif [ "${software}" = "xenforo2" ]; then
     #cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && php cmd.php xf-rebuild:search
     #cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && php cmd.php xf-rebuild:threads
     #cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && php cmd.php xf-rebuild:users
+    : #no-op
 
 elif [ "${software}" = "zendframework2" ]; then
 
