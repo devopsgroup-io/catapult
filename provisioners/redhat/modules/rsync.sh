@@ -43,7 +43,7 @@ else
                 if [ $? -ne 0 ]; then
                     echo -e "- this file store is tracked in git"
                     if [ "${file_store_size}" -gt "${directory_size_maximum}" ]; then
-                        echo -e "- test:production file store is over the tracked limit [$(( ${file_store_size} / 1024 ))MB / $(( ${directory_size_maximum} / 1024 ))MB max]"
+                        echo -e "- production:downstream file store is over the tracked limit [$(( ${file_store_size} / 1024 ))MB / $(( ${directory_size_maximum} / 1024 ))MB max]"
                         echo -e "- rsyncing..."
                         sudo rsync --compress --delete --recursive -e "ssh -oStrictHostKeyChecking=no -i /catapult/secrets/id_rsa" "root@${production_redhat_ip}:${file_store}" "${file_store}"
                     fi
