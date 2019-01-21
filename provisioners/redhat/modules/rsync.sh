@@ -53,6 +53,8 @@ else
                     sudo rsync --compress --delete --recursive -e "ssh -oStrictHostKeyChecking=no -i /catapult/secrets/id_rsa" "root@${production_redhat_ip}:${file_store}" "${file_store}"
                 fi
             fi
+            # rsync the always untracked _sql file store
+            sudo rsync --compress --delete --recursive -e "ssh -oStrictHostKeyChecking=no -i /catapult/secrets/id_rsa" "root@${production_redhat_ip}:/var/www/repositories/apache/${domain}/_sql/" "/var/www/repositories/apache/${domain}/_sql/"
         
         elif ([ "${software_workflow}" = "upstream" ] && [ "$1" != "test" ]); then
             
@@ -77,6 +79,8 @@ else
                     sudo rsync --compress --delete --recursive -e "ssh -oStrictHostKeyChecking=no -i /catapult/secrets/id_rsa" "root@${test_redhat_ip}:${file_store}" "${file_store}"
                 fi
             fi
+            # rsync the always untracked _sql file store
+            sudo rsync --compress --delete --recursive -e "ssh -oStrictHostKeyChecking=no -i /catapult/secrets/id_rsa" "root@${test_redhat_ip}:/var/www/repositories/apache/${domain}/_sql/" "/var/www/repositories/apache/${domain}/_sql/"
 
         else
 

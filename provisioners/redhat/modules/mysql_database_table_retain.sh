@@ -45,10 +45,6 @@ if ([ ! -z "${software}" ]); then
                 fi
             fi
         done
-        # git add and commit the _sql folder changes
-        cd "/var/www/repositories/apache/${domain}" && git add --all "/var/www/repositories/apache/${domain}/_sql" 2>&1
-        cd "/var/www/repositories/apache/${domain}" && git commit --message="Catapult auto-commit ${1}:${software_workflow}:software_dbtable_retain" 2>&1
-        cd "/var/www/repositories/apache/${domain}" && sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git push origin $(catapult environments.$1.branch)" 2>&1
     fi
 
 fi
