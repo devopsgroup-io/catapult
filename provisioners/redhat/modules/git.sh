@@ -93,7 +93,7 @@ if [ -d "/var/www/repositories/apache/${domain}/.git" ]; then
                                 echo -e "- this website file store will be rsynced"
                                 echo -e "- rely on virtual machine backups for disaster recovery"
                                 cd "/var/www/repositories/apache/${domain}" \
-                                    && git reset --all "${file_store}"
+                                    && git reset --mixed "${file_store}"
                             else
                                 echo -e "- this website file store is tracked and within the limit to commit [$(( ${file_store_size} / 1024 ))MB / $(( ${directory_size_maximum} / 1024 ))MB max]"
                                 echo -e "- this website file store will be committed"
