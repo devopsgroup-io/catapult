@@ -1180,7 +1180,7 @@ Software | Tool | Command | Documentation
 ### Refreshing Databases ###
 
 * Databases are dumped once per day to the `~/_sql` folder and restored, dependent on the environment and `software_workflow` setting per website - see [Release Management](#release-management) for details.
-* Leverage Catapult's workflow model (configured by `software_workflow`) to trigger a database refresh. From the develop branch, commit a deletion of today's database backup from the `~/_sql` folder.
+* Leverage Catapult's workflow model (configured by `software_workflow`) to trigger a database refresh. From the develop branch, commit a deletion of today's database backup lock file from the `~/_sql` folder.
 
 ### Connecting to Databases ###
 

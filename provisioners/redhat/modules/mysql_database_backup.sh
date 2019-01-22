@@ -19,7 +19,7 @@ if ([ ! -z "${software}" ]); then
 
     if ([ "${1}" = "production" ] && [ "${software_workflow}" = "downstream" ] && [ "${software_db}" != "" ] && [ "${software_db_tables}" != "0" ]) || ([ "${1}" = "test" ] && [ "${software_workflow}" = "upstream" ] && [ "${software_db}" != "" ] && [ "${software_db_tables}" != "0" ]); then
         # dump the database as long as it hasn't already been dumped for the day
-        if ! [ -f /var/www/repositories/apache/${domain}/_sql/$(date +"%Y%m%d").sql ]; then
+        if ! [ -f /var/www/repositories/apache/${domain}/_sql/$(date +"%Y%m%d").sql.lock ]; then
             echo -e "\t* performing a database backup"
             # create the _sql directory if it does not exist
             mkdir --parents "/var/www/repositories/apache/${domain}/_sql"
