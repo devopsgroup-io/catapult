@@ -45,13 +45,15 @@ if ([ ! -z "${software}" ]); then
             filenewest=$(ls "/var/www/repositories/apache/${domain}/_sql" | grep -E ^[0-9]{8}\.sql$ | sort --numeric-sort | tail -1)
             for file in /var/www/repositories/apache/${domain}/_sql/*.*; do
                 if [[ "${file}" != *.sql ]]; then
-                    echo -e "\t\t[invalid] [ ].sql [ ]YYYYMMDD.sql [ ]newest => $file"
+                    echo -e "\t\t[invalid] [ ].sql [ ]YYYYMMDD.sql [ ]newest => $file [ ]newest => $file.lock"
                 elif ! [[ "$(basename "${file}")" =~ ^[0-9]{8}.sql$ ]]; then
-                    echo -e "\t\t[invalid] [x].sql [ ]YYYYMMDD.sql [ ]newest => $file"
+                    echo -e "\t\t[invalid] [x].sql [ ]YYYYMMDD.sql [ ]newest => $file [ ]newest => $file.lock"
                 elif [[ "$(basename "$file")" != "${filenewest}" ]]; then
-                    echo -e "\t\t[invalid] [x].sql [x]YYYYMMDD.sql [ ]newest => $file"
+                    echo -e "\t\t[invalid] [x].sql [x]YYYYMMDD.sql [ ]newest => $file [ ]newest => $file.lock"
+                elif [[ "$(basename "$file")" != "${filenewest}.lock" ]]; then
+                    echo -e "\t\t[invalid] [x].sql [x]YYYYMMDD.sql [x]newest => $file [ ]newest => $file.lock"
                 else
-                    echo -e "\t\t[valid]   [x].sql [x]YYYYMMDD.sql [x]newest => $file"
+                    echo -e "\t\t[valid]   [x].sql [x]YYYYMMDD.sql [x]newest => $file [x]newest => $file.lock"
                     echo -e "\t\t\trestoring..."
                     # support domain_tld_override for URL replacements
                     if [ -z "${domain_tld_override}" ]; then
@@ -140,7 +142,8 @@ if ([ ! -z "${software}" ]); then
     # we look for the newest possible _software_dbtable_retain database sql file and restore
     if ([ ! -z "${software}" ] && [ "${software_workflow}" = "upstream" ] && [ "${software_db}" != "" ] && [ "${software_db_tables}" != "0" ]); then
         filenewest=$(ls "/var/www/repositories/apache/${domain}/_sql" | grep -E ^[0-9]{8}_software_dbtable_retain\.sql$ | sort --numeric-sort | tail -1)
-        if [ -f "/var/www/repositories/apache/${domain}/_sql/${filenewest}" ]; then
+        filenewest_lock=$(ls "/var/www/repositories/apache/${domain}/_sql" | grep -E ^[0-9]{8}_software_dbtable_retain\.sql\.lock$ | sort --numeric-sort | tail -1)
+        if ([ -f "/var/www/repositories/apache/${domain}/_sql/${filenewest}" ] && [ -f "/var/www/repositories/apache/${domain}/_sql/${filenewest_lock}" ]); then
             mysql --defaults-extra-file=$dbconf ${1}_${domain_valid_db_name} < "/var/www/repositories/apache/${domain}/_sql/${filenewest}"
         fi
     fi
