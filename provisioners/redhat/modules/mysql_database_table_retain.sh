@@ -29,6 +29,8 @@ if ([ ! -z "${software}" ]); then
         # dump the database tables that are specified
         # note if there is an invalid table, there will be an error of: mysqldump: Couldn't find table: "test"
         mysqldump --defaults-extra-file=$dbconf --single-transaction --quick ${1}_${domain_valid_db_name} ${software_dbtable_retain[*]} > /var/www/repositories/apache/${domain}/_sql/$(date +"%Y%m%d")_software_dbtable_retain.sql
+        # write out a sql lock file for use in controlling what is restored in other environments
+        touch "/var/www/repositories/apache/${domain}/_sql/$(date +"%Y%m%d")_software_dbtable_retain.sql.lock"
         # ensure no more than 50mb or at least the one, newest, YYYYMMDD_software_dbtable_retain.sql file exists
         sql_files_size_maximum=$(( 1024 * 50 ))
         sql_files_size_total=0
