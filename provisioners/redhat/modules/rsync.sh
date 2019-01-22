@@ -3,9 +3,13 @@ source "/catapult/provisioners/redhat/modules/catapult.sh"
 if [ "${1}" == "dev" ]; then
     test_redhat_ip=$(catapult environments.test.servers.redhat.ip)
     production_redhat_ip=$(catapult environments.production.servers.redhat.ip)
+    test_redhat_mysql_ip=$(catapult environments.test.servers.redhat_mysql.ip)
+    production_redhat_mysql_ip=$(catapult environments.production.servers.redhat_mysql.ip)
 else
     test_redhat_ip=$(catapult environments.test.servers.redhat.ip_private)
     production_redhat_ip=$(catapult environments.production.servers.redhat.ip_private)
+    test_redhat_mysql_ip=$(catapult environments.test.servers.redhat_mysql.ip_private)
+    production_redhat_mysql_ip=$(catapult environments.production.servers.redhat_mysql.ip_private)
 fi
 
 domain=$(catapult websites.apache.$5.domain)
@@ -54,7 +58,8 @@ else
                 fi
             fi
             # rsync the always untracked _sql file store
-            sudo rsync --compress --delete --recursive -e "ssh -oStrictHostKeyChecking=no -i /catapult/secrets/id_rsa" "root@${production_redhat_ip}:/var/www/repositories/apache/${domain}/_sql/" "/var/www/repositories/apache/${domain}/_sql/"
+            echo -e "- rsyncing /var/www/repositories/apache/${domain}/_sql/ from production:downstream..."
+            sudo rsync --compress --delete --recursive -e "ssh -oStrictHostKeyChecking=no -i /catapult/secrets/id_rsa" "root@${production_redhat_mysql_ip}:/var/www/repositories/apache/${domain}/_sql/" "/var/www/repositories/apache/${domain}/_sql/"
         
         elif ([ "${software_workflow}" = "upstream" ] && [ "$1" != "test" ]); then
             
@@ -80,7 +85,8 @@ else
                 fi
             fi
             # rsync the always untracked _sql file store
-            sudo rsync --compress --delete --recursive -e "ssh -oStrictHostKeyChecking=no -i /catapult/secrets/id_rsa" "root@${test_redhat_ip}:/var/www/repositories/apache/${domain}/_sql/" "/var/www/repositories/apache/${domain}/_sql/"
+            echo -e "- rsyncing /var/www/repositories/apache/${domain}/_sql/ from test:upstream..."
+            sudo rsync --compress --delete --recursive -e "ssh -oStrictHostKeyChecking=no -i /catapult/secrets/id_rsa" "root@${test_redhat_mysql_ip}:/var/www/repositories/apache/${domain}/_sql/" "/var/www/repositories/apache/${domain}/_sql/"
 
         else
 
