@@ -59,7 +59,7 @@ else
             fi
             # rsync the always untracked _sql file store
             echo -e "- rsyncing /var/www/repositories/apache/${domain}/_sql/ from production:downstream..."
-            sudo rsync --compress --delete --recursive -e "ssh -oStrictHostKeyChecking=no -i /catapult/secrets/id_rsa" "root@${production_redhat_mysql_ip}:/var/www/repositories/apache/${domain}/_sql/" "/var/www/repositories/apache/${domain}/_sql/"
+            sudo rsync --compress --delete --exclude '*.lock' --recursive -e "ssh -oStrictHostKeyChecking=no -i /catapult/secrets/id_rsa" "root@${production_redhat_mysql_ip}:/var/www/repositories/apache/${domain}/_sql/" "/var/www/repositories/apache/${domain}/_sql/"
         
         elif ([ "${software_workflow}" = "upstream" ] && [ "$1" != "test" ]); then
             
@@ -86,7 +86,7 @@ else
             fi
             # rsync the always untracked _sql file store
             echo -e "- rsyncing /var/www/repositories/apache/${domain}/_sql/ from test:upstream..."
-            sudo rsync --compress --delete --recursive -e "ssh -oStrictHostKeyChecking=no -i /catapult/secrets/id_rsa" "root@${test_redhat_mysql_ip}:/var/www/repositories/apache/${domain}/_sql/" "/var/www/repositories/apache/${domain}/_sql/"
+            sudo rsync --compress --delete --exclude '*.lock' --recursive -e "ssh -oStrictHostKeyChecking=no -i /catapult/secrets/id_rsa" "root@${test_redhat_mysql_ip}:/var/www/repositories/apache/${domain}/_sql/" "/var/www/repositories/apache/${domain}/_sql/"
 
         else
 
