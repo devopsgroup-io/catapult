@@ -1273,7 +1273,9 @@ module Catapult
       catapult_exception("Please set [\"company\"][\"sendgrid_api_key\"] in secrets/configuration.yml")
     else
       begin
-        uri = URI("https://api.sendgrid.com/v3/suppression/blocks")
+        current_time = DateTime.now
+        current_time_month = current_time.strftime("%Y-%m-01")
+        uri = URI("https://api.sendgrid.com/v3/stats?aggregated_by=month&start_date=#{current_time_month}")
         Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
           request = Net::HTTP::Get.new uri.request_uri
           request.add_field "Authorization", "Bearer #{@configuration["company"]["sendgrid_api_key"]}"
@@ -1284,6 +1286,25 @@ module Catapult
             puts " * SendGrid API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
           else
             puts " * SendGrid API authenticated successfully."
+            @api_sendgrid = JSON.parse(response.body)
+            if @api_sendgrid
+              @api_sendgrid.each do |stat|
+                puts "   - Requests since #{current_time_month}: #{stat["stats"][0]["metrics"]["requests"]}"
+                puts "   - Delivered since #{current_time_month}: #{stat["stats"][0]["metrics"]["delivered"]}"
+              end
+            end
+          end
+        end
+        uri = URI("https://api.sendgrid.com/v3/suppression/blocks")
+        Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
+          request = Net::HTTP::Get.new uri.request_uri
+          request.add_field "Authorization", "Bearer #{@configuration["company"]["sendgrid_api_key"]}"
+          response = http.request(request)
+          if response.code.to_f.between?(399,499)
+            catapult_exception("#{response.code} The SendGrid API could not authenticate, please verify [\"company\"][\"sendgrid_api_key\"].")
+          elsif response.code.to_f.between?(500,600)
+            puts " * SendGrid API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
+          else
             @api_sendgrid = JSON.parse(response.body)
             if @api_sendgrid
               @api_sendgrid.each do |block|
