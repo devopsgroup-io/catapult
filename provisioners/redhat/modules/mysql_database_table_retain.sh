@@ -43,6 +43,7 @@ if ([ ! -z "${software}" ]); then
                 if [[ "$(basename "$file")" != "${file_newest}" ]]; then
                     echo -e "\t\t removing the old /var/www/repositories/apache/${domain}/_sql/${file}..."
                     sudo rm --force "/var/www/repositories/apache/${domain}/_sql/${file}"
+                    sudo rm --force "/var/www/repositories/apache/${domain}/_sql/${file}.lock"
                 fi
             fi
         done
