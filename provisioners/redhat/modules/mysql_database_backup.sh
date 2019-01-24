@@ -1,8 +1,7 @@
 source "/catapult/provisioners/redhat/modules/catapult.sh"
 
-# set a variable to the .cnf
+branch=$(catapult environments.$1.branch)
 dbconf="/catapult/provisioners/redhat/installers/temp/${1}.cnf"
-
 domain=$(catapult websites.apache.$5.domain)
 domain_valid_db_name=$(catapult websites.apache.$5.domain | tr "." "_" | tr "-" "_")
 software=$(catapult websites.apache.$5.software)
@@ -43,6 +42,12 @@ if ([ ! -z "${software}" ]); then
                     fi
                 fi
             done
+            # git add, commit, pull, then push the _sql folder changes
+            cd "/var/www/repositories/apache/${domain}" \
+                && git commit --message="Catapult auto-commit ${1}:${software_workflow}:software_database" \
+                && sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git fetch" \
+                && sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git pull origin ${branch}" \
+                && sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git push origin ${branch}"
         else
             echo -e "\t* a database backup was already performed today"
         fi
