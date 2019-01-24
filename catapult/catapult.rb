@@ -1273,7 +1273,7 @@ module Catapult
       catapult_exception("Please set [\"company\"][\"sendgrid_api_key\"] in secrets/configuration.yml")
     else
       begin
-        uri = URI("https://api.sendgrid.com/v3/suppression/bounces")
+        uri = URI("https://api.sendgrid.com/v3/suppression/blocks")
         Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
           request = Net::HTTP::Get.new uri.request_uri
           request.add_field "Authorization", "Bearer #{@configuration["company"]["sendgrid_api_key"]}"
@@ -1286,8 +1286,26 @@ module Catapult
             puts " * SendGrid API authenticated successfully."
             @api_sendgrid = JSON.parse(response.body)
             if @api_sendgrid
+              @api_sendgrid.each do |block|
+                puts "   - Block: #{Time.at(block["created"]).to_date} #{block["email"]} #{block["reason"]} #{block["status"]}".color(Colors::RED)
+              end
+            end
+          end
+        end
+        uri = URI("https://api.sendgrid.com/v3/suppression/bounces")
+        Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
+          request = Net::HTTP::Get.new uri.request_uri
+          request.add_field "Authorization", "Bearer #{@configuration["company"]["sendgrid_api_key"]}"
+          response = http.request(request)
+          if response.code.to_f.between?(399,499)
+            catapult_exception("#{response.code} The SendGrid API could not authenticate, please verify [\"company\"][\"sendgrid_api_key\"].")
+          elsif response.code.to_f.between?(500,600)
+            puts " * SendGrid API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
+          else
+            @api_sendgrid = JSON.parse(response.body)
+            if @api_sendgrid
               @api_sendgrid.each do |bounce|
-                puts "   - Bounce: #{Time.at(bounce["created"]).to_date} #{bounce["email"]} #{bounce["reason"]}".color(Colors::YELLOW)
+                puts "   - Bounce: #{Time.at(bounce["created"]).to_date} #{bounce["email"]} #{bounce["reason"]} #{bounce["status"]}".color(Colors::YELLOW)
               end
             end
           end
@@ -1329,6 +1347,24 @@ module Catapult
             puts " * SendGrid API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
           else
             puts "   - Configured bounces to forward to #{@configuration["company"]["email"]}."
+          end
+        end
+        uri = URI("https://api.sendgrid.com/v3/suppression/spam_reports")
+        Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
+          request = Net::HTTP::Get.new uri.request_uri
+          request.add_field "Authorization", "Bearer #{@configuration["company"]["sendgrid_api_key"]}"
+          response = http.request(request)
+          if response.code.to_f.between?(399,499)
+            catapult_exception("#{response.code} The SendGrid API could not authenticate, please verify [\"company\"][\"sendgrid_api_key\"].")
+          elsif response.code.to_f.between?(500,600)
+            puts " * SendGrid API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
+          else
+            @api_sendgrid = JSON.parse(response.body)
+            if @api_sendgrid
+              @api_sendgrid.each do |spam|
+                puts "   - Spam: #{Time.at(spam["created"]).to_date} #{spam["email"]} #{spam["ip"]}".color(Colors::RED)
+              end
+            end
           end
         end
       rescue Net::ReadTimeout => ex
