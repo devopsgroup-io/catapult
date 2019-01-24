@@ -62,8 +62,8 @@ if [ -d "/var/www/repositories/apache/${domain}/.git" ]; then
             fi
             # manage the _sql directory entry in the .gitignore file
             sed -i '/_sql/,$d' "/var/www/repositories/apache/${domain}/.gitignore"
-            if ! grep -q "_sql/*.lock" "/var/www/repositories/apache/${domain}/.gitignore"; then
-               sudo bash -c "echo \"_sql/*.lock\" >> \"/var/www/repositories/apache/${domain}/.gitignore\""
+            if ! grep -q "_sql/*.sql" "/var/www/repositories/apache/${domain}/.gitignore"; then
+               sudo bash -c "echo \"_sql/*.sql\" >> \"/var/www/repositories/apache/${domain}/.gitignore\""
             fi
             # add everything in the repository to the git index (keep in mind untracked file stores)
             cd "/var/www/repositories/apache/${domain}" \
