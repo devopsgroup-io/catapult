@@ -106,16 +106,16 @@ if ([ ! -z "${software}" ]); then
                  || [ "${software}" = "xenforo2" ] \
                  || [ "${software}" = "zendframework2" ]); then
                     echo -e "\t- replacing URLs in the database to align with the enivronment..."
-                    replacements=$(grep --extended-regexp --only-matching --regexp=":\/\/(www\.)?(dev\.|test\.|qc\.)?(${domain_url_replace})" "/var/www/repositories/apache/${domain}/_sql/$(basename "$file")" | wc --lines)
-                    sed --regexp-extended --expression="s/:\/\/(www\.)?(dev\.|test\.|qc\.)?(${domain_url_replace})/:\/\/\1${domain_url}/g" "/var/www/repositories/apache/${domain}/_sql/$(basename "$file")" > "/var/www/repositories/apache/${domain}/_sql/${1}.$(basename "$file")"
+                    replacements=$(grep --extended-regexp --only-matching --regexp=":\/\/(www\.)?(dev\.|test\.|qc\.)?(${domain_url_replace})" "/var/www/repositories/apache/${domain}/_sql/${filenewest}" | wc --lines)
+                    sed --regexp-extended --expression="s/:\/\/(www\.)?(dev\.|test\.|qc\.)?(${domain_url_replace})/:\/\/\1${domain_url}/g" "/var/www/repositories/apache/${domain}/_sql/${filenewest}" > "/var/www/repositories/apache/${domain}/_sql/${1}.${filenewest}"
                     echo -e "\t- found and replaced ${replacements} occurrences"
                 else
-                    cp "/var/www/repositories/apache/${domain}/_sql/$(basename "$file")" "/var/www/repositories/apache/${domain}/_sql/${1}.$(basename "$file")"
+                    cp "/var/www/repositories/apache/${domain}/_sql/${filenewest}" "/var/www/repositories/apache/${domain}/_sql/${1}.${filenewest}"
                 fi
 
                 # restore the full database sql file
-                mysql --defaults-extra-file=$dbconf ${1}_${domain_valid_db_name} < "/var/www/repositories/apache/${domain}/_sql/${1}.$(basename "$file")"
-                rm --force "/var/www/repositories/apache/${domain}/_sql/${1}.$(basename "$file")"
+                mysql --defaults-extra-file=$dbconf ${1}_${domain_valid_db_name} < "/var/www/repositories/apache/${domain}/_sql/${1}.${filenewest}"
+                rm --force "/var/www/repositories/apache/${domain}/_sql/${1}.${filenewest}"
 
                 # post-process the database
                 # necessary for PHP serialized arrays
