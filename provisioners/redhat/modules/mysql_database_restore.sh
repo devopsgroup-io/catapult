@@ -43,97 +43,89 @@ if ([ ! -z "${software}" ]); then
         else
             echo -e "\t* ~/_sql directory exists, looking for a valid database dump to restore from"
             filenewest=$(ls "/var/www/repositories/apache/${domain}/_sql" | grep -E ^[0-9]{8}\.sql$ | sort --numeric-sort | tail -1)
-            for file in /var/www/repositories/apache/${domain}/_sql/*.*; do
-                if [[ "${file}" != *.sql ]]; then
-                    echo -e "\t\t[invalid] [ ].sql [ ]YYYYMMDD.sql [ ]newest => $file [ ]newest => $file.lock"
-                elif ! [[ "$(basename "${file}")" =~ ^[0-9]{8}.sql$ ]]; then
-                    echo -e "\t\t[invalid] [x].sql [ ]YYYYMMDD.sql [ ]newest => $file [ ]newest => $file.lock"
-                elif [[ "$(basename "$file")" != "${filenewest}" ]]; then
-                    echo -e "\t\t[invalid] [x].sql [x]YYYYMMDD.sql [ ]newest => $file [ ]newest => $file.lock"
-                elif [[ "$(basename "$file")" != "${filenewest}.lock" ]]; then
-                    echo -e "\t\t[invalid] [x].sql [x]YYYYMMDD.sql [x]newest => $file [ ]newest => $file.lock"
+            filenewest_lock=$(ls "/var/www/repositories/apache/${domain}/_sql" | grep -E ^[0-9]{8}\.sql\.lock$ | sort --numeric-sort | tail -1)
+            if ([ -f "/var/www/repositories/apache/${domain}/_sql/${filenewest}" ] && [ -f "/var/www/repositories/apache/${domain}/_sql/${filenewest_lock}" ]); then
+                echo -e "\t- found ${filenewest_lock}"
+                echo -e "\t- found ${filenewest}"
+                echo -e "\t- restoring..."
+                # support domain_tld_override for URL replacements
+                if [ -z "${domain_tld_override}" ]; then
+                    # create replace string and make sure to escape periods
+                    domain_url_replace=$(echo -e "${domain}" | sed 's/\./\\./g')
+                    # create string of final url
+                    if [ "${1}" = "production" ]; then
+                        domain_url="${domain}"
+                    else
+                        domain_url="${1}.${domain}"
+                    fi
                 else
-                    echo -e "\t\t[valid]   [x].sql [x]YYYYMMDD.sql [x]newest => $file [x]newest => $file.lock"
-                    echo -e "\t\t\trestoring..."
-                    # support domain_tld_override for URL replacements
-                    if [ -z "${domain_tld_override}" ]; then
-                        # create replace string and make sure to escape periods
-                        domain_url_replace=$(echo -e "${domain}" | sed 's/\./\\./g')
-                        # create string of final url
-                        if [ "${1}" = "production" ]; then
-                            domain_url="${domain}"
-                        else
-                            domain_url="${1}.${domain}"
-                        fi
+                    # create replace string and make sure to escape periods
+                    domain_url_replace=$(echo -e "${domain}.${domain_tld_override}|${domain}" | sed 's/\./\\./g')
+                    # create string of final url
+                    if [ "${1}" = "production" ]; then
+                        domain_url="${domain}.${domain_tld_override}"
                     else
-                        # create replace string and make sure to escape periods
-                        domain_url_replace=$(echo -e "${domain}.${domain_tld_override}|${domain}" | sed 's/\./\\./g')
-                        # create string of final url
-                        if [ "${1}" = "production" ]; then
-                            domain_url="${domain}.${domain_tld_override}"
-                        else
-                            domain_url="${1}.${domain}.${domain_tld_override}"
-                        fi
-                    fi
-                    # replace variances of the following urls during a restore to match the environment
-                    # pay attention to the order of the (${domain}.${domain_tld_override|${domain}}) rule
-                    # https://regex101.com/r/vF7hY9/2
-                    # :\/\/(www\.)?(dev\.|test\.|qc\.)?(devopsgroup\.io\.example.com|devopsgroup\.io)
-                    # ://dev.devopsgroup.io
-                    # ://www.dev.devopsgroup.io
-                    # ://test.devopsgroup.io
-                    # ://www.test.devopsgroup.io
-                    # ://devopsgroup.io
-                    # ://www.devopsgroup.io
-                    # ://dev.devopsgroup.io.example.com
-                    # ://www.dev.devopsgroup.io.example.com
-                    # ://test.devopsgroup.io.example.com
-                    # ://www.test.devopsgroup.io.example.com
-                    # ://devopsgroup.io.example.com
-                    # ://www.devopsgroup.io.example.com
-
-                    # pre-process database sql file
-                    # for software without a cli tool for database url reference replacements, use sed to pre-process sql file and replace url references
-                    if ([ "${software}" = "codeigniter2" ] \
-                     || [ "${software}" = "codeigniter3" ] \
-                     || [ "${software}" = "concrete58" ] \
-                     || [ "${software}" = "drupal6" ] \
-                     || [ "${software}" = "drupal7" ] \
-                     || [ "${software}" = "drupal8" ] \
-                     || [ "${software}" = "elgg1" ] \
-                     || [ "${software}" = "elgg2" ] \
-                     || [ "${software}" = "expressionengine3" ] \
-                     || [ "${software}" = "joomla3" ] \
-                     || [ "${software}" = "laravel5" ] \
-                     || [ "${software}" = "mediawiki1" ] \
-                     || [ "${software}" = "moodle3" ] \
-                     || [ "${software}" = "silverstripe3" ] \
-                     || [ "${software}" = "suitecrm7" ] \
-                     || [ "${software}" = "xenforo1" ] \
-                     || [ "${software}" = "xenforo2" ] \
-                     || [ "${software}" = "zendframework2" ]); then
-                        echo -e "\t* replacing URLs in the database to align with the enivronment..."
-                        replacements=$(grep --extended-regexp --only-matching --regexp=":\/\/(www\.)?(dev\.|test\.|qc\.)?(${domain_url_replace})" "/var/www/repositories/apache/${domain}/_sql/$(basename "$file")" | wc --lines)
-                        sed --regexp-extended --expression="s/:\/\/(www\.)?(dev\.|test\.|qc\.)?(${domain_url_replace})/:\/\/\1${domain_url}/g" "/var/www/repositories/apache/${domain}/_sql/$(basename "$file")" > "/var/www/repositories/apache/${domain}/_sql/${1}.$(basename "$file")"
-                        echo -e "\t* found and replaced ${replacements} occurrences"
-                    else
-                        cp "/var/www/repositories/apache/${domain}/_sql/$(basename "$file")" "/var/www/repositories/apache/${domain}/_sql/${1}.$(basename "$file")"
-                    fi
-
-                    # restore the full database sql file
-                    mysql --defaults-extra-file=$dbconf ${1}_${domain_valid_db_name} < "/var/www/repositories/apache/${domain}/_sql/${1}.$(basename "$file")"
-                    rm --force "/var/www/repositories/apache/${domain}/_sql/${1}.$(basename "$file")"
-
-                    # post-process the database
-                    # necessary for PHP serialized arrays
-                    # for software with a cli tool for database url reference replacements, use cli tool to post-process database and replace url references
-                    if ([ "${software}" = "wordpress4" ] \
-                     || [ "${software}" = "wordpress5" ]); then
-                        echo -e "\t* replacing URLs in the database to align with the enivronment..."
-                        wp-cli --allow-root --path="/var/www/repositories/apache/${domain}/${webroot}" search-replace ":\/\/(www\.)?(dev\.|test\.|qc\.)?(${domain_url_replace})" "://\$1${domain_url}" --regex | sed "s/^/\t\t/"
+                        domain_url="${1}.${domain}.${domain_tld_override}"
                     fi
                 fi
-            done
+                # replace variances of the following urls during a restore to match the environment
+                # pay attention to the order of the (${domain}.${domain_tld_override|${domain}}) rule
+                # https://regex101.com/r/vF7hY9/2
+                # :\/\/(www\.)?(dev\.|test\.|qc\.)?(devopsgroup\.io\.example.com|devopsgroup\.io)
+                # ://dev.devopsgroup.io
+                # ://www.dev.devopsgroup.io
+                # ://test.devopsgroup.io
+                # ://www.test.devopsgroup.io
+                # ://devopsgroup.io
+                # ://www.devopsgroup.io
+                # ://dev.devopsgroup.io.example.com
+                # ://www.dev.devopsgroup.io.example.com
+                # ://test.devopsgroup.io.example.com
+                # ://www.test.devopsgroup.io.example.com
+                # ://devopsgroup.io.example.com
+                # ://www.devopsgroup.io.example.com
+
+                # pre-process database sql file
+                # for software without a cli tool for database url reference replacements, use sed to pre-process sql file and replace url references
+                if ([ "${software}" = "codeigniter2" ] \
+                 || [ "${software}" = "codeigniter3" ] \
+                 || [ "${software}" = "concrete58" ] \
+                 || [ "${software}" = "drupal6" ] \
+                 || [ "${software}" = "drupal7" ] \
+                 || [ "${software}" = "drupal8" ] \
+                 || [ "${software}" = "elgg1" ] \
+                 || [ "${software}" = "elgg2" ] \
+                 || [ "${software}" = "expressionengine3" ] \
+                 || [ "${software}" = "joomla3" ] \
+                 || [ "${software}" = "laravel5" ] \
+                 || [ "${software}" = "mediawiki1" ] \
+                 || [ "${software}" = "moodle3" ] \
+                 || [ "${software}" = "silverstripe3" ] \
+                 || [ "${software}" = "suitecrm7" ] \
+                 || [ "${software}" = "xenforo1" ] \
+                 || [ "${software}" = "xenforo2" ] \
+                 || [ "${software}" = "zendframework2" ]); then
+                    echo -e "\t- replacing URLs in the database to align with the enivronment..."
+                    replacements=$(grep --extended-regexp --only-matching --regexp=":\/\/(www\.)?(dev\.|test\.|qc\.)?(${domain_url_replace})" "/var/www/repositories/apache/${domain}/_sql/$(basename "$file")" | wc --lines)
+                    sed --regexp-extended --expression="s/:\/\/(www\.)?(dev\.|test\.|qc\.)?(${domain_url_replace})/:\/\/\1${domain_url}/g" "/var/www/repositories/apache/${domain}/_sql/$(basename "$file")" > "/var/www/repositories/apache/${domain}/_sql/${1}.$(basename "$file")"
+                    echo -e "\t- found and replaced ${replacements} occurrences"
+                else
+                    cp "/var/www/repositories/apache/${domain}/_sql/$(basename "$file")" "/var/www/repositories/apache/${domain}/_sql/${1}.$(basename "$file")"
+                fi
+
+                # restore the full database sql file
+                mysql --defaults-extra-file=$dbconf ${1}_${domain_valid_db_name} < "/var/www/repositories/apache/${domain}/_sql/${1}.$(basename "$file")"
+                rm --force "/var/www/repositories/apache/${domain}/_sql/${1}.$(basename "$file")"
+
+                # post-process the database
+                # necessary for PHP serialized arrays
+                # for software with a cli tool for database url reference replacements, use cli tool to post-process database and replace url references
+                if ([ "${software}" = "wordpress4" ] \
+                 || [ "${software}" = "wordpress5" ]); then
+                    echo -e "\t- replacing URLs in the database to align with the enivronment..."
+                    wp-cli --allow-root --path="/var/www/repositories/apache/${domain}/${webroot}" search-replace ":\/\/(www\.)?(dev\.|test\.|qc\.)?(${domain_url_replace})" "://\$1${domain_url}" --regex | sed "s/^/\t\t/"
+                fi
+            fi
         fi
     fi
 
@@ -144,6 +136,9 @@ if ([ ! -z "${software}" ]); then
         filenewest=$(ls "/var/www/repositories/apache/${domain}/_sql" | grep -E ^[0-9]{8}_software_dbtable_retain\.sql$ | sort --numeric-sort | tail -1)
         filenewest_lock=$(ls "/var/www/repositories/apache/${domain}/_sql" | grep -E ^[0-9]{8}_software_dbtable_retain\.sql\.lock$ | sort --numeric-sort | tail -1)
         if ([ -f "/var/www/repositories/apache/${domain}/_sql/${filenewest}" ] && [ -f "/var/www/repositories/apache/${domain}/_sql/${filenewest_lock}" ]); then
+            echo -e "\t- found ${filenewest_lock}"
+            echo -e "\t- found ${filenewest}"
+            echo -e "\t- restoring..."
             mysql --defaults-extra-file=$dbconf ${1}_${domain_valid_db_name} < "/var/www/repositories/apache/${domain}/_sql/${filenewest}"
         fi
     fi
