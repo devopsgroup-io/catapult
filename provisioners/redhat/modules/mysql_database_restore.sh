@@ -33,10 +33,10 @@ if ([ ! -z "${software}" ]); then
             echo -e "\t* ~/_sql directory does not exist, ${software} may not function properly"
         else
             echo -e "\t* ~/_sql directory exists, looking for a valid database dump to restore from"
-            filenewest=$(ls "/var/www/repositories/apache/${domain}/_sql" | grep -E ^[0-9]{8}\.sql$ | sort --numeric-sort | tail -1)
             filenewest_lock=$(ls "/var/www/repositories/apache/${domain}/_sql" | grep -E ^[0-9]{8}\.sql\.lock$ | sort --numeric-sort | tail -1)
-            if ( ([ "${filenewest}.lock" = "${filenewest_lock}" ]) \
-              && ([ -f "/var/www/repositories/apache/${domain}/_sql/${filenewest}" ] && [ -f "/var/www/repositories/apache/${domain}/_sql/${filenewest_lock}" ])); then
+            filenewest=${filenewest_lock::-5}
+
+            if ([ -f "/var/www/repositories/apache/${domain}/_sql/${filenewest}" ] && [ -f "/var/www/repositories/apache/${domain}/_sql/${filenewest_lock}" ]); then
                 # drop the database
                 for database in $(mysql --defaults-extra-file=$dbconf -e "show databases" | egrep -v "Database|mysql|information_schema|performance_schema"); do
                     if [ ${database} = ${1}_${domain_valid_db_name} ]; then
@@ -134,10 +134,9 @@ if ([ ! -z "${software}" ]); then
     # we do not respect the software_workflow in the scenario and restore the _software_dbtable_retain in any environment if a _software_dbtable_retain db sql file exists
     # we look for the newest possible _software_dbtable_retain database sql file and restore
     if ([ ! -z "${software}" ] && [ "${software_workflow}" = "upstream" ] && [ "${software_db}" != "" ] && [ "${software_db_tables}" != "0" ]); then
-        filenewest=$(ls "/var/www/repositories/apache/${domain}/_sql" | grep -E ^[0-9]{8}_software_dbtable_retain\.sql$ | sort --numeric-sort | tail -1)
         filenewest_lock=$(ls "/var/www/repositories/apache/${domain}/_sql" | grep -E ^[0-9]{8}_software_dbtable_retain\.sql\.lock$ | sort --numeric-sort | tail -1)
-        if ( ([ "${filenewest}.lock" = "${filenewest_lock}" ]) \
-          && ([ -f "/var/www/repositories/apache/${domain}/_sql/${filenewest}" ] && [ -f "/var/www/repositories/apache/${domain}/_sql/${filenewest_lock}" ])); then
+        filenewest=${filenewest_lock::-5}
+        if ([ -f "/var/www/repositories/apache/${domain}/_sql/${filenewest}" ] && [ -f "/var/www/repositories/apache/${domain}/_sql/${filenewest_lock}" ]); then
             echo -e "\t- found ${filenewest_lock}"
             echo -e "\t- found ${filenewest}"
             echo -e "\t- restoring..."
