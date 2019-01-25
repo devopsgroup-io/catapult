@@ -28,15 +28,6 @@ if ([ ! -z "${software}" ]); then
         else
             echo -e "\t* workflow is set to ${software_workflow} and this is the ${1} environment, performing a database restore..."
         fi
-        # drop the database
-        # the loop is necessary just in case the database doesn't yet exist
-        for database in $(mysql --defaults-extra-file=$dbconf -e "show databases" | egrep -v "Database|mysql|information_schema|performance_schema"); do
-            if [ ${database} = ${1}_${domain_valid_db_name} ]; then
-                mysql --defaults-extra-file=$dbconf -e "DROP DATABASE ${1}_${domain_valid_db_name}";
-            fi
-        done
-        # create database
-        mysql --defaults-extra-file=$dbconf -e "CREATE DATABASE ${1}_${domain_valid_db_name}"
         # confirm we have a usable database backup
         if ! [ -d "/var/www/repositories/apache/${domain}/_sql" ]; then
             echo -e "\t* ~/_sql directory does not exist, ${software} may not function properly"
@@ -44,7 +35,17 @@ if ([ ! -z "${software}" ]); then
             echo -e "\t* ~/_sql directory exists, looking for a valid database dump to restore from"
             filenewest=$(ls "/var/www/repositories/apache/${domain}/_sql" | grep -E ^[0-9]{8}\.sql$ | sort --numeric-sort | tail -1)
             filenewest_lock=$(ls "/var/www/repositories/apache/${domain}/_sql" | grep -E ^[0-9]{8}\.sql\.lock$ | sort --numeric-sort | tail -1)
-            if ([ -f "/var/www/repositories/apache/${domain}/_sql/${filenewest}" ] && [ -f "/var/www/repositories/apache/${domain}/_sql/${filenewest_lock}" ]); then
+            if ( ([ "${filenewest}.lock" = "${filenewest_lock}" ]) \
+              && ([ -f "/var/www/repositories/apache/${domain}/_sql/${filenewest}" ] && [ -f "/var/www/repositories/apache/${domain}/_sql/${filenewest_lock}" ])); then
+                # drop the database
+                for database in $(mysql --defaults-extra-file=$dbconf -e "show databases" | egrep -v "Database|mysql|information_schema|performance_schema"); do
+                    if [ ${database} = ${1}_${domain_valid_db_name} ]; then
+                        mysql --defaults-extra-file=$dbconf -e "DROP DATABASE ${1}_${domain_valid_db_name}";
+                    fi
+                done
+                # create database
+                mysql --defaults-extra-file=$dbconf -e "CREATE DATABASE ${1}_${domain_valid_db_name}"
+                # restore database
                 echo -e "\t- found ${filenewest_lock}"
                 echo -e "\t- found ${filenewest}"
                 echo -e "\t- restoring..."
@@ -135,7 +136,8 @@ if ([ ! -z "${software}" ]); then
     if ([ ! -z "${software}" ] && [ "${software_workflow}" = "upstream" ] && [ "${software_db}" != "" ] && [ "${software_db_tables}" != "0" ]); then
         filenewest=$(ls "/var/www/repositories/apache/${domain}/_sql" | grep -E ^[0-9]{8}_software_dbtable_retain\.sql$ | sort --numeric-sort | tail -1)
         filenewest_lock=$(ls "/var/www/repositories/apache/${domain}/_sql" | grep -E ^[0-9]{8}_software_dbtable_retain\.sql\.lock$ | sort --numeric-sort | tail -1)
-        if ([ -f "/var/www/repositories/apache/${domain}/_sql/${filenewest}" ] && [ -f "/var/www/repositories/apache/${domain}/_sql/${filenewest_lock}" ]); then
+        if ( ([ "${filenewest}.lock" = "${filenewest_lock}" ]) \
+          && ([ -f "/var/www/repositories/apache/${domain}/_sql/${filenewest}" ] && [ -f "/var/www/repositories/apache/${domain}/_sql/${filenewest_lock}" ])); then
             echo -e "\t- found ${filenewest_lock}"
             echo -e "\t- found ${filenewest}"
             echo -e "\t- restoring..."
