@@ -106,6 +106,7 @@ module Catapult
 
     # check for an internet connection
     require "resolv"
+    require "resolv-replace"
     dns_resolver = Resolv::DNS.new()
     begin
       dns_resolver.getaddress("google.com")
