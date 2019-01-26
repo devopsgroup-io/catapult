@@ -158,7 +158,6 @@ module Catapult
     require "nokogiri"
     require "open-uri"
     require "openssl"
-    require "resolv"
     require "securerandom"
     require "yaml"
 
