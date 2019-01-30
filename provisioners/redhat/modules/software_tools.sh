@@ -17,8 +17,8 @@ if [ ! -f /usr/bin/composer ]; then
 
 fi
 # configure php version
-if ! grep -q "alias composer-php70='/opt/rh/rh-php70/root/usr/bin/php /usr/local/src/composer/composer.phar'" ~/.bashrc; then
-    sudo bash -c "echo -e \"\nalias composer-php70='/opt/rh/rh-php70/root/usr/bin/php /usr/local/src/composer/composer.phar'\" >> ~/.bashrc"
+if ! grep -q "alias composer-php71='/opt/rh/rh-php71/root/usr/bin/php /usr/local/src/composer/composer.phar'" ~/.bashrc; then
+    sudo bash -c "echo -e \"\nalias composer-php71='/opt/rh/rh-php71/root/usr/bin/php /usr/local/src/composer/composer.phar'\" >> ~/.bashrc"
 fi
 # update to latest composer
 composer self-update
@@ -38,8 +38,8 @@ if [ ! -f /usr/bin/drush ]; then
 fi
 # configure php version
 # http://docs.drush.org/en/master/install/
-if ! grep -q "export DRUSH_PHP='/opt/rh/rh-php70/root/usr/bin/php'" ~/.bashrc; then
-    sudo bash -c "echo -e \"\nexport DRUSH_PHP='/opt/rh/rh-php70/root/usr/bin/php'\" >> ~/.bashrc"
+if ! grep -q "export DRUSH_PHP='/opt/rh/rh-php71/root/usr/bin/php'" ~/.bashrc; then
+    sudo bash -c "echo -e \"\nexport DRUSH_PHP='/opt/rh/rh-php71/root/usr/bin/php'\" >> ~/.bashrc"
 fi
 # update to specific drush version
 cd /usr/local/src/drush \
@@ -65,8 +65,8 @@ fi
 # configure php version
 # https://github.com/wp-cli/wp-cli#installing
 # https://make.wordpress.org/cli/handbook/installing/#using-a-custom-php-binary
-if ! grep -q "alias wp-cli-php70='/opt/rh/rh-php70/root/usr/bin/php /usr/local/src/wp-cli/wp-cli.phar'" ~/.bashrc; then
-    sudo bash -c "echo -e \"\nalias wp-cli-php70='/opt/rh/rh-php70/root/usr/bin/php /usr/local/src/wp-cli/wp-cli.phar'\" >> ~/.bashrc"
+if ! grep -q "alias wp-cli-php71='/opt/rh/rh-php71/root/usr/bin/php /usr/local/src/wp-cli/wp-cli.phar'" ~/.bashrc; then
+    sudo bash -c "echo -e \"\nalias wp-cli-php71='/opt/rh/rh-php71/root/usr/bin/php /usr/local/src/wp-cli/wp-cli.phar'\" >> ~/.bashrc"
 fi
 # update to latest wp-cli
 wp-cli --allow-root cli update --yes

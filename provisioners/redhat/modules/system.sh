@@ -331,8 +331,8 @@ done
 
 
 
-echo -e "\n> system epel-release configuration"
-sudo yum install -y epel-release
+echo -e "\n> system additional repositories"
+sudo yum install -y epel-release centos-release-scl
 
 
 
