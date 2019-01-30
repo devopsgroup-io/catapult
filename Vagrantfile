@@ -49,6 +49,7 @@ Vagrant.configure("2") do |config|
     config.vm.provider :virtualbox do |provider|
       provider.memory = 512
       provider.cpus = 1
+      provider.customize ["modifyvm", :id, "--audio", "none"]
     end
     # configure hosts file on both the host and guest
     config.vm.provision :hostmanager
@@ -69,6 +70,7 @@ Vagrant.configure("2") do |config|
     config.vm.provider :virtualbox do |provider|
       provider.memory = 512
       provider.cpus = 1
+      provider.customize ["modifyvm", :id, "--audio", "none"]
     end
     # disable the default vagrant share
     config.vm.synced_folder ".", "/vagrant", disabled: true
@@ -213,6 +215,7 @@ Vagrant.configure("2") do |config|
     config.vm.provider :virtualbox do |provider|
       provider.memory = 1024
       provider.cpus = 1
+      provider.customize ["modifyvm", :id, "--audio", "none"]
     end
     # windows specific configuration
     config.vm.guest = :windows
@@ -237,6 +240,7 @@ Vagrant.configure("2") do |config|
     config.vm.provider :virtualbox do |provider|
       provider.memory = 1024
       provider.cpus = 1
+      provider.customize ["modifyvm", :id, "--audio", "none"]
     end
     # windows specific configuration
     config.vm.guest = :windows
