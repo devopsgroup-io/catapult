@@ -48,7 +48,7 @@ database_config_file=$(provisioners software.apache.${software}.database_config_
 # generate software database config files
 # set website software logging and debug output
 if ([ ! -z "${software}" ]); then
-    echo -e "* generating ${software} database config file and configuring software-specific logging output..."
+    echo -e "* generating ${software} database config file and configuring software-specific logging and debug output..."
 fi
 
 if [ "${software}" = "codeigniter2" ]; then
