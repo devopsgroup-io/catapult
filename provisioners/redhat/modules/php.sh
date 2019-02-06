@@ -8,8 +8,9 @@ sudo yum remove -y *php70*
 
 #################
 # PHP 7.2 PHP_FPM
-# /opt/rh/rh-php72/root/usr/bin/php
 # /etc/opt/rh/rh-php72/php.ini
+# /opt/rh/rh-php72/root/usr/bin/php
+# /var/opt/rh/rh-php72/log/php-fpm
 # sudo yum list \*-php72-\*
 #################
 
@@ -67,8 +68,9 @@ sudo yum install -y sclo-php72-php-pecl-geoip sclo-php72-php-pecl-imagick sclo-p
 
 #################
 # PHP 7.1 PHP_FPM
-# /opt/rh/rh-php71/root/usr/bin/php
 # /etc/opt/rh/rh-php71/php.ini
+# /opt/rh/rh-php71/root/usr/bin/php
+# /var/opt/rh/rh-php71/log/php-fpm
 # sudo yum list \*-php71-\*
 #################
 
@@ -125,9 +127,10 @@ curl --output /etc/yum.repos.d/rhscl-centos-release-scl-epel-7.repo wget https:/
 sudo yum install -y sclo-php71-php-pecl-geoip sclo-php71-php-pecl-imagick sclo-php71-php-pecl-uploadprogress
 
 #################
-# PHP 5.4 MOD_PHP
-# /usr/bin/php
+# PHP 5.4 MOD_PHP AND PHP_FPM
 # /etc/php.ini
+# /usr/bin/php
+# /var/log/php-fpm/
 # sudo yum list php-\*
 #################
 

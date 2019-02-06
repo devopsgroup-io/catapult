@@ -116,9 +116,7 @@ if [ -d "/var/www/repositories/apache/${domain}/.git" ]; then
             fi
             # after we have a diff, continute to pull
             cd "/var/www/repositories/apache/${domain}" \
-                && sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git pull origin ${branch}" \
-                && sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git submodule update --init --recursive" \
-                && sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git push origin ${branch}"
+                && sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git pull origin ${branch} && git submodule update --init --recursive && git push origin ${branch}"
         # git reset files and branch if outside of branch and software_workflow
         else
             # stash any pending work in localdev as a courtesy (branch may vary)
@@ -141,17 +139,13 @@ if [ -d "/var/www/repositories/apache/${domain}/.git" ]; then
             fi
             # after we have a diff, continue to pull
             cd "/var/www/repositories/apache/${domain}" \
-                && sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git pull origin ${branch}" \
-                && sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git submodule update --init --recursive"
+                && sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git pull origin ${branch} && git submodule update --init --recursive"
         fi
         # if we're on develop, pull master into develop to keep it up to date
         # this accomodates software_workflow = downstream and software_workflow = upstream (when dbtable_retain commits)
         if ([ "${branch_this}" = "develop" ]); then
             cd "/var/www/repositories/apache/${domain}" \
-                && sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git fetch" \
-                && sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git pull origin master" \
-                && sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git submodule update --init --recursive" \
-                && sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git push origin ${branch}"
+                && sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git fetch && git pull origin master && git submodule update --init --recursive && git push origin ${branch}"
         fi
         # last but not least, run git gc to cleanup unnecessary files and optimize the local repository
         # using the --auto flag will prevent gc from running every time, which on larger repositories can take a while
