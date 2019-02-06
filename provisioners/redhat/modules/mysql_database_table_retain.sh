@@ -51,9 +51,7 @@ if ([ ! -z "${software}" ]); then
         cd "/var/www/repositories/apache/${domain}" \
             && git add --all "_sql" \
             && git commit --message="Catapult auto-commit ${1}:${software_workflow}:software_dbtable_retain" \
-            && sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git fetch" \
-            && sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git pull origin ${branch}" \
-            && sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git push origin ${branch}"
+            && sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git fetch && git pull origin ${branch} && git push origin ${branch}"
     fi
 
 fi
