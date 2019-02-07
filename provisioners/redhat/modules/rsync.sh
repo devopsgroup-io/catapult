@@ -18,7 +18,7 @@ software_workflow=$(catapult websites.apache.$5.software_workflow)
 softwareroot=$(provisioners software.apache.${software}.softwareroot)
 webroot=$(catapult websites.apache.$5.webroot)
 
-if [ -z $(provisioners_array software.apache.${software}.file_stores) ]; then
+if [ -z "$(provisioners_array software.apache.${software}.file_stores)" ]; then
 
     echo "this software has no file stores"
     
@@ -36,10 +36,10 @@ else
 
         if ([ "${software_workflow}" = "downstream" ] && [ "$1" != "production" ]); then
                 
-            file_store_size=$(ssh -oStrictHostKeyChecking=no -i /catapult/secrets/id_rsa root@${production_redhat_ip} "du --summarize ${file_store} 2>&1")
+            file_store_size=$(ssh -oStrictHostKeyChecking=no -i /catapult/secrets/id_rsa -n -q root@${production_redhat_ip} "du --summarize ${file_store} 2>&1")
             file_store_size=$(echo -e "${file_store_size}" | awk '{ print $1 }')
 
-            if echo $file_store_size | grep --extended-regexp --quiet --regexp="du"; then
+            if (echo $file_store_size | grep --extended-regexp --quiet --regexp="du"); then
                 echo -e "- production:downstream file store does not exist"
             else
                 echo -e "- production:downstream file store size: $(( ${file_store_size} / 1024 ))MB"
@@ -49,24 +49,21 @@ else
                     if [ "${file_store_size}" -gt "${directory_size_maximum}" ]; then
                         echo -e "- production:downstream file store is over the tracked limit [$(( ${file_store_size} / 1024 ))MB / $(( ${directory_size_maximum} / 1024 ))MB max]"
                         echo -e "- rsyncing..."
-                        sudo rsync --delete --recursive -e "ssh -oStrictHostKeyChecking=no -i /catapult/secrets/id_rsa" "root@${production_redhat_ip}:${file_store}" "${file_store}"
+                        sudo rsync --delete --recursive -e "ssh -oStrictHostKeyChecking=no -i /catapult/secrets/id_rsa -q" "root@${production_redhat_ip}:${file_store}" "${file_store}"
                     fi
                 else
                     echo -e "- this file store is untracked in git"
                     echo -e "- rsyncing..."
-                    sudo rsync --delete --recursive -e "ssh -oStrictHostKeyChecking=no -i /catapult/secrets/id_rsa" "root@${production_redhat_ip}:${file_store}" "${file_store}"
+                    sudo rsync --delete --recursive -e "ssh -oStrictHostKeyChecking=no -i /catapult/secrets/id_rsa -q" "root@${production_redhat_ip}:${file_store}" "${file_store}"
                 fi
             fi
-            # rsync the always untracked _sql file store
-            echo -e "- rsyncing /var/www/repositories/apache/${domain}/_sql/ from production:downstream..."
-            sudo rsync --delete --exclude '*.lock' --recursive -e "ssh -oStrictHostKeyChecking=no -i /catapult/secrets/id_rsa" "root@${production_redhat_mysql_ip}:/var/www/repositories/apache/${domain}/_sql/" "/var/www/repositories/apache/${domain}/_sql/"
-        
+       
         elif ([ "${software_workflow}" = "upstream" ] && [ "$1" != "test" ]); then
             
-            file_store_size=$(ssh -oStrictHostKeyChecking=no -i /catapult/secrets/id_rsa root@${test_redhat_ip} "du --summarize ${file_store} 2>&1")
+            file_store_size=$(ssh -oStrictHostKeyChecking=no -i /catapult/secrets/id_rsa -n -q root@${test_redhat_ip} "du --summarize ${file_store} 2>&1")
             file_store_size=$(echo -e "${file_store_size}" | awk '{ print $1 }')
 
-            if echo $file_store_size | grep --extended-regexp --quiet --regexp="du"; then
+            if (echo $file_store_size | grep --extended-regexp --quiet --regexp="du"); then
                 echo -e "- test:upstream file store does not exist"
             else
                 echo -e "- test:upstream file store size: $(( ${file_store_size} / 1024 ))MB"
@@ -76,17 +73,14 @@ else
                     if [ "${file_store_size}" -gt "${directory_size_maximum}" ]; then
                         echo -e "- test:upstream file store is over the tracked limit [$(( ${file_store_size} / 1024 ))MB / $(( ${directory_size_maximum} / 1024 ))MB max]"
                         echo -e "- rsyncing..."
-                        sudo rsync --delete --recursive -e "ssh -oStrictHostKeyChecking=no -i /catapult/secrets/id_rsa" "root@${test_redhat_ip}:${file_store}" "${file_store}"
+                        sudo rsync --delete --recursive -e "ssh -oStrictHostKeyChecking=no -i /catapult/secrets/id_rsa -q" "root@${test_redhat_ip}:${file_store}" "${file_store}"
                     fi
                 else
                     echo -e "- this file store is untracked in git"
                     echo -e "- rsyncing..."
-                    sudo rsync --delete --recursive -e "ssh -oStrictHostKeyChecking=no -i /catapult/secrets/id_rsa" "root@${test_redhat_ip}:${file_store}" "${file_store}"
+                    sudo rsync --delete --recursive -e "ssh -oStrictHostKeyChecking=no -i /catapult/secrets/id_rsa -q" "root@${test_redhat_ip}:${file_store}" "${file_store}"
                 fi
             fi
-            # rsync the always untracked _sql file store
-            echo -e "- rsyncing /var/www/repositories/apache/${domain}/_sql/ from test:upstream..."
-            sudo rsync --delete --exclude '*.lock' --recursive -e "ssh -oStrictHostKeyChecking=no -i /catapult/secrets/id_rsa" "root@${test_redhat_mysql_ip}:/var/www/repositories/apache/${domain}/_sql/" "/var/www/repositories/apache/${domain}/_sql/"
 
         else
 
@@ -95,6 +89,29 @@ else
         fi
 
     done
+
+    # rsync the always untracked _sql file store
+    if ([ "${software_workflow}" = "downstream" ] && [ "$1" != "production" ]); then
+
+        file_store_size=$(ssh -oStrictHostKeyChecking=no -i /catapult/secrets/id_rsa -n -q root@${production_redhat_mysql_ip} "du --summarize /var/www/repositories/apache/${domain}/_sql/ 2>&1")
+        file_store_size=$(echo -e "${file_store_size}" | awk '{ print $1 }')
+
+        echo -e "sql file store: /var/www/repositories/apache/${domain}/_sql/"
+        echo -e "- production:downstream file store size: $(( ${file_store_size} / 1024 ))MB"
+        echo -e "- rsyncing..."
+        sudo rsync --delete --exclude '*.lock' --recursive -e "ssh -oStrictHostKeyChecking=no -i /catapult/secrets/id_rsa -q" "root@${production_redhat_mysql_ip}:/var/www/repositories/apache/${domain}/_sql/" "/var/www/repositories/apache/${domain}/_sql/"
+
+    elif ([ "${software_workflow}" = "upstream" ] && [ "$1" != "test" ]); then
+
+        file_store_size=$(ssh -oStrictHostKeyChecking=no -i /catapult/secrets/id_rsa -n -q root@${test_redhat_mysql_ip} "du --summarize /var/www/repositories/apache/${domain}/_sql/ 2>&1")
+        file_store_size=$(echo -e "${file_store_size}" | awk '{ print $1 }')
+
+        echo -e "sql file store: /var/www/repositories/apache/${domain}/_sql/"
+        echo -e "- test:upstream file store size: $(( ${file_store_size} / 1024 ))MB"
+        echo -e "- rsyncing..."
+        sudo rsync --delete --exclude '*.lock' --recursive -e "ssh -oStrictHostKeyChecking=no -i /catapult/secrets/id_rsa -q" "root@${test_redhat_mysql_ip}:/var/www/repositories/apache/${domain}/_sql/" "/var/www/repositories/apache/${domain}/_sql/"
+    
+    fi
 fi
 
 touch "/catapult/provisioners/redhat/logs/rsync.$(catapult websites.apache.$5.domain).complete"
