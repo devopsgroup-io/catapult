@@ -29,8 +29,13 @@ mysql --defaults-extra-file=$dbconf -e "DELETE FROM mysql.user WHERE user=''"
 # clear out all users except root
 mysql --defaults-extra-file=$dbconf -e "DELETE FROM mysql.user WHERE user!='root'"
 
-# tune mysql
+# tune mysql for the running environment
 mysql --defaults-extra-file=$dbconf -e "SET global max_allowed_packet=1024 * 1024 * 64;"
+# tune mysql for the starting environment
+sudo cat > /etc/my.cnf.d/mariadb_custom.cnf << EOF
+[mysqld]
+max_allowed_packet = 64M
+EOF
 
 # create an array of domain_valid_db_names
 while IFS='' read -r -d '' key; do

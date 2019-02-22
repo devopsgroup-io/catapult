@@ -134,7 +134,7 @@ fi
 sudo iptables --append INPUT --jump LOG --log-prefix "INPUT:DROP: " --log-level 6 --match limit --limit 5/min --limit-burst 10
 
 # now that everything is configured, we drop everything else (drop does not send any return packets, reject does)
-sudo iptables --policy INPUT --jump DROP
+sudo iptables --policy INPUT DROP
 
 # save our newly created config
 # saves to cat /etc/sysconfig/iptables
