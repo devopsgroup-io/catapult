@@ -1196,9 +1196,9 @@ Oracle SQL Developer is the recommended tool, to connect to and work with, datab
     * The firewall allows direct connection to the database server. 
         * From Oracle SQL Developer > View > Connections, add a New Connection with the respective environment's mysql user values in `~/secrets/configuration.yml`.
 * **Connecting to:** Test, QC, Production
-    * The firewall does not allow direct connect to the database servers.
-        * From Oracle SQL Developer > View > SSH, add a New SSH Host in Oracle SQL Developer with the respective environment's web server host public ip address, root username with key file at `~/secrets/id_rsa`.
-            * Create a New Local Port Forward with the respective environment's database server host private ip address and port 3306.
+    * The firewall does not allow a direct mysql connection to the database servers.
+        * From Oracle SQL Developer > View > SSH, add a New SSH Host in Oracle SQL Developer with the respective environment's mysql server host public IP address, root username with key file at `~/secrets/id_rsa`.
+            * Create a New Local Port Forward with 127.0.0.1 as the IP address and port 3306.
         * From Oracle SQL Developer > View > Connections, add a New Connection with the respective environment's mysql user values in `~/secrets/configuration.yml`.
             * The hostname will be localhost since we are forwarding the port through our local SSH tunnel.
 

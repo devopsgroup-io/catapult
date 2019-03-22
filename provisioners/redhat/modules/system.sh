@@ -15,52 +15,59 @@ sudo last
 # only allow authentication via ssh key pair
 sed -i -e "/PasswordAuthentication/d" /etc/ssh/sshd_config
 if ! grep -q "PasswordAuthentication no" "/etc/ssh/sshd_config"; then
-   sudo bash -c 'echo -e "\nPasswordAuthentication no" >> /etc/ssh/sshd_config'
+   sudo bash -c 'echo -e "PasswordAuthentication no" >> /etc/ssh/sshd_config'
 fi
 sed -i -e "/PubkeyAuthentication/d" /etc/ssh/sshd_config
 if ! grep -q "PubkeyAuthentication yes" "/etc/ssh/sshd_config"; then
-   sudo bash -c 'echo -e "\nPubkeyAuthentication yes" >> /etc/ssh/sshd_config'
+   sudo bash -c 'echo -e "PubkeyAuthentication yes" >> /etc/ssh/sshd_config'
 fi
 # https://cisofy.com/controls/SSH-7408/ - harden ssh configuration
 sed -i -e "/ClientAliveCountMax/d" /etc/ssh/sshd_config
 if ! grep -q "ClientAliveCountMax 2" "/etc/ssh/sshd_config"; then
-   sudo bash -c 'echo -e "\nClientAliveCountMax 2" >> /etc/ssh/sshd_config'
+   sudo bash -c 'echo -e "ClientAliveCountMax 2" >> /etc/ssh/sshd_config'
 fi
 sed -i -e "/MaxSessions/d" /etc/ssh/sshd_config
 if ! grep -q "MaxSessions 2" "/etc/ssh/sshd_config"; then
-   sudo bash -c 'echo -e "\nMaxSessions 2" >> /etc/ssh/sshd_config'
+   sudo bash -c 'echo -e "MaxSessions 2" >> /etc/ssh/sshd_config'
 fi
 sed -i -e "/X11Forwarding/d" /etc/ssh/sshd_config
 if ! grep -q "X11Forwarding no" "/etc/ssh/sshd_config"; then
-   sudo bash -c 'echo -e "\nX11Forwarding no" >> /etc/ssh/sshd_config'
+   sudo bash -c 'echo -e "X11Forwarding no" >> /etc/ssh/sshd_config'
 fi
 sed -i -e "/MaxAuthTries/d" /etc/ssh/sshd_config
 if ! grep -q "MaxAuthTries 2" "/etc/ssh/sshd_config"; then
-   sudo bash -c 'echo -e "\nMaxAuthTries 2" >> /etc/ssh/sshd_config'
+   sudo bash -c 'echo -e "MaxAuthTries 2" >> /etc/ssh/sshd_config'
 fi
 sed -i -e "/LogLevel/d" /etc/ssh/sshd_config
 if ! grep -q "LogLevel VERBOSE" "/etc/ssh/sshd_config"; then
-   sudo bash -c 'echo -e "\nLogLevel VERBOSE" >> /etc/ssh/sshd_config'
+   sudo bash -c 'echo -e "LogLevel VERBOSE" >> /etc/ssh/sshd_config'
 fi
 sed -i -e "/ClientAliveInterval/d" /etc/ssh/sshd_config
 if ! grep -q "ClientAliveInterval 120" "/etc/ssh/sshd_config"; then
-   sudo bash -c 'echo -e "\nClientAliveInterval 120" >> /etc/ssh/sshd_config'
+   sudo bash -c 'echo -e "ClientAliveInterval 120" >> /etc/ssh/sshd_config'
 fi
 sed -i -e "/ClientAliveCountMax/d" /etc/ssh/sshd_config
 if ! grep -q "ClientAliveCountMax 2" "/etc/ssh/sshd_config"; then
-   sudo bash -c 'echo -e "\nClientAliveCountMax 2" >> /etc/ssh/sshd_config'
+   sudo bash -c 'echo -e "ClientAliveCountMax 2" >> /etc/ssh/sshd_config'
 fi
 sed -i -e "/TCPKeepAlive/d" /etc/ssh/sshd_config
 if ! grep -q "TCPKeepAlive no" "/etc/ssh/sshd_config"; then
-   sudo bash -c 'echo -e "\nTCPKeepAlive no" >> /etc/ssh/sshd_config'
+   sudo bash -c 'echo -e "TCPKeepAlive no" >> /etc/ssh/sshd_config'
 fi
 sed -i -e "/AllowAgentForwarding/d" /etc/ssh/sshd_config
 if ! grep -q "AllowAgentForwarding no" "/etc/ssh/sshd_config"; then
-   sudo bash -c 'echo -e "\nAllowAgentForwarding no" >> /etc/ssh/sshd_config'
+   sudo bash -c 'echo -e "AllowAgentForwarding no" >> /etc/ssh/sshd_config'
 fi
+# allow tcp forwarding for mysql to allow for ssh tunnel to connect to loopback for mysql connections
 sed -i -e "/AllowTcpForwarding/d" /etc/ssh/sshd_config
-if ! grep -q "AllowTcpForwarding no" "/etc/ssh/sshd_config"; then
-   sudo bash -c 'echo -e "\nAllowTcpForwarding no" >> /etc/ssh/sshd_config'
+if ([ "${4}" == "mysql" ]); then
+    if ! grep -q "AllowTcpForwarding yes" "/etc/ssh/sshd_config"; then
+       sudo bash -c 'echo -e "AllowTcpForwarding yes" >> /etc/ssh/sshd_config'
+    fi
+else
+    if ! grep -q "AllowTcpForwarding no" "/etc/ssh/sshd_config"; then
+       sudo bash -c 'echo -e "AllowTcpForwarding no" >> /etc/ssh/sshd_config'
+    fi
 fi
 # https://wiki.centos.org/TipsAndTricks/BannerFiles
 banner="
@@ -84,7 +91,7 @@ ${banner}
 EOF
 sed -i -e "/Banner/d" /etc/ssh/sshd_config
 if ! grep -q "Banner /etc/issue.net" "/etc/ssh/sshd_config"; then
-   sudo bash -c 'echo -e "\nBanner /etc/issue.net" >> /etc/ssh/sshd_config'
+   sudo bash -c 'echo -e "Banner /etc/issue.net" >> /etc/ssh/sshd_config'
 fi
 # harden file permissions
 sudo chmod 0700 /root/.ssh
