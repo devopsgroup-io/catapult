@@ -50,6 +50,7 @@ sudo yum install -y mod_security
 sudo cat > /etc/httpd/conf.d/mod_security_custom.conf << EOF
 <IfModule mod_security2.c>
     SecRequestBodyLimit 67108864
+    SecRequestBodyNoFilesLimit 1048576
 </IfModule>
 EOF
 
