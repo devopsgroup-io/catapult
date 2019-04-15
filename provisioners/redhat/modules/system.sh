@@ -116,6 +116,8 @@ EOF
 fi
 # https://cisofy.com/controls/MAIL-8818/ - hide the mail_name (option: smtpd_banner) from your postfix configuration
 sed --in-place --expression="s/^#smtpd_banner\s=\s\$myhostname\sESMTP\s\$mail_name$/smtpd_banner = \$myhostname ESMTP/g" "/etc/postfix/main.cf"
+# install postfix-perl-scripts for postfix reporting. e.g. perl /usr/sbin/pflogsumm -d today /var/log/maillog
+sudo yum install -y postfix-perl-scripts
 # reload postfix after configuration changes
 sudo systemctl reload postfix.service
 
