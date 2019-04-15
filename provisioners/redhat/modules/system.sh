@@ -298,9 +298,9 @@ EOF
 
 
 echo -e "\n> system monitoring configuration"
-# new relic servers is no longer available, so until we find an agnostic monir, let's rely on the provider
+# new relic servers is no longer available, so until we find an agnostic monitor, let's rely on the provider
 if ([ "$1" != "dev" ]); then
-    curl --silent --show-error --connect-timeout 5 --max-time 5 --location https://agent.digitalocean.com/install.sh | sh
+    curl --silent --show-error --connect-timeout 5 --max-time 5 --location https://insights.nyc3.cdn.digitaloceanspaces.com/install.sh | sudo bash
 fi
 
 
