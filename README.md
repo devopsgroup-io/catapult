@@ -1145,7 +1145,7 @@ The following HTTP request limits are defined for all websites:
 
 **HTTP (ModSecurity) Limits**
 
-* Maximum request body size excluding the size of any files being transported in the request (`SecRequestBodyNoFilesLimit`): `128 KB`
+* Maximum request body size excluding the size of any files being transported in the request (`SecRequestBodyNoFilesLimit`): `1 MB`
    * Limits the `application/x-www-form-urlencoded` Content-Type
 * Maximum request body size (`SecRequestBodyLimit`): `64 MB`
    * Limits the `multi-part` Content-Type
