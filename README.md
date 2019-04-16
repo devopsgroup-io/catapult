@@ -1132,6 +1132,7 @@ An example implementation would be the [WP Mail SMTP](https://wordpress.org/plug
 
 If you do not use SendGrid as your SMTP relay provider in your website software SMTP configuration, then the following default configurations will apply to assist with email deliverability:
 
+* SPF DNS record: If your website's domain is configured to use Cloudflare, Catapult will automatically configure a SPF record for each environment.
 * TLS message encryption: If the receiving mail server supports it, the message will be TLS encrypted.
 
 **Bounce Management**
