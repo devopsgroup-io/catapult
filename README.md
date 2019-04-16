@@ -1115,7 +1115,9 @@ Progressive Web App (PWA), in general, is a term used to denote web apps that us
 
 ### Email ###
 
-Email delivery is an art, there are many considerations when trying to get an email into someone's inbox. Some considerations include, IP reputation, bounce management, analytics visibility, and more. For that reason, Catapult requires setup of a SendGrid account and configuration of SMTP within your website's software. To configure SendGrid with your website's software, please set the SMTP configuration to the following:
+**SMTP: SendGrid**
+
+Email delivery is an art, there are many considerations when trying to get an email into someone's inbox. Some considerations include, message encryption, authentication, IP reputation, bounce management, analytics visibility, [and more](https://sendgrid.com/email-delivery/). For that reason, Catapult requires setup of the managed SMTP relay provider, SendGrid. To configure SendGrid with your website's software, please set the SMTP configuration to the following:
 
 * SMTP host: `smtp.sendgrid.net`
 * SMTP port: `587`
@@ -1124,12 +1126,18 @@ Email delivery is an art, there are many considerations when trying to get an em
 * Username: `~/secrets/configuration.yml["company"]["sendgrid_username"]`
 * Password: `~/secrets/configuration.yml["company"]["sendgrid_password"]`
 
-An example of implementation would be the [WP Mail SMTP](https://wordpress.org/plugins/wp-mail-smtp/) WordPress plugin.
+An example implementation would be the [WP Mail SMTP](https://wordpress.org/plugins/wp-mail-smtp/) WordPress plugin.
+
+**SMTP: Default**
+
+If you do not use SendGrid as your SMTP relay provider in your website software SMTP configuration, then the following default configurations will apply to assist with email deliverability:
+
+* TLS message encryption: If the receiving mail server supports it, the message will be TLS encrypted.
 
 **Bounce Management**
 
-* With SendGrid: Catapult automatically configures SendGrid to forward bounces to your `~/secrets/configuration.yml["company"]["email"]` to clear hard bounces every 5 days and soft bounces every 3 days.
-* Without SendGrid: Postfix will retry sending every hour for five days. Catapult cron looks for bounces and emails them to your `~/secrets/configuration.yml["company"]["email"]` daily.
+* **With SendGrid:** Catapult automatically configures SendGrid to forward bounces to your `~/secrets/configuration.yml["company"]["email"]` to clear hard bounces every 5 days and soft bounces every 3 days.
+* **Without SendGrid:** Postfix will retry sending every hour for five days. Catapult cron looks for bounces and emails them to your `~/secrets/configuration.yml["company"]["email"]` daily.
 
 ### Upload Limits ###
 
