@@ -234,9 +234,9 @@ sudo gunzip --force "/usr/share/GeoIP/GeoIPASNum.dat.gz"
 
 
 if ([ "${4}" == "apache" ]); then
-    #################
-    # NEW RELIC PHP APM
-    #################
+    #####################
+    # NEW RELIC PHP APM #
+    #####################
     # add the new relic yum repository
     rpm --hash --upgrade --verbose https://yum.newrelic.com/pub/newrelic/el5/x86_64/newrelic-repo-5-3.noarch.rpm
     # install the new relic apm php package
@@ -280,6 +280,67 @@ if ([ "${4}" == "apache" ]); then
     /etc/init.d/newrelic-daemon status
     tail /var/log/newrelic/newrelic-daemon.log
     tail /var/log/newrelic/php_agent.log
+
+    ###########################
+    # APACHE & PHP-FPM TUNING #
+    ###########################
+
+    # look for httpd max errors
+    # cat /var/log/httpd/error_log* | grep Max
+
+    # look for php-fpm max errors
+    # cat /var/opt/rh/rh-php72/log/php-fpm/error.log* | grep max
+    # cat /var/opt/rh/rh-php71/log/php-fpm/error.log* | grep max
+    # cat /var/log/php-fpm/error.log* | grep max
+
+    # apache2buddy
+    # https://github.com/richardforth/apache2buddy
+    sudo yum install -y net-tools
+    # curl -sL https://raw.githubusercontent.com/richardforth/apache2buddy/master/apache2buddy.pl | perl
+
+    # php-fpmpal
+    # https://github.com/pksteyn/php-fpmpal
+    sudo yum install -y bc
+    # curl -sL https://raw.githubusercontent.com/pksteyn/php-fpmpal/master/php-fpmpal.sh | bash
+
+    # apache mpm_prefork default values
+    # https://httpd.apache.org/docs/2.4/mod/mpm_common.html#startservers
+    # https://httpd.apache.org/docs/2.4/mod/prefork.html
+    # StartServers 5
+    # MinSpareServers 5
+    # MaxSpareServers 10
+    # MaxRequestWorkers 256
+    # MaxConnectionsPerChild 0
+    # ServerLimit 256
+
+    # php-fpm default values
+    # pm.max_children = 50
+    # pm.start_servers = 5
+    # pm.min_spare_servers = 5
+    # pm.max_spare_servers = 35
+    # pm.max_requests = 0 (set this to something to prevent memory leaks from php applications - recommended 500)
+
+    # https://medium.com/@sbuckpesch/apache2-and-php-fpm-performance-optimization-step-by-step-guide-1bfecf161534
+
+    # get process values
+    # curl -sL https://raw.githubusercontent.com/pixelb/ps_mem/master/ps_mem.py | python
+
+    # get number of cores
+    # grep -c ^processor /proc/cpuinfo
+
+    # get total ram
+    # grep MemTotal /proc/meminfo | awk '{print $2 / 1024}'
+
+    # calculate configuration based on above values
+    # /catapult/provisioners/redhat/installers/php/configuration-calculator.xlsx
+
+    sed -i -e "s#^pm.max_children.*#pm.max_children = 100#g" /etc/opt/rh/rh-php72/php-fpm.d/www.conf
+    sed -i -e "s#^pm.max_children.*#pm.max_children = 100#g" /etc/opt/rh/rh-php71/php-fpm.d/www.conf
+    sed -i -e "s#^pm.max_children.*#pm.max_children = 100#g" /etc/php-fpm.d/www.conf
+
+    sed -i -e "s#.*pm.max_requests.*#pm.max_requests = 500#g" /etc/opt/rh/rh-php72/php-fpm.d/www.conf
+    sed -i -e "s#.*pm.max_requests.*#pm.max_requests = 500#g" /etc/opt/rh/rh-php71/php-fpm.d/www.conf
+    sed -i -e "s#.*pm.max_requests.*#pm.max_requests = 500#g" /etc/php-fpm.d/www.conf
 
     echo -e "\n> php 7.2 configuration"
     /opt/rh/rh-php72/root/usr/bin/php --version
