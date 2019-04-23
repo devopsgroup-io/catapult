@@ -70,7 +70,7 @@ for domain in "${domains[@]}"; do
             dns_record=$(echo "${dns_record}" | sed -e 's/HTTPSTATUS\:.*//g')
             # create or update the dns a record
             if [[ ! "${valid_http_response_codes[@]}" =~ "${dns_record_status}" ]]; then
-                echo -e "[${dns_record_status}] there was a problem with the cloudflare api request - please visit https://www.cloudflarestatus.com to see if there is a problem"
+                echo -e "[${domain_dns_record} - dns A record] http error ${dns_record_status} there was a problem with the cloudflare api request - please visit https://www.cloudflarestatus.com to see if there is a problem"
             else
                 # create dns a record
                 if [ "$(echo "${dns_record}" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["result"]')" == "[]" ]; then
@@ -94,11 +94,11 @@ for domain in "${domains[@]}"; do
                 fi
                 # output the result
                 if [[ ! "${valid_http_response_codes[@]}" =~ "${dns_record_status}" ]]; then
-                    echo -e "[${dns_record_status}] there was a problem with the cloudflare api request - please visit https://www.cloudflarestatus.com to see if there is a problem"
+                    echo -e "[${domain_dns_record} - dns A record] http error ${dns_record_status} there was a problem with the cloudflare api request - please visit https://www.cloudflarestatus.com to see if there is a problem"
                 elif [ "$(echo "${dns_record}" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["success"]')" == "False" ]; then
-                    echo "[${domain_dns_record}] $(echo ${dns_record} | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["errors"][0]["message"]')"
+                    echo "[${domain_dns_record} - dns A record] $(echo ${dns_record} | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["errors"][0]["message"]')"
                 else
-                    echo "[${domain_dns_record}] successfully set dns a record"
+                    echo "[${domain_dns_record} - dns A record] successfully set dns"
                 fi
             fi
 
@@ -113,11 +113,11 @@ for domain in "${domains[@]}"; do
             dns_record=$(echo "${dns_record}" | sed -e 's/HTTPSTATUS\:.*//g')
             # output the result
             if [[ ! "${valid_http_response_codes[@]}" =~ "${dns_record_status}" ]]; then
-                echo -e "[${dns_record_status}] there was a problem with the cloudflare api request - please visit https://www.cloudflarestatus.com to see if there is a problem"
+                echo -e "[${domain_dns_record} - dns TXT SPF record] http error ${dns_record_status} there was a problem with the cloudflare api request - please visit https://www.cloudflarestatus.com to see if there is a problem"
             elif [ "$(echo "${dns_record}" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["success"]')" == "False" ]; then
-                echo "[${domain_dns_record}] $(echo ${dns_record} | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["errors"][0]["message"]')"
+                echo "[${domain_dns_record} - dns TXT SPF record] $(echo ${dns_record} | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["errors"][0]["message"]')"
             else
-                echo "[${domain_dns_record}] successfully set dns txt spf record"
+                echo "[${domain_dns_record} - dns TXT SPF record] successfully set dns"
             fi
 
         done
