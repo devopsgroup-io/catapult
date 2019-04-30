@@ -306,7 +306,7 @@ if ([ "${4}" == "apache" ]); then
     # apache mpm_prefork default values
     # https://httpd.apache.org/docs/2.4/mod/mpm_common.html#startservers
     # https://httpd.apache.org/docs/2.4/mod/prefork.html
-    # StartServers 5
+    # StartServers 5 (cores x 1)
     # MinSpareServers 5
     # MaxSpareServers 10
     # MaxRequestWorkers 256
@@ -315,9 +315,9 @@ if ([ "${4}" == "apache" ]); then
 
     # php-fpm default values
     # pm.max_children = 50
-    # pm.start_servers = 5
-    # pm.min_spare_servers = 5
-    # pm.max_spare_servers = 35
+    # pm.start_servers = 5 (cores x 4)
+    # pm.min_spare_servers = 5 (cores x 2)
+    # pm.max_spare_servers = 35 (cores x 4)
     # pm.max_requests = 0 (set this to something to prevent memory leaks from php applications - recommended 500)
 
     # https://medium.com/@sbuckpesch/apache2-and-php-fpm-performance-optimization-step-by-step-guide-1bfecf161534
@@ -334,9 +334,9 @@ if ([ "${4}" == "apache" ]); then
     # calculate configuration based on above values
     # /catapult/provisioners/redhat/installers/php/configuration-calculator.xlsx
 
-    sed -i -e "s#^pm.max_children.*#pm.max_children = 100#g" /etc/opt/rh/rh-php72/php-fpm.d/www.conf
-    sed -i -e "s#^pm.max_children.*#pm.max_children = 100#g" /etc/opt/rh/rh-php71/php-fpm.d/www.conf
-    sed -i -e "s#^pm.max_children.*#pm.max_children = 100#g" /etc/php-fpm.d/www.conf
+    sed -i -e "s#^pm.max_children.*#pm.max_children = 300#g" /etc/opt/rh/rh-php72/php-fpm.d/www.conf
+    sed -i -e "s#^pm.max_children.*#pm.max_children = 300#g" /etc/opt/rh/rh-php71/php-fpm.d/www.conf
+    sed -i -e "s#^pm.max_children.*#pm.max_children = 300#g" /etc/php-fpm.d/www.conf
 
     sed -i -e "s#.*pm.max_requests.*#pm.max_requests = 500#g" /etc/opt/rh/rh-php72/php-fpm.d/www.conf
     sed -i -e "s#.*pm.max_requests.*#pm.max_requests = 500#g" /etc/opt/rh/rh-php71/php-fpm.d/www.conf
