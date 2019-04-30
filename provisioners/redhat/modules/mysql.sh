@@ -31,10 +31,12 @@ mysql --defaults-extra-file=$dbconf -e "DELETE FROM mysql.user WHERE user!='root
 
 # tune mysql for the running environment
 mysql --defaults-extra-file=$dbconf -e "SET global max_allowed_packet=1024 * 1024 * 64;"
+mysql --defaults-extra-file=$dbconf -e "SET global max_connections=501;"
 # tune mysql for the starting environment
 sudo cat > /etc/my.cnf.d/mariadb_custom.cnf << EOF
 [mysqld]
 max_allowed_packet = 64M
+max_connections = 501
 EOF
 
 # create an array of domain_valid_db_names
