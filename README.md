@@ -1092,7 +1092,7 @@ Debug output, unlike logging, is a configuration that outputs exceptions on-scre
 
 ### Cache Busting ###
 
-Caching plays a very important role in the performance of your website and enforces and recommends many [performance optimizations](#performance). Catapult generally enforces caching of files to 7 days, because of this, to ensure that a new website release is reflected in a user's browser you should consider [semantic versioning]((http://semver.org/spec/v2.0.0.html)) of website resource files. Here's an example of query string cache busting:
+Caching plays a very important role in the performance of your website and enforces and recommends many [performance optimizations](#performance). Catapult generally enforces caching of files to [1 year](https://developers.google.com/web/tools/lighthouse/audits/cache-policy), because of this, to ensure that a new website release is reflected in a user's browser you should consider [semantic versioning]((http://semver.org/spec/v2.0.0.html)) of website resource files. Here's an example of query string cache busting:
 
 `<link rel="stylesheet" href="/css/style.min.css?v=3.4.1">`
 
