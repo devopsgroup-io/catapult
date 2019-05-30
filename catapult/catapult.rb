@@ -2335,6 +2335,22 @@ module Catapult
             end
             # validate repo access 
             if "#{repo_split_2[0]}" == "bitbucket.org"
+              # get the uuid, or account_id, from the defined bitbucket_username
+              # https://developer.atlassian.com/cloud/bitbucket/bitbucket-api-changes-gdpr/
+              uri = URI("https://api.bitbucket.org/2.0/user")
+              Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
+                request = Net::HTTP::Get.new uri.request_uri
+                request.basic_auth "#{@configuration["company"]["bitbucket_username"]}", "#{@configuration["company"]["bitbucket_password"]}"
+                response = http.request(request)
+                if response.code.to_f == 404
+                  catapult_exception("The Bitbucket repo #{instance["repo"]} does not exist")
+                elsif response.code.to_f.between?(399,600)
+                  puts "   - The Bitbucket API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
+                else
+                  @api_bitbucket_user_account_id = JSON.parse(response.body)
+                  @api_bitbucket_user_account_id = @api_bitbucket_user_account_id["account_id"]
+                end
+              end
               @api_bitbucket_repo_access = false
               if @api_bitbucket_repo_access === false
                 uri = URI("https://api.bitbucket.org/1.0/group-privileges/#{repo_split_3[0]}")
@@ -2351,7 +2367,7 @@ module Catapult
                     api_bitbucket_repo_group_privileges.each do |group|
                       if group["privilege"] == "admin" || group["privilege"] == "write"
                         group["group"]["members"].each do |member|
-                          if member["username"] == "#{@configuration["company"]["bitbucket_username"]}"
+                          if member["account_id"] == "#{@api_bitbucket_user_account_id}"
                             @api_bitbucket_repo_access = true
                           end
                         end
@@ -2374,7 +2390,7 @@ module Catapult
                     api_bitbucket_repo_privileges = JSON.parse(response.body)
                     api_bitbucket_repo_privileges.each do |member|
                       if member["privilege"] == "admin" || member["privilege"] == "write"
-                        if member["user"]["username"] == "#{@configuration["company"]["bitbucket_username"]}"
+                        if member["user"]["account_id"] == "#{@api_bitbucket_user_account_id}"
                           @api_bitbucket_repo_access = true
                         end
                       end
@@ -2395,7 +2411,7 @@ module Catapult
                   else
                     api_bitbucket_repo_repositories = JSON.parse(response.body)
                     if response.code.to_f == 200
-                      if api_bitbucket_repo_repositories["owner"]["username"] == "#{@configuration["company"]["bitbucket_username"]}"
+                      if api_bitbucket_repo_repositories["owner"]["account_id"] == "#{@api_bitbucket_user_account_id}"
                         @api_bitbucket_repo_access = true
                       end
                     end
