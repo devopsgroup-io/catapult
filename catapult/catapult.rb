@@ -776,7 +776,9 @@ module Catapult
       catapult_exception("Please set [\"company\"][\"bitbucket_username\"] and [\"company\"][\"bitbucket_password\"] in secrets/configuration.yml")
     else
       begin
-        uri = URI("https://api.bitbucket.org/1.0/user")
+        # get the uuid, or account_id, from the defined bitbucket_username
+        # https://developer.atlassian.com/cloud/bitbucket/bitbucket-api-changes-gdpr/
+        uri = URI("https://api.bitbucket.org/2.0/user")
         Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
           request = Net::HTTP::Get.new uri.request_uri
           request.basic_auth "#{@configuration["company"]["bitbucket_username"]}", "#{@configuration["company"]["bitbucket_password"]}"
@@ -787,9 +789,10 @@ module Catapult
             puts " * Bitbucket API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
           else
             puts " * Bitbucket API authenticated successfully."
-            @api_bitbucket = JSON.parse(response.body)
+            @api_bitbucket_user_account_id = JSON.parse(response.body)
+            @api_bitbucket_user_account_id = @api_bitbucket_user_account_id["account_id"]
             # verify bitbucket user's catapult ssh key
-            uri = URI("https://api.bitbucket.org/1.0/users/#{@configuration["company"]["bitbucket_username"]}/ssh-keys")
+            uri = URI("https://api.bitbucket.org/2.0/users/#{@api_bitbucket_user_account_id}/ssh-keys")
             Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
               request = Net::HTTP::Get.new uri.request_uri
               request.basic_auth "#{@configuration["company"]["bitbucket_username"]}", "#{@configuration["company"]["bitbucket_password"]}"
@@ -798,7 +801,7 @@ module Catapult
               @api_bitbucket_ssh_keys_title = false
               @api_bitbucket_ssh_keys_key = false
               unless response.code.to_f.between?(399,600)
-                @api_bitbucket_ssh_keys.each do |key|
+                @api_bitbucket_ssh_keys["values"].each do |key|
                   if key["label"] == "Catapult"
                     @api_bitbucket_ssh_keys_title = true
                     if "#{key["key"].match(/(\w*-\w*\s\S*)/)}" == "#{File.read("secrets/id_rsa.pub").match(/(\w*-\w*\s\S*)/)}"
@@ -893,6 +896,7 @@ module Catapult
       end
     end
     # https://bobswift.atlassian.net/wiki/display/BCLI/Reference
+    # https://bobswift.atlassian.net/wiki/spaces/BCLI/pages/652083565/Reference+-+7.9.0
     puts "[Bamboo CLI]"
     if @environment == :posix
       @api_bamboo_cli = "bash catapult/installers/atlassian-cli-7.0.0/bamboo.sh"
@@ -946,11 +950,21 @@ module Catapult
         if ! api_bamboo_cli_result_plan.strip.include?("error")
           puts "   - #{api_bamboo_cli_result_plan.strip}"
         end
-        # configure: trigger
+        # configure: trigger: scheduled
         api_bamboo_cli_result_plan_triggers = `#{@api_bamboo_cli} --server #{@configuration["company"]["bamboo_base_url"]} --password #{@configuration["company"]["bamboo_password"]} --user #{@configuration["company"]["bamboo_username"]} --action getTriggerList --plan "#{plan}" #{@api_bamboo_cli_redirect}`; result=$?.success?
         if ! api_bamboo_cli_result_plan_triggers.strip.include?("Scheduled")
           api_bamboo_cli_result_plan_triggers = `#{@api_bamboo_cli} --server #{@configuration["company"]["bamboo_base_url"]} --password #{@configuration["company"]["bamboo_password"]} --user #{@configuration["company"]["bamboo_username"]} --action addTrigger --plan "#{plan}" --type "scheduled" --schedule "#{@api_bamboo_cli_environment_trigger_time}" --field1 "custom.triggerrCondition.plansGreen.plan" #{@api_bamboo_cli_environment_trigger_conditions} #{@api_bamboo_cli_redirect}`; result=$?.success?
           puts "   - #{api_bamboo_cli_result_plan_triggers.strip}"
+        end
+        # configure: trigger: remote
+        # https://confluence.atlassian.com/bitbucket/what-are-the-bitbucket-cloud-ip-addresses-i-should-use-to-configure-my-corporate-firewall-343343385.html
+        # https://ip-ranges.atlassian.com/
+        if plan.include?("TEST")
+          api_bamboo_cli_result_plan_triggers = `#{@api_bamboo_cli} --server #{@configuration["company"]["bamboo_base_url"]} --password #{@configuration["company"]["bamboo_password"]} --user #{@configuration["company"]["bamboo_username"]} --action getTriggerList --plan "#{plan}" #{@api_bamboo_cli_redirect}`; result=$?.success?
+          if ! api_bamboo_cli_result_plan_triggers.strip.include?("Remote")
+            api_bamboo_cli_result_plan_triggers = `#{@api_bamboo_cli} --server #{@configuration["company"]["bamboo_base_url"]} --password #{@configuration["company"]["bamboo_password"]} --user #{@configuration["company"]["bamboo_username"]} --action addTrigger --plan "#{plan}" --type "remote" --ipRestriction "18.205.93.0/25,18.234.32.128/25,13.52.5.0/25" #{@api_bamboo_cli_redirect}`; result=$?.success?
+            puts "   - #{api_bamboo_cli_result_plan_triggers.strip}"
+          end
         end
         # configure: stage
         api_bamboo_cli_result_stage = `#{@api_bamboo_cli} --server #{@configuration["company"]["bamboo_base_url"]} --password #{@configuration["company"]["bamboo_password"]} --user #{@configuration["company"]["bamboo_username"]} --action addStage --plan "#{plan}" --stage "Default Stage" #{@api_bamboo_cli_redirect}`; result=$?.success?
@@ -2335,22 +2349,6 @@ module Catapult
             end
             # validate repo access 
             if "#{repo_split_2[0]}" == "bitbucket.org"
-              # get the uuid, or account_id, from the defined bitbucket_username
-              # https://developer.atlassian.com/cloud/bitbucket/bitbucket-api-changes-gdpr/
-              uri = URI("https://api.bitbucket.org/2.0/user")
-              Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
-                request = Net::HTTP::Get.new uri.request_uri
-                request.basic_auth "#{@configuration["company"]["bitbucket_username"]}", "#{@configuration["company"]["bitbucket_password"]}"
-                response = http.request(request)
-                if response.code.to_f == 404
-                  catapult_exception("The Bitbucket repo #{instance["repo"]} does not exist")
-                elsif response.code.to_f.between?(399,600)
-                  puts "   - The Bitbucket API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
-                else
-                  @api_bitbucket_user_account_id = JSON.parse(response.body)
-                  @api_bitbucket_user_account_id = @api_bitbucket_user_account_id["account_id"]
-                end
-              end
               @api_bitbucket_repo_access = false
               if @api_bitbucket_repo_access === false
                 uri = URI("https://api.bitbucket.org/1.0/group-privileges/#{repo_split_3[0]}")
@@ -2485,7 +2483,7 @@ module Catapult
             end
             # validate repo branches
             if "#{repo_split_2[0]}" == "bitbucket.org"
-              uri = URI("https://api.bitbucket.org/1.0/repositories/#{repo_split_3[0]}/branches")
+              uri = URI("https://api.bitbucket.org/2.0/repositories/#{repo_split_3[0]}/refs/branches?pagelen=100")
               Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
                 request = Net::HTTP::Get.new uri.request_uri
                 request.basic_auth "#{@configuration["company"]["bitbucket_username"]}", "#{@configuration["company"]["bitbucket_password"]}"
@@ -2497,14 +2495,14 @@ module Catapult
                   @api_bitbucket_repo_develop = false
                   @api_bitbucket_repo_release = false
                   @api_bitbucket_repo_master = false
-                  api_bitbucket_repo_branches.each do |branch, array|
-                    if branch == "master"
+                  api_bitbucket_repo_branches["values"].each do |branch|
+                    if branch["name"] == "master"
                       @api_bitbucket_repo_master = true
                     end
-                    if branch == "release"
+                    if branch["name"] == "release"
                       @api_bitbucket_repo_release = true
                     end
-                    if branch == "develop"
+                    if branch["name"] == "develop"
                       @api_bitbucket_repo_develop = true
                     end
                   end
@@ -2568,92 +2566,50 @@ module Catapult
                 end
               end
             end
-            # create bamboo service per bitbucket repo
+            # create bamboo webhook per bitbucket repo
             if "#{repo_split_2[0]}" == "bitbucket.org"
-              # the bitbucket api offers no patch for service hooks, so we first need to check if the bitbucket bamboo service hooks exist
-              uri = URI("https://api.bitbucket.org/1.0/repositories/#{repo_split_3[0]}/services")
+              @api_bitbucket_repo_hook = false
+              uri = URI("https://api.bitbucket.org/2.0/repositories/#{repo_split_3[0]}/hooks")
               Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
                 request = Net::HTTP::Get.new uri.request_uri
                 request.basic_auth "#{@configuration["company"]["bitbucket_username"]}", "#{@configuration["company"]["bitbucket_password"]}"
                 response = http.request(request)
                 if response.code.to_f.between?(399,600)
-                  puts "   - The Bitbucket API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
+                  puts "   - The GitHub API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
                 else
-                  api_bitbucket_services = JSON.parse(response.body)
-                  @api_bitbucket_services_bamboo_cat_test = 0
-                  api_bitbucket_services.each do |service|
-                    if service["service"]["type"] == "Bamboo"
-                      service["service"]["fields"].each do |field|
-                        if field["name"] == "Plan Key"
-                          if field["value"] == "CAT-TEST"
-                            @api_bitbucket_services_bamboo_cat_test = @api_bitbucket_services_bamboo_cat_test + 1
-                            # remove potential duplicates
-                            if @api_bitbucket_services_bamboo_cat_test > 1
-                              uri = URI("https://api.bitbucket.org/1.0/repositories/#{repo_split_3[0]}/services/#{service["id"]}")
-                              Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
-                                request = Net::HTTP::Delete.new uri.request_uri
-                                request.basic_auth "#{@configuration["company"]["bitbucket_username"]}", "#{@configuration["company"]["bitbucket_password"]}"
-                                response = http.request(request)
-                                if response.code.to_f.between?(399,600)
-                                  catapult_exception("Unable to configure Bitbucket Bamboo service for websites => #{service} => domain => #{instance["domain"]}. Ensure the github_username defined in secrets/configuration.yml has correct access to the repository.")
-                                end
-                              end
-                            # update existing
-                            else
-                              uri = URI("https://api.bitbucket.org/1.0/repositories/#{repo_split_3[0]}/services/#{service["id"]}")
-                              Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
-                                request = Net::HTTP::Put.new uri.request_uri
-                                request.basic_auth "#{@configuration["company"]["bitbucket_username"]}", "#{@configuration["company"]["bitbucket_password"]}"
-                                request.body = URI::encode\
-                                  (""\
-                                    "type=Bamboo"\
-                                    "&URL=#{@configuration["company"]["bamboo_base_url"]}"\
-                                    "&Plan Key=CAT-TEST"\
-                                    "&Username=#{@configuration["company"]["bamboo_username"]}"\
-                                    "&Password=#{@configuration["company"]["bamboo_password"]}"\
-                                  "")
-                                response = http.request(request)
-                                if response.code.to_f.between?(399,600)
-                                  catapult_exception("Unable to configure Bitbucket Bamboo service for websites => #{service} => domain => #{instance["domain"]}. Ensure the github_username defined in secrets/configuration.yml has correct access to the repository.")
-                                end
-                              end
-                            end
-                          end
-                          # remove known service plans we no longer want
-                          if field["value"] == "CAT-QC"
-                            uri = URI("https://api.bitbucket.org/1.0/repositories/#{repo_split_3[0]}/services/#{service["id"]}")
-                            Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
-                              request = Net::HTTP::Delete.new uri.request_uri
-                              request.basic_auth "#{@configuration["company"]["bitbucket_username"]}", "#{@configuration["company"]["bitbucket_password"]}"
-                              response = http.request(request)
-                              if response.code.to_f.between?(399,600)
-                                catapult_exception("Unable to configure Bitbucket Bamboo service for websites => #{service} => domain => #{instance["domain"]}. Ensure the github_username defined in secrets/configuration.yml has correct access to the repository.")
-                              end
-                            end
-                          end
-                        end
-                      end
+                  api_github_repo_hooks = JSON.parse(response.body)
+                  api_github_repo_hooks["values"].each do |hook|
+                    if hook["description"] == "bamboo:CAT-TEST" && hook["url"] == "#{@configuration["company"]["bamboo_base_url"]}rest/triggers/1.0/remote/changeDetection?planKey=CAT-TEST&skipBranches=false"
+                      @api_bitbucket_repo_hook = true
                     end
                   end
-                  # create the service if it does not exist
-                  unless @api_bitbucket_services_bamboo_cat_test > 0
-                    uri = URI("https://api.bitbucket.org/1.0/repositories/#{repo_split_3[0]}/services")
+                  unless @api_bitbucket_repo_hook
+                    uri = URI("https://api.bitbucket.org/2.0/repositories/#{repo_split_3[0]}/hooks")
                     Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
                       request = Net::HTTP::Post.new uri.request_uri
                       request.basic_auth "#{@configuration["company"]["bitbucket_username"]}", "#{@configuration["company"]["bitbucket_password"]}"
-                      request.body = URI::encode\
-                        (""\
-                          "type=Bamboo"\
-                          "&URL=#{@configuration["company"]["bamboo_base_url"]}"\
-                          "&Plan Key=CAT-TEST"\
-                          "&Username=#{@configuration["company"]["bamboo_username"]}"\
-                          "&Password=#{@configuration["company"]["bamboo_password"]}"\
-                        "")
+                      request.add_field "Content-Type", "application/json"
+                      request.body = ""\
+                        "{"\
+                          "\"description\":\"bamboo:CAT-TEST\","\
+                          "\"url\":\"#{@configuration["company"]["bamboo_base_url"]}rest/triggers/1.0/remote/changeDetection?planKey=CAT-TEST&skipBranches=false\","\
+                          "\"active\":true,"\
+                          "\"events\":"\
+                            "["\
+                              "\"repo:push\""\
+                            "]"\
+                        "}"
                       response = http.request(request)
-                      if response.code.to_f.between?(399,600)
-                        catapult_exception("Unable to configure Bitbucket Bamboo service for websites => #{service} => domain => #{instance["domain"]}. Ensure the github_username defined in secrets/configuration.yml has correct access to the repository.")
+                      if response.code.to_f.between?(500,600)
+                        puts "   - The Bitbucket API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
+                      elsif response.code.to_f.between?(399,499)
+                        catapult_exception("Unable to configure Bitbucket Bamboo webhook for websites => #{service} => domain => #{instance["domain"]}. Ensure the bitbucket_username defined in secrets/configuration.yml has correct access to the repository.")
+                      else
+                        row.push("configured".ljust(17))
                       end
                     end
+                  else
+                    row.push("configured".ljust(17))
                   end
                 end
               end
@@ -2682,10 +2638,11 @@ module Catapult
                   puts "   - The GitHub API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
                 elsif response.code.to_f.between?(399,499)
                   catapult_exception("Unable to configure GitHub Bamboo service for websites => #{service} => domain => #{instance["domain"]}. Ensure the github_username defined in secrets/configuration.yml has correct access to the repository.")
+                else
+                  row.push("configured".ljust(17))
                 end
               end
             end
-            row.push("configured".ljust(17))
 
             puts row.join(" ")
 
