@@ -961,7 +961,6 @@ module Catapult
         # https://ip-ranges.atlassian.com/
         if plan.include?("TEST")
           api_bamboo_cli_result_plan_triggers = `#{@api_bamboo_cli} --server #{@configuration["company"]["bamboo_base_url"]} --password #{@configuration["company"]["bamboo_password"]} --user #{@configuration["company"]["bamboo_username"]} --action getTriggerList --plan "#{plan}" #{@api_bamboo_cli_redirect}`; result=$?.success?
-          puts api_bamboo_cli_result_plan_triggers
           if ! api_bamboo_cli_result_plan_triggers.strip.include?("Remote")
             api_bamboo_cli_result_plan_triggers = `#{@api_bamboo_cli} --server #{@configuration["company"]["bamboo_base_url"]} --password #{@configuration["company"]["bamboo_password"]} --user #{@configuration["company"]["bamboo_username"]} --action addTrigger --plan "#{plan}" --type "remote" --ipRestriction "18.205.93.0/25,18.234.32.128/25,13.52.5.0/25" #{@api_bamboo_cli_redirect}`; result=$?.success?
             puts "   - #{api_bamboo_cli_result_plan_triggers.strip}"
