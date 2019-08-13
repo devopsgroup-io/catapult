@@ -48,7 +48,7 @@ fi
 
 # bundled extensions
 # These extensions are bundled with PHP.
-sudo yum install -y rh-php72-php-gd rh-php72-php-intl rh-php72-php-mbstring rh-php72-php-opcache rh-php72-php-soap rh-php72-php-xmlrpc
+sudo yum install -y rh-php72-php-bcmath rh-php72-php-gd rh-php72-php-intl rh-php72-php-mbstring rh-php72-php-opcache rh-php72-php-soap rh-php72-php-xmlrpc
 # disable opcache for dev
 if [ "$1" = "dev" ]; then
     sudo bash -c 'echo "/var/www" > /etc/opt/rh/rh-php72/php.d/opcache-default.blacklist'
@@ -108,7 +108,7 @@ fi
 
 # bundled extensions
 # These extensions are bundled with PHP.
-sudo yum install -y rh-php71-php-gd rh-php71-php-intl rh-php71-php-mbstring rh-php71-php-opcache rh-php71-php-soap rh-php71-php-xmlrpc
+sudo yum install -y rh-php71-php-bcmath rh-php71-php-gd rh-php71-php-intl rh-php71-php-mbstring rh-php71-php-opcache rh-php71-php-soap rh-php71-php-xmlrpc
 # disable opcache for dev
 if [ "$1" = "dev" ]; then
     sudo bash -c 'echo "/var/www" > /etc/opt/rh/rh-php71/php.d/opcache-default.blacklist'
@@ -169,7 +169,7 @@ fi
 
 # bundled extensions
 # These extensions are bundled with PHP.
-sudo yum install -y php-gd php-intl php-mbstring php-posix php-soap php-xmlrpc
+sudo yum install -y php-bcmath php-gd php-intl php-mbstring php-posix php-soap php-xmlrpc
 
 # external extensions
 # These extensions are bundled with PHP but in order to compile them, external libraries will be needed.
