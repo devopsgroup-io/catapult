@@ -1493,6 +1493,7 @@ Catapult as a platform can only reach so far into the configuration of your webs
   * Image compression with [imagemin](https://www.npmjs.com/package/gulp-imagemin)
   * JavaScript minification with [UglifyJS2](https://www.npmjs.com/package/gulp-uglify)
   * CSS minification with [clean-css](https://www.npmjs.com/package/gulp-clean-css)
+  * Concatenate minified JavaScript and CSS to reduce the number of HTTP requests
 * Execute `<script>` tags [asynchronously](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script#attr-async)
     * Note that asynchronous scripts are not guaranteed to execute in specified order
 * Execute `<script>` tags after the document has been parsed with [defer](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script#attr-defer)
