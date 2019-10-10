@@ -65,7 +65,7 @@ sudo iptables\
     --protocol udp\
     --dport 123\
     --jump ACCEPT
-# allow incoming web traffic from the world
+# allow incoming web traffic from the world on 80, 443, and 32700 (HAProxy)
 if [ "${4}" == "apache" ]; then
     sudo iptables\
         --append INPUT\
@@ -78,6 +78,13 @@ if [ "${4}" == "apache" ]; then
         --append INPUT\
         --protocol tcp\
         --dport 443\
+        --match state\
+        --state NEW,ESTABLISHED\
+        --jump ACCEPT
+    sudo iptables\
+        --append INPUT\
+        --protocol tcp\
+        --dport 32700\
         --match state\
         --state NEW,ESTABLISHED\
         --jump ACCEPT

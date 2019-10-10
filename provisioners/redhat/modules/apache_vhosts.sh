@@ -215,7 +215,7 @@ EOF
 
     RewriteEngine On
 
-    <VirtualHost *:80> # must listen * to support cloudflare
+    <VirtualHost *:8080> # must listen * to support cloudflare
 
         ServerAdmin ${company_email}
         ServerName ${domain_environment}
@@ -238,7 +238,7 @@ EOF
     </VirtualHost>
 
     <IfModule mod_ssl.c>
-        <VirtualHost *:443> # must listen * to support cloudflare
+        <VirtualHost *:8081> # must listen * to support cloudflare
 
             ServerAdmin ${company_email}
             ServerName ${domain_environment}

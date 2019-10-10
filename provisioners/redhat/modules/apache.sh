@@ -2,6 +2,16 @@ source "/catapult/provisioners/redhat/modules/catapult.sh"
 
 # 80: install httpd
 sudo yum install -y httpd
+
+# 80: update to listen on port 8080 for haproxy instead of default 80
+sed --in-place 's/^Listen.*/Listen 8080/g' /etc/httpd/conf/httpd.conf
+# 443: update to listen on port 8081 for haproxy instead of default 443
+sed --in-place 's/^Listen.*/Listen 8081 https/g' /etc/httpd/conf.d/ssl.conf
+
+# reload apache
+sudo systemctl reload httpd.service
+
+# enable apache
 sudo systemctl enable httpd.service
 sudo systemctl start httpd.service
 
@@ -97,11 +107,11 @@ fi
 
 # 80/443: create vhosts
 sudo cat > /etc/httpd/sites-enabled/_default_.conf << EOF
-<VirtualHost *:80>
+<VirtualHost *:8080>
   DocumentRoot /var/www/repositories/apache/_default_/
 </VirtualHost>
 <IfModule mod_ssl.c>
-    <VirtualHost *:443>
+    <VirtualHost *:8081>
         DocumentRoot /var/www/repositories/apache/_default_/
         SSLEngine on
         SSLCertificateFile /etc/ssl/certs/httpd-dummy-cert.key.cert

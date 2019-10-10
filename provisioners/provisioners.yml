@@ -56,6 +56,11 @@ redhat:
       multithreading: true
       multithreading_persistent: false
       persistent: true
+    haproxy:
+      description: "Manages HAProxy as a layer 4 load balancer."
+      multithreading: false
+      multithreading_persistent: false
+      persistent: false
     iptables:
       description: "Manages a strict firewall to only allow necessary traffic."
       multithreading: false
@@ -138,7 +143,7 @@ redhat:
       persistent: false
   servers:
     apache:
-      modules: ["time","system","iptables","cron","apache","php","software_tools","git_clean","software_operations_file","git","rsync","git_permissions","software_config","cloudflare_zones","cloudflare_dns","apache_vhosts_clean","apache_vhosts"]
+      modules: ["time","system","iptables","cron","apache","php","software_tools","git_clean","software_operations_file","git","rsync","git_permissions","software_config","cloudflare_zones","cloudflare_dns","apache_vhosts_clean","apache_vhosts","haproxy"]
     bamboo:
       modules: ["time","system","iptables","cron","bamboo"]
     mysql:
