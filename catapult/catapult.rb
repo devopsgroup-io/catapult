@@ -47,14 +47,14 @@ module Catapult
         title = "Catapult Error:"
         length = title.size
         padding = 5
-        puts "+".ljust(padding,"!") + "".ljust(length,"!") + "+".rjust(padding,"!")
-        puts "|".ljust(padding)     + title                + "|".rjust(padding)
-        puts "+".ljust(padding,"!") + "".ljust(length,"!") + "+".rjust(padding,"!")
+        puts "+".ljust(padding,"!").color(Colors::RED) + "".ljust(length,"!").color(Colors::RED)     + "+".rjust(padding,"!").color(Colors::RED)
+        puts "|".ljust(padding).color(Colors::RED)     + title.color(Colors::RED) + "|".rjust(padding).color(Colors::RED)
+        puts "+".ljust(padding,"!").color(Colors::RED) + "".ljust(length,"!").color(Colors::RED)     + "+".rjust(padding,"!").color(Colors::RED)
         puts "\n"
-        puts exception.message
+        puts exception.message.color(Colors::RED)
         puts "\n"
-        puts "Please correct the error then re-run your vagrant command."
-        puts "See https://github.com/devopsgroup-io/catapult for more information."
+        puts "To continue, please correct the error then re-run your vagrant command.".color(Colors::YELLOW)
+        puts "See https://github.com/devopsgroup-io/catapult for README information.".color(Colors::YELLOW)
         exit 1
       end
     end
@@ -559,7 +559,7 @@ module Catapult
     # validate @configuration["company"]
     if @configuration["company"]["catapult_repo"] == nil
       if @configuration_user["settings"]["gpg_edit"] == false
-        confirm = ask("You have outstanding configuration that needs to be set in configuration.yml and the gpg_edit setting in your configuration-user.yml file is set to false, would you like to set it to true? [Y/N]") { |yn| yn.limit = 1, yn.validate = /[yn]/i }
+        confirm = ask("You have outstanding configuration that needs to be set in configuration.yml and the gpg_edit setting in your configuration-user.yml file is set to false, would you like to set it to true? [y/n]".color(Colors::YELLOW)) { |yn| yn.limit = 1, yn.validate = /[yn]/i }
         if confirm.downcase == 'y'
           @configuration_user["settings"]["gpg_edit"] = true
           File.open('secrets/configuration-user.yml', 'w') {|f| f.write configuration_user.to_yaml }
@@ -568,7 +568,7 @@ module Catapult
       end
     else
       if @configuration_user["settings"]["gpg_edit"] == true
-        confirm = ask("The gpg_edit setting in your configuration-user.yml file is set to true, would you like to set it to false? [Y/N]") { |yn| yn.limit = 1, yn.validate = /[yn]/i }
+        confirm = ask("The gpg_edit setting in your configuration-user.yml file is set to true, would you like to set it to false? [y/n]".color(Colors::YELLOW)) { |yn| yn.limit = 1, yn.validate = /[yn]/i }
         if confirm.downcase == 'y'
           @configuration_user["settings"]["gpg_edit"] = false
           File.open('secrets/configuration-user.yml', 'w') {|f| f.write configuration_user.to_yaml }
@@ -1624,10 +1624,32 @@ module Catapult
     @configuration["environments"].each do |environment,data|
 
       puts "\n[#{environment}]"
-      puts "[machine]".ljust(45) + "[provider]".ljust(14) + "[state]".ljust(13) + "[id]".ljust(12) + "[type]".ljust(13) + "[ipv4_public]".ljust(17) + "[ipv4_private]".ljust(17)
+      
+      # verify environments
+      if not ["dev","test","qc","production"].include?("#{environment}")
+        catapult_exception("There is an error in your secrets/configuration.yml file.\nThe \"#{environment}\" environment is invalid, it must be dev, test, qc, or production.")
+      end
+
+      # verify environments => servers (load balancer)
+      @environment_loadbalancer = false
+      @configuration["environments"]["#{environment}"]["servers"].each do |server,data|
+        if "#{server}" === "redhat1"
+          @environment_loadbalancer = true
+        end
+      end
+      if @environment_loadbalancer === false
+        puts " * Could not find \"redhat1\" at [\"environments\"][\"#{environment}\"][\"servers\"] in secrets/configuration.yml, there will be no load balancing for [\"websites\"][\"apache\"].".color(Colors::YELLOW)
+      end
+
+      puts "[server]".ljust(44) + "[provider]".ljust(14) + "[state]".ljust(13) + "[id]".ljust(12) + "[type]".ljust(13) + "[ipv4_public]".ljust(17) + "[ipv4_private]".ljust(17)
       puts "\n"
 
       @configuration["environments"]["#{environment}"]["servers"].each do |server,data|
+
+        # verify environments => servers
+        if not ["redhat","redhat1","redhat_mysql","windows","windows_mssql"].include?("#{server}")
+          catapult_exception("There is an error in your secrets/configuration.yml file.\nThe \"#{server}\" server is invalid, it must be redhat, redhat1, redhat_mysql, windows, or windows_mssql.")
+        end
 
         # start new row
         row = Array.new
@@ -1809,12 +1831,12 @@ module Catapult
               `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml.gpg --armor --cipher-algo AES256 --symmetric secrets/configuration.yml`
             end
           end
-          if @configuration["environments"]["#{environment}"]["servers"]["#{server}"]["slug"] == nil
-            catapult_exception("There is an error in your secrets/configuration.yml file.\nThe slug (DigitalOcean droplet size) for #{environment} => servers => redhat is empty and the droplet has not been created. Please choose from the following (see DigitalOcean.com for pricing):\n#{@api_digitalocean_slugs}")
+          if !defined?(@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["slug"]) || (@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["slug"].nil?)
+            catapult_exception("There is an error in your secrets/configuration.yml file.\nThe slug (DigitalOcean droplet size) for #{environment} => servers => #{server} is empty and the droplet has not been created. Please choose from the following (see DigitalOcean.com for pricing):\n#{@api_digitalocean_slugs}")
           end
           if @api_digitalocean_slugs.any?
             if not @api_digitalocean_slugs.include?("#{@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["slug"]}")
-              catapult_exception("There is an error in your secrets/configuration.yml file.\nThe slug (DigitalOcean droplet size) for #{environment} => servers => redhat is invalid and the droplet has not been created. Please choose from the following (see DigitalOcean.com for pricing):\n#{@api_digitalocean_slugs}")
+              catapult_exception("There is an error in your secrets/configuration.yml file.\nThe slug (DigitalOcean droplet size) for #{environment} => servers => #{server} is invalid and the droplet has not been created. Please choose from the following (see DigitalOcean.com for pricing):\n#{@api_digitalocean_slugs}")
             end
           end
           # ipv4_public
@@ -1883,6 +1905,7 @@ module Catapult
         puts row.join(" ")
 
       end
+
       # if environment passwords do not exist, create them
       ######################################################################
       # BE VERY CAREFUL WITH THE MERGE OPERATIONS                          #
@@ -2280,7 +2303,7 @@ module Catapult
 
                 if response.code.to_f == 404
                   # create the repo if it does not exist
-                  confirm = ask("The Bitbucket repository #{repo_split_3[0]} does not exist, would you like to create it? [Y/N]") { |yn| yn.limit = 1, yn.validate = /[yn]/i }
+                  confirm = ask("The Bitbucket repository #{repo_split_3[0]} does not exist, would you like to create it? [y/n]") { |yn| yn.limit = 1, yn.validate = /[yn]/i }
                   if confirm.downcase == 'y'
                     uri = URI("https://api.bitbucket.org/2.0/repositories/#{repo_split_3[0]}")
                     Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|

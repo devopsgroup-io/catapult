@@ -134,6 +134,8 @@ hostnamectl set-hostname "" --pretty
 # configure the hostname
 if ([ "${4}" == "apache" ]); then
     hostnamectl set-hostname "$(catapult company.name | tr '[:upper:]' '[:lower:]')-${1}-redhat"
+elif ([ "${4}" == "apache-node" ]); then
+    hostnamectl set-hostname "$(catapult company.name | tr '[:upper:]' '[:lower:]')-${1}-redhat1"
 elif ([ "${4}" == "bamboo" ]); then
     hostnamectl set-hostname "$(catapult company.name | tr '[:upper:]' '[:lower:]')-build"
 elif ([ "${4}" == "mysql" ]); then
@@ -216,7 +218,7 @@ echo -e "\n> system swap configuration"
 swaps=$(swapon --noheadings --show=NAME)
 swap_volumes=$(cat /etc/fstab | grep "swap" | awk '{print $1}')
 
-if ([ "${4}" == "apache" ] || [ "${4}" == "mysql" ]); then
+if ([ "${4}" == "apache" ] || [ "${4}" == "apache-node" ] || [ "${4}" == "mysql" ]); then
 
     # create a 256MB swap at /swapfile if it does not exist
     if [[ ! ${swaps[*]} =~ "/swapfile" ]]; then
@@ -264,7 +266,7 @@ if ([ "${4}" == "bamboo" ]); then
 fi
 
 # define the swaps
-if ([ "${4}" == "apache" ] || [ "${4}" == "mysql" ]); then
+if ([ "${4}" == "apache" ] || [ "${4}" == "apache-node" ] || [ "${4}" == "mysql" ]); then
     defined_swaps=("/swapfile" "/swapfile512")
 elif ([ "${4}" == "bamboo" ]); then
     defined_swaps=("/swapfile" "/swapfile512" "/swapfile768")
