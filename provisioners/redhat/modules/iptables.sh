@@ -66,7 +66,7 @@ sudo iptables\
     --dport 123\
     --jump ACCEPT
 # allow incoming web traffic from the world on 80, 443, and 32700 (HAProxy)
-if [ "${4}" == "apache" ]; then
+if ([ "${4}" == "apache" ]); then
     sudo iptables\
         --append INPUT\
         --protocol tcp\
@@ -88,8 +88,24 @@ if [ "${4}" == "apache" ]; then
         --match state\
         --state NEW,ESTABLISHED\
         --jump ACCEPT
+# allow incoming web traffic from 8080 and 8081 for HAProxy backend apache nodes
+elif ([ "${4}" == "apache-node" ]); then
+    sudo iptables\
+        --append INPUT\
+        --protocol tcp\
+        --dport 8080\
+        --match state\
+        --state NEW,ESTABLISHED\
+        --jump ACCEPT
+    sudo iptables\
+        --append INPUT\
+        --protocol tcp\
+        --dport 8081\
+        --match state\
+        --state NEW,ESTABLISHED\
+        --jump ACCEPT
 # allow incoming traffic for bamboo
-elif [ "${4}" == "bamboo" ]; then
+elif ([ "${4}" == "bamboo" ]); then
     sudo iptables\
         --append INPUT\
         --protocol tcp\
@@ -112,7 +128,7 @@ elif [ "${4}" == "bamboo" ]; then
         --state NEW,ESTABLISHED\
         --jump ACCEPT
 # allow incoming database traffic
-elif [ "${4}" == "mysql" ]; then
+elif ([ "${4}" == "mysql" ]); then
     # allow any connection from the developer workstation
     if [ "${1}" == "dev"  ]; then
         sudo iptables\
@@ -165,7 +181,7 @@ sudo systemctl enable fail2ban
 sudo systemctl start fail2ban
 
 # define fail2ban filters
-if [ "${4}" == "apache" ]; then
+if ([ "${4}" == "apache" ] || [ "${4}" == "apache-node" ]); then
 fail2ban_filters="
 [apache-botsearch]
 enabled = true

@@ -144,6 +144,8 @@ redhat:
   servers:
     apache:
       modules: ["time","system","iptables","cron","apache","php","software_tools","git_clean","software_operations_file","git","rsync","git_permissions","software_config","cloudflare_zones","cloudflare_dns","apache_vhosts_clean","apache_vhosts","haproxy"]
+    apache-node:
+      modules: ["time","system","iptables","cron","apache","php","apache_vhosts_clean","apache_vhosts"]
     bamboo:
       modules: ["time","system","iptables","cron","bamboo"]
     mysql:

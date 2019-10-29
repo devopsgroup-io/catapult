@@ -23,7 +23,7 @@ if ([ "${4}" == "apache" ] || [ "${4}" == "mysql" ]); then
     cat "/catapult/provisioners/redhat/modules/cron_git.sh" > "/etc/cron.weekly/catapult-git.cron"
 fi
 # mail
-if ([ "${4}" == "apache" ]); then
+if ([ "${4}" == "apache" ] || [ "${4}" == "apache-node" ]); then
     cat "/catapult/provisioners/redhat/modules/cron_mail.sh" > "/etc/cron.daily/catapult-mail.cron"
 fi
 # mysql
