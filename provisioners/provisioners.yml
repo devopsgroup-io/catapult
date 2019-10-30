@@ -12,7 +12,7 @@ redhat:
       multithreading_persistent: false
       persistent: false
     apache_vhosts:
-      description: "Manages HTTP and HTTPS virtual hosts and SSL certificates for websites."
+      description: "Manages HTTP and HTTPS virtual hosts for websites."
       multithreading: false
       multithreading_persistent: false
       persistent: false
@@ -63,6 +63,11 @@ redhat:
       persistent: false
     iptables:
       description: "Manages a strict firewall to only allow necessary traffic."
+      multithreading: false
+      multithreading_persistent: false
+      persistent: false
+    letsencrypt:
+      description: "Manages HTTPS certificates for websites."
       multithreading: false
       multithreading_persistent: false
       persistent: false
@@ -143,7 +148,7 @@ redhat:
       persistent: false
   servers:
     apache:
-      modules: ["time","system","iptables","cron","apache","php","software_tools","git_clean","software_operations_file","git","rsync","git_permissions","software_config","cloudflare_zones","cloudflare_dns","apache_vhosts_clean","apache_vhosts","haproxy"]
+      modules: ["time","system","iptables","cron","apache","php","software_tools","git_clean","software_operations_file","git","rsync","git_permissions","software_config","cloudflare_zones","cloudflare_dns","apache_vhosts_clean","letsencrypt","apache_vhosts","haproxy"]
     apache-node:
       modules: ["time","system","iptables","cron","apache","php","apache_vhosts_clean","apache_vhosts"]
     bamboo:
