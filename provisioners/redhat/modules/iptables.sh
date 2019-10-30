@@ -1,5 +1,7 @@
 source "/catapult/provisioners/redhat/modules/catapult.sh"
 
+redhat_ip="$(catapult environments.${1}.servers.redhat.ip_private)"
+redhat1_ip="$(catapult environments.${1}.servers.redhat1.ip_private)"
 
 # IPTABLES CONFIGURATION
 echo -e "\n> configuring iptables-services"
@@ -42,18 +44,18 @@ sudo iptables --policy FORWARD DROP
 # allow all output, only filter input
 sudo iptables --policy OUTPUT ACCEPT
 
-# allow server/client ssh over 22
+# allow ssh over 22
 sudo iptables\
     --append INPUT\
     --protocol tcp\
     --dport 22\
     --jump ACCEPT
-# allow server to use 127.0.0.1 or localhost, lo = loopback interface
+# allow self use of 127.0.0.1 or localhost, lo = loopback interface
 sudo iptables\
     --append INPUT\
     --in-interface lo\
     --jump ACCEPT
-# allow server to access the web for packages, updates, etc
+# allow self to access the web for packages, updates, etc
 sudo iptables\
     --append INPUT\
     --match state\
@@ -88,6 +90,25 @@ if ([ "${4}" == "apache" ]); then
         --match state\
         --state NEW,ESTABLISHED\
         --jump ACCEPT
+    # allow incoming nfs from apache-nodes if present
+    if ([ "${1}" != "dev"  ] && [ ! -z "${redhat1_ip}" ]); then
+        sudo iptables\
+            --append INPUT\
+            --protocol tcp\
+            --dport 2049\
+            --source 10.132.83.110\
+            --match state\
+            --state NEW,ESTABLISHED\
+            --jump ACCEPT
+        sudo iptables\
+            --append INPUT\
+            --protocol udp\
+            --dport 2049\
+            --source 10.132.83.110\
+            --match state\
+            --state NEW,ESTABLISHED\
+            --jump ACCEPT
+    fi
 # allow incoming web traffic from 8080 and 8081 for HAProxy backend apache nodes
 elif ([ "${4}" == "apache-node" ]); then
     sudo iptables\
@@ -129,8 +150,8 @@ elif ([ "${4}" == "bamboo" ]); then
         --jump ACCEPT
 # allow incoming database traffic
 elif ([ "${4}" == "mysql" ]); then
-    # allow any connection from the developer workstation
-    if [ "${1}" == "dev"  ]; then
+    # allow any connection from developer's workstation
+    if ([ "${1}" != "dev"  ]); then
         sudo iptables\
             --append INPUT\
             --protocol tcp\
@@ -140,7 +161,6 @@ elif ([ "${4}" == "mysql" ]); then
             --jump ACCEPT
     # restrict incoming connection only from redhat private interface
     else
-        redhat_ip="$(catapult environments.${1}.servers.redhat.ip_private)"
         sudo iptables\
             --append INPUT\
             --protocol tcp\
