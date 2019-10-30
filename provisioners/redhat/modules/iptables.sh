@@ -169,6 +169,16 @@ elif ([ "${4}" == "mysql" ]); then
             --match state\
             --state NEW,ESTABLISHED\
             --jump ACCEPT
+        if ([ ! -z "${redhat1_ip}" ]); then
+            sudo iptables\
+                --append INPUT\
+                --protocol tcp\
+                --dport 3306\
+                --source ${redhat1_ip}\
+                --match state\
+                --state NEW,ESTABLISHED\
+                --jump ACCEPT
+        fi
     fi
 fi
 
