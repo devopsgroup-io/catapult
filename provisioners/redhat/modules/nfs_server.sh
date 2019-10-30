@@ -13,6 +13,7 @@ sudo systemctl start nfs-server.service
 if ([ "$1" != "dev" ] && [ ! -z "${redhat1_ip}" ]); then
 sudo cat > /etc/exports << EOF
 /var/www/repositories/apache ${redhat1_ip}(ro,sync,no_root_squash,no_subtree_check)
+/catapult/provisioners/redhat/installers/dehydrated/certs ${redhat1_ip}(ro,sync,no_root_squash,no_subtree_check)
 EOF
 fi
 

@@ -9,4 +9,6 @@ sudo yum install -y nfs-utils
 if ([ "$1" != "dev" ]); then
     mkdir -p /var/www/repositories/apache
     mount ${redhat_ip}:/var/www/repositories/apache /var/www/repositories/apache
+    mkdir -p /catapult/provisioners/redhat/installers/dehydrated/certs
+    mount ${redhat_ip}:/catapult/provisioners/redhat/installers/dehydrated/certs /catapult/provisioners/redhat/installers/dehydrated/certs
 fi
