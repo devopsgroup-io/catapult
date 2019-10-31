@@ -118,9 +118,9 @@ Catapult maintains a high level of integrity when it comes to PHP versions, thro
 
 PHP Version | End-of-Life | Maintainer | Updater
 ------------|-------------|------------|--------
-5.4 | June 30, 2024 | [CentOS](https://wiki.centos.org/FAQ/General#head-fe8a0be91ee3e7dea812e8694491e1dde5b75e6d) | [RedHat](https://access.redhat.com/security/updates/backporting)
-7.1 | December 1, 2019 | [SCLO](https://www.softwarecollections.org/en/scls/rhscl/rh-php71/) | [RedHat](https://developers.redhat.com/products/softwarecollections/overview/)
-7.2 | November 30, 2020 | [SCLO](https://www.softwarecollections.org/en/scls/rhscl/rh-php72/) | [RedHat](https://developers.redhat.com/products/softwarecollections/overview/)
+5.4 | June 30, 2024 | [CentOS](https://wiki.centos.org/FAQ/General#head-fe8a0be91ee3e7dea812e8694491e1dde5b75e6d) | [Red Hat](https://access.redhat.com/security/updates/backporting)
+7.1 | December 1, 2019 | [SCLO](https://www.softwarecollections.org/en/scls/rhscl/rh-php71/) | [Red Hat](https://developers.redhat.com/products/softwarecollections/overview/)
+7.2 | November 30, 2020 | [SCLO](https://www.softwarecollections.org/en/scls/rhscl/rh-php72/) | [Red Hat](https://developers.redhat.com/products/softwarecollections/overview/)
 
 ### End-of-Life (EOL) ###
 
@@ -148,7 +148,7 @@ Environments                                  | LocalDev, Test, QC, Production  
 Exacting Configuration                        | :white_check_mark:                    | :x:<sup>[2](#references)</sup>| :x:<sup>[3](#references)</sup>
 Approach                                      | Virtual Machine                       | Container                     | Virtual Machine
 Data Center                                   | DigitalOcean and AWS                  | Rackspace                     | AWS
-Scaling                                       | Vertical                              | Horizontal                    | Vertical
+Scaling                                       | Horizontal                            | Horizontal                    | Vertical
 Scaling Management                            | Manual                                | Automatic                     | Manual
 Development Environment                       | Unlimited Local                       | 5 Cloud                       | Unlimited Local
 Development Environment Approach              | Exact                                 | Exact                         | Similar
@@ -227,7 +227,8 @@ See an error or have a suggestion? Email competition@devopsgroup.io - we appreci
     - [Caching Optimizations](#caching-optimizations)
     - [Geographic Optimizations](#geographic-optimizations)
     - [Recommended Optimizations](#recommended-optimizations)
-- [Performance Testing](#performance-testing)
+- [Capacity](#capacity)
+- [Performance and Capacity Testing](#performance-and-capacity-testing)
     - [Website Concurrency Maximum](#website-concurrency-maximum)
     - [Interpreting Apache AB Results](#interpreting-apache-ab-results)
 - [Troubleshooting](#troubleshooting)
@@ -1455,14 +1456,14 @@ Your website's performance is maximized with bandwidth, caching, and geographic 
 
 <img src="https://cdn.rawgit.com/devopsgroup-io/catapult/master/catapult/installers/images/catapult_performance.png" alt="Catapult Performance">
 
-**Please note:** Any optimization that would impact development or component testing in LocalDev is disabled; this workflow aligns with the testing activites described in the [Release Management](#release-management) section.
+**Please note:** Any performance optimization that would impact development or component testing in LocalDev is disabled; this workflow aligns with the testing activites described in the [Release Management](#release-management) section.
 
 ## Bandwidth Optimizations ##
 
 Bandwidth optimizations are made to lower the total bytes downloaded and decrease the amount of requests made by the browser.
 
-* HTTP Content-Encoding headers are set for a defined list of files, this will compress the output sent with gzip. This saves network bandwidth.
-* Aggregating CSS files and JavaScript files is enabled for the website's software type if available.
+* HTTP Content-Encoding headers are set for a defined list of files, this will compress the file sent from the server to the client using gzip. This saves network bandwidth and total time for the client to download the file.
+* Aggregating CSS and JavaScript files is enabled for the website's software type if available.
   * [https://github.com/devopsgroup-io/catapult/blob/master/provisioners/redhat/modules/software_operations_meta.sh](https://github.com/devopsgroup-io/catapult/blob/master/provisioners/redhat/modules/software_operations_meta.sh)
 
 ## Caching Optimizations ##
@@ -1508,13 +1509,38 @@ Google's [PageSpeed Insights](https://developers.google.com/speed/pagespeed/insi
 
 
 
-# Performance Testing #
+# Capacity #
 
-Often disregarded, performance testing is a crucial component of quality assurance. The risks of neglecting performance testing include downtime, SEO impacts, gaps in analytics, poor user experience, and unknown ability to scale.
+Your website's capacity potential is defined by two key elements; 1) your website's average resource requirement per request and 2) server resources available. We recommend to first [Performance](#performance) optmize your website and *then* consider your website's capacity potential through [Performance and Capacity Testing](#performance-and-capcity-testing).
+
+## Increasing Capacity ##
+
+Catapult defines horizontal scaling through adding additional servers, this affords you increased capacity. Currently, only the Red Hat stack supports horizontal scaling and only one (1) additional server is supported. Each Red Hat environment (LocalDev, Test, QC, and Production) support horizontal scaling independently. To spin up the additional server per environment, please run the following command:
+
+    * `vagrant up ~/secrets/configuration.yml["company"]["name"]-dev-redhat1`
+    * `vagrant up ~/secrets/configuration.yml["company"]["name"]-test-redhat1`
+    * `vagrant up ~/secrets/configuration.yml["company"]["name"]-qc-redhat1`
+    * `vagrant up ~/secrets/configuration.yml["company"]["name"]-production-redhat1`
+
+
+
+# Performance and Capacity Testing #
+
+Often disregarded, performance and capacity testing are a crucial component of quality assurance. The risks of neglecting performance and capacity testing include downtime, SEO impacts, gaps in analytics, poor user experience, and unknown ability to scale.
 
 With Catapult's exactly duplicated configuration, even the Test environment can accurately represent the performance potential of the Production environment. [ApacheBench](https://httpd.apache.org/docs/2.4/programs/ab.html) is a powerful tool to test request performance and concurrency - OSX includes ApacheBench out of the box, while [this StackOverflow post](http://stackoverflow.com/a/7407602/4838803) details how to get up and running on Windows.
 
-ApacheBench enables us to profile request performance (`-n` represents the number of requests to perform) and concurrency (`-c` represents the number of multiple requests to make at a time) to test for performance, including common limits such as [C10k and C10M](http://highscalability.com/blog/2013/5/13/the-secret-to-10-million-concurrent-connections-the-kernel-i.html).
+ApacheBench enables us to perform both performance and load testing. Each website has it's own unique resource requirements and knowing these requirements are paramount to the performance and uptime of your website. 
+
+* **Performance testing
+  * Definition: Testing for the time it takes for a client to request a web page from the server.
+  * Why: Enables us to see real-world request times for our website.
+  * How to improve: Please reference the [Performance](#performance) section and its many optimization recommendations.
+
+* **Capacity testing
+  * Definition: Testing many concurrent requests at a time to uncover when performance begins to degrade.
+  * Why: Enables us to see real-world capacity limits for our website's unique resource fingerprint.
+  * How to improve: Please reference the [Capacity](#capacity) section and its many optimization recommendations.
 
 ## Website Concurrency Maximum ##
 
@@ -1579,12 +1605,8 @@ Percentage of the requests served within a certain time (ms)
 
 Below is a log of service related troubleshooting. If you're having issues related to Catapult, [submit a GitHub Issue](https://github.com/devopsgroup-io/catapult/issues/new).
 
-* **DigitalOcean**
-    * [09-01-2015] vagrant rebuild was failing with a `The configured shell (config.ssh.shell) is invalid and unable to properly execute commands.` it is due to DigitalOcean's API not re-inserting the SSH key that was originally used during the first vagrant up (creation of the droplet). To rebuild, you must use the DigitalOcean console, run through the first root password reset workflow that was emailed to you, then vi /etc/sudoers and remove the `Defaults requiretty` line and save and exit. You can then run vagrant provision successfully.
-* **GitHub**
-    * [09-08-2015] Some database dumps exceed 100MB, so it's recommened to use Bitbucket in those instances as Catapult auto-commits database dumps to your website's repository, up to 500MB worth of database dumps or the one, newest database dump. [Bitbucket](https://help.github.com/articles/what-is-my-disk-quota/) has a 2GB hard repo push limit with no documented file limit and [GitHub](https://help.github.com/articles/what-is-my-disk-quota/) has a 1GB soft repo limit with a 100MB file size limit.
 * **Vagrant**
-   * [02-04-2015] When upgrading Vagrant you may run into errors - the most common issue are mismatched plugins, running this command has a good chance of success `sudo rm -Rf ~/.vagrant.d/gems/ && sudo rm ~/.vagrant.d/plugins.json`
+   * When upgrading Vagrant you may run into errors - the most common issue are mismatched plugins, running this command has a good chance of success `sudo rm -Rf ~/.vagrant.d/gems/ && sudo rm ~/.vagrant.d/plugins.json`
 
 
 
