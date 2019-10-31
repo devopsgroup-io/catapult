@@ -441,12 +441,14 @@ EOF
         sudo ln -s /etc/httpd/sites-available/$domain_environment.conf /etc/httpd/sites-enabled/$domain_environment.conf
     fi
 
-    # set a .user.ini file for php-fpm to read
-    sudo mkdir --parents /var/www/repositories/apache/${domain}/${webroot}
-    sudo touch /var/www/repositories/apache/${domain}/${webroot}/.user.ini
-    sudo cat > /var/www/repositories/apache/${domain}/${webroot}/.user.ini << EOF
+    if ([ "${4}" == "apache" ]); then
+        # set a .user.ini file for php-fpm to read
+        sudo mkdir --parents /var/www/repositories/apache/${domain}${webroot}
+        sudo touch /var/www/repositories/apache/${domain}/${webroot}.user.ini
+        sudo cat > /var/www/repositories/apache/${domain}/${webroot}.user.ini << EOF
 newrelic.appname="${domain_environment};$(catapult company.name | tr '[:upper:]' '[:lower:]')-${1}-redhat"
 EOF
+    fi
 
 done
 
