@@ -91,12 +91,12 @@ if ([ "${4}" == "apache" ]); then
         --state NEW,ESTABLISHED\
         --jump ACCEPT
     # allow incoming nfs from apache-nodes if present
-    if ([ "${1}" != "dev"  ] && [ ! -z "${redhat1_ip}" ]); then
+    if ([ ! -z "${redhat1_ip}" ]); then
         sudo iptables\
             --append INPUT\
             --protocol tcp\
             --dport 2049\
-            --source 10.132.83.110\
+            --source ${redhat1_ip}\
             --match state\
             --state NEW,ESTABLISHED\
             --jump ACCEPT
@@ -104,7 +104,7 @@ if ([ "${4}" == "apache" ]); then
             --append INPUT\
             --protocol udp\
             --dport 2049\
-            --source 10.132.83.110\
+            --source ${redhat1_ip}\
             --match state\
             --state NEW,ESTABLISHED\
             --jump ACCEPT
