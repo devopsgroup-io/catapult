@@ -443,7 +443,7 @@ EOF
 
     if ([ "${4}" == "apache" ]); then
         # set a .user.ini file for php-fpm to read
-        sudo mkdir --parents /var/www/repositories/apache/${domain}${webroot}
+        sudo mkdir --parents /var/www/repositories/apache/${domain}/${webroot}
         sudo touch /var/www/repositories/apache/${domain}/${webroot}.user.ini
         sudo cat > /var/www/repositories/apache/${domain}/${webroot}.user.ini << EOF
 newrelic.appname="${domain_environment};$(catapult company.name | tr '[:upper:]' '[:lower:]')-${1}-redhat"
