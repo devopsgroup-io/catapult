@@ -40,8 +40,8 @@ done <<< "${mounts}"
 # create startup entries for mounting nfs shared folders
 mounts=$(cat /etc/fstab | grep "${redhat_ip}" | awk '{print $1}')
 if [[ ! ${mounts[*]} =~ "${redhat_ip}:/var/www/repositories/apache" ]]; then
-    sudo bash -c 'echo -e "\n${redhat_ip}:/var/www/repositories/apache  /var/www/repositories/apache   nfs      rw,sync,hard,intr  0     0" >> /etc/fstab'
+    sudo bash -c "echo -e \"\n${redhat_ip}:/var/www/repositories/apache  /var/www/repositories/apache   nfs      rw,sync,hard,intr  0     0\" >> /etc/fstab"
 fi
 if [[ ! ${mounts[*]} =~ "${redhat_ip}:/catapult/provisioners/redhat/installers/dehydrated/certs" ]]; then
-    sudo bash -c 'echo -e "\n${redhat_ip}:/catapult/provisioners/redhat/installers/dehydrated/certs  /catapult/provisioners/redhat/installers/dehydrated/certs   nfs      rw,sync,hard,intr  0     0" >> /etc/fstab'
+    sudo bash -c "echo -e \"\n${redhat_ip}:/catapult/provisioners/redhat/installers/dehydrated/certs  /catapult/provisioners/redhat/installers/dehydrated/certs   nfs      rw,sync,hard,intr  0     0\" >> /etc/fstab"
 fi
