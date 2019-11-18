@@ -92,7 +92,7 @@ else
 fi
 
 # rsync the always untracked _sql file store
-if ([ "${software_workflow}" = "downstream" ] && [ "$1" != "production" ]) || ([ "${software_workflow}" = "downstream" ] && [ "$1" = "production"] && [ "$4" = "redhat"]); then
+if ([ "${software_workflow}" = "downstream" ] && [ "$1" != "production" ]) || ([ "${software_workflow}" = "downstream" ] && [ "$1" = "production" ] && [ "$4" = "redhat" ]); then
 
     file_store_size=$(ssh -oStrictHostKeyChecking=no -i /catapult/secrets/id_rsa -n -q root@${production_redhat_mysql_ip} "du --summarize /var/www/repositories/apache/${domain}/_sql/ 2>&1")
     file_store_size=$(echo -e "${file_store_size}" | awk '{ print $1 }')
@@ -102,7 +102,7 @@ if ([ "${software_workflow}" = "downstream" ] && [ "$1" != "production" ]) || ([
     echo -e "- rsyncing..."
     sudo rsync --delete --exclude '*.lock' --recursive -e "ssh -oStrictHostKeyChecking=no -i /catapult/secrets/id_rsa -q" "root@${production_redhat_mysql_ip}:/var/www/repositories/apache/${domain}/_sql/" "/var/www/repositories/apache/${domain}/_sql/"
 
-elif ([ "${software_workflow}" = "upstream" ] && [ "$1" != "test" ]) || ([ "${software_workflow}" = "upstream" ] && [ "$1" = "test"] && [ "$4" = "redhat"]); then
+elif ([ "${software_workflow}" = "upstream" ] && [ "$1" != "test" ]) || ([ "${software_workflow}" = "upstream" ] && [ "$1" = "test" ] && [ "$4" = "redhat" ]); then
 
     file_store_size=$(ssh -oStrictHostKeyChecking=no -i /catapult/secrets/id_rsa -n -q root@${test_redhat_mysql_ip} "du --summarize /var/www/repositories/apache/${domain}/_sql/ 2>&1")
     file_store_size=$(echo -e "${file_store_size}" | awk '{ print $1 }')
