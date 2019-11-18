@@ -1,6 +1,6 @@
 source "/catapult/provisioners/redhat/modules/catapult.sh"
 
-mysql_ip="$(catapult environments.${1}.servers.mysql.ip_private)"
+mysql_ip="$(catapult environments.${1}.servers.redhat_mysql.ip_private)"
 redhat_ip="$(catapult environments.${1}.servers.redhat.ip_private)"
 redhat1_ip="$(catapult environments.${1}.servers.redhat1.ip_private)"
 
@@ -93,7 +93,7 @@ if ([ "${4}" == "apache" ]); then
         --jump ACCEPT
     # allow incoming nfs from mysql
     if ([ "${1}" != "dev"  ]); then
-    sudo iptables\
+        sudo iptables\
             --append INPUT\
             --protocol tcp\
             --dport 2049\
