@@ -68,6 +68,9 @@ fi
 if ! grep -q "alias wp-cli-php71='/opt/rh/rh-php71/root/usr/bin/php /usr/local/src/wp-cli/wp-cli.phar'" ~/.bashrc; then
     sudo bash -c "echo -e \"\nalias wp-cli-php71='/opt/rh/rh-php71/root/usr/bin/php /usr/local/src/wp-cli/wp-cli.phar'\" >> ~/.bashrc"
 fi
+if ! grep -q "alias wp-cli-php72='/opt/rh/rh-php72/root/usr/bin/php /usr/local/src/wp-cli/wp-cli.phar'" ~/.bashrc; then
+    sudo bash -c "echo -e \"\nalias wp-cli-php72='/opt/rh/rh-php72/root/usr/bin/php /usr/local/src/wp-cli/wp-cli.phar'\" >> ~/.bashrc"
+fi
 # update to latest wp-cli
 wp-cli --allow-root cli update --yes
 wp-cli --allow-root cli version

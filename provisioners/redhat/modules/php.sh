@@ -124,7 +124,7 @@ sudo yum install -y rh-php71-php-gmp rh-php71-php-mysqlnd
 # https://blog.remirepo.net/post/2017/02/23/Additional-PHP-packages-for-RHSCL
 curl --output /etc/yum.repos.d/rhscl-centos-release-scl-epel-7.repo wget https://copr.fedorainfracloud.org/coprs/rhscl/centos-release-scl/repo/epel-7/rhscl-centos-release-scl-epel-7.repo
 # These extensions are available from » PECL. They may require external libraries. More PECL extensions exist but they are not documented in the PHP manual yet.
-sudo yum install -y sclo-php71-php-pecl-geoip sclo-php71-php-pecl-imagick sclo-php71-php-pecl-uploadprogress
+sudo yum install -y sclo-php71-php-pecl-geoip sclo-php71-php-pecl-imagick sclo-php71-php-mcrypt sclo-php71-php-pecl-uploadprogress
 
 #################
 # PHP 5.4 MOD_PHP AND PHP_FPM
