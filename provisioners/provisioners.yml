@@ -236,6 +236,7 @@ software:
       repo: "https://git.drupal.org/project/drupal.git"
       branch: "7.x"
       database_config_file: "sites/default/settings.php"
+      eol: "2021-11-1"
       file_store_containers: ["sites/default/files"]
       file_stores: ["sites/default/files"]
       php_version: "7.1"
@@ -252,6 +253,7 @@ software:
       repo: "https://github.com/Elgg/Elgg.git"
       branch: "1.12"
       database_config_file: "engine/settings.php"
+      eol: "2019-04-05"
       file_store_containers: ["dataroot"]
       php_version: "7.1"
       version: [1]
