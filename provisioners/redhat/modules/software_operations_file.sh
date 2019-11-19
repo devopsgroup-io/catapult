@@ -16,6 +16,10 @@ else
     software_auto_update="false"
 fi
 
+# expose the alternate software tool version aliases
+shopt -s expand_aliases
+source ~/.bashrc
+
 # only auto-update if the tools are available
 if hash composer 2>/dev/null && hash drush 2>/dev/null && hash wp-cli 2>/dev/null; then
 

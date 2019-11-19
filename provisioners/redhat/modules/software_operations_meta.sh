@@ -13,7 +13,9 @@ webroot=$(catapult websites.apache.$5.webroot)
 
 softwareroot=$(provisioners software.apache.${software}.softwareroot)
 
-
+# expose the alternate software tool version aliases
+shopt -s expand_aliases
+source ~/.bashrc
 
 # set website software site email address
 # set website software admin credentials, email address, and role
