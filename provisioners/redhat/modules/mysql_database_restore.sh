@@ -14,6 +14,9 @@ software_db_tables=$(mysql --defaults-extra-file=$dbconf --silent --skip-column-
 softwareroot=$(provisioners software.apache.${software}.softwareroot)
 webroot=$(catapult websites.apache.$5.webroot)
 
+# expose the alternate software tool version aliases
+shopt -s expand_aliases
+source ~/.bashrc
 
 # respect software_workflow and restore the database if appropriate
 if ([ ! -z "${software}" ]); then
