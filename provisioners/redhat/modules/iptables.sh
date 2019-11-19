@@ -171,7 +171,7 @@ elif ([ "${4}" == "bamboo" ]); then
 # allow incoming database traffic
 elif ([ "${4}" == "mysql" ]); then
     # allow any connection from developer's workstation
-    if ([ "${1}" != "dev"  ]); then
+    if ([ "${1}" == "dev"  ]); then
         sudo iptables\
             --append INPUT\
             --protocol tcp\
