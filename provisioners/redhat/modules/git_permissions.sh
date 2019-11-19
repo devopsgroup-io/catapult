@@ -47,27 +47,6 @@ if [ ! -z "$(provisioners_array software.apache.${software}.file_store_container
     done
 fi
 
-# set permissions of software file stores
-if [ ! -z "$(provisioners_array software.apache.${software}.file_stores)" ]; then
-    cat "/catapult/provisioners/provisioners.yml" | shyaml get-values-0 software.apache.$(catapult websites.apache.$5.software).file_stores | while read -r -d $'\0' file_store; do
-
-        # create the software file store if it does not exist
-        if [ ! -d "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}${file_store}" ]; then
-            echo -e "- file store container does not exist, creating..."
-            sudo mkdir --parents "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}${file_store}"
-        fi
-
-        # set permissions of file store [directory]
-        chmod ug=rwx,o= "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}${file_store}"
-
-        # set permissions of contents of file store [directories and files]
-        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}${file_store}" \
-            && find . -type d -exec chmod ug=rwx,o= '{}' \; \
-            && find . -type f -exec chmod ug=rw,o= '{}' \;
-
-    done
-fi
-
 # for directories that may have been just created or removed by git clean if empty, again, set ownership of software [directories and files]
 if [ "$1" != "dev" ]; then
     cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" \
