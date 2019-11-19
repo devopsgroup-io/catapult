@@ -228,6 +228,7 @@ software:
       branch: "6.x"
       database_config_file: "sites/default/settings.php"
       eol: "2016-02-24"
+      file_store_containers: ["sites/default/files"]
       file_stores: ["sites/default/files"]
       php_version: "5.4"
       version: [6]
@@ -235,6 +236,7 @@ software:
       repo: "https://git.drupal.org/project/drupal.git"
       branch: "7.x"
       database_config_file: "sites/default/settings.php"
+      file_store_containers: ["sites/default/files"]
       file_stores: ["sites/default/files"]
       php_version: "7.1"
       version: [7]
@@ -242,6 +244,7 @@ software:
       repo: "https://git.drupal.org/project/drupal.git"
       branch: "8.5.x"
       database_config_file: "sites/default/settings.php"
+      file_store_containers: ["sites/default/files"]
       file_stores: ["sites/default/files"]
       php_version: "7.1"
       version: [8]
@@ -312,7 +315,7 @@ software:
       database_config_file: "config_override.php"
       eol: "2019-11-15"
       file_store_containers: ["cache","custom","data","modules","upload","themes","tmp"]
-      file_stores: ["uploads"]
+      file_stores: ["upload"]
       php_version: "7.1"
       version: [7]
     wordpress4:
