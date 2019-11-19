@@ -148,7 +148,7 @@ elif [ "${software}" = "wordpress4" ]; then
         VALUES ('1', 'admin', MD5('$(catapult environments.${1}.software.wordpress.admin_password)'), 'admin', '$(catapult company.email)', '0', 'admin')
         ON DUPLICATE KEY UPDATE user_login='admin', user_pass=MD5('$(catapult environments.${1}.software.wordpress.admin_password)'), user_nicename='admin', user_email='$(catapult company.email)', user_status='0', display_name='admin';
     "
-    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && wp-cli --allow-root user add-role 1 administrator
+    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && wp-cli-php71 --allow-root user add-role 1 administrator
 
 elif [ "${software}" = "wordpress5" ]; then
     
@@ -159,7 +159,7 @@ elif [ "${software}" = "wordpress5" ]; then
         VALUES ('1', 'admin', MD5('$(catapult environments.${1}.software.wordpress.admin_password)'), 'admin', '$(catapult company.email)', '0', 'admin')
         ON DUPLICATE KEY UPDATE user_login='admin', user_pass=MD5('$(catapult environments.${1}.software.wordpress.admin_password)'), user_nicename='admin', user_email='$(catapult company.email)', user_status='0', display_name='admin';
     "
-    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && wp-cli --allow-root user add-role 1 administrator
+    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && wp-cli-php71 --allow-root user add-role 1 administrator
 
 elif [ "${software}" = "xenforo2" ]; then
 
@@ -374,13 +374,13 @@ elif [ "${software}" = "suitecrm7" ]; then
 
 elif [ "${software}" = "wordpress4" ]; then
 
-    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && wp-cli --allow-root core update-db
-    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && wp-cli --allow-root cache flush
+    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && wp-cli-php71 --allow-root core update-db
+    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && wp-cli-php71 --allow-root cache flush
 
 elif [ "${software}" = "wordpress5" ]; then
 
-    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && wp-cli --allow-root core update-db
-    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && wp-cli --allow-root cache flush
+    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && wp-cli-php71 --allow-root core update-db
+    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && wp-cli-php71 --allow-root cache flush
 
 elif [ "${software}" = "xenforo1" ]; then
 
