@@ -289,6 +289,10 @@ module Catapult
       "")
     end
     puts "\n * Configuring the #{branch} branch:\n\n"
+    # remove the catapult changes file if it exists
+    if File.exist?('provisioners/redhat/logs/catapult.changes')
+      File.delete('provisioners/redhat/logs/catapult.changes')
+    end
     # if on the develop branch, update from catapult core
     if "#{branch}" == "develop"
       `#{@git} fetch`

@@ -42,7 +42,12 @@ elif ([ $1 = "qc" ]); then
 else
     branch="develop"
 fi
-# get the catapult instance
+# determine if this is a new instance
+force_full_build="false"
+if [ ! -f "/catapult/provisioners/redhat/logs/${4}.log" ]; then
+    force_full_build="true"
+fi
+# handle the catapult instance for dev
 if ([ $1 = "dev" ]); then
     # determine if the vagrant synced folder is working properly
     if ! [ -e "/catapult/secrets/configuration.yml.gpg" ]; then
@@ -51,13 +56,9 @@ if ([ $1 = "dev" ]); then
     else
         echo -e "Your Catapult instance is being synced from your host machine."
     fi
-    # if there are changes between us and remote, write a changes file for later use
-    cd "/catapult" && sudo git diff --exit-code --quiet
-    if [ $? -eq 1 ]; then
-        touch "/catapult/provisioners/redhat/logs/catapult.changes"
-    fi
+# handle the catapult instance for upstream
 else
-    # clone the catapultrepository if it does not exist
+    # clone the catapult repository if it does not exist
     if ! [ -d "/catapult/.git" ]; then
         sudo git clone --recursive --branch ${branch} $2 "/catapult"
     # if the catapult repository does exist
@@ -70,18 +71,21 @@ else
             && sudo git checkout . \
             && sudo git checkout ${branch} \
             && sudo git fetch
+        # if there are changes between us and remote, force a full build
+        cd "/catapult" && sudo git diff --exit-code --quiet ${branch} origin/${branch}
+        if [ $? -eq 1 ]; then
+            force_full_build="true"
+        fi
+        # pull in the latest
+        cd "/catapult" && sudo git pull
     fi
-    # if there are changes between us and remote, write a changes file for later use
-    cd "/catapult" && sudo git diff --exit-code --quiet ${branch} origin/${branch}
-    if [ $? -eq 1 ]; then
-        touch "/catapult/provisioners/redhat/logs/catapult.changes"
-    fi
-    # pull in the latest
-    cd "/catapult" \
-        && sudo git pull
 fi
-# override updates variable if this is a new machine
-if [ ! -f "/catapult/provisioners/redhat/logs/${4}.log" ]; then
+# cleanup any leftover utility files
+if ([ "${4}" == "apache" ] || [ "${4}" == "bamboo" ]); then
+    cd "/catapult/provisioners/redhat/logs" && rm -rf !(".gitignore")
+fi
+# force a full build if appropriate
+if ([ "${force_full_build}" = "true" ]); then
     touch "/catapult/provisioners/redhat/logs/catapult.changes"
 fi
 
