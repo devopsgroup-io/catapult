@@ -364,7 +364,7 @@ Service | Product | Use Case | Monthly Cost
 &dagger;Cloud Hosting: Windows (.NET) | Amazon Web Services (AWS) EC2 | Web and Database Servers (6) | \*$80+
 Source Code Repositories | Atlassian Bitbucket | Private Repositories | Free
 Source Code Repositories | GitHub | Public Repositories | Free
-Continuous Integration | Atlassian Bamboo Server | Build Server | $15
+Automated Deployments / Continuous Integration | Atlassian Bamboo Server | Build Server | $15
 DNS | CloudFlare | Cloud DNS | Free
 Monitoring | New Relic Application Performance Monitoring (APM), Browser, Server, and \**Synthetics | Performance and Infrastructure Monitoring | Free
 **Total** | | | &dagger;$45+
@@ -1505,7 +1505,7 @@ Catapult as a platform can only reach so far into the configuration of your webs
   * Practice [self-documenting code](https://www.amazon.com/dp/0132350882/)
 * Write [efficient PHP](http://www.phpbench.com/)
 
-Google's [PageSpeed Insights](https://developers.google.com/speed/pagespeed/insights/) is a good tool to test for performance optimizations.
+Google's [PageSpeed Insights](https://developers.google.com/speed/pagespeed/insights/) and [Lighthouse](https://developers.google.com/web/tools/lighthouse) are good tools to test for performance optimizations.
 
 
 
@@ -1528,19 +1528,19 @@ Catapult defines horizontal scaling through adding additional servers, this affo
 
 Often disregarded, performance and capacity testing are a crucial component of quality assurance. The risks of neglecting performance and capacity testing include downtime, SEO impacts, gaps in analytics, poor user experience, and unknown ability to scale.
 
-With Catapult's exactly duplicated configuration, even the Test environment can accurately represent the performance potential of the Production environment. [ApacheBench](https://httpd.apache.org/docs/2.4/programs/ab.html) is a powerful tool to test request performance and concurrency - OSX includes ApacheBench out of the box, while [this StackOverflow post](http://stackoverflow.com/a/7407602/4838803) details how to get up and running on Windows.
+With Catapult's exactly duplicated configuration, even the Test environment can accurately represent the performance and capacity potential of the Production environment. [ApacheBench](https://httpd.apache.org/docs/2.4/programs/ab.html) is a powerful tool to test request performance and concurrency - macOS includes ApacheBench out of the box, while [this StackOverflow post](http://stackoverflow.com/a/7407602/4838803) details how to get up and running on Windows.
 
-ApacheBench enables us to perform both performance and load testing. Each website has it's own unique resource requirements and knowing these requirements are paramount to the performance and uptime of your website. 
+ApacheBench enables us to perform both performance and capacity testing. Each website has it's own unique resource requirements and knowing these requirements are paramount to the performance, capacity, and uptime of your website. 
 
-* **Performance testing
-  * Definition: Testing for the time it takes for a client to request a web page from the server.
-  * Why: Enables us to see real-world request times for our website.
-  * How to improve: Please reference the [Performance](#performance) section and its many optimization recommendations.
+* **Performance testing**
+  * *Definition*: Testing for the time it takes for a client to request a web page from the server.
+  * *Why*: Enables us to see real-world request times for our website.
+  * *How to improve*: Please reference the [Performance](#performance) section and its many optimization recommendations.
 
-* **Capacity testing
-  * Definition: Testing many concurrent requests at a time to uncover when performance begins to degrade.
-  * Why: Enables us to see real-world capacity limits for our website's unique resource fingerprint.
-  * How to improve: Please reference the [Capacity](#capacity) section and its many optimization recommendations.
+* **Capacity testing**
+  * *Definition*: Testing many concurrent requests at a time to uncover when performance begins to degrade.
+  * *Why*: Enables us to see real-world capacity limits for our website's unique resource fingerprint.
+  * *How to improve*: Please reference the [Capacity](#capacity) section and its many optimization recommendations.
 
 ## Website Concurrency Maximum ##
 
@@ -1664,7 +1664,7 @@ Catapult is making the conference tour! We plan to attend the following conferen
 
 Catapult will also be seen throughout local meetups in the Philadelphia and Greater Philadelphia area! Get a chance to meet the team and engage at a personal level.
 
-* [Technical.ly Philly](http://www.meetup.com/Technically-Philly/) 9k+ technologists
+* [Technical.ly Philly](http://www.meetup.com/Technically-Philly/) 12k+ technologists
 * [Tech in Motion Philly](http://www.meetup.com/TechinMotionPhilly/) 7k+ technologists
 * [Philadelphia WordPress Meetup Group](http://www.meetup.com/philadelphia-wordpress-meetup-group/) 2k+ technologists
 * [Philly DevOps](http://www.meetup.com/PhillyDevOps/) 2k+ technologists
