@@ -102,18 +102,6 @@ if [ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-values-0 redha
     cat "/catapult/provisioners/provisioners.yml" | shyaml get-values-0 redhat.servers.$4.modules |
     while read -r -d $'\0' module; do
 
-        # cleanup leftover utility files
-        for file in /catapult/provisioners/redhat/logs/${module}.*.log; do
-            if [ -e "$file" ]; then
-                rm $file
-            fi
-        done
-        for file in /catapult/provisioners/redhat/logs/${module}.*.complete; do
-            if [ -e "$file" ]; then
-                rm $file
-            fi
-        done
-
         # check for reboot status between modules
         # not required for red hat to properly install and update software
         kernel_running=$(uname --release)
@@ -220,23 +208,6 @@ if [ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-values-0 redha
         end=$(date +%s)
         echo -e "==> MODULE: ${module}"
         echo -e "==> DURATION: $(($end - $start)) seconds"
-        # cleanup leftover utility files
-        for file in /catapult/provisioners/redhat/logs/${module}.*.log; do
-            if [ -e "$file" ]; then
-                rm $file
-            fi
-        done
-        for file in /catapult/provisioners/redhat/logs/${module}.*.complete; do
-            if [ -e "$file" ]; then
-                rm $file
-            fi
-        done
-    done
-    # cleanup leftover utility files
-    for file in /catapult/provisioners/redhat/logs/*.changes; do
-        if [ -e "$file" ]; then
-            rm $file
-        fi
     done
 
     # remove secrets
