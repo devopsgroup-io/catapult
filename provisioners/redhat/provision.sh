@@ -82,7 +82,7 @@ else
 fi
 # cleanup any leftover utility files
 if ([ "${4}" == "apache" ] || [ "${4}" == "bamboo" ]); then
-    cd "/catapult/provisioners/redhat/logs" && rm -rf !\(".gitignore"\)
+    find "/catapult/provisioners/redhat/logs" -type f -not -name '.gitignore' -delete
 fi
 # force a full build if appropriate
 if ([ "${force_full_build}" = "true" ]); then
