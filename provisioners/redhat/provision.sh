@@ -82,7 +82,7 @@ else
 fi
 # cleanup any leftover utility files
 if ([ "${4}" == "apache" ] || [ "${4}" == "bamboo" ]); then
-    find "/catapult/provisioners/redhat/logs" -type f -not \(-name '.gitignore' -or -name 'apache.log' -or -name 'apache-node.log' -or -name 'bamboo.log' -or -name 'mysql.log' \) -delete
+    find "/catapult/provisioners/redhat/logs" -type f -not \( -name '.gitignore' -or -name 'apache.log' -or -name 'apache-node.log' -or -name 'bamboo.log' -or -name 'mysql.log' \) -delete
 fi
 # force a full build if appropriate
 if ([ "${force_full_build}" = "true" ]); then
