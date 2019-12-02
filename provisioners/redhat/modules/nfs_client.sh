@@ -56,7 +56,7 @@ if ([ "$1" != "dev" ]); then
 
     # mount nfs shared folders
     mounts=$(mount | grep "${redhat_ip}" | awk '{print $1}')
-    if [[ ! ${mounts[*]} =~ "${redhat_ip}:/catapult/provisioners/redhat/installers/dehydrated/certs" ]]; then
+    if [[ ! ${mounts[*]} =~ "${redhat_ip}:/catapult/provisioners/redhat/logs" ]]; then
         umount /catapult/provisioners/redhat/logs
         rm -rf /catapult/provisioners/redhat/logs
         mkdir -p /catapult/provisioners/redhat/logs
