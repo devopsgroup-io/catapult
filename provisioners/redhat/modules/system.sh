@@ -309,7 +309,11 @@ EOF
 echo -e "\n> system monitoring configuration"
 # new relic servers is no longer available, so until we find an agnostic monitor, let's rely on the provider
 if ([ "$1" != "dev" ]); then
-    curl --silent --show-error --connect-timeout 5 --max-time 5 --location https://insights.nyc3.cdn.digitaloceanspaces.com/install.sh | sudo bash
+    version=$(/opt/digitalocean/bin/do-agent --version 2>/dev/null | grep "^Version:" | grep --only-matching --regexp="[0-9]\.[0-9]\.[0-9]" | grep --only-matching --regexp="^[0-9]" || echo "0")
+    if [[ "${version}" != "3" ]]; then
+        sudo yum remove -y do-agent
+        curl --silent --show-error --connect-timeout 5 --max-time 5 --location https://insights.nyc3.cdn.digitaloceanspaces.com/install.sh | sudo bash
+    fi
 fi
 
 
