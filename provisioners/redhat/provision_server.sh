@@ -137,29 +137,28 @@ if [ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-values-0 redha
             website_index=0
             # loop through websites and start sub-processes
             while read -r -d $'\0' website; do
-                # only allow a certain number of parallel bash sub-processes at once
-                sleep 0.15
-                while true; do
-                    resources=$(resources ${module})
-                    if ([[ $resources == *"!"* ]]); then
-                        echo "${resources}"
-                        sleep 0.25
-                    else
-                        echo "${resources}"
-                        break
-                    fi
-                done
                 # if there are no incoming catapult changes, website changes, and there is no need to run persistent modules for this domain
                 if ([ ! -f "/catapult/provisioners/redhat/logs/catapult.changes" ] && [ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-value redhat.modules.${module}.multithreading_persistent) != "True" ] && [ ! -f "/catapult/provisioners/redhat/logs/domain.$(echo "${website}" | shyaml get-value domain).changes" ]); then
                     echo "> module skipped for this website when there are no catapult repository changes and no website repository changes..." > "/catapult/provisioners/redhat/logs/${module}.$(echo "${website}" | shyaml get-value domain).log"
                     touch "/catapult/provisioners/redhat/logs/${module}.$(echo "${website}" | shyaml get-value domain).complete"
                 # if there are incoming websites changes, run the persistent module for this domain
                 else
+                    # only allow a certain number of parallel bash sub-processes at once
+                    while true; do
+                        resources=$(resources ${module})
+                        if ([[ $resources == *"!"* ]]); then
+                            echo "${resources}"
+                            sleep 0.25
+                        else
+                            echo "${resources}"
+                            break
+                        fi
+                    done
                     bash "/catapult/provisioners/redhat/modules/${module}.sh" $1 $2 $3 $4 $website_index > "/catapult/provisioners/redhat/logs/${module}.$(echo "${website}" | shyaml get-value domain).log" 2>&1 &
                 fi
                 (( website_index += 1 ))
             done < <(echo "${configuration}" | shyaml get-values-0 websites.apache)
-            # determine when each subprocess finishes
+            # loop through websites and look for finished sub-process
             while read -r -d $'\0' website; do
                 domain=$(echo "${website}" | shyaml get-value domain)
                 domain_tld_override=$(echo "${website}" | shyaml get-value domain_tld_override 2>/dev/null )
@@ -167,16 +166,22 @@ if [ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-values-0 redha
                 software_auto_update=$(echo "${website}" | shyaml get-value software_auto_update 2>/dev/null )
                 software_dbprefix=$(echo "${website}" | shyaml get-value software_dbprefix 2>/dev/null )
                 software_workflow=$(echo "${website}" | shyaml get-value software_workflow 2>/dev/null )
-                # only allow a certain number of parallel bash sub-processes at once
-                while true; do
-                    resources=$(resources ${module})
-                    if [ ! -e "/catapult/provisioners/redhat/logs/${module}.${domain}.complete" ]; then
-                        echo "${resources}"
-                        sleep 0.25
-                    else
-                        break
-                    fi
-                done
+                # if there are no incoming catapult changes, website changes, and there is no need to run persistent modules for this domain
+                if ([ ! -f "/catapult/provisioners/redhat/logs/catapult.changes" ] && [ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-value redhat.modules.${module}.multithreading_persistent) != "True" ] && [ ! -f "/catapult/provisioners/redhat/logs/domain.$(echo "${website}" | shyaml get-value domain).changes" ]); then
+                    : #no-op
+                # if there are incoming websites changes, run the persistent module for this domain
+                else
+                    # only allow a certain number of parallel bash sub-processes at once
+                    while true; do
+                        resources=$(resources ${module})
+                        if [ ! -e "/catapult/provisioners/redhat/logs/${module}.${domain}.complete" ]; then
+                            echo "${resources}"
+                            sleep 0.25
+                        else
+                            break
+                        fi
+                    done
+                fi
                 echo -e "========================================================="
                 echo -e "=> environment: ${1}"
                 echo -e "=> domain: ${domain}"

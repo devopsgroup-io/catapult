@@ -1,6 +1,5 @@
 source "/catapult/provisioners/redhat/modules/catapult.sh"
 
-# create a vhost per website
 echo "${configuration}" | shyaml get-values-0 websites.apache |
 while IFS='' read -r -d '' key; do
 
