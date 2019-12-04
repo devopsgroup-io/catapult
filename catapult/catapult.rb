@@ -961,12 +961,16 @@ module Catapult
           puts "   - #{api_bamboo_cli_result_plan_triggers.strip}"
         end
         # configure: trigger: remote
+        # bitbucket
         # https://confluence.atlassian.com/bitbucket/what-are-the-bitbucket-cloud-ip-addresses-i-should-use-to-configure-my-corporate-firewall-343343385.html
         # https://ip-ranges.atlassian.com/
+        # github
+        # https://developer.github.com/changes/2019-03-29-webhooks-ip-changes/
+        # https://api.github.com/meta
         if plan.include?("TEST")
           api_bamboo_cli_result_plan_triggers = `#{@api_bamboo_cli} --server #{@configuration["company"]["bamboo_base_url"]} --password #{@configuration["company"]["bamboo_password"]} --user #{@configuration["company"]["bamboo_username"]} --action getTriggerList --plan "#{plan}" #{@api_bamboo_cli_redirect}`; result=$?.success?
-          if ! api_bamboo_cli_result_plan_triggers.strip.include?("Remote")
-            api_bamboo_cli_result_plan_triggers = `#{@api_bamboo_cli} --server #{@configuration["company"]["bamboo_base_url"]} --password #{@configuration["company"]["bamboo_password"]} --user #{@configuration["company"]["bamboo_username"]} --action addTrigger --plan "#{plan}" --type "remote" --ipRestriction "18.205.93.0/25,18.234.32.128/25,13.52.5.0/25" #{@api_bamboo_cli_redirect}`; result=$?.success?
+          if ! api_bamboo_cli_result_plan_triggers.strip.include?("18.205.93.0/25,18.234.32.128/25,13.52.5.0/25,192.30.252.0/22,185.199.108.0/22,140.82.112.0/20")
+            api_bamboo_cli_result_plan_triggers = `#{@api_bamboo_cli} --server #{@configuration["company"]["bamboo_base_url"]} --password #{@configuration["company"]["bamboo_password"]} --user #{@configuration["company"]["bamboo_username"]} --action addTrigger --plan "#{plan}" --type "remote" --ipRestriction "18.205.93.0/25,18.234.32.128/25,13.52.5.0/25,192.30.252.0/22,185.199.108.0/22,140.82.112.0/20" #{@api_bamboo_cli_redirect}`; result=$?.success?
             puts "   - #{api_bamboo_cli_result_plan_triggers.strip}"
           end
         end
@@ -2110,150 +2114,157 @@ module Catapult
     # validate @configuration["websites"]
     if ["provision","status"].include?(ARGV[0])
       puts "\nVerification of configuration[\"websites\"]:".color(Colors::WHITE)
+      # temporarily add catapult to verify repo and add bamboo webhooks
+      @configuration["websites"]["catapult"] = *(["domain" => "#{@repo}", "repo" => "#{@repo}"])
       # validate @configuration["websites"]
       @configuration["websites"].each do |service,data|
+        if "#{service}" == "catapult"
+          puts "\nVerification of this Catapult instance:".color(Colors::WHITE)
+        end
         # create array of domains to later validate domain alpha order per service
         domains = Array.new
         domains_sorted = Array.new
         unless @configuration["websites"]["#{service}"] == nil
           puts "\n[#{service}] #{@configuration["websites"]["#{service}"].nil? ? "0" : @configuration["websites"]["#{service}"].length} total"
-          puts "[domain]".ljust(40) + "[repo]".ljust(12) + "[repo size]".ljust(12) + "[repo write access]".ljust(20) + "[develop]".ljust(16) + "[release]".ljust(16) + "[master]".ljust(16) + "[bamboo service]".ljust(18)
+          puts "[domain]".ljust(40) + "[repo]".ljust(12) + "[repo size]".ljust(12) + "[repo write access]".ljust(20) + "[develop]".ljust(16) + "[release]".ljust(16) + "[master]".ljust(16) + "[bamboo webhook]".ljust(18)
           puts "\n"
           @configuration["websites"]["#{service}"].each do |instance|
             # start new row
             row = Array.new
             # get domain
             row.push(" * #{instance["domain"]}".slice!(0, 39).ljust(39))
-            # validate the domain to ensure it only includes the domain and not protocol
-            if instance["domain"].include? "://"
-              catapult_exception("There is an error in your secrets/configuration.yml file.\nThe domain for websites => #{service} => domain => #{instance["domain"]} is invalid, it must not include http:// or https://.")
-            end
-            # validate the domain_tld_override to ensure only valid characters
-            if not instance["domain"] =~ /^[0-9a-zA-Z\-\.]*$/
-              catapult_exception("There is an error in your secrets/configuration.yml file.\nThe domain for websites => #{service} => domain => #{instance["domain"]} must only contain numbers, letters, hyphens, and periods.")
-            end
-            # validate the domain depth
-            domain_depth = instance["domain"].split(".")
-            if domain_depth.count > 3
-              catapult_exception("There is an error in your secrets/configuration.yml file.\nThe domain for websites => #{service} => domain => #{instance["domain"]} is invalid, there is a maximum of one subdomain.")
-            end
-            unless instance["domain_tld_override"] == nil
-              # validate the domain_tld_override to ensure it only includes the domain and not protocol
-              if instance["domain_tld_override"].include? "://"
-                catapult_exception("There is an error in your secrets/configuration.yml file.\nThe domain_tld_override for websites => #{service} => domain => #{instance["domain"]} is invalid, it must not include http:// or https://.")
+            unless "#{service}" == "catapult"
+              # validate the domain to ensure it only includes the domain and not protocol
+              if instance["domain"].include? "://"
+                catapult_exception("There is an error in your secrets/configuration.yml file.\nThe domain for websites => #{service} => domain => #{instance["domain"]} is invalid, it must not include http:// or https://.")
               end
               # validate the domain_tld_override to ensure only valid characters
-              if not instance["domain_tld_override"] =~ /^[0-9a-zA-Z\-\.]*$/
-                catapult_exception("There is an error in your secrets/configuration.yml file.\nThe domain_tld_override for websites => #{service} => domain => #{instance["domain"]} must only contain numbers, letters, hyphens, and periods.")
+              if not instance["domain"] =~ /^[0-9a-zA-Z\-\.]*$/
+                catapult_exception("There is an error in your secrets/configuration.yml file.\nThe domain for websites => #{service} => domain => #{instance["domain"]} must only contain numbers, letters, hyphens, and periods.")
               end
-              # validate the domain_tld_override depth
-              domain_tld_override_depth = instance["domain_tld_override"].split(".")
-              if domain_tld_override_depth.count != 2
-                catapult_exception("There is an error in your secrets/configuration.yml file.\nThe domain_tld_override for websites => #{service} => domain => #{instance["domain"]} is invalid, it must only be one domain level (company.com).")
+              # validate the domain depth
+              domain_depth = instance["domain"].split(".")
+              if domain_depth.count > 3
+                catapult_exception("There is an error in your secrets/configuration.yml file.\nThe domain for websites => #{service} => domain => #{instance["domain"]} is invalid, there is a maximum of one subdomain.")
               end
-            end
-            # there is a maximum domain (including domain_tld_override) length of 53 characters
-            # max mysql database name length of 64 - 11 for longest prefix of production_ = 53
-            # max mssql database name length of 128
-            if (instance["domain"].length + (instance["domain_tld_override"].nil? ? 0 : instance["domain_tld_override"].length)) > 53
-              catapult_exception("There is an error in your secrets/configuration.yml file.\nThe combination of domain and domain_tld_override for websites => #{service} => domain => #{instance["domain"]} must not exceed 53 characters in length.")
-            end
-            # validate force_auth
-            unless instance["force_auth"] == nil
-              if instance["force_auth"].length < 10 || instance["force_auth"].length > 20
-                catapult_exception("There is an error in your secrets/configuration.yml file.\nThe force_auth for websites => #{service} => domain => #{instance["domain"]} must be 10 to 20 characters in length.")
-              end
-              if not instance["force_auth"] =~ /^[0-9a-zA-Z]*$/
-                catapult_exception("There is an error in your secrets/configuration.yml file.\nThe force_auth for websites => #{service} => domain => #{instance["domain"]} must only contain numbers, lowercase letters, and uppercase letters.")
-              end
-            end
-            # validate force_auth_exclude
-            unless instance["force_auth_exclude"] == nil
-              # this can only be used with force_auth
-              if instance["force_auth"] == nil
-                catapult_exception("There is an error in your secrets/configuration.yml file.\nThe force_auth_exclude for websites => #{service} => domain => #{instance["domain"]} requires force_auth to be set.")
-              end
-              # only test, qc, and production are valid values
-              @force_auth_exclude_valid_values = true
-              instance["force_auth_exclude"].each do |value|
-                if not ["dev","test","qc","production"].include?("#{value}")
-                  @force_auth_exclude_valid_values = false
+              unless instance["domain_tld_override"] == nil
+                # validate the domain_tld_override to ensure it only includes the domain and not protocol
+                if instance["domain_tld_override"].include? "://"
+                  catapult_exception("There is an error in your secrets/configuration.yml file.\nThe domain_tld_override for websites => #{service} => domain => #{instance["domain"]} is invalid, it must not include http:// or https://.")
+                end
+                # validate the domain_tld_override to ensure only valid characters
+                if not instance["domain_tld_override"] =~ /^[0-9a-zA-Z\-\.]*$/
+                  catapult_exception("There is an error in your secrets/configuration.yml file.\nThe domain_tld_override for websites => #{service} => domain => #{instance["domain"]} must only contain numbers, letters, hyphens, and periods.")
+                end
+                # validate the domain_tld_override depth
+                domain_tld_override_depth = instance["domain_tld_override"].split(".")
+                if domain_tld_override_depth.count != 2
+                  catapult_exception("There is an error in your secrets/configuration.yml file.\nThe domain_tld_override for websites => #{service} => domain => #{instance["domain"]} is invalid, it must only be one domain level (company.com).")
                 end
               end
-              unless @force_auth_exclude_valid_values
-                catapult_exception("There is an error in your secrets/configuration.yml file.\nThe force_auth_exclude for websites => #{service} => domain => #{instance["domain"]} is invalid, it must only include one, some, or all of the following [\"dev\",\"test\",\"qc\",\"production\"].")
+              # there is a maximum domain (including domain_tld_override) length of 53 characters
+              # max mysql database name length of 64 - 11 for longest prefix of production_ = 53
+              # max mssql database name length of 128
+              if (instance["domain"].length + (instance["domain_tld_override"].nil? ? 0 : instance["domain_tld_override"].length)) > 53
+                catapult_exception("There is an error in your secrets/configuration.yml file.\nThe combination of domain and domain_tld_override for websites => #{service} => domain => #{instance["domain"]} must not exceed 53 characters in length.")
               end
-            end
-            # validate force_https
-            unless instance["force_https"] == nil
-              unless ["true"].include?("#{instance["force_https"]}")
-                catapult_exception("There is an error in your secrets/configuration.yml file.\nThe force_https for websites => #{service} => domain => #{instance["domain"]} is invalid, it must be true or removed.")
-              end
-            end
-            # validate force_ip
-            unless instance["force_ip"] == nil
-              # validate both IPv4 and IPv6 adressess
-              instance["force_ip"].each do |value|
-                if not (value =~ Resolv::IPv4::Regex || value =~ Resolv::IPv6::Regex)
-                  catapult_exception("There is an error in your secrets/configuration.yml file.\nThe force_ip for websites => #{service} => domain => #{instance["domain"]} is invalid, it must be an array of valid IPv4 or IPv6 address.")
+              # validate force_auth
+              unless instance["force_auth"] == nil
+                if instance["force_auth"].length < 10 || instance["force_auth"].length > 20
+                  catapult_exception("There is an error in your secrets/configuration.yml file.\nThe force_auth for websites => #{service} => domain => #{instance["domain"]} must be 10 to 20 characters in length.")
+                end
+                if not instance["force_auth"] =~ /^[0-9a-zA-Z]*$/
+                  catapult_exception("There is an error in your secrets/configuration.yml file.\nThe force_auth for websites => #{service} => domain => #{instance["domain"]} must only contain numbers, lowercase letters, and uppercase letters.")
                 end
               end
-            end
-            # validate force_ip_exclude
-            unless instance["force_ip_exclude"] == nil
-              # this can only be used with force_ip
-              if instance["force_ip"] == nil
-                catapult_exception("There is an error in your secrets/configuration.yml file.\nThe force_ip_exclude for websites => #{service} => domain => #{instance["domain"]} requires force_ip to be set.")
-              end
-              # only test, qc, and production are valid values
-              @force_ip_exclude_valid_values = true
-              instance["force_ip_exclude"].each do |value|
-                if not ["dev","test","qc","production"].include?("#{value}")
-                  @force_ip_exclude_valid_values = false
+              # validate force_auth_exclude
+              unless instance["force_auth_exclude"] == nil
+                # this can only be used with force_auth
+                if instance["force_auth"] == nil
+                  catapult_exception("There is an error in your secrets/configuration.yml file.\nThe force_auth_exclude for websites => #{service} => domain => #{instance["domain"]} requires force_auth to be set.")
+                end
+                # only test, qc, and production are valid values
+                @force_auth_exclude_valid_values = true
+                instance["force_auth_exclude"].each do |value|
+                  if not ["dev","test","qc","production"].include?("#{value}")
+                    @force_auth_exclude_valid_values = false
+                  end
+                end
+                unless @force_auth_exclude_valid_values
+                  catapult_exception("There is an error in your secrets/configuration.yml file.\nThe force_auth_exclude for websites => #{service} => domain => #{instance["domain"]} is invalid, it must only include one, some, or all of the following [\"dev\",\"test\",\"qc\",\"production\"].")
                 end
               end
-              unless @force_ip_exclude_valid_values
-                catapult_exception("There is an error in your secrets/configuration.yml file.\nThe force_ip_exclude for websites => #{service} => domain => #{instance["domain"]} is invalid, it must only include one, some, or all of the following [\"dev\",\"test\",\"qc\",\"production\"].")
+              # validate force_https
+              unless instance["force_https"] == nil
+                unless ["true"].include?("#{instance["force_https"]}")
+                  catapult_exception("There is an error in your secrets/configuration.yml file.\nThe force_https for websites => #{service} => domain => #{instance["domain"]} is invalid, it must be true or removed.")
+                end
               end
-            end
-            # validate software
-            unless instance["software"] == nil
-              # create an array of available software
-              provisioners_software = Array.new
-              unless @provisioners["software"]["#{service}"] == nil
-                @provisioners["software"]["#{service}"].each { |i, v| provisioners_software.push(i) }
+              # validate force_ip
+              unless instance["force_ip"] == nil
+                # validate both IPv4 and IPv6 adressess
+                instance["force_ip"].each do |value|
+                  if not (value =~ Resolv::IPv4::Regex || value =~ Resolv::IPv6::Regex)
+                    catapult_exception("There is an error in your secrets/configuration.yml file.\nThe force_ip for websites => #{service} => domain => #{instance["domain"]} is invalid, it must be an array of valid IPv4 or IPv6 address.")
+                  end
+                end
+              end
+              # validate force_ip_exclude
+              unless instance["force_ip_exclude"] == nil
+                # this can only be used with force_ip
+                if instance["force_ip"] == nil
+                  catapult_exception("There is an error in your secrets/configuration.yml file.\nThe force_ip_exclude for websites => #{service} => domain => #{instance["domain"]} requires force_ip to be set.")
+                end
+                # only test, qc, and production are valid values
+                @force_ip_exclude_valid_values = true
+                instance["force_ip_exclude"].each do |value|
+                  if not ["dev","test","qc","production"].include?("#{value}")
+                    @force_ip_exclude_valid_values = false
+                  end
+                end
+                unless @force_ip_exclude_valid_values
+                  catapult_exception("There is an error in your secrets/configuration.yml file.\nThe force_ip_exclude for websites => #{service} => domain => #{instance["domain"]} is invalid, it must only include one, some, or all of the following [\"dev\",\"test\",\"qc\",\"production\"].")
+                end
               end
               # validate software
-              unless provisioners_software.include?("#{instance["software"]}")
-                catapult_exception("There is an error in your secrets/configuration.yml file.\nThe software for websites => #{service} => domain => #{instance["domain"]} is invalid, it must be one of the following #{provisioners_software.join(", ")}.")
-              end
-              # validate software_auto_update
-              unless instance["software_auto_update"] == nil
-                if instance["software_auto_update"].to_s != "true"
-                  catapult_exception("There is an error in your secrets/configuration.yml file.\nThe software_auto_update for websites => #{service} => domain => #{instance["domain"]} is invalid, it must be \"true\" or not set.")
+              unless instance["software"] == nil
+                # create an array of available software
+                provisioners_software = Array.new
+                unless @provisioners["software"]["#{service}"] == nil
+                  @provisioners["software"]["#{service}"].each { |i, v| provisioners_software.push(i) }
+                end
+                # validate software
+                unless provisioners_software.include?("#{instance["software"]}")
+                  catapult_exception("There is an error in your secrets/configuration.yml file.\nThe software for websites => #{service} => domain => #{instance["domain"]} is invalid, it must be one of the following #{provisioners_software.join(", ")}.")
+                end
+                # validate software_auto_update
+                unless instance["software_auto_update"] == nil
+                  if instance["software_auto_update"].to_s != "true"
+                    catapult_exception("There is an error in your secrets/configuration.yml file.\nThe software_auto_update for websites => #{service} => domain => #{instance["domain"]} is invalid, it must be \"true\" or not set.")
+                  end
+                end
+                # validate software_dbprefix
+                unless instance["software_dbprefix"] == nil
+                  if not instance["software_dbprefix"] =~ /^[0-9a-zA-Z\_]*$/
+                    catapult_exception("There is an error in your secrets/configuration.yml file.\nThe software_dbprefix for websites => #{service} => domain => #{instance["domain"]} is invalid, it must only contain numbers, letters, and underscores.")
+                  end
+                end
+                # validate software_dbtable_retain
+                unless instance["software_dbtable_retain"] == nil
+                  if not instance["software_dbtable_retain"].kind_of?(Array)
+                    catapult_exception("There is an error in your secrets/configuration.yml file.\nThe software_dbtable_retain for websites => #{service} => domain => #{instance["domain"]} is invalid, it must be an array in the following example format [\"comments\",\"commentmeta\"].")
+                  end
+                end
+                # validate software_workflow
+                unless ["downstream","upstream"].include?("#{instance["software_workflow"]}")
+                  catapult_exception("There is an error in your secrets/configuration.yml file.\nThe software_workflow for websites => #{service} => domain => #{instance["domain"]} is invalid, it must be one of the following [\"downstream\",\"upstream\"].")
                 end
               end
-              # validate software_dbprefix
-              unless instance["software_dbprefix"] == nil
-                if not instance["software_dbprefix"] =~ /^[0-9a-zA-Z\_]*$/
-                  catapult_exception("There is an error in your secrets/configuration.yml file.\nThe software_dbprefix for websites => #{service} => domain => #{instance["domain"]} is invalid, it must only contain numbers, letters, and underscores.")
+              # validate webroot
+              unless instance["webroot"] == nil
+                unless "#{instance["webroot"]}"[-1,1] == "/"
+                  catapult_exception("There is an error in your secrets/configuration.yml file.\nThe webroot for websites => #{service} => domain => #{instance["domain"]} is invalid, it must include a trailing slash.")
                 end
-              end
-              # validate software_dbtable_retain
-              unless instance["software_dbtable_retain"] == nil
-                if not instance["software_dbtable_retain"].kind_of?(Array)
-                  catapult_exception("There is an error in your secrets/configuration.yml file.\nThe software_dbtable_retain for websites => #{service} => domain => #{instance["domain"]} is invalid, it must be an array in the following example format [\"comments\",\"commentmeta\"].")
-                end
-              end
-              # validate software_workflow
-              unless ["downstream","upstream"].include?("#{instance["software_workflow"]}")
-                catapult_exception("There is an error in your secrets/configuration.yml file.\nThe software_workflow for websites => #{service} => domain => #{instance["domain"]} is invalid, it must be one of the following [\"downstream\",\"upstream\"].")
-              end
-            end
-            # validate webroot
-            unless instance["webroot"] == nil
-              unless "#{instance["webroot"]}"[-1,1] == "/"
-                catapult_exception("There is an error in your secrets/configuration.yml file.\nThe webroot for websites => #{service} => domain => #{instance["domain"]} is invalid, it must include a trailing slash.")
               end
             end
             # create array of domains to later validate repo alpha order per service
@@ -2295,16 +2306,15 @@ module Catapult
               # repo_split_4[0] => devopsgroup-io
               # repo_split_4[1] => devopsgroup-io
             end
-            # validate repo uri
+            # validate repo is an ssh uri
             unless "#{service}" == "catapult"
-              # validate repo is an ssh uri
               unless "#{repo_split_1[0]}" == "git"
                 catapult_exception("There is an error in your secrets/configuration.yml file.\nThe repo for websites => #{service} => domain => #{instance["domain"]} is invalid, the format must be git@github.com:devopsgroup-io/devopsgroup-io.git")
               end
-              # validate repo hosted at bitbucket.org or github.com
-              unless "#{repo_split_2[0]}" == "bitbucket.org" || "#{repo_split_2[0]}" == "github.com"
-                catapult_exception("There is an error in your secrets/configuration.yml file.\nThe repo for websites => #{service} => domain => #{instance["domain"]} is invalid, it must either be a bitbucket.org or github.com repository.")
-              end
+            end
+            # validate repo hosted at bitbucket.org or github.com
+            unless "#{repo_split_2[0]}" == "bitbucket.org" || "#{repo_split_2[0]}" == "github.com"
+              catapult_exception("There is an error in your secrets/configuration.yml file.\nThe repo for websites => #{service} => domain => #{instance["domain"]} is invalid, it must either be a bitbucket.org or github.com repository.")
             end
             # validate repo exists
             if "#{repo_split_2[0]}" == "bitbucket.org"
@@ -2651,7 +2661,7 @@ module Catapult
                 end
               end
             end
-            # create bamboo service per github repo
+            # create bamboo webhook per github repo
             if "#{repo_split_2[0]}" == "github.com"
               uri = URI("https://api.github.com/repos/#{repo_split_3[0]}/hooks")
               Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
@@ -2660,21 +2670,19 @@ module Catapult
                 request.add_field "Content-Type", "application/json"
                 request.body = ""\
                   "{"\
-                    "\"name\":\"bamboo\","\
+                    "\"name\":\"web\","\
                     "\"active\":true,"\
                     "\"config\":"\
                       "{"\
-                        "\"base_url\":\"#{@configuration["company"]["bamboo_base_url"]}\","\
-                        "\"build_key\":\"develop:CAT-TEST\","\
-                        "\"username\":\"#{@configuration["company"]["bamboo_username"]}\","\
-                        "\"password\":\"#{@configuration["company"]["bamboo_password"]}\""\
+                        "\"url\":\"#{@configuration["company"]["bamboo_base_url"]}rest/triggers/1.0/remote/changeDetection?planKey=CAT-TEST&skipBranches=false \","\
+                        "\"content_type\":\"json\""\
                       "}"\
                   "}"
                 response = http.request(request)
                 if response.code.to_f.between?(500,600)
                   puts "   - The GitHub API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
                 elsif response.code.to_f.between?(399,499)
-                  catapult_exception("Unable to configure GitHub Bamboo service for websites => #{service} => domain => #{instance["domain"]}. Ensure the github_username defined in secrets/configuration.yml has correct access to the repository.")
+                  catapult_exception("Unable to configure GitHub Bamboo webhook for websites => #{service} => domain => #{instance["domain"]}. Ensure the github_username defined in secrets/configuration.yml has correct access to the repository.")
                 else
                   row.push("configured".ljust(17))
                 end
@@ -2692,6 +2700,8 @@ module Catapult
         end
       end
     end
+    # remove the temporary catapult entry
+    @configuration["websites"].delete("catapult")
 
 
 
