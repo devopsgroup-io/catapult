@@ -11,7 +11,7 @@ sudo systemctl start sshd.service
 # reduce this number "There were 34877 failed login attempts since the last successful login."
 echo -e "$(lastb | head -n -2 | wc -l) failed login attempts"
 echo -e "$(last | head -n -2 | wc -l) successful login attempts"
-sudo last
+sudo last -F -n 20
 # only allow authentication via ssh key pair
 sed -i -e "/PasswordAuthentication/d" /etc/ssh/sshd_config
 if ! grep -q "PasswordAuthentication no" "/etc/ssh/sshd_config"; then
