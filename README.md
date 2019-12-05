@@ -1500,7 +1500,8 @@ Catapult as a platform can only reach so far into the configuration of your webs
 * Execute `<script>` tags after the document has been parsed with [defer](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script#attr-defer)
     * Note this is the same as placing script tags just before the `</body>` tag
 * Use [CSS sprites](https://css-tricks.com/css-sprites/) to reduce the number of HTTP requests
-* Take advantage of [link prefetching](https://css-tricks.com/prefetching-preloading-prebrowsing/) using `rel="prefetch"`
+* Take advantage of [resource prioritization](https://developers.google.com/web/fundamentals/performance/resource-prioritization) using `rel="prefetch"`
+* Take advantage of [cross-origin performance gains](https://developers.google.com/web/tools/lighthouse/audits/noopener) for external `target="_blank"` links, use `rel="noopener"`
 * Write [PHP the right way](http://www.phptherightway.com/#welcome)
   * Practice [self-documenting code](https://www.amazon.com/dp/0132350882/)
 * Write [efficient PHP](http://www.phpbench.com/)
