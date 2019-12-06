@@ -65,6 +65,13 @@ if [ -d "/var/www/repositories/apache/${domain}/.git" ]; then
             if ! grep -q "_sql/*.sql" "/var/www/repositories/apache/${domain}/.gitignore"; then
                sudo bash -c "echo \"_sql/*.sql\" >> \"/var/www/repositories/apache/${domain}/.gitignore\""
             fi
+            # manage software ignores
+            if [ "${software}" = "wordpress4" ] || [ "${software}" = "wordpress5" ]; then
+                git rm -rf --cached "/var/www/repositories/apache/${domain}/${webroot}wp-content/cache"
+                if ! grep -q "${webroot}wp-content/cache" "/var/www/repositories/apache/${domain}/.gitignore"; then
+                   sudo bash -c "echo \"${webroot}wp-content/cache\" >> \"/var/www/repositories/apache/${domain}/.gitignore\""
+                fi
+            fi
             # add everything in the repository to the git index (keep in mind untracked file stores)
             cd "/var/www/repositories/apache/${domain}" \
                 && git add --all :/

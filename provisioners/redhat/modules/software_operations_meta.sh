@@ -282,7 +282,7 @@ elif [ "${software}" = "wordpress4" ]; then
 
 elif [ "${software}" = "wordpress5" ]; then
 
-    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && wp-cli-php71 --allow-root plugin activate w3-total-cache
+    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && wp-cli-php72 --allow-root plugin activate w3-total-cache
     if [ "$1" = "dev" ]; then
         cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && wp-cli-php72 --allow-root w3-total-cache option set dbcache.enabled false --type=boolean
         cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && wp-cli-php72 --allow-root w3-total-cache option set pgcache.enabled false --type=boolean
