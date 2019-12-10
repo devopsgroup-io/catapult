@@ -857,14 +857,17 @@ The following options are available:
 * `software:`
     * required: no
     * description: manages many aspects of software respective to each environment for websites with supported software types
-        * maintains software database config file
-        * manages tracked and untracked software file stores intelligently via git and rsync
-        * manages permissions of software file store containers
-        * manages software operations such as cron, garbage collection, and caches
-        * manages software database migrations
-        * manages software database backups and restores intelligently via git
-        * manages software url references in database
-        * manages software admininistrator account integrity
+        * php version
+        * git ignore file entries
+        * directory and file permissions
+        * database configuration file
+        * software file stores
+        * operations such as cron, garbage collection, and cache rebuilds
+        * performance configuration
+        * database migrations
+        * database backups and restores
+        * url references in database
+        * admininistrator account integrity
     * option: `software: codeigniter2`
     * option: `software: codeigniter3`
     * option: `software: concrete58`
