@@ -102,7 +102,7 @@ Moodle 3                          | `moodle3`              | 5.6.5  | 7.1 | Nove
 SilverStripe 3                    | `silverstripe3`        | 5.3.3  | 5.4 | June 29, 2012      |
 SuiteCRM 7                        | `suitecrm7`            | 5.5    | 7.1 | October 21, 2013   | [November 15, 2019](http://support.sugarcrm.com/Resources/Supported_Versions/)
 WordPress 4                       | `wordpress4`           | 5.2.4  | 7.1 | September 4, 2014  |
-WordPress 5                       | `wordpress5`           | 5.2.4  | 7.1 | December 6, 2018   |
+WordPress 5                       | `wordpress5`           | 5.2.4  | 7.2 | December 6, 2018   |
 XenForo 1                         | `xenforo1`             | 5.2.11 | 5.4 | March 8, 2011      | [December 31, 2019](https://xenforo.com/community/threads/xenforo-1-5-end-of-life-schedule.157679/)
 XenForo 2                         | `xenforo2`             | 5.4.0  | 7.1 | November 28, 2017  |
 Zend Framework 2                  | `zendframework2`       | 5.3.23 | 5.4 | September 5, 2012  |
