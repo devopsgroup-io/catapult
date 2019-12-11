@@ -44,6 +44,10 @@ unique_hash=$(dmidecode -s system-uuid)
 webroot=$(catapult websites.apache.$5.webroot)
 database_config_file=$(provisioners software.apache.${software}.database_config_file)
 
+# expose the alternate software tool version aliases
+shopt -s expand_aliases
+source ~/.bashrc
+
 
 # generate software database config files
 # set website software logging and debug output
