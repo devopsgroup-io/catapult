@@ -243,12 +243,21 @@ software:
       version: [7]
     drupal8:
       repo: "https://git.drupal.org/project/drupal.git"
-      branch: "8.5.x"
+      branch: "8.8.x"
       database_config_file: "sites/default/settings.php"
+      eol: "2021-11-1"
       file_store_containers: ["sites/default/files"]
       file_stores: ["sites/default/files"]
       php_version: "7.2"
       version: [8]
+    drupal9:
+      repo: "https://git.drupal.org/project/drupal.git"
+      branch: "9.0.x"
+      database_config_file: "sites/default/settings.php"
+      file_store_containers: ["sites/default/files"]
+      file_stores: ["sites/default/files"]
+      php_version: "7.2"
+      version: [9]
     elgg1:
       repo: "https://github.com/Elgg/Elgg.git"
       branch: "1.12"
