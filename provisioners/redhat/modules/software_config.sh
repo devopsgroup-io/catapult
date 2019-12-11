@@ -352,6 +352,12 @@ elif [ "${software}" = "suitecrm7" ]; then
 
 elif [ "${software}" = "wordpress4" ]; then
 
+    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && wp-cli-php71 --allow-root plugin is-installed w3-total-cache
+    if [ $? -eq 0 ]; then
+        cache="true"
+    else
+        cache="false"
+    fi
     if ([ "$1" = "dev" ] || [ "$1" = "test" ]); then
         debug="true"
     else
@@ -369,12 +375,19 @@ elif [ "${software}" = "wordpress4" ]; then
         --expression="s/localhost/${redhat_mysql_ip}/g" \
         --expression="s/'wp_'/'${software_dbprefix}'/g" \
         --expression="s/'put your unique phrase here'/'${unique_hash}'/g" \
-        --expression="s/false/${debug}/g" \
+        --expression="s/'debug_here'/${debug}/g" \
+        --expression="s/'cache_here'/${cache}/g" \
         /catapult/provisioners/redhat/installers/software/${software}/wp-config.php > "${file}"
     sudo chmod 0444 "${file}"
 
 elif [ "${software}" = "wordpress5" ]; then
 
+    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && wp-cli-php72 --allow-root plugin is-installed w3-total-cache
+    if [ $? -eq 0 ]; then
+        cache="true"
+    else
+        cache="false"
+    fi
     if ([ "$1" = "dev" ] || [ "$1" = "test" ]); then
         debug="true"
     else
@@ -392,7 +405,8 @@ elif [ "${software}" = "wordpress5" ]; then
         --expression="s/localhost/${redhat_mysql_ip}/g" \
         --expression="s/'wp_'/'${software_dbprefix}'/g" \
         --expression="s/'put your unique phrase here'/'${unique_hash}'/g" \
-        --expression="s/false/${debug}/g" \
+        --expression="s/'debug_here'/${debug}/g" \
+        --expression="s/'cache_here'/${cache}/g" \
         /catapult/provisioners/redhat/installers/software/${software}/wp-config.php > "${file}"
     sudo chmod 0444 "${file}"
 

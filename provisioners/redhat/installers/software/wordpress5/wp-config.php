@@ -1,6 +1,6 @@
 <?php
 /** Enable W3 Total Cache */
-define('WP_CACHE', true); // Added by W3 Total Cache
+define('WP_CACHE', 'cache_here'); // Added by W3 Total Cache
 
 /**
  * The base configuration for WordPress
@@ -80,7 +80,7 @@ $table_prefix  = 'wp_';
  *
  * @link https://codex.wordpress.org/Debugging_in_WordPress
  */
-define('WP_DEBUG', false);
+define('WP_DEBUG', 'debug_here');
 
 /* That's all, stop editing! Happy blogging. */
 
