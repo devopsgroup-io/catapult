@@ -1046,6 +1046,9 @@ module Catapult
               api_bamboo_cli_result_task = `#{@api_bamboo_cli} --server #{@configuration["company"]["bamboo_base_url"]} --password #{@configuration["company"]["bamboo_password"]} --user #{@configuration["company"]["bamboo_username"]} --action updateTask --plan "#{plan}" --job "JOB1" --id 3 --taskKey "SSH" --field1 "host" --value1 "#{@configuration["environments"]["#{@api_bamboo_cli_environment}"]["servers"]["redhat1"]["ip"]}" --field2 "username" --value2 "root" --field3 "authType" --value3 "KEY" --field4 "private_key" --value4 @file --field5 "change_key" --value5 "true" --field6 "command" --value6 'bash /catapult/provisioners/redhat/provision.sh "#{@api_bamboo_cli_environment}" "#{@repo}" "#{@configuration_user["settings"]["gpg_key"]}" "apache-node"' --file "secrets/id_rsa" #{@api_bamboo_cli_redirect}`; result=$?.success?
               puts "   - #{api_bamboo_cli_result_task.strip}"
             end
+          else
+            api_bamboo_cli_result_task = `#{@api_bamboo_cli} --server #{@configuration["company"]["bamboo_base_url"]} --password #{@configuration["company"]["bamboo_password"]} --user #{@configuration["company"]["bamboo_username"]} --action removeTask --plan "#{plan}" --job "JOB1" --id 3 #{@api_bamboo_cli_redirect}`; result=$?.success?
+            puts "   - #{api_bamboo_cli_result_task.strip}"
           end
         end
       end
