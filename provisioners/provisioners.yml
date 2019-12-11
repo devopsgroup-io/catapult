@@ -247,7 +247,7 @@ software:
       database_config_file: "sites/default/settings.php"
       file_store_containers: ["sites/default/files"]
       file_stores: ["sites/default/files"]
-      php_version: "7.1"
+      php_version: "7.2"
       version: [8]
     elgg1:
       repo: "https://github.com/Elgg/Elgg.git"

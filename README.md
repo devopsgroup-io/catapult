@@ -91,7 +91,7 @@ CodeIgniter 3                     | `codeigniter3`         | 5.6    | 7.1 | Marc
 concrete5 8                       | `concrete58`           | 5.5.9  | 7.1 | December 1, 2016   |
 Drupal 6                          | `drupal6`              | 5.4    | 5.4 | February 13, 2008  | [February 24, 2016](https://www.drupal.org/drupal-6-eol)
 Drupal 7                          | `drupal7`              | 5.2.5  | 7.1 | January 5, 2011    |
-Drupal 8                          | `drupal8`              | 5.5.9  | 7.1 | November 19, 2015  |
+Drupal 8                          | `drupal8`              | 7.0.8  | 7.2 | November 19, 2015  |
 Elgg 1                            | `elgg1`                | 5.4    | 5.4 | August 20, 2008    |
 Elgg 2                            | `elgg2`                | 5.6    | 7.1 | December 14, 2015  |
 ExpressionEngine 3                | `expressionengine3`    | 5.3.10 | 5.4 | October 13, 2015   | [December 14, 2018](https://expressionengine.com/blog/version-3-end-of-life)
