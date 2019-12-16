@@ -235,17 +235,15 @@ if ([ "${4}" == "apache" ] || [ "${4}" == "apache-node" ]); then
 fail2ban_filters="
 [apache-botsearch]
 enabled = true
-[sshd-ddos]
-enabled = true
 [sshd]
 enabled = true
+mode = ddos
 "
 else
 fail2ban_filters="
-[sshd-ddos]
-enabled = true
 [sshd]
 enabled = true
+mode = ddos
 "
 fi
 
