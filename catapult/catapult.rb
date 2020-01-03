@@ -2625,7 +2625,7 @@ module Catapult
                 request.basic_auth "#{@configuration["company"]["bitbucket_username"]}", "#{@configuration["company"]["bitbucket_password"]}"
                 response = http.request(request)
                 if response.code.to_f.between?(399,600)
-                  puts "   - The GitHub API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
+                  puts "   - The Bitbucket API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
                 else
                   api_github_repo_hooks = JSON.parse(response.body)
                   api_github_repo_hooks["values"].each do |hook|
@@ -2666,28 +2666,49 @@ module Catapult
             end
             # create bamboo webhook per github repo
             if "#{repo_split_2[0]}" == "github.com"
+              @api_github_repo_hook = false
               uri = URI("https://api.github.com/repos/#{repo_split_3[0]}/hooks")
               Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
-                request = Net::HTTP::Post.new uri.request_uri
+                request = Net::HTTP::Get.new uri.request_uri
                 request.basic_auth "#{@configuration["company"]["github_username"]}", "#{@configuration["company"]["github_password"]}"
-                request.add_field "Content-Type", "application/json"
-                request.body = ""\
-                  "{"\
-                    "\"name\":\"web\","\
-                    "\"active\":true,"\
-                    "\"config\":"\
-                      "{"\
-                        "\"url\":\"#{@configuration["company"]["bamboo_base_url"]}rest/triggers/1.0/remote/changeDetection?planKey=CAT-TEST&skipBranches=false \","\
-                        "\"content_type\":\"json\""\
-                      "}"\
-                  "}"
                 response = http.request(request)
-                if response.code.to_f.between?(500,600)
+                if response.code.to_f.between?(399,600)
                   puts "   - The GitHub API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
-                elsif response.code.to_f.between?(399,499)
-                  catapult_exception("Unable to configure GitHub Bamboo webhook for websites => #{service} => domain => #{instance["domain"]}. Ensure the github_username defined in secrets/configuration.yml has correct access to the repository.")
                 else
-                  row.push("configured".ljust(17))
+                  api_github_repo_hooks = JSON.parse(response.body)
+                  api_github_repo_hooks.each do |hook|
+                    if hook["config"]["url"] == "#{@configuration["company"]["bamboo_base_url"]}rest/triggers/1.0/remote/changeDetection?planKey=CAT-TEST&skipBranches=false"
+                      @api_github_repo_hook = true
+                    end
+                  end
+                  unless @api_github_repo_hook
+                    uri = URI("https://api.github.com/repos/#{repo_split_3[0]}/hooks")
+                    Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
+                      request = Net::HTTP::Post.new uri.request_uri
+                      request.basic_auth "#{@configuration["company"]["github_username"]}", "#{@configuration["company"]["github_password"]}"
+                      request.add_field "Content-Type", "application/json"
+                      request.body = ""\
+                        "{"\
+                          "\"name\":\"web\","\
+                          "\"active\":true,"\
+                          "\"config\":"\
+                            "{"\
+                              "\"url\":\"#{@configuration["company"]["bamboo_base_url"]}rest/triggers/1.0/remote/changeDetection?planKey=CAT-TEST&skipBranches=false \","\
+                              "\"content_type\":\"json\""\
+                            "}"\
+                        "}"
+                      response = http.request(request)
+                      if response.code.to_f.between?(500,600)
+                        puts "   - The GitHub API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
+                      elsif response.code.to_f.between?(399,499)
+                        catapult_exception("Unable to configure GitHub Bamboo webhook for websites => #{service} => domain => #{instance["domain"]}. Ensure the github_username defined in secrets/configuration.yml has correct access to the repository.")
+                      else
+                        row.push("configured".ljust(17))
+                      end
+                    end
+                  else
+                    row.push("configured".ljust(17))
+                  end
                 end
               end
             end
