@@ -40,7 +40,6 @@ if ([ ! -z "${software}" ]); then
             echo -e "\t* ~/_sql directory exists, looking for a valid database dump to restore from"
             filenewest_lock=$(ls "/var/www/repositories/apache/${domain}/_sql" | grep -E ^[0-9]{8}\.sql\.lock$ | sort --numeric-sort | tail -1)
             filenewest=${filenewest_lock::-5}
-
             if ([ -f "/var/www/repositories/apache/${domain}/_sql/${filenewest}" ] && [ -f "/var/www/repositories/apache/${domain}/_sql/${filenewest_lock}" ]); then
                 # drop the database
                 for database in $(mysql --defaults-extra-file=$dbconf -e "show databases" | egrep -v "Database|mysql|information_schema|performance_schema"); do
