@@ -108,12 +108,14 @@ elif [ "${software}" = "concrete58" ]; then
         sudo chmod 0444 "${file}"
     else
         mkdir --parents $(dirname "${file_site_install}")
+        sudo chmod 0777 "${file_site_install}"
+        sudo chmod 0777 "${file_site_install_user}"
         sed --expression="s/database_name_here/${1}_${domain_valid_db_name}/g" \
             --expression="s/username_here/${mysql_user}/g" \
             --expression="s/password_here/${mysql_user_password}/g" \
             --expression="s/localhost/${redhat_mysql_ip}/g" \
             /catapult/provisioners/redhat/installers/software/${software}/site_install.php > "${file_site_install}"
-        cp "${file_site_install}" "${file_site_install_user}"
+        yes | cp -rf "${file_site_install}" "${file_site_install_user}"
         sudo chmod 0444 "${file_site_install}"
         sudo chmod 0444 "${file_site_install_user}"
     fi

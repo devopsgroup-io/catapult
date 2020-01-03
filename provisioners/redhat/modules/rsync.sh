@@ -100,7 +100,8 @@ if ([ "${software_workflow}" = "downstream" ] && [ "$1" != "production" ]) || ([
     echo -e "sql file store: /var/www/repositories/apache/${domain}/_sql/"
     echo -e "- production:downstream file store size: $(( ${file_store_size} / 1024 ))MB"
     echo -e "- rsyncing..."
-    sudo rsync --delete --exclude '*.lock' --recursive -e "ssh -oStrictHostKeyChecking=no -i /catapult/secrets/id_rsa -q" "root@${production_redhat_mysql_ip}:/var/www/repositories/apache/${domain}/_sql/" "/var/www/repositories/apache/${domain}/_sql/"
+    # do a --size-only to help eleviate unnecessary copies of large files (with the risk of skipping byteless file changes to sql dumps)
+    sudo rsync --delete --exclude '*.lock' --recursive --size-only -e "ssh -oStrictHostKeyChecking=no -i /catapult/secrets/id_rsa -q" "root@${production_redhat_mysql_ip}:/var/www/repositories/apache/${domain}/_sql/" "/var/www/repositories/apache/${domain}/_sql/"
 
 elif ([ "${software_workflow}" = "upstream" ] && [ "$1" != "test" ]) || ([ "${software_workflow}" = "upstream" ] && [ "$1" = "test" ] && [ "$4" = "apache" ]); then
 
@@ -110,7 +111,8 @@ elif ([ "${software_workflow}" = "upstream" ] && [ "$1" != "test" ]) || ([ "${so
     echo -e "sql file store: /var/www/repositories/apache/${domain}/_sql/"
     echo -e "- test:upstream file store size: $(( ${file_store_size} / 1024 ))MB"
     echo -e "- rsyncing..."
-    sudo rsync --delete --exclude '*.lock' --recursive -e "ssh -oStrictHostKeyChecking=no -i /catapult/secrets/id_rsa -q" "root@${test_redhat_mysql_ip}:/var/www/repositories/apache/${domain}/_sql/" "/var/www/repositories/apache/${domain}/_sql/"
+    # do a --size-only to help eleviate unnecessary copies of large files (with the risk of skipping byteless file changes to sql dumps)
+    sudo rsync --delete --exclude '*.lock' --recursive --size-only -e "ssh -oStrictHostKeyChecking=no -i /catapult/secrets/id_rsa -q" "root@${test_redhat_mysql_ip}:/var/www/repositories/apache/${domain}/_sql/" "/var/www/repositories/apache/${domain}/_sql/"
 
 fi
 
