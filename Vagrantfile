@@ -47,8 +47,8 @@ Vagrant.configure("2") do |config|
     config.vm.network "private_network", ip: Catapult::Command.configuration["environments"]["dev"]["servers"]["redhat"]["ip"]
     config.vm.network "forwarded_port", guest: 80, host: Catapult::Command.configuration["environments"]["dev"]["servers"]["redhat"]["port_80"]
     config.vm.provider :virtualbox do |provider|
-      provider.memory = 512
-      provider.cpus = 1
+      provider.memory = 1024
+      provider.cpus = 2
       provider.customize ["modifyvm", :id, "--audio", "none"]
     end
     # configure hosts file on both the host and guest
@@ -68,8 +68,8 @@ Vagrant.configure("2") do |config|
     config.vm.box = "centos/7"
     config.vm.network "private_network", ip: Catapult::Command.configuration["environments"]["dev"]["servers"]["redhat_mysql"]["ip"]
     config.vm.provider :virtualbox do |provider|
-      provider.memory = 512
-      provider.cpus = 1
+      provider.memory = 1024
+      provider.cpus = 2
       provider.customize ["modifyvm", :id, "--audio", "none"]
     end
     # disable the default vagrant share
