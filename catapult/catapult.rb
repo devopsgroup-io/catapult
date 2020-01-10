@@ -2171,6 +2171,12 @@ module Catapult
               if (instance["domain"].length + (instance["domain_tld_override"].nil? ? 0 : instance["domain_tld_override"].length)) > 53
                 catapult_exception("There is an error in your secrets/configuration.yml file.\nThe combination of domain and domain_tld_override for websites => #{service} => domain => #{instance["domain"]} must not exceed 53 characters in length.")
               end
+              # validate configure_email
+              unless instance["configure_email"] == nil
+                unless ["false"].include?("#{instance["configure_email"]}")
+                  catapult_exception("There is an error in your secrets/configuration.yml file.\nThe configure_email for websites => #{service} => domain => #{instance["domain"]} is invalid, it must be false or removed.")
+                end
+              end
               # validate force_auth
               unless instance["force_auth"] == nil
                 if instance["force_auth"].length < 10 || instance["force_auth"].length > 20
