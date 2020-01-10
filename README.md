@@ -811,6 +811,7 @@ The following options are available:
             * `dev.example.com`, `test.example.com`, `qc.example.com`, `example.com`
             * `www.dev.example.com`, `www.test.example.com`, `www.qc.example.com`, `www.example.com`
 * `domain_tld_override:`
+    * default: not set
     * required: no
     * example: `domain_tld_override: mycompany.com`
         * a domain name under your [name server authority](https://en.wikipedia.org/wiki/Domain_Name_System#Authoritative_name_server) to append to the top-level-domain (e.g. `.com`)
@@ -821,30 +822,41 @@ The following options are available:
         * PLEASE NOTE: When removing this option from a website with `software:`, you need to manually replace URLs in the database respective to the `software_workflow:` option.
             * ie `vagrant ssh mycompany.com-test-redhat-mysql`
             * `wp-cli --allow-root --path="/var/www/repositories/apache/example.com/(webroot if applicable)" search-replace ":\/\/(www\.)?(dev\.|test\.)?(example\.com\.mycompany\.com)" "://example.com" --regex`
+* `configure_email:`
+    * default: `true`
+    * required: no
+    * option: `configure_email: false`
+        * should be used for when there is an already configured email provider at this website's domain
+        * disables creating dns spf records for the website's dns zone
+        * disables configuring website software smtp settings
 * `force_auth:`
+    * default: not set
     * required: no
     * example: `force_auth: letmein`
         * forces [HTTP basic authentication](https://en.wikipedia.org/wiki/Basic_access_authentication) in LocalDev, Test, QC, and Production (see `force_auth_exclude`)
         * `letmein` is both the username and password
 * `force_auth_exclude:`
+    * default: not set
     * required: no
     * dependency: `force_auth:`
     * example: `force_auth_exclude: ["production"]`
         * array of select environments `["dev","test","qc","production"]` to exclude from the `force_auth` option
 * `force_https:`
+    * default: `false`
     * required: no
     * option: `force_https: true`
         * rewrites all http traffic to https
         * all `dev.` domains in LocalDev will have an unsigned certificate warning
         * free certificates are created and managed for you compliments of CloudFlare (single-subdomain) and Let's Encrypt (multi-subdomain)
 * `force_ip:`
-    * required: no
+    * default: not set
     * example: `force_ip: ["208.80.154.224"]`
         * an array of valid IPv4 or IPv6 addresses that denies all traffic except for traffic coming from the defined addresses
         * option applies to LocalDev, Test, QC, and Production unless `force_ip_exclude` is defined
         * can be used as an alternative to `force_auth` for when HTTP basic authentication cannot be used. e.g. [Drupal 8 Basic Auth Module](https://www.drupal.org/project/drupal/issues/2842858)
         * can be used in addition to `force_auth` for added security
 * `force_ip_exclude:`
+    * default: not set
     * required: no
     * dependency: `force_ip:`
     * example: `force_ip_exclude: ["production"]`
@@ -855,6 +867,7 @@ The following options are available:
         * the existing source code repository of your website (repo automatically created if none exists)
         * GitHub and Bitbucket over SSH are supported, HTTPS is not supported
 * `software:`
+    * default: not set
     * required: no
     * description: manages many aspects of software respective to each environment for websites with supported software types
         * php version
@@ -888,6 +901,7 @@ The following options are available:
     * option: `software: xenforo2`
     * option: `software: zendframework2`
 * `software_auto_update:`
+    * default: `false`
     * required: no
     * dependency: `software:`
     * option: `software_auto_update: true`
@@ -895,12 +909,14 @@ The following options are available:
         * updates only occur in the `software_workflow` environment
         * not all `software` is supported, see [Software Auto Updates](#software-auto-updates)
 * `software_dbprefix:`
+    * default: not set
     * required: no
     * dependency: `software:`
     * example: `software_dbprefix: wp_`
         * the value that prefixes table names within the database
             * PLEASE NOTE: table prefixes included in software distributions, such as WordPress' `wp_`, must be specified if desired
 * `software_dbtable_retain:`
+    * default: not set
     * required: no
     * dependency: `software:`
     * dependency: `software_workflow: upstream`
@@ -920,6 +936,7 @@ The following options are available:
         * specifies the Test environment and the `develop` branch as the source and automated save point for software files and database
         * REMINDER: websites with this option will have its Production instance overwritten with software files and datbase from the `master` branch - see [Release Management](#release-management)
 * `webroot:`
+    * default: `/`
     * required: no
     * example: `webroot: www/`
         * if the webroot differs from the repo root, specify it here
