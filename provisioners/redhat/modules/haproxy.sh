@@ -15,35 +15,36 @@ if [ ! -z "${redhat1_ip}" ]; then
 sudo cat >> /etc/haproxy/haproxy.cfg << EOF
 backend backend_http
     balance source
-    mode tcp
+    mode http
     server redhat 127.0.0.1:8080 check
     server redhat1 ${redhat1_ip}:8080 check
 
 backend backend_https
     balance source
-    mode tcp
+    mode http
     server redhat 127.0.0.1:8081 check
-    server redhat1 ${redhat1_ip}:8081 check
+    server redhat1 ${redhat1_ip}:8081 check ssl verify none
 
 EOF
 else
 sudo cat >> /etc/haproxy/haproxy.cfg << EOF
 backend backend_http
     balance source
-    mode tcp
+    mode http
     server redhat 127.0.0.1:8080 check
 
 backend backend_https
     balance source
-    mode tcp
-    server redhat 127.0.0.1:8081 check
+    mode http
+    server redhat 127.0.0.1:8081 check ssl verify none
 
 EOF
 fi
 
-# reload haproxy
-sudo systemctl reload haproxy.service
-
 # enable haproxy
 sudo systemctl enable haproxy.service
 sudo systemctl start haproxy.service
+
+# reload haproxy
+sudo systemctl reload haproxy.service
+sudo systemctl status haproxy.service

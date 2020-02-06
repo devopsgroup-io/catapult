@@ -57,7 +57,7 @@ redhat:
       multithreading_persistent: false
       persistent: true
     haproxy:
-      description: "Manages HAProxy as a layer 4 load balancer."
+      description: "Manages HAProxy as a layer 7 load balancer."
       multithreading: false
       multithreading_persistent: false
       persistent: false
