@@ -22,7 +22,7 @@ backend backend_http
 backend backend_https
     balance source
     mode http
-    server redhat 127.0.0.1:8081 check
+    server redhat 127.0.0.1:8081 check ssl verify none
     server redhat1 ${redhat1_ip}:8081 check ssl verify none
 
 EOF
