@@ -128,6 +128,8 @@ while IFS='' read -r -d '' key; do
         SSLCertificateKeyFile /var/www/repositories/apache/${domain}/_cert/${domainvalidcertname}/server.key
         SSLCertificateChainFile /var/www/repositories/apache/${domain}/_cert/${domainvalidcertname}/${domainvalidcertname}.ca-bundle
         "
+        # create combined pem file for use by haproxy
+        cd "/var/www/repositories/apache/${domain}/_cert/${domainvalidcertname}/" && cat "${domainvalidcertname}.crt" "server.key" "${domainvalidcertname}.ca-bundle" > "/catapult/provisioners/redhat/certs/${domain_environment}.pem"
     # upstream without domain_tld_override and a letsencrypt cert available
     elif ([ "$1" != "dev" ]) && ([ -z "${domain_tld_override}" ]) && ([ -f /catapult/provisioners/redhat/installers/dehydrated/certs/${domain_environment}/cert.pem ]); then
         https_certificates="
@@ -135,6 +137,8 @@ while IFS='' read -r -d '' key; do
         SSLCertificateKeyFile /catapult/provisioners/redhat/installers/dehydrated/certs/${domain_environment}/privkey.pem
         SSLCertificateChainFile /catapult/provisioners/redhat/installers/dehydrated/certs/${domain_environment}/chain.pem
         "
+        # create combined pem file for use by haproxy
+        cd "/catapult/provisioners/redhat/installers/dehydrated/certs/${domain_environment}/" && cat "cert.pem" "privkey.pem" "chain.pem" > "/catapult/provisioners/redhat/certs/${domain_environment}.pem"
     # upstream with domain_tld_override and a letsencrypt cert available
     elif ([ "$1" != "dev" ]) && ([ ! -z "${domain_tld_override}" ]) && ([ -f /catapult/provisioners/redhat/installers/dehydrated/certs/${domain_environment}.${domain_tld_override}/cert.pem ]); then
         https_certificates="
@@ -142,12 +146,16 @@ while IFS='' read -r -d '' key; do
         SSLCertificateKeyFile /catapult/provisioners/redhat/installers/dehydrated/certs/${domain_environment}.${domain_tld_override}/privkey.pem
         SSLCertificateChainFile /catapult/provisioners/redhat/installers/dehydrated/certs/${domain_environment}.${domain_tld_override}/chain.pem
         "
+        # create combined pem file for use by haproxy
+        cd "/catapult/provisioners/redhat/installers/dehydrated/certs/${domain_environment}.${domain_tld_override}/" && cat "cert.pem" "privkey.pem" "chain.pem" > "/catapult/provisioners/redhat/certs/${domain_environment}.${domain_tld_override}.pem"
     # self-signed in localdev or if we do not have a letsencrypt cert
     else
         https_certificates="
         SSLCertificateFile /etc/ssl/certs/httpd-dummy-cert.key.cert
         SSLCertificateKeyFile /etc/ssl/certs/httpd-dummy-cert.key.cert
         "
+        # create combined pem file for use by haproxy
+        cd "/etc/ssl/certs/" && cat "httpd-dummy-cert.key.cert" > "/catapult/provisioners/redhat/certs/${domain_environment}.pem"
     fi
     # handle the force_https option
     if [ "${force_https}" = true ]; then

@@ -50,6 +50,9 @@ IncludeOptional sites-enabled/*.conf
 <Proxy fcgi://127.0.0.1:9540>
     ProxySet timeout=300
 </Proxy>
+
+# update logformat to accomodate for haproxy
+LogFormat "%{X-Forwarded-For}i %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" combined
 EOF
 
 # 443: install mod_security
@@ -95,6 +98,9 @@ cat /dev/null > /catapult/provisioners/redhat/installers/dehydrated/domains.txt
 # also helps resolve redirect loops when HSTS is enabled
 # https://www.cloudflare.com/technical-resources/
 # new versions released here https://github.com/cloudflare/mod_cloudflare
+# https://support.cloudflare.com/hc/en-us/articles/360029696071-Restoring-original-visitor-IPs-Option-2-Installing-mod-remoteip-with-Apache
+# httpd -M | grep "remote"
+# httpd -M | grep "cloudflare"
 sudo yum install -y libtool httpd-devel
 sudo apxs -a -i -c /catapult/provisioners/redhat/installers/cloudflare/mod_cloudflare.c
 
