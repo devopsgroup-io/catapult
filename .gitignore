@@ -1,4 +1,5 @@
 /*.lock
+/provisioners/redhat/certs/
 /secrets/configuration.yml
 /secrets/configuration.yml.compare
 /secrets/configuration-user.yml
