@@ -228,6 +228,9 @@ while IFS='' read -r -d '' key; do
         # force https if configured
         ${force_https_value}
 
+        # make downstream applications aware of proxied HTTPS
+        SetEnvIf x-forwarded-proto https HTTPS=on
+
     </VirtualHost>
 
     <IfModule mod_ssl.c>
