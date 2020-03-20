@@ -9,7 +9,9 @@
 while IFS= read -r line
 do
     domain=$(echo "${line}" | cut -d " " -f 1)
-    cd "/catapult/provisioners/redhat/installers/dehydrated/certs/${domain}/" && cat "cert.pem" "privkey.pem" "chain.pem" > "/catapult/provisioners/redhat/certs/${domain}.pem"
+    if ([ -f /catapult/provisioners/redhat/installers/dehydrated/certs/${domain}/cert.pem ]); then
+        cd "/catapult/provisioners/redhat/installers/dehydrated/certs/${domain}/" && cat "cert.pem" "privkey.pem" "chain.pem" > "/catapult/provisioners/redhat/certs/${domain}.pem"
+    fi
 done < "/catapult/provisioners/redhat/installers/dehydrated/domains.txt"
 
 sudo /usr/bin/systemctl reload haproxy.service
