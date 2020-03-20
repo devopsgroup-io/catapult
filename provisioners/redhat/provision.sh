@@ -56,6 +56,7 @@ if ([ $1 = "dev" ]); then
     else
         echo -e "Your Catapult instance is being synced from your host machine."
     fi
+    force_full_build="true"
 # handle the catapult instance for upstream
 else
     # clone the catapult repository if it does not exist
