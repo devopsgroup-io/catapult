@@ -57,12 +57,10 @@ Vagrant.configure("2") do |config|
     # disable the default vagrant share
     config.vm.synced_folder ".", "/vagrant", disabled: true
     config.vm.synced_folder ".", "/catapult", mount_options: ["nolock,vers=3,udp,noatime,fsc,actimeo=1"], type: "nfs"
-    # sync the repositories folder for local access from the host
-    config.vm.synced_folder "repositories", "/var/www/repositories", mount_options: ["nolock,vers=3,udp,noatime,fsc,actimeo=1"], type: "nfs"
     # configure the provisioner
     config.vm.provision "shell", path: "provisioners/redhat/provision.sh", args: ["dev","#{Catapult::Command.repo}","#{Catapult::Command.configuration_user["settings"]["gpg_key"]}","apache"]
     # ensure httpd is started once the synced_folder is mounted: fixes https://github.com/devopsgroup-io/catapult/issues/681
-    config.vm.provision :shell, :inline => "sudo systemctl is-active --quiet httpd.service && sudo systemctl start httpd.service", run: "always"
+    config.vm.provision :shell, :inline => "sudo systemctl start httpd.service; echo 'attempted to start httpd.service'; exit 0", run: "always"
   end
   config.vm.define "#{Catapult::Command.configuration["company"]["name"].downcase}-dev-redhat-mysql" do |config|
     config.vm.box = "centos/7"
@@ -74,9 +72,7 @@ Vagrant.configure("2") do |config|
     end
     # disable the default vagrant share
     config.vm.synced_folder ".", "/vagrant", disabled: true
-    config.vm.synced_folder ".", "/catapult", type: "nfs"
-    # sync the repositories folder for local access from the host
-    config.vm.synced_folder "repositories", "/var/www/repositories", type: "nfs"
+    config.vm.synced_folder ".", "/catapult", mount_options: ["nolock,vers=3,udp,noatime,fsc,actimeo=1"], type: "nfs"
     # configure the provisioner
     config.vm.provision "shell", path: "provisioners/redhat/provision.sh", args: ["dev","#{Catapult::Command.repo}","#{Catapult::Command.configuration_user["settings"]["gpg_key"]}","mysql"]
   end
