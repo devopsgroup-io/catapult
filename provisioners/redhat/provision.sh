@@ -57,7 +57,11 @@ if ([ $1 = "dev" ]); then
         echo -e "Your Catapult instance is being synced from your host machine."
     fi
     # link the repositories directory for local access from the developer workstation host machine
-    sudo ln -s /catapult/repositories /var/www/ 
+    if [ ! -L /var/www/repositories ]; then
+        sudo rm -rf /var/www/repositories
+        sudo mkdir --parents /var/www
+        sudo ln -s /catapult/repositories /var/www/
+    fi
     force_full_build="true"
 # handle the catapult instance for upstream
 else
