@@ -59,8 +59,9 @@ Vagrant.configure("2") do |config|
     config.vm.synced_folder ".", "/catapult", mount_options: ["nolock,vers=3,udp,noatime,fsc,actimeo=1"], type: "nfs"
     # configure the provisioner
     config.vm.provision "shell", path: "provisioners/redhat/provision.sh", args: ["dev","#{Catapult::Command.repo}","#{Catapult::Command.configuration_user["settings"]["gpg_key"]}","apache"]
-    # ensure httpd is started once the synced_folder is mounted: fixes https://github.com/devopsgroup-io/catapult/issues/681
-    config.vm.provision :shell, :inline => "sudo systemctl start httpd.service; echo 'attempted to start httpd.service'; exit 0", run: "always"
+    # ensure httpd and haproxy are started once the synced_folder is mounted: fixes https://github.com/devopsgroup-io/catapult/issues/681
+    config.vm.provision :shell, :inline => "sudo systemctl start httpd.service; echo '[Catapult] attempted to start httpd.service'; exit 0", run: "always"
+    config.vm.provision :shell, :inline => "sudo systemctl start haproxy.service; echo '[Catapult] attempted to start haproxy.service'; exit 0", run: "always"
   end
   config.vm.define "#{Catapult::Command.configuration["company"]["name"].downcase}-dev-redhat-mysql" do |config|
     config.vm.box = "centos/7"
