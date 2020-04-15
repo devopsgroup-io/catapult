@@ -281,13 +281,13 @@ Catapult is controlled via Vagrant and the command line of a developer's worksta
             * [![Gem](https://img.shields.io/gem/dt/vagrant-vbguest.svg)](https://rubygems.org/gems/vagrant-vbguest)
 3. **VirtualBox**
     * **Using macOS?**
-        1. Download and install the latest version of VirtualBox v5.2 from https://www.virtualbox.org/wiki/Downloads
+        1. Download and install the latest version of VirtualBox from https://www.virtualbox.org/wiki/Downloads
     * **Using Windows?**
-        1. Download and install the latest version of VirtualBox v5.2 from https://www.virtualbox.org/wiki/Downloads
+        1. Download and install the latest version of VirtualBox from https://www.virtualbox.org/wiki/Downloads
     * **Using Linux (Debian, Ubuntu)?**
-        1. Download and install the latest version of VirtualBox v5.2 using Advanced Packaging Tool (APT) `sudo apt-get install virtualbox`
+        1. Download and install the latest version of VirtualBox using Advanced Packaging Tool (APT) `sudo apt-get install virtualbox`
     * **Using Linux (Fedora, Red Hat, Suse)?**
-        1. Download and install the latest version of VirtualBox v5.2 using Yellowdog Updater, Modifed (yum) `sudo yum install virtualbox`
+        1. Download and install the latest version of VirtualBox using Yellowdog Updater, Modifed (yum) `sudo yum install virtualbox`
 4. **GPG2**
     * **Using macOS?**
         1. Download and install GPG Suite from https://gpgtools.org
