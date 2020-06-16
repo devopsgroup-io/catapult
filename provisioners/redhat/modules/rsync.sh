@@ -117,7 +117,7 @@ elif ([ "${software_workflow}" = "upstream" ] && [ "$1" != "test" ]) || ([ "${so
 fi
 
 # rsync the always untracked _sql file store: YYYYMMDD_software_dbtable_retain.sql files
-if ([ "${software_workflow}" = "downstream" ] && [ "$1" != "production" ]); then
+if ([ "${software_workflow}" = "upstream" ] && [ "$1" != "production" ]); then
 
     echo -e "- rsyncing YYYYMMDD_software_dbtable_retain.sql files..."
     # do a --size-only to help eleviate unnecessary copies of large files (with the risk of skipping byteless file changes to sql dumps)
