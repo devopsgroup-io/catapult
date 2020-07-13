@@ -92,8 +92,6 @@ sh /etc/ssl/certs/renew-dummy-cert /etc/ssl/certs/httpd-dummy-cert.key.cert
 # 443: support letsencrypt
 sudo mkdir --parents /var/www/dehydrated
 sudo mkdir --parents /catapult/provisioners/redhat/certs
-# initalize the domains.txt file for certificates cron job
-cat /dev/null > /catapult/provisioners/redhat/installers/dehydrated/domains.txt
 
 # 443: add support for cloudflare and report real user IP addresses
 # also helps resolve redirect loops when HSTS is enabled
