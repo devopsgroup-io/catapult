@@ -41,6 +41,17 @@ if ([ "$1" != "dev" ]); then
             sed --in-place "/${mount}/d" /etc/fstab
         fi
     done <<< "${mounts}"
+    defined_mounts=("${redhat_ip}:/var/www/dehydrated  /var/www/repositories/dehydrated   nfs      rw,sync,hard,intr  0     0")
+    mounts=$(cat /etc/fstab | grep "/var/www/repositories/dehydrated" | awk '{print $1}')
+    while read -r mount; do
+        if [[ ! ${defined_mounts[*]} =~ "${mount}" ]]; then
+            echo -e "only the \"${defined_mounts[*]}\" mounts should exist, removing ${mount}..."
+            # escape slashes for sed
+            mount=$(echo -e "${mount}" | sed 's#\/#\\\/#g')
+            # remove mounts that don't match the defined mounts
+            sed --in-place "/${mount}/d" /etc/fstab
+        fi
+    done <<< "${mounts}"
 
     # create startup entries for mounting nfs shared folders
     mounts=$(cat /etc/fstab | grep "${redhat_ip}" | awk '{print $1}')
@@ -52,6 +63,9 @@ if ([ "$1" != "dev" ]); then
     fi
     if [[ ! ${mounts[*]} =~ "${redhat_ip}:/var/www/repositories/apache" ]]; then
         sudo bash -c "echo -e \"\n${redhat_ip}:/var/www/repositories/apache  /var/www/repositories/apache   nfs      rw,sync,hard,intr  0     0\" >> /etc/fstab"
+    fi
+    if [[ ! ${mounts[*]} =~ "${redhat_ip}:/var/www/dehydrated" ]]; then
+        sudo bash -c "echo -e \"\n${redhat_ip}:/var/www/dehydrated  /var/www/dehydrated   nfs      rw,sync,hard,intr  0     0\" >> /etc/fstab"
     fi
 
     # mount nfs shared folders
@@ -73,6 +87,12 @@ if ([ "$1" != "dev" ]); then
         rm -rf /var/www/repositories/apache
         mkdir -p /var/www/repositories/apache
         mount ${redhat_ip}:/var/www/repositories/apache /var/www/repositories/apache
+    fi
+    if [[ ! ${mounts[*]} =~ "${redhat_ip}:/var/www/dehydrated" ]]; then
+        umount /var/www/dehydrated
+        rm -rf /var/www/dehydrated
+        mkdir -p /var/www/dehydrated
+        mount ${redhat_ip}:/var/www/dehydrated /var/www/dehydrated
     fi
 
 fi
