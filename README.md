@@ -1687,7 +1687,7 @@ Catapult will also be seen throughout local meetups in the Philadelphia and Grea
 
 * [Technical.ly Philly](http://www.meetup.com/Technically-Philly/) 12k+ technologists
 * [Tech in Motion Philly](http://www.meetup.com/TechinMotionPhilly/) 7k+ technologists
-* [Philadelphia WordPress Meetup Group](http://www.meetup.com/philadelphia-wordpress-meetup-group/) 2k+ technologists
+* [Philadelphia WordPress Meetup Group](http://www.meetup.com/philadelphia-wordpress-meetup-group/) 2.5k+ technologists
 * [Philly DevOps](http://www.meetup.com/PhillyDevOps/) 3k+ technologists
     * [\[09-20-2016\]  From Pets to Serverless: Deployment Panel](https://www.meetup.com/PhillyDevOps/events/232930398/)
 * [Greater Philadelphia Drupal Meetup Group](http://www.meetup.com/drupaldelphia/) .75k+ technologists
