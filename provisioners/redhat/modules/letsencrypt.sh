@@ -1,5 +1,8 @@
 source "/catapult/provisioners/redhat/modules/catapult.sh"
 
+# initialize the domains.txt file for cron_certificates.sh
+cat /dev/null > /catapult/provisioners/redhat/installers/dehydrated/domains.txt
+
 echo "${configuration}" | shyaml get-values-0 websites.apache |
 while IFS='' read -r -d '' key; do
 
