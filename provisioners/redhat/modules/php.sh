@@ -208,6 +208,11 @@ echo autodetect | sudo pecl upgrade geoip
 #################
 # pecl extension: imagick
 # http://pecl.php.net/package/imagick
+# this version of ImageMagic was associated with the Remi repo and needs to be removed to successfully install the new version maintained by Red hat
+# https://wiki.centos.org/Manuals/ReleaseNotes/CentOS7.2003?action=show&redirect=Manuals%2FReleaseNotes%2FCentOS7#Known_Issues
+if yum list installed | grep ImageMagic | grep -q 6.7.8; then
+    sudo yum remove -y ImageMagick ImageMagick-devel
+fi
 sudo yum install -y ImageMagick ImageMagick-devel
 echo autodetect | sudo pecl upgrade imagick
 #################
