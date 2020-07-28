@@ -246,7 +246,7 @@ Catapult requires a [Developer Setup](#developer-setup), [Instance Setup](#insta
 * You must run most commands from an elevated shell. For macOS and Linux, type `sudo su` in a terminal window, or for Windows, right-clicking on Command Prompt from the Start Menu and selecting "Run as Administrator".
 * It is advised to turn off any antivirus software that you may have installed during setup and usage of Catapult - tasks such as forwarding ports and writing hosts files may be blocked.
 * Virtualizaion must be enabled in the BIOS of the developer's workstation - follow [this how-to](https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux/5/html/Virtualization/sect-Virtualization-Troubleshooting-Enabling_Intel_VT_and_AMD_V_virtualization_hardware_extensions_in_BIOS.html) to get started.
-* Using a VPN client during usage of LocalDev may result in lost communication between your workstation and the guests, requiring a `vagrant reload` to regain SSH and/or WinRM communication.
+* Using a VPN client during usage of LocalDev may result in lost communication between your workstation and the guests, requiring a `vagrant reload` to regain communication.
 
 ## Developer Setup ##
 
@@ -256,56 +256,7 @@ Catapult is controlled via Vagrant and the command line of a developer's worksta
 * Linux workstations: Compatible and supported
 * Windows workstations: Limited testing and support
 
-1. **Vagrant**
-    * **Using macOS?**
-        1. Ensure Xcode Command Line Tools are installed by running `xcode-select --install` from Terminal
-        2. Download and install the latest version of Vagrant v2.x from https://releases.hashicorp.com/vagrant/
-    * **Using Windows?**
-        1. Download and install the latest version of Vagrant v2.x from https://releases.hashicorp.com/vagrant/
-    * **Using Linux (Debian, Ubuntu)?**
-        1. Download the latest version of Vagrant v2.x respective to your architecture from https://releases.hashicorp.com/vagrant/ by running e.g. `wget https://releases.hashicorp.com/vagrant/2.2.2/vagrant_2.2.2_x86_64.deb`
-        2. Install Vagrant using dpkg e.g. `sudo dpkg --install vagrant_2.2.2_x86_64.deb`
-        3. Install Network File System (NFS) `sudo apt-get install nfs-kernel-server`
-    * **Using Linux (Fedora, Red Hat, Suse)?**
-        1. Download the latest version of Vagrant v2.x respective to your architecture from https://releases.hashicorp.com/vagrant/ by running e.g. `wget https://releases.hashicorp.com/vagrant/2.2.2/vagrant_2.2.2_x86_64.rpm`
-        2. Install Vagrant using yum e.g. `sudo yum install vagrant_2.2.2_x86_64.rpm`
-2. **Vagrant Plugins**
-    1. Open your command line and install the following Vagrant plugins:
-        1. `vagrant plugin install vagrant-aws`
-            * [![Gem](https://img.shields.io/gem/dt/vagrant-aws.svg)](https://rubygems.org/gems/vagrant-aws)
-        2. `vagrant plugin install vagrant-digitalocean`
-            * [![Gem](https://img.shields.io/gem/dt/vagrant-digitalocean.svg)](https://rubygems.org/gems/vagrant-digitalocean) We maintain this project! [GitHub](https://github.com/smdahlen/vagrant-digitalocean)
-        3. `vagrant plugin install vagrant-hostmanager`
-            * [![Gem](https://img.shields.io/gem/dt/vagrant-hostmanager.svg)](https://rubygems.org/gems/vagrant-hostmanager) We maintain this project! [GitHub](https://github.com/smdahlen/vagrant-hostmanager)
-        4. `vagrant plugin install vagrant-vbguest`
-            * [![Gem](https://img.shields.io/gem/dt/vagrant-vbguest.svg)](https://rubygems.org/gems/vagrant-vbguest)
-3. **VirtualBox**
-    * **Using macOS?**
-        1. Download and install the latest version of VirtualBox from https://www.virtualbox.org/wiki/Downloads
-    * **Using Windows?**
-        1. Download and install the latest version of VirtualBox from https://www.virtualbox.org/wiki/Downloads
-    * **Using Linux (Debian, Ubuntu)?**
-        1. Download and install the latest version of VirtualBox using Advanced Packaging Tool (APT) `sudo apt-get install virtualbox`
-    * **Using Linux (Fedora, Red Hat, Suse)?**
-        1. Download and install the latest version of VirtualBox using Yellowdog Updater, Modifed (yum) `sudo yum install virtualbox`
-4. **GPG2**
-    * **Using macOS?**
-        1. Download and install GPG Suite from https://gpgtools.org
-    * **Using Windows?**
-        1. Download and install Gpg4win from http://gpg4win.org/download.html
-    * **Using Linux?**
-        1. GPG is included in the base distribution in most cases.
-        1. If being prompted by the Passphrase GUI Agent, comment out 'use-agent' in `~/.gnupg/gpg.conf`
-5. **Git**
-    * **Using macOS?**
-        1. Git commandline is included in the base distribution in most cases.
-        1. For a streamlined Git GUI, download and install SourceTree from https://www.sourcetreeapp.com/
-    * **Using Windows?**
-        1. Download and install SourceTree from https://www.sourcetreeapp.com/
-    * **Using Linux?**
-        1. Git commandline is included in the base distribution in most cases.
-        1. For a streamlined Git GUI, download and install SmartGit from http://www.syntevo.com/smartgit/
-6. **Terminal**
+1. **Terminal**
     * **Using macOS?**
         1. The terminal in the base distrubitions are 100% compatible.
     * **Using Windows?**
@@ -315,7 +266,49 @@ Catapult is controlled via Vagrant and the command line of a developer's worksta
             * Make sure to open Cygwin terminal as Administrator by right-clicking and selecting "Open as Administrator"
     * **Using Linux?**
         1. The terminal in the base distrubitions are 100% compatible.
-
+2. **GPG2**
+    * **Using macOS?**
+        1. Download and install GPG Suite from https://gpgtools.org
+    * **Using Windows?**
+        1. Download and install Gpg4win from http://gpg4win.org/download.html
+    * **Using Linux?**
+        1. GPG is included in the base distribution in most cases.
+        1. If being prompted by the Passphrase GUI Agent, comment out 'use-agent' in `~/.gnupg/gpg.conf`
+3. **Git**
+    * **Using macOS?**
+        1. Git command line is included in the base distribution in most cases.
+        1. For a streamlined Git GUI, download and install SourceTree from https://www.sourcetreeapp.com/
+    * **Using Windows?**
+        1. Download and install SourceTree from https://www.sourcetreeapp.com/ (this will install Git
+    * **Using Linux?**
+        1. Git commandline is included in the base distribution in most cases.
+        1. For a streamlined Git GUI, download and install SmartGit from http://www.syntevo.com/smartgit/
+4. **Git Credential Caching**
+        1. Follow the instructions outlined for your system to store your Git credentials https://docs.github.com/en/github/using-git/caching-your-github-credentials-in-git
+5. **VirtualBox**
+    * **Using macOS?**
+        1. Download and install the latest version of VirtualBox from https://www.virtualbox.org/wiki/Downloads
+    * **Using Windows?**
+        1. Download and install the latest version of VirtualBox from https://www.virtualbox.org/wiki/Downloads
+    * **Using Linux (Debian, Ubuntu)?**
+        1. Download and install the latest version of VirtualBox using Advanced Packaging Tool (APT) `sudo apt-get install virtualbox`
+    * **Using Linux (Fedora, Red Hat, Suse)?**
+        1. Download and install the latest version of VirtualBox using Yellowdog Updater, Modifed (yum) `sudo yum install virtualbox`
+6. **Vagrant**
+    * **Using macOS?**
+        1. Ensure Xcode Command Line Tools are installed by running `xcode-select --install` from Terminal
+        2. Download and install the latest version of Vagrant v2.x from https://releases.hashicorp.com/vagrant/
+    * **Using Windows?**
+        1. Download and install the latest version of Vagrant v2.x from https://releases.hashicorp.com/vagrant/
+    * **Using Linux (Debian, Ubuntu)?**
+        1. Download the latest version of Vagrant v2.x respective to your architecture from https://releases.hashicorp.com/vagrant/ by running e.g. `wget https://releases.hashicorp.com/vagrant/2.2.9/vagrant_2.2.9_x86_64.deb`
+        2. Install Vagrant using dpkg e.g. `sudo dpkg --install vagrant_2.2.9_x86_64.deb`
+        3. Install Network File System (NFS) `sudo apt-get install nfs-kernel-server`
+    * **Using Linux (Fedora, Red Hat, Suse)?**
+        1. Download the latest version of Vagrant v2.x respective to your architecture from https://releases.hashicorp.com/vagrant/ by running e.g. `wget https://releases.hashicorp.com/vagrant/2.2.9/vagrant_2.2.9_x86_64.rpm`
+        2. Install Vagrant using yum e.g. `sudo yum install vagrant_2.2.9_x86_64.rpm`
+7. **Java SE Development Kit**
+        1. Follow the instructions outlined for your system http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html
 
 Having your team use the same tools is beneficial to streamlining your workflow - below is a list of recommended software tools.
 
