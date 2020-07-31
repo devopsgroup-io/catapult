@@ -329,16 +329,17 @@ Catapult is quick to setup. You have the option of using GitHub (public) or Bitb
     1. Create a *passwordless* SSH key pair - this will drive authentication for Catapult.
         1. For instructions please see https://help.github.com/articles/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent/
         2. Place the newly created *passwordless* SSH key pair `id_rsa` and `id_rsa.pub` in the `~/secrets/` folder.
-3. **GPG Key**
-    1. Generate a GPG key - this will drive encryption for Catapult.
-        1. NEVER SHARE THE KEY WITH ANYONE OTHER THAN YOUR TEAM.
+3. **GPG Passphrase**
+    1. Generate a GPG passphrase 
+        1. This passphrase is used to encrypt and descrypt your Catapult instance's configuration file.
+        2. NEVER SHARE THE PASSPHRASE WITH ANYONE OTHER THAN YOUR TEAM.
         3. Spaces are not permitted and must be at least 20 characters.
-        4. To create a strong key, please visit https://xkpasswd.net/
-        5. Place your newly generated GPG key at `~/secrets/configuration-user.yml["settings"]["gpg_key"]`
-        6. It is recommended to print a QR code of the key to distribute to your team, please visit http://educastellano.github.io/qr-code/demo/
-        7. Remember! Security is 99% process and 1% technology.
+        4. To create a strong passphrase, please visit https://xkpasswd.net/
+        5. Place your newly generated passphrase at `~/secrets/configuration-user.yml["settings"]["gpg_key"]`
+        6. It is recommended to print a QR code of the passphrase to distribute to your team, please visit http://educastellano.github.io/qr-code/demo/
+        7. Remember! Effective security is equal parts process and technology.
 4. **GPG Edit Mode**
-    1. **GPG Edit Mode** is set at `~/secrets/configuration-user.yml["settings"]["gpg_edit"]` (`false` by default) and is used to encrypt your Catapult configuration secrets using your **GPG Key**:
+    1. **GPG Edit Mode** is set at `~/secrets/configuration-user.yml["settings"]["gpg_edit"]` (`false` by default) and is used to encrypt your Catapult configuration secrets using your **GPG Passphrase**:
         1. `~/secrets/id_rsa` as `~/secrets/id_rsa.gpg`
         2. `~/secrets/id_rsa.pub` as `~/secrets/id_rsa.pub.gpg`
         3. `~/secrets/configuration.yml` as `~/secrets/configuration.yml.gpg`
