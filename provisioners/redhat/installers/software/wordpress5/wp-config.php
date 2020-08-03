@@ -3,7 +3,8 @@
 define('WP_CACHE', 'cache_here'); // Added by W3 Total Cache
 
 if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-    $_SERVER['REMOTE_ADDR'] = $_SERVER['HTTP_X_FORWARDED_FOR'];
+    $ip = explode(",", $_SERVER['HTTP_X_FORWARDED_FOR']);
+    $_SERVER['REMOTE_ADDR'] = $ip[0];
 }
 
 /**
