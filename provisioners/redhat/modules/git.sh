@@ -149,8 +149,16 @@ if [ -d "/var/www/repositories/apache/${domain}/.git" ]; then
                 && sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git pull origin ${branch} && git submodule update --init --recursive"
         fi
         # if we're on develop, pull master into develop to keep it up to date
-        # this accomodates software_workflow = downstream and software_workflow = upstream (when dbtable_retain commits)
+        # this accomodates:
+        # software_workflow = downstream - when either code or database is committed to master and then merged back into develop
+        # software_workflow = upstream - when software_dbtable_retain.sql.lock files are committed to master
         if ([ "${branch_this}" = "develop" ]); then
+            # if there are changes between us and master, write a changes file for later use
+            cd "/var/www/repositories/apache/${domain}" \
+                && sudo git diff --exit-code --quiet ${branch} origin/master
+            if [ $? -eq 1 ]; then
+                touch "/catapult/provisioners/redhat/logs/domain.${domain}.changes"
+            fi
             cd "/var/www/repositories/apache/${domain}" \
                 && sudo ssh-agent bash -c "ssh-add /catapult/secrets/id_rsa; git fetch && git pull origin master && git submodule update --init --recursive && git push origin ${branch}"
         fi
