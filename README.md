@@ -310,12 +310,6 @@ Catapult is controlled via Vagrant and the command line of a developer's worksta
 7. **Java SE Development Kit**
     1. Follow the instructions outlined for your system http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html
 
-Having your team use the same tools is beneficial to streamlining your workflow - below is a list of recommended software tools.
-
-1. **Sublime Text 3**
-    1. Please download and install from http://www.sublimetext.com/3
-
-
 ## Instance Setup ##
 
 Catapult is quick to setup. You have the option of using GitHub (public) or Bitbucket (private) to store your Catapult instance. Your Catapult secrets are encrypted and safe, but please use your best judgment when choosing a destination for your Catapult instance.
