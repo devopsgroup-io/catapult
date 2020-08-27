@@ -80,101 +80,14 @@ Catapult orchestrates the following key components of DevOps to provide you with
 
 
 
-## Supported Website Software ##
-
-Catapult intelligently manages the following website software that have been chosen from trending usage statistics from [BuiltWith](https://trends.builtwith.com/cms) and aligns with the [CentOS 7](http://mirror.centos.org/centos/7/os/x86_64/Packages/) and [Software Collections](https://www.softwarecollections.org/) trunks:
-
-Software | [Key](#websites) | Required PHP Version | Running PHP Version | Released | End-of-Life
----------|------------------|---------------------|---------------------|----------|------------
-CodeIgniter 2                     | `codeigniter2`         | 5.1.6  | 5.4 | January 28, 2011   | [October 31, 2015](http://forum.codeigniter.com/thread-61357.html)
-CodeIgniter 3                     | `codeigniter3`         | 5.6    | 7.1 | March 30, 2015     |
-concrete5 8                       | `concrete58`           | 5.5.9  | 7.1 | December 1, 2016   |
-Drupal 6                          | `drupal6`              | 5.4    | 5.4 | February 13, 2008  | [February 24, 2016](https://www.drupal.org/drupal-6-eol)
-Drupal 7                          | `drupal7`              | 5.2.5  | 7.1 | January 5, 2011    |
-Drupal 8                          | `drupal8`              | 7.0.8  | 7.2 | November 19, 2015  |
-Elgg 1                            | `elgg1`                | 5.4    | 5.4 | August 20, 2008    |
-Elgg 2                            | `elgg2`                | 5.6    | 7.1 | December 14, 2015  |
-ExpressionEngine 3                | `expressionengine3`    | 5.3.10 | 5.4 | October 13, 2015   | [December 14, 2018](https://expressionengine.com/blog/version-3-end-of-life)
-Joomla 3                          | `joomla3`              | 5.3.10 | 7.1 | September 27, 2012 |
-Laravel 5                         | `laravel5`             | 7.0.0  | 7.1 | February 4, 2015   |
-MediaWiki 1                       | `mediawiki1`           | 5.5.9  | 7.1 | December 8, 2003   |
-Moodle 3                          | `moodle3`              | 5.6.5  | 7.1 | November 16, 2015  |
-SilverStripe 3                    | `silverstripe3`        | 5.3.3  | 5.4 | June 29, 2012      |
-SuiteCRM 7                        | `suitecrm7`            | 5.5    | 7.1 | October 21, 2013   | [November 15, 2019](http://support.sugarcrm.com/Resources/Supported_Versions/)
-WordPress 4                       | `wordpress4`           | 5.2.4  | 7.1 | September 4, 2014  |
-WordPress 5                       | `wordpress5`           | 5.2.4  | 7.2 | December 6, 2018   |
-XenForo 1                         | `xenforo1`             | 5.2.11 | 5.4 | March 8, 2011      | [December 31, 2019](https://xenforo.com/community/threads/xenforo-1-5-end-of-life-schedule.157679/)
-XenForo 2                         | `xenforo2`             | 5.4.0  | 7.1 | November 28, 2017  |
-Zend Framework 2                  | `zendframework2`       | 5.3.23 | 5.4 | September 5, 2012  |
-
-If you do not see your website software listed, Catapult supports basic PHP projects that do not have a database requirement.
-
-* When an above software type is not defined, the default PHP version that is used is PHP 5.4. This is not configurable.
-* PHP-less static site generators, such as, [Jekyll](https://jekyllrb.com/), are supported.
-
-### PHP Versions ###
-
-Catapult maintains a high level of integrity when it comes to PHP versions, through maintaining security, backwards compatibility, performance, and new features. Below is an overview of the PHP versions used in Catapult and when you can expect these versions to be End-of-Life (EOL). We will bump to the next highest version of PHP in the list when nearing the EOL - this provides ample time for support of the newer PHP version by the software. In cases where a software version is sunsetting, the CentOS Long-term Support (LTS) version of PHP is used.
-
-PHP Version | End-of-Life | Maintainer | Updater
-------------|-------------|------------|--------
-5.4 | June 30, 2024 | [CentOS](https://wiki.centos.org/FAQ/General#head-fe8a0be91ee3e7dea812e8694491e1dde5b75e6d) | [Red Hat](https://access.redhat.com/security/updates/backporting)
-7.1 | December 1, 2019 | [SCLO](https://www.softwarecollections.org/en/scls/rhscl/rh-php71/) | [Red Hat](https://access.redhat.com/support/policy/updates/rhscl-rhel7)
-7.2 | November 30, 2020 | [SCLO](https://www.softwarecollections.org/en/scls/rhscl/rh-php72/) | [Red Hat](https://access.redhat.com/support/policy/updates/rhscl-rhel7)
-
-### End-of-Life (EOL) ###
-
-Catapult tracks vendor announced EOL dates for website software and a red EOL date will be displayed during `vagrant status` if one of your website's software is EOL. Currently Catapult has no plan to block Catapult supported software that is past its EOL date - it is up to you to move to the next major supported version.
-
-## Competition ##
-
-The free market and competition is great - it pushes the envelope of innovation. Here, we compare similar platforms to shed light on where we are and we're headed. Catapult's approach is holistic, meaning, there are no optional features - the platform includes everything in its default state and its default state is the only state of the platform. Some platforms offer and support optional third-party features that need configured - these are excluded.
-
-Platform Feature | Catapult | Pantheon | Acquia
------------------|----------|----------|--------
-Source                                        | Open                                  | Closed                        | Closed
-Subscription Feature Set                      | Bundled                               | Separated                     | Separated
-Traditional Tooling (VMs & Shell)             | :white_check_mark:                    | :x:                           | :x:
-Multi-Platform (Linux & Windows)              | :white_check_mark:                    | :x:                           | :x:
-Supported PHP Software                        | 20+                                   | 2                             | 1
-Supported .NET Software                       | TBA                                   | :x:                           | :x:
-Minimum Bundled<br>Monthly Cost               | $45                                   | $400                          | $134
-Websites per instance                         | Unlimited                             | 1                             | 1
-Managed Workflow                              | Git Flow (branch-based environments)  | :x:                           | :x:
-Managed Software Workflow Model               | Upstream or Downstream                | :x:                           | :x:
-Agile Methodology Focus                       | Scrum                                 | :x:                           | :x:
-Managed Continuous Integration                | :white_check_mark:                    | :x:                           | :x:
-Environments                                  | LocalDev, Test, QC, Production        | Multidev, Dev, Test, Live     | Dev Desktop, Dev, Stage, Prod
-Exacting Configuration                        | :white_check_mark:                    | :x:<sup>[2](#references)</sup>| :x:<sup>[3](#references)</sup>
-Approach                                      | Virtual Machine                       | Container                     | Virtual Machine
-Data Center                                   | DigitalOcean and AWS                  | Rackspace                     | AWS
-Scaling                                       | Horizontal                            | Horizontal                    | Vertical
-Scaling Management                            | Manual                                | Automatic                     | Manual
-Development Environment                       | Unlimited Local                       | 5 Cloud                       | Unlimited Local
-Development Environment Approach              | Exact                                 | Exact                         | Similar
-Dashboard - Control                           | CLI                                   | CLI & Web                     | CLI & Web
-Dashboard - Monitor                           | Web                                   | Web                           | Web
-Managed Public Git Website Repository Support | GitHub & Bitbucket                    | :x:                           | :x:
-Managed DNS                                   | CloudFlare                            | :x:                           | :x:
-Managed Free HTTPS Certificates               | CloudFlare/Let's Encrypt              | :x:                           | :x:
-Managed Server Monitoring                     | New Relic                             | :x:                           | Proprietary
-Managed Application Error Logs                | New Relic                             | Proprietary                   | Proprietary
-Managed Application Performance Monitoring    | New Relic                             | :x:                           | :x:
-Managed Browser Performance Monitoring        | New Relic                             | :x:                           | :x:
-Managed Synthetic Monitoring                  | New Relic                             | :x:                           | :x:
-
-See an error or have a suggestion? Email competition@devopsgroup.io - we appreciate all feedback.
-
-
-
 ## Table of Contents ##
 
 - [Catapult](#catapult)
-    - [Platform Overview](#platform-overview)
     - [Security Disclosure](#security-disclosure)
-    - [Supported Website Software](#supported-website-software)
-    - [Competition](#competition)
+    - [Platform Overview](#platform-overview)
     - [Table of Contents](#table-of-contents)
+    - [Supported Website Software](#supported-website-software)
+    - [Platform Comparison](#platform-comparison)
 - [Setup Catapult](#setup-catapult)
     - [Developer Setup](#developer-setup)
     - [Instance Setup](#instance-setup)
@@ -235,6 +148,93 @@ See an error or have a suggestion? Email competition@devopsgroup.io - we appreci
 - [Contributing](#contributing)
     - [Releases](#releases)
 - [Community](#community)
+
+
+
+## Supported Website Software ##
+
+Catapult intelligently manages the following website software that have been chosen from trending usage statistics from [BuiltWith](https://trends.builtwith.com/cms) and aligns with the [CentOS 7](http://mirror.centos.org/centos/7/os/x86_64/Packages/) and [Software Collections](https://www.softwarecollections.org/) trunks:
+
+Software | [Key](#websites) | Required PHP Version | Running PHP Version | Released | End-of-Life
+---------|------------------|---------------------|---------------------|----------|------------
+CodeIgniter 2                     | `codeigniter2`         | 5.1.6  | 5.4 | January 28, 2011   | [October 31, 2015](http://forum.codeigniter.com/thread-61357.html)
+CodeIgniter 3                     | `codeigniter3`         | 5.6    | 7.1 | March 30, 2015     |
+concrete5 8                       | `concrete58`           | 5.5.9  | 7.1 | December 1, 2016   |
+Drupal 6                          | `drupal6`              | 5.4    | 5.4 | February 13, 2008  | [February 24, 2016](https://www.drupal.org/drupal-6-eol)
+Drupal 7                          | `drupal7`              | 5.2.5  | 7.1 | January 5, 2011    |
+Drupal 8                          | `drupal8`              | 7.0.8  | 7.2 | November 19, 2015  |
+Elgg 1                            | `elgg1`                | 5.4    | 5.4 | August 20, 2008    |
+Elgg 2                            | `elgg2`                | 5.6    | 7.1 | December 14, 2015  |
+ExpressionEngine 3                | `expressionengine3`    | 5.3.10 | 5.4 | October 13, 2015   | [December 14, 2018](https://expressionengine.com/blog/version-3-end-of-life)
+Joomla 3                          | `joomla3`              | 5.3.10 | 7.1 | September 27, 2012 |
+Laravel 5                         | `laravel5`             | 7.0.0  | 7.1 | February 4, 2015   |
+MediaWiki 1                       | `mediawiki1`           | 5.5.9  | 7.1 | December 8, 2003   |
+Moodle 3                          | `moodle3`              | 5.6.5  | 7.1 | November 16, 2015  |
+SilverStripe 3                    | `silverstripe3`        | 5.3.3  | 5.4 | June 29, 2012      |
+SuiteCRM 7                        | `suitecrm7`            | 5.5    | 7.1 | October 21, 2013   | [November 15, 2019](http://support.sugarcrm.com/Resources/Supported_Versions/)
+WordPress 4                       | `wordpress4`           | 5.2.4  | 7.1 | September 4, 2014  |
+WordPress 5                       | `wordpress5`           | 5.2.4  | 7.2 | December 6, 2018   |
+XenForo 1                         | `xenforo1`             | 5.2.11 | 5.4 | March 8, 2011      | [December 31, 2019](https://xenforo.com/community/threads/xenforo-1-5-end-of-life-schedule.157679/)
+XenForo 2                         | `xenforo2`             | 5.4.0  | 7.1 | November 28, 2017  |
+Zend Framework 2                  | `zendframework2`       | 5.3.23 | 5.4 | September 5, 2012  |
+
+If you do not see your website software listed, Catapult supports basic PHP projects that do not have a database requirement.
+
+* When an above software type is not defined, the default PHP version that is used is PHP 5.4. This is not configurable.
+* PHP-less static site generators, such as, [Jekyll](https://jekyllrb.com/), are supported.
+
+### PHP Versions ###
+
+Catapult maintains a high level of integrity when it comes to PHP versions, through maintaining security, backwards compatibility, performance, and new features. Below is an overview of the PHP versions used in Catapult and when you can expect these versions to be End-of-Life (EOL). We will bump to the next highest version of PHP in the list when nearing the EOL - this provides ample time for support of the newer PHP version by the software. In cases where a software version is sunsetting, the CentOS Long-term Support (LTS) version of PHP is used.
+
+PHP Version | End-of-Life | Maintainer | Updater
+------------|-------------|------------|--------
+5.4 | June 30, 2024 | [CentOS](https://wiki.centos.org/FAQ/General#head-fe8a0be91ee3e7dea812e8694491e1dde5b75e6d) | [Red Hat](https://access.redhat.com/security/updates/backporting)
+7.1 | December 1, 2019 | [SCLO](https://www.softwarecollections.org/en/scls/rhscl/rh-php71/) | [Red Hat](https://access.redhat.com/support/policy/updates/rhscl-rhel7)
+7.2 | November 30, 2020 | [SCLO](https://www.softwarecollections.org/en/scls/rhscl/rh-php72/) | [Red Hat](https://access.redhat.com/support/policy/updates/rhscl-rhel7)
+
+### End-of-Life (EOL) ###
+
+Catapult tracks vendor announced EOL dates for website software and a red EOL date will be displayed during `vagrant status` if one of your website's software is EOL. Currently Catapult has no plan to block Catapult supported software that is past its EOL date - it is up to you to move to the next major supported version.
+
+## Platform Comparision ##
+
+Here, we compare similar platforms to shed light on where we are and we're headed. Catapult's approach is holistic, meaning, there are no optional features - the platform includes everything in its default state and its default state is the only state of the platform. Some platforms offer and support optional third-party features that need configured - these are excluded.
+
+Platform Feature | Catapult | Pantheon | Acquia
+-----------------|----------|----------|--------
+Source                                        | Open                                  | Closed                        | Closed
+Subscription Feature Set                      | Bundled                               | Separated                     | Separated
+Traditional Tooling (VMs & Shell)             | :white_check_mark:                    | :x:                           | :x:
+Multi-Platform (Linux & Windows)              | :white_check_mark:                    | :x:                           | :x:
+Supported PHP Software                        | 20+                                   | 2                             | 1
+Supported .NET Software                       | TBA                                   | :x:                           | :x:
+Minimum Bundled<br>Monthly Cost               | $45                                   | $400                          | $134
+Websites per instance                         | Unlimited                             | 1                             | 1
+Managed Workflow                              | Git Flow (branch-based environments)  | :x:                           | :x:
+Managed Software Workflow Model               | Upstream or Downstream                | :x:                           | :x:
+Agile Methodology Focus                       | Scrum                                 | :x:                           | :x:
+Managed Continuous Integration                | :white_check_mark:                    | :x:                           | :x:
+Environments                                  | LocalDev, Test, QC, Production        | Multidev, Dev, Test, Live     | Dev Desktop, Dev, Stage, Prod
+Exacting Configuration                        | :white_check_mark:                    | :x:<sup>[2](#references)</sup>| :x:<sup>[3](#references)</sup>
+Approach                                      | Virtual Machine                       | Container                     | Virtual Machine
+Data Center                                   | DigitalOcean and AWS                  | Rackspace                     | AWS
+Scaling                                       | Horizontal                            | Horizontal                    | Vertical
+Scaling Management                            | Manual                                | Automatic                     | Manual
+Development Environment                       | Unlimited Local                       | 5 Cloud                       | Unlimited Local
+Development Environment Approach              | Exact                                 | Exact                         | Similar
+Dashboard - Control                           | CLI                                   | CLI & Web                     | CLI & Web
+Dashboard - Monitor                           | Web                                   | Web                           | Web
+Managed Public Git Website Repository Support | GitHub & Bitbucket                    | :x:                           | :x:
+Managed DNS                                   | CloudFlare                            | :x:                           | :x:
+Managed Free HTTPS Certificates               | CloudFlare/Let's Encrypt              | :x:                           | :x:
+Managed Server Monitoring                     | New Relic                             | :x:                           | Proprietary
+Managed Application Error Logs                | New Relic                             | Proprietary                   | Proprietary
+Managed Application Performance Monitoring    | New Relic                             | :x:                           | :x:
+Managed Browser Performance Monitoring        | New Relic                             | :x:                           | :x:
+Managed Synthetic Monitoring                  | New Relic                             | :x:                           | :x:
+
+See an error or have a suggestion? Email competition@devopsgroup.io - we appreciate all feedback.
 
 
 
