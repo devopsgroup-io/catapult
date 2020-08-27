@@ -1,4 +1,5 @@
 ---
 settings:
+  admin: true
   gpg_key: ''
   gpg_edit: false
