@@ -119,8 +119,8 @@ Catapult maintains a high level of integrity when it comes to PHP versions, thro
 PHP Version | End-of-Life | Maintainer | Updater
 ------------|-------------|------------|--------
 5.4 | June 30, 2024 | [CentOS](https://wiki.centos.org/FAQ/General#head-fe8a0be91ee3e7dea812e8694491e1dde5b75e6d) | [Red Hat](https://access.redhat.com/security/updates/backporting)
-7.1 | December 1, 2019 | [SCLO](https://www.softwarecollections.org/en/scls/rhscl/rh-php71/) | [Red Hat](https://developers.redhat.com/products/softwarecollections/overview/)
-7.2 | November 30, 2020 | [SCLO](https://www.softwarecollections.org/en/scls/rhscl/rh-php72/) | [Red Hat](https://developers.redhat.com/products/softwarecollections/overview/)
+7.1 | December 1, 2019 | [SCLO](https://www.softwarecollections.org/en/scls/rhscl/rh-php71/) | [Red Hat](https://access.redhat.com/support/policy/updates/rhscl-rhel7)
+7.2 | November 30, 2020 | [SCLO](https://www.softwarecollections.org/en/scls/rhscl/rh-php72/) | [Red Hat](https://access.redhat.com/support/policy/updates/rhscl-rhel7)
 
 ### End-of-Life (EOL) ###
 
