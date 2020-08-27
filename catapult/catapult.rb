@@ -212,8 +212,28 @@ module Catapult
     end
 
 
+    # bootstrap secrets/configuration-user.yml
+    # generate secrets/configuration-user.yml file if it does not exist
+    unless File.exist?("secrets/configuration-user.yml")
+      FileUtils.cp("catapult/installers/templates/configuration-user.yml.template", "secrets/configuration-user.yml")
+    end
+    # parse secrets/configuration-user.yml and catapult/installers/templates/configuration-user.yml.template file
+    @configuration_user = YAML.load_file("secrets/configuration-user.yml")
+    @configuration_user_template = YAML.load_file("catapult/installers/templates/configuration-user.yml.template")
+    # validate @configuration_user_template["settings"]
+    if not [true,false].include?(@configuration_user["settings"]["admin"]) || @configuration_user["settings"]["admin"] == nil || @configuration_user["settings"]["admin"].match(/\s/)
+      catapult_exception("Please set admin to either true or false in secrets/configuration-user.yml.")
+    end
+    if @configuration_user["settings"]["gpg_key"] == nil || @configuration_user["settings"]["gpg_key"].match(/\s/) || @configuration_user["settings"]["gpg_key"].length < 20
+      catapult_exception("Please set your team's gpg_key in secrets/configuration-user.yml - spaces are not permitted and must be at least 20 characters. Please visit https://github.com/devopsgroup-io/catapult#instance-setup for more information.")
+    end
+    if not [true,false].include?(@configuration_user["settings"]["gpg_edit"]) || @configuration_user["settings"]["gpg_edit"] == nil || @configuration_user["settings"]["gpg_edit"].match(/\s/)
+      catapult_exception("Please set gpg_edit to either true or false in secrets/configuration-user.yml.")
+    end
 
-    puts "\n\nVerification and self updating of this Catapult instance:\n".color(Colors::WHITE)
+
+
+    puts "\n\nVerification of this Catapult instance:\n".color(Colors::WHITE)
     # verify access to catapult repository
     `#{@git} fetch`
     if $?.exitstatus > 0
@@ -229,11 +249,11 @@ module Catapult
     branch = `#{@git} rev-parse --abbrev-ref HEAD`.strip
     # get current repo
     @repo = `#{@git} config --get remote.origin.url`.strip
-    puts " * Your repository: #{@repo}"
+    puts " * Your repository (origin): #{@repo}"
     # set the correct upstream
     repo_upstream = `#{@git} config --get remote.upstream.url`.strip
     repo_upstream_url = "https://github.com/devopsgroup-io/catapult.git"
-    puts " * Will sync from: #{repo_upstream}"
+    puts " * Will sync from (upstream): #{repo_upstream}"
     if repo_upstream.empty?
       `#{@git} remote add upstream #{repo_upstream_url}`
     else
@@ -253,30 +273,78 @@ module Catapult
     if !File.exist?(ENV['HOME']+'/.ssh/id_rsa')
         catapult_exception("Could not detect your SSH private key at ~/.ssh/id_rsa - please follow the Instance Setup at https://github.com/devopsgroup-io/catapult#instance-setup")
     end
-    # create the develop-catapult branch if it does not yet exist
-    if not @branches.find { |element| element.include?("refs/heads/develop-catapult") }
-      `#{@git} fetch upstream`
-      `#{@git} checkout -b develop-catapult --track upstream/master`
-      `#{@git} pull upstream master`
-      `#{@git} push origin develop-catapult`
-      # this is our first opportunity to verify write access to the repository
-      if $?.exitstatus > 0
-        ssh_public_key = File.read(ENV['HOME']+'/.ssh/id_rsa.pub')
-        catapult_exception("It seems that your SSH public key pair does not have write access to this Catapult repository.\nPlease ensure that your GitHub user has appropriate rights.\n\nHere is your workstation's SSH public key for reference:\n\n#{ssh_public_key}")
+    # admin only: configure branches and push
+    if @configuration_user["settings"]["admin"]
+      puts "\n * Configuring the #{branch} branch:\n\n"
+      # create the develop-catapult branch if it does not yet exist
+      if not @branches.find { |element| element.include?("refs/heads/develop-catapult") }
+        `#{@git} fetch upstream`
+        `#{@git} checkout -b develop-catapult --track upstream/master`
+        `#{@git} pull upstream master`
+        `#{@git} push origin develop-catapult`
+        # this is our first opportunity to verify write access to the repository
+        if $?.exitstatus > 0
+          ssh_public_key = File.read(ENV['HOME']+'/.ssh/id_rsa.pub')
+          catapult_exception("It seems that your SSH public key pair does not have write access to this Catapult repository.\nPlease ensure that your GitHub user has appropriate rights.\n\nHere is your workstation's SSH public key for reference:\n\n#{ssh_public_key}")
+        end
+      end
+      # create the develop branch if it does not yet exist
+      if not @branches.find { |element| element.include?("refs/heads/develop") }
+        `#{@git} fetch upstream`
+        `#{@git} checkout -b develop --track upstream/master`
+        `#{@git} pull upstream master`
+        `#{@git} push origin develop`
+      end
+      # create the release branch if it does not yet exist
+      if not @branches.find { |element| element.include?("refs/heads/release") }
+        `#{@git} checkout master`
+        `#{@git} checkout -b release`
+        `#{@git} push origin release`
+      end
+      # if on the develop branch, update from catapult core
+      if "#{branch}" == "develop"
+        # only self update from catapult core if the same MAJOR
+        `#{@git} fetch`
+        `#{@git} pull origin develop`
+        `#{@git} fetch upstream`
+        @version_this = YAML.load_file("VERSION.yml")
+        @version_this_integer = @version_this["version"].to_i
+        @version_upstream = YAML.load(`#{@git} show upstream/master:VERSION.yml`)
+        @version_upstream_integer = @version_upstream["version"].to_i
+        if @version_upstream_integer > @version_this_integer
+          puts "\n"
+          puts "#{@version_upstream["major"]["notice"]}".color(Colors::RED)
+          puts "#{@version_upstream["major"]["description"]}".color(Colors::YELLOW)
+          puts " * This Catapult instance is version #{@version_this["version"]}"
+          puts " * Catapult version #{@version_upstream["version"]} is available"
+          puts "The upgrade path warning from MAJOR version #{@version_this["version"].to_i} to #{@version_upstream["version"].to_i} is:"
+          puts " * #{@version_upstream["major"][@version_upstream_integer][@version_this_integer]}"
+          puts "Given that you are prepared for the above, please follow these instructions to upgrade manually from within the root of Catapult:"
+          puts " * `#{@git} pull --no-edit --strategy-option=theirs upstream master`"
+          puts " * `#{@git} push origin develop`"
+          puts "\n"
+        else
+            `#{@git} pull --no-edit --strategy-option=theirs upstream master`
+            `#{@git} push origin develop`
+        end
+      end
+      # if on the develop-catapult branch, update from catapult core, and checkout secrets from develop
+      if "#{branch}" == "develop-catapult"
+        `#{@git} checkout develop -- secrets/configuration.yml.gpg`
+        `#{@git} checkout develop -- secrets/id_rsa.gpg`
+        `#{@git} checkout develop -- secrets/id_rsa.pub.gpg`
+        `#{@git} reset HEAD secrets/configuration.yml.gpg`
+        `#{@git} reset HEAD secrets/id_rsa.gpg`
+        `#{@git} reset HEAD secrets/id_rsa.pub.gpg`
+        `#{@git} pull origin develop-catapult`
+        `#{@git} pull upstream master`
+        `#{@git} push origin develop-catapult`
       end
     end
-    # create the develop branch if it does not yet exist
-    if not @branches.find { |element| element.include?("refs/heads/develop") }
-      `#{@git} fetch upstream`
-      `#{@git} checkout -b develop --track upstream/master`
-      `#{@git} pull upstream master`
-      `#{@git} push origin develop`
-    end
-    # create the release branch if it does not yet exist
-    if not @branches.find { |element| element.include?("refs/heads/release") }
-      `#{@git} checkout master`
-      `#{@git} checkout -b release`
-      `#{@git} push origin release`
+    # if on the develop branch, pull updates from origin
+    if "#{branch}" == "develop"
+      `#{@git} fetch`
+      `#{@git} pull origin develop`
     end
     # if on the master or release branch, stop user
     if "#{branch}" == "master" || "#{branch}" == "release"
@@ -288,62 +356,6 @@ module Catapult
         "\n\nTo move your configuration from environment to environment, create pull requests (develop => release, release => master)."\
       "")
     end
-    puts "\n * Configuring the #{branch} branch:\n\n"
-    # remove the catapult changes file if it exists
-    if File.exist?('provisioners/redhat/logs/catapult.changes')
-      File.delete('provisioners/redhat/logs/catapult.changes')
-    end
-    # if on the develop branch, update from catapult core
-    if "#{branch}" == "develop"
-      `#{@git} fetch`
-      # if there are changes between us and remote, write a changes file for later use
-      `#{@git} diff --exit-code --quiet origin/develop`
-      if $?.exitstatus > 0
-        FileUtils.touch('provisioners/redhat/logs/catapult.changes')
-      end
-      `#{@git} pull origin develop`
-      # only self update from catapult core if the same MAJOR
-      `#{@git} fetch upstream`
-      # if there are changes between us and remote, write a changes file for later use
-      `#{@git} diff --exit-code --quiet upstream/master`
-      if $?.exitstatus > 0
-        FileUtils.touch('provisioners/redhat/logs/catapult.changes')
-      end
-      @version_this = YAML.load_file("VERSION.yml")
-      @version_this_integer = @version_this["version"].to_i
-      @version_upstream = YAML.load(`#{@git} show upstream/master:VERSION.yml`)
-      @version_upstream_integer = @version_upstream["version"].to_i
-      if @version_upstream_integer > @version_this_integer
-        puts "\n"
-        puts "#{@version_upstream["major"]["notice"]}".color(Colors::RED)
-        puts "#{@version_upstream["major"]["description"]}".color(Colors::YELLOW)
-        puts " * This Catapult instance is version #{@version_this["version"]}"
-        puts " * Catapult version #{@version_upstream["version"]} is available"
-        puts "The upgrade path warning from MAJOR version #{@version_this["version"].to_i} to #{@version_upstream["version"].to_i} is:"
-        puts " * #{@version_upstream["major"][@version_upstream_integer][@version_this_integer]}"
-        puts "Given that you are prepared for the above, please follow these instructions to upgrade manually from within the root of Catapult:"
-        puts " * `git pull --no-edit --strategy-option=theirs upstream master`"
-        puts " * `git push origin develop`"
-        puts "\n"
-      else
-        `#{@git} pull --no-edit --strategy-option=theirs upstream master`
-        `#{@git} push origin develop`
-      end
-    end
-    # if on the develop-catapult branch, update from catapult core, and checkout secrets from develop
-    if "#{branch}" == "develop-catapult"
-      `#{@git} checkout develop -- secrets/configuration.yml.gpg`
-      `#{@git} checkout develop -- secrets/id_rsa.gpg`
-      `#{@git} checkout develop -- secrets/id_rsa.pub.gpg`
-      `#{@git} reset HEAD secrets/configuration.yml.gpg`
-      `#{@git} reset HEAD secrets/id_rsa.gpg`
-      `#{@git} reset HEAD secrets/id_rsa.pub.gpg`
-      `#{@git} pull origin develop-catapult`
-      `#{@git} pull upstream master`
-      `#{@git} push origin develop-catapult`
-    end
-    # write a changes file for later use
-    FileUtils.touch('provisioners/redhat/logs/catapult.changes')
     # create a git pre-commit hook to ensure only configuration is committed to only the develop branch
     FileUtils.mkdir_p(".git/hooks")
     File.write('.git/hooks/pre-commit',
@@ -403,24 +415,7 @@ module Catapult
     File.chmod(0777,'.git/hooks/pre-commit')
 
 
-    # bootstrap secrets/configuration-user.yml
-    # generate secrets/configuration-user.yml file if it does not exist
-    unless File.exist?("secrets/configuration-user.yml")
-      FileUtils.cp("catapult/installers/templates/configuration-user.yml.template", "secrets/configuration-user.yml")
-    end
-    # parse secrets/configuration-user.yml and catapult/installers/templates/configuration-user.yml.template file
-    @configuration_user = YAML.load_file("secrets/configuration-user.yml")
-    @configuration_user_template = YAML.load_file("catapult/installers/templates/configuration-user.yml.template")
-    # validate @configuration_user_template["settings"]
-    if @configuration_user["settings"]["gpg_key"] == nil || @configuration_user["settings"]["gpg_key"].match(/\s/) || @configuration_user["settings"]["gpg_key"].length < 20
-      catapult_exception("Please set your team's gpg_key in secrets/configuration-user.yml - spaces are not permitted and must be at least 20 characters. Please visit https://github.com/devopsgroup-io/catapult#instance-setup for more information.")
-    end
-    if not [true,false].include?(@configuration_user["settings"]["gpg_edit"]) || @configuration_user["settings"]["gpg_edit"] == nil || @configuration_user["settings"]["gpg_edit"].match(/\s/)
-      catapult_exception("Please set gpg_edit to either true or false in secrets/configuration-user.yml.")
-    end
-
-
-    puts "\n\n\nVerification of encrypted Catapult configuration files:\n".color(Colors::WHITE)
+    puts "\nVerification of encrypted Catapult configuration files:\n".color(Colors::WHITE)
     if "#{branch}" == "develop-catapult"
       puts " * You are on the develop-catapult branch, this branch is automatically synced with Catapult core and is meant to contribute back to the core Catapult project."
       puts " * secrets/configuration.yml.gpg, secrets/id_rsa.gpg, and secrets/id_rsa.pub.gpg are checked out from the develop branch so that you're able to develop and test."
