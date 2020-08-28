@@ -260,10 +260,7 @@ Catapult is controlled via Vagrant and the command line of a developer's worksta
     * **Using macOS?**
         1. The terminal in the base distrubitions are 100% compatible.
     * **Using Windows?**
-        1. Download and install Cygwin from https://cygwin.com/install.html
-            * Make sure to install the openssh package
-        1. Run all Vagrant commands from within the Cygwin terminal.
-            * Make sure to open Cygwin terminal as Administrator by right-clicking and selecting "Open as Administrator"
+        1. Run all Vagrant commands from Command Prompt as Administrator by right-clicking and selecting "Open as Administrator"
     * **Using Linux?**
         1. The terminal in the base distrubitions are 100% compatible.
 2. **GPG2**
@@ -279,7 +276,8 @@ Catapult is controlled via Vagrant and the command line of a developer's worksta
         1. Git command line is included in the base distribution in most cases.
         1. For a streamlined Git GUI, download and install SourceTree from https://www.sourcetreeapp.com/
     * **Using Windows?**
-        1. Download and install SourceTree from https://www.sourcetreeapp.com/ (this will install Git
+        1. Download and install Git from https://git-scm.com/download/win
+        1. Download and install SourceTree from https://www.sourcetreeapp.com/
     * **Using Linux?**
         1. Git commandline is included in the base distribution in most cases.
         1. For a streamlined Git GUI, download and install SmartGit from http://www.syntevo.com/smartgit/

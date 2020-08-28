@@ -119,10 +119,6 @@ module Catapult
     # windows
     if (RbConfig::CONFIG['host_os'] =~ /mswin|msys|mingw|cygwin|bccwin|wince|emc/)
       @environment = :windows
-      # check for cygwin
-      if RbConfig::CONFIG['host_os'] != "cygwin"
-        catapult_exception("Please run all commands from within the Cygwin terminal as an administrator.")
-      end
       # check for git
       if File.exist?('C:\Program Files (x86)\Git\bin\git.exe')
         @git = "\"C:\\Program Files (x86)\\Git\\bin\\git.exe\""
@@ -265,13 +261,6 @@ module Catapult
     # halt if there is no master branch
     if not @branches.find { |element| element.include?("refs/heads/master") }
       catapult_exception("Cannot find the master branch for your Catapult's fork, please fork again or manually correct.")
-    end
-    # verify that there is a ssh public and private key
-    if !File.exist?(ENV['HOME']+'/.ssh/id_rsa.pub')
-        catapult_exception("Could not detect your SSH public key at ~/.ssh/id_rsa.pub - please follow the Instance Setup at https://github.com/devopsgroup-io/catapult#instance-setup")
-    end
-    if !File.exist?(ENV['HOME']+'/.ssh/id_rsa')
-        catapult_exception("Could not detect your SSH private key at ~/.ssh/id_rsa - please follow the Instance Setup at https://github.com/devopsgroup-io/catapult#instance-setup")
     end
     # admin only: configure branches and push
     if @configuration_user["settings"]["admin"]
