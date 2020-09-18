@@ -8,6 +8,12 @@ sed --in-place 's/^Listen.*/Listen 8080/g' /etc/httpd/conf/httpd.conf
 # 443: update to listen on port 8081 for haproxy instead of default 443
 sed --in-place 's/^Listen.*/Listen 8081 https/g' /etc/httpd/conf.d/ssl.conf
 
+# https://docs.bitnami.com/bch/infrastructure/lapp/administration/understand-event-mpm/
+# php configuration
+sudo cat /catapult/provisioners/redhat/installers/httpd/php.conf > /etc/httpd/conf.d/php.conf
+# mpm configuration
+sudo cat /catapult/provisioners/redhat/installers/httpd/00-mpm.conf > /etc/httpd/conf.modules.d/00-mpm.conf
+
 # reload apache
 sudo systemctl reload httpd.service
 
