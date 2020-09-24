@@ -992,12 +992,13 @@ Software | `software_auto_update` Support
 `xenforo2`          | :white_check_mark:
 `zendframework2`    | :white_check_mark:
 
-In the scenario where an update may overwrite customizations to a file that is expected to be able to be customized (e.g. `.htaccess` or `robots.txt`), you may create an `_append` directory within the repository root of the website with files containing your customizations.
+In the scenario where an update may overwrite customizations to a file that is expected to be able to be customized (e.g. `.htaccess`, `.gitignore`, or `robots.txt`), you may create an `_append` directory within the repository root of the website with files containing your customizations.
 
+* The files in `~/_append/` will be appended to files in `~/{webroot}/`
 * The append filenames must match the filenames that you would like to append.
-* The files must only contain the lines of content that you would like to append.
-* Please note that only files that allow for hash style comments (i.e. `# THIS IS A COMMENT`).
-* Please note that only files that are in the root of the software are supported.
+* The append files must only contain the lines of content that you would like to append.
+* Please note that only files that allow for hash style comments (i.e. `# THIS IS A COMMENT`) are supported.
+* Please note that only files that are in the root of the website's `webroot` are supported.
 
 ### HTTPS and Certificates ###
 
