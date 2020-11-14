@@ -406,7 +406,10 @@ Bitbucket provides free private repositories and GitHub provides free public rep
     1. Create an account at https://github.com
         1. Place the username (not the email address) that you used to sign up for GitHub at `~/secrets/configuration.yml["company"]["github_username"]`
         2. Place the password of the account for GitHub at `~/secrets/configuration.yml["company"]["github_password"]`
-    2. Add your newly created `id_rsa.pub` from `~/secrets/id_rsa.pub` key in https://github.com/settings/ssh named "Catapult"
+    2. Go to your account then Settings, Developer settings, and Personal access tokens.
+        1. Create a personal access token and name it Catapult. Enable repo, admin:public_key, and user permissions.
+        2. Place the personal access token at `~/secrets/configuration.yml["company"]["github_personal_access_token"]`
+    3. Add your newly created `id_rsa.pub` from `~/secrets/id_rsa.pub` key in https://github.com/settings/ssh named "Catapult"
 
 ### 3. **Automated Deployments:**
 
@@ -755,6 +758,7 @@ The remaining keys include credentials to services, ideally rotated on a bi-annu
 * `bitbucket_password`
 * `github_username`
 * `github_password`
+* `github_personal_access_token`
 * `bamboo_base_url`
 * `bamboo_username`
 * `aws_access_key`
