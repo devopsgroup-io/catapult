@@ -837,17 +837,17 @@ module Catapult
     end
     # https://developer.github.com/v3/
     puts "[GitHub API]"
-    if @configuration["company"]["github_username"] == nil || @configuration["company"]["github_password"] == nil
-      catapult_exception("Please set [\"company\"][\"github_username\"] and [\"company\"][\"github_password\"] in secrets/configuration.yml")
+    if @configuration["company"]["github_username"] == nil || @configuration["company"]["github_password"] == nil || @configuration["company"]["github_personal_access_token"] == nil
+      catapult_exception("Please set [\"company\"][\"github_username\"], [\"company\"][\"github_password\"], and [\"company\"][\"github_personal_access_token\"] in secrets/configuration.yml")
     else
       begin
         uri = URI("https://api.github.com/user")
         Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
           request = Net::HTTP::Get.new uri.request_uri
-          request.basic_auth "#{@configuration["company"]["github_username"]}", "#{@configuration["company"]["github_password"]}"
+          request.basic_auth "#{@configuration["company"]["github_username"]}", "#{@configuration["company"]["github_personal_access_token"]}"
           response = http.request(request)
           if response.code.to_f.between?(399,499)
-            catapult_exception("#{response.code} The GitHub API could not authenticate, please verify [\"company\"][\"github_username\"] and [\"company\"][\"github_password\"].")
+            catapult_exception("#{response.code} The GitHub API could not authenticate, please verify [\"company\"][\"github_username\"] and [\"company\"][\"github_personal_access_token\"].")
           elsif response.code.to_f.between?(500,600)
             puts " * GitHub API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
           else
@@ -857,7 +857,7 @@ module Catapult
             uri = URI("https://api.github.com/user/keys")
             Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
               request = Net::HTTP::Get.new uri.request_uri
-              request.basic_auth "#{@configuration["company"]["github_username"]}", "#{@configuration["company"]["github_password"]}"
+              request.basic_auth "#{@configuration["company"]["github_username"]}", "#{@configuration["company"]["github_personal_access_token"]}"
               response = http.request(request)
               @api_github_ssh_keys = JSON.parse(response.body)
               @api_github_ssh_keys_title = false
@@ -2367,7 +2367,7 @@ module Catapult
               uri = URI("https://api.github.com/repos/#{repo_split_3[0]}")
               Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
                 request = Net::HTTP::Get.new uri.request_uri
-                request.basic_auth "#{@configuration["company"]["github_username"]}", "#{@configuration["company"]["github_password"]}"
+                request.basic_auth "#{@configuration["company"]["github_username"]}", "#{@configuration["company"]["github_personal_access_token"]}"
                 response = http.request(request)
                 if response.code.to_f == 404
                   # create the repo if it does not exist
@@ -2376,7 +2376,7 @@ module Catapult
                     uri = URI("ttps://api.github.com/repos")
                     Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
                       request = Net::HTTP::Post.new uri.request_uri
-                      request.basic_auth "#{@configuration["company"]["github_username"]}", "#{@configuration["company"]["github_password"]}"
+                      request.basic_auth "#{@configuration["company"]["github_username"]}", "#{@configuration["company"]["github_personal_access_token"]}"
                       request.add_field "Content-Type", "application/json"
                       request.body = ""\
                         "{"\
@@ -2484,7 +2484,7 @@ module Catapult
               uri = URI("https://api.github.com/repos/#{repo_split_3[0]}/collaborators/#{@configuration["company"]["github_username"]}")
               Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
                 request = Net::HTTP::Get.new uri.request_uri
-                request.basic_auth "#{@configuration["company"]["github_username"]}", "#{@configuration["company"]["github_password"]}"
+                request.basic_auth "#{@configuration["company"]["github_username"]}", "#{@configuration["company"]["github_personal_access_token"]}"
                 response = http.request(request)
                 if response.code.to_f == 404
                   catapult_exception("The GitHub repo #{instance["repo"]} does not exist")
@@ -2525,7 +2525,7 @@ module Catapult
               uri = URI("https://api.github.com/repos/#{repo_split_3[0]}/contributors")
               Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
                 request = Net::HTTP::Get.new uri.request_uri
-                request.basic_auth "#{@configuration["company"]["github_username"]}", "#{@configuration["company"]["github_password"]}"
+                request.basic_auth "#{@configuration["company"]["github_username"]}", "#{@configuration["company"]["github_personal_access_token"]}"
                 response = http.request(request)
                 if response.code.to_f.between?(399,600)
                   puts "   - The GitHub API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
@@ -2581,7 +2581,7 @@ module Catapult
               uri = URI("https://api.github.com/repos/#{repo_split_3[0]}/branches")
               Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
                 request = Net::HTTP::Get.new uri.request_uri
-                request.basic_auth "#{@configuration["company"]["github_username"]}", "#{@configuration["company"]["github_password"]}"
+                request.basic_auth "#{@configuration["company"]["github_username"]}", "#{@configuration["company"]["github_personal_access_token"]}"
                 response = http.request(request)
                 if response.code.to_f.between?(399,600)
                   puts "   - The GitHub API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
@@ -2673,7 +2673,7 @@ module Catapult
               uri = URI("https://api.github.com/repos/#{repo_split_3[0]}/hooks")
               Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
                 request = Net::HTTP::Get.new uri.request_uri
-                request.basic_auth "#{@configuration["company"]["github_username"]}", "#{@configuration["company"]["github_password"]}"
+                request.basic_auth "#{@configuration["company"]["github_username"]}", "#{@configuration["company"]["github_personal_access_token"]}"
                 response = http.request(request)
                 if response.code.to_f.between?(399,600)
                   puts "   - The GitHub API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
@@ -2688,7 +2688,7 @@ module Catapult
                     uri = URI("https://api.github.com/repos/#{repo_split_3[0]}/hooks")
                     Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
                       request = Net::HTTP::Post.new uri.request_uri
-                      request.basic_auth "#{@configuration["company"]["github_username"]}", "#{@configuration["company"]["github_password"]}"
+                      request.basic_auth "#{@configuration["company"]["github_username"]}", "#{@configuration["company"]["github_personal_access_token"]}"
                       request.add_field "Content-Type", "application/json"
                       request.body = ""\
                         "{"\

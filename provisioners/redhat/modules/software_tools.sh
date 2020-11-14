@@ -108,7 +108,7 @@ wp-cli-php71 --allow-root cli version
 
 
 echo "> configuring wp-cli-php72"
-if ! grep -q "alias wp-cli-cliphp72='/opt/rh/rh-php72/root/usr/bin/php /usr/local/src/wp-cli/wp-cli.phar'" ~/.bashrc; then
+if ! grep -q "alias wp-cli-php72='/opt/rh/rh-php72/root/usr/bin/php /usr/local/src/wp-cli/wp-cli.phar'" ~/.bashrc; then
     sudo bash -c "echo -e \"\nalias wp-cli-php72='/opt/rh/rh-php72/root/usr/bin/php /usr/local/src/wp-cli/wp-cli.phar'\" >> ~/.bashrc"
 fi
 # expose the alternate software tool version aliases
