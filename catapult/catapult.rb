@@ -158,6 +158,8 @@ module Catapult
       @git = "git"
       if File.exist?('/usr/bin/vboxmanage')
         @vboxmanage = "\"/usr/bin/vboxmanage\""
+      elsif File.exist?('/usr/local/bin/vboxmanage')
+        @vboxmanage = "\"/usr/local/bin/vboxmanage\""        
       else
         catapult_exception("VBoxManage is not installed at /usr/bin/vboxmanage")
       end
