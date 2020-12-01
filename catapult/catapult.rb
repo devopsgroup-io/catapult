@@ -224,6 +224,7 @@ module Catapult
     puts "=> VAGRANT VERSION: #{Vagrant::VERSION}"
     puts "=> VIRTUALBOX VERSION: #{version_virtualbox}"
 
+
     # configure catapult and git
     remote = `#{@git} config --get remote.origin.url`
     if remote.include?("devopsgroup-io/")
