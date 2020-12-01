@@ -127,6 +127,7 @@ module Catapult
       catapult_exception("Please check your internet connection, unable to reach google.com")
     end
 
+
     # handle different workstation operating systems and install required gems
     # windows
     if (RbConfig::CONFIG['host_os'] =~ /mswin|msys|mingw|cygwin|bccwin|wince|emc/)
