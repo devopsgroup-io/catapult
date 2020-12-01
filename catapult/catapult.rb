@@ -140,6 +140,12 @@ module Catapult
       else
         catapult_exception("Git is not installed at C:\\Program Files (x86)\\Git\\bin\\git.exe or C:\\Program Files\\Git\\bin\\git.exe")
       end
+      # check for vboxmanage
+      if File.exist?('C:\Program Files\Oracle\VirtualBox\VBoxManage.exe')
+        @vboxmanage = "\"C:\\Program Files\\Oracle\\VirtualBox\\VBoxManage.exe\""
+      else
+        catapult_exception("VBoxManage is not installed at C:\\Program Files\\Oracle\\VirtualBox\\VBoxManage.exe")
+      end
       # check for vagrant versions
       if Vagrant::VERSION == "1.8.1"
         catapult_exception("There is an issue with Vagrant v1.8.1 on Windows, please install a lesser or greater version.")
@@ -150,6 +156,13 @@ module Catapult
     elsif (RbConfig::CONFIG['host_os'] =~ /darwin|mac os|linux|solaris|bsd/)
       @environment = :posix
       @git = "git"
+      if File.exist?('/usr/bin/vboxmanage')
+        @vboxmanage = "\"/usr/bin/vboxmanage\""
+      elsif File.exist?('/usr/local/bin/vboxmanage')
+        @vboxmanage = "\"/usr/local/bin/vboxmanage\""        
+      else
+        catapult_exception("VBoxManage is not installed at /usr/bin/vboxmanage")
+      end
       # define required vagrant plugins
       vagrant_plugins(["highline","vagrant-aws","vagrant-digitalocean","vagrant-hostmanager","vagrant-vbguest"]);
     else
@@ -199,7 +212,7 @@ module Catapult
     puts "\n"
     version = YAML.load_file("VERSION.yml")
     version_git = `#{@git} --version`.strip
-    version_virtualbox = `vboxmanage --version`.strip
+    version_virtualbox = `#{@vboxmanage} --version`.strip
     repo = `#{@git} config --get remote.origin.url`.strip
     branch = `#{@git} rev-parse --abbrev-ref HEAD`.strip
     puts "=> CATAPULT VERSION: #{version["version"]}"
