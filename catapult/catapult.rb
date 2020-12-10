@@ -198,10 +198,10 @@ module Catapult
     FileUtils.touch(@lock_file_unique)
 
 
-    # require vm name on up and provision
-    if ["up","provision"].include?(ARGV[0])
+    # require machine name with certain vagrant commands
+    if ["box","destroy","halt","package","provision","rebuild","reload","resume","snapshot","suspend","up"].include?(ARGV[0])
       if ARGV.length == 1
-        catapult_exception("You must use 'vagrant #{ARGV[0]} <name>', run 'vagrant status' to view VM <name>s.")
+        catapult_exception("You must use 'vagrant #{ARGV[0]} <machine-name>'. Run 'vagrant status' to view machine <name>s.")
       end
     end
 
@@ -245,6 +245,9 @@ module Catapult
     # validate @configuration_user_template["settings"]
     if not [true,false].include?(@configuration_user["settings"]["admin"]) || @configuration_user["settings"]["admin"] == nil || @configuration_user["settings"]["admin"].match(/\s/)
       catapult_exception("Please set admin to either true or false in secrets/configuration-user.yml.")
+    end
+    if ((@configuration_user["settings"]["admin"] == false) && (ARGV[1]) && (ARGV[1].include?("-test-") || ARGV[1].include?("-qc-") || ARGV[1].include?("-production-")))
+      catapult_exception("Only admins are authorized to control test, qc, and production machines.")
     end
     if @configuration_user["settings"]["gpg_key"] == nil || @configuration_user["settings"]["gpg_key"].match(/\s/) || @configuration_user["settings"]["gpg_key"].length < 20
       catapult_exception("Please set your team's gpg_key in secrets/configuration-user.yml - spaces are not permitted and must be at least 20 characters. Please visit https://github.com/devopsgroup-io/catapult#instance-setup for more information.")
