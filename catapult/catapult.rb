@@ -1532,7 +1532,7 @@ module Catapult
     end
     # get digitalocean available slugs
     begin
-      uri = URI("https://api.digitalocean.com/v2/sizes")
+      uri = URI("https://api.digitalocean.com/v2/sizes?per_page=200")
       Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
         request = Net::HTTP::Get.new uri.request_uri
         request.add_field "Authorization", "Bearer #{@configuration["company"]["digitalocean_personal_access_token"]}"
