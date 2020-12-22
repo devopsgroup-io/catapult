@@ -2346,7 +2346,6 @@ module Catapult
                 request = Net::HTTP::Get.new uri.request_uri
                 request.basic_auth "#{@configuration["company"]["bitbucket_username"]}", "#{@configuration["company"]["bitbucket_password"]}"
                 response = http.request(request)
-
                 if response.code.to_f == 404
                   # create the repo if it does not exist
                   confirm = ask("The Bitbucket repository #{repo_split_3[0]} does not exist, would you like to create it? [y/n]") { |yn| yn.limit = 1, yn.validate = /[yn]/i }
@@ -2372,6 +2371,8 @@ module Catapult
                   else
                     catapult_exception("The Bitbucket repo #{instance["repo"]} must exist before continuing")
                   end
+                elsif response.code.to_f == 403
+                  catapult_exception("Your Bitbucket user #{@configuration["company"]["bitbucket_username"]} does not have access to this repository #{instance["repo"]}. Please correct before continuing.")
                 elsif response.code.to_f.between?(399,600)
                   puts "   - The Bitbucket API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
                 end
@@ -2409,6 +2410,8 @@ module Catapult
                   else
                     catapult_exception("The GitHub repo #{instance["repo"]} must exist before continuing")
                   end
+                elsif response.code.to_f == 403
+                  catapult_exception("Your GitHub user #{@configuration["company"]["github_username"]} does not have access to this repository #{instance["repo"]}. Please correct before continuing.")
                 elsif response.code.to_f.between?(399,600)
                   puts "   - The GitHub API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
                 end
@@ -2420,7 +2423,7 @@ module Catapult
             if "#{repo_split_2[0]}" == "bitbucket.org"
               @api_bitbucket_repo_access = false
               if @api_bitbucket_repo_access === false
-                uri = URI("https://api.bitbucket.org/1.0/group-privileges/#{repo_split_3[0]}")
+                uri = URI("https://api.bitbucket.org/2.0/user/permissions/repositories?q=repository.name=\"#{repo_split_4[1]}\"")
                 Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
                   request = Net::HTTP::Get.new uri.request_uri
                   request.basic_auth "#{@configuration["company"]["bitbucket_username"]}", "#{@configuration["company"]["bitbucket_password"]}"
@@ -2430,56 +2433,13 @@ module Catapult
                   elsif response.code.to_f.between?(399,600)
                     puts "   - The Bitbucket API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
                   else
-                    api_bitbucket_repo_group_privileges = JSON.parse(response.body)
-                    api_bitbucket_repo_group_privileges.each do |group|
-                      if group["privilege"] == "admin" || group["privilege"] == "write"
-                        group["group"]["members"].each do |member|
-                          if member["account_id"] == "#{@api_bitbucket_user_account_id}"
-                            @api_bitbucket_repo_access = true
-                          end
-                        end
-                      end
-                    end
-                  end
-                end
-              end
-              if @api_bitbucket_repo_access === false
-                uri = URI("https://api.bitbucket.org/1.0/privileges/#{repo_split_3[0]}")
-                Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
-                  request = Net::HTTP::Get.new uri.request_uri
-                  request.basic_auth "#{@configuration["company"]["bitbucket_username"]}", "#{@configuration["company"]["bitbucket_password"]}"
-                  response = http.request(request)
-                  if response.code.to_f == 404
-                    catapult_exception("The Bitbucket repo #{instance["repo"]} does not exist")
-                  elsif response.code.to_f.between?(399,600)
-                    puts "   - The Bitbucket API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
-                  else
-                    api_bitbucket_repo_privileges = JSON.parse(response.body)
-                    api_bitbucket_repo_privileges.each do |member|
-                      if member["privilege"] == "admin" || member["privilege"] == "write"
-                        if member["user"]["account_id"] == "#{@api_bitbucket_user_account_id}"
+                    api_bitbucket_user_repo_privileges = JSON.parse(response.body)
+                    api_bitbucket_user_repo_privileges["values"].each do |result|
+                      if result["repository"]["full_name"] == "#{repo_split_3[0]}" && result["permission"] == "admin"
                           @api_bitbucket_repo_access = true
-                        end
                       end
-                    end
-                  end
-                end
-              end
-              if @api_bitbucket_repo_access === false
-                uri = URI("https://api.bitbucket.org/2.0/repositories/#{repo_split_3[0]}")
-                Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
-                  request = Net::HTTP::Get.new uri.request_uri
-                  request.basic_auth "#{@configuration["company"]["bitbucket_username"]}", "#{@configuration["company"]["bitbucket_password"]}"
-                  response = http.request(request)
-                  if response.code.to_f == 404
-                    catapult_exception("The Bitbucket repo #{instance["repo"]} does not exist")
-                  elsif response.code.to_f.between?(399,600)
-                    puts "   - The Bitbucket API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
-                  else
-                    api_bitbucket_repo_repositories = JSON.parse(response.body)
-                    if response.code.to_f == 200
-                      if api_bitbucket_repo_repositories["owner"]["account_id"] == "#{@api_bitbucket_user_account_id}"
-                        @api_bitbucket_repo_access = true
+                      if result["repository"]["full_name"] == "#{repo_split_3[0]}" && result["permission"] == "write"
+                          @api_bitbucket_repo_access = true
                       end
                     end
                   end
