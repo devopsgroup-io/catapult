@@ -141,6 +141,8 @@ Catapult orchestrates the following key components of DevOps to provide you with
     - [Geographic Optimizations](#geographic-optimizations)
     - [Recommended Optimizations](#recommended-optimizations)
 - [Capacity](#capacity)
+    - [Increasing Capacity](#increasing-capacity)
+    - [Load Balancer](#load-balancer)
 - [Performance and Capacity Testing](#performance-and-capacity-testing)
     - [Website Concurrency Maximum](#website-concurrency-maximum)
     - [Interpreting Apache AB Results](#interpreting-apache-ab-results)
@@ -1533,6 +1535,10 @@ Catapult defines horizontal scaling through adding additional servers, this affo
     * `vagrant up ~/secrets/configuration.yml["company"]["name"]-test-redhat1`
     * `vagrant up ~/secrets/configuration.yml["company"]["name"]-qc-redhat1`
     * `vagrant up ~/secrets/configuration.yml["company"]["name"]-production-redhat1`
+    
+## Load Balancer
+
+HAProxy is used to facilitate capacity management by means of a layer 7 load-balancer. The HAProxy status dashboard is made available to you for each environment by visiting port 32700 at the respective environment's `-redhat` server `ip` address as defined in `~/secrets/configuration.yml`. As example, `42.67.232.56:32700`. The username to login is `admin` and the password is the password as defined at the respective environment's `["software"]["admin_password"]` entry.
 
 
 
