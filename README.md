@@ -1525,7 +1525,7 @@ Google's [PageSpeed Insights](https://developers.google.com/speed/pagespeed/insi
 
 # Capacity #
 
-Your website's capacity potential is defined by two key elements; 1) your website's average resource requirement per request and 2) server resources available. We recommend to first [Performance](#performance) optmize your website and *then* consider your website's capacity potential through [Performance and Capacity Testing](#performance-and-capcity-testing).
+Your website's capacity potential is defined by two key elements; 1) your website's average resource requirement per request and 2) server resources available. We recommend to first [Performance](#performance) optmize your website and *then* consider your website's capacity potential through [Performance and Capacity Testing](#performance-and-capacity-testing).
 
 ## Increasing Capacity ##
 
