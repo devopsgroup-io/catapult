@@ -252,7 +252,7 @@ Catapult requires a [Developer Setup](#developer-setup), [Instance Setup](#insta
 
 ## Developer Setup ##
 
-Catapult uses Vagrant and the command line of a developer's workstation, below is a list of required software that will need to be installed.
+Catapult uses Vagrant and the command line of a developer's workstation. To get started with Catapult, please install the below, required, software.
 
 * macOS workstations: Compatible and supported
 * Linux workstations: Compatible and supported
