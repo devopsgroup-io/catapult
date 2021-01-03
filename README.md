@@ -245,14 +245,14 @@ See an error or have a suggestion? Email competition@devopsgroup.io - we appreci
 Catapult requires a [Developer Setup](#developer-setup), [Instance Setup](#instance-setup), and [Services Setup](#services-setup) as described in the following sections.
 
 **Please Note:**
-* You must run most commands from an elevated shell. For macOS and Linux, type `sudo su` in a terminal window, or for Windows, right-clicking on Command Prompt from the Start Menu and selecting "Run as Administrator".
 * It is advised to turn off any antivirus software that you may have installed during setup and usage of Catapult - tasks such as forwarding ports and writing hosts files may be blocked.
 * Virtualizaion must be enabled in the BIOS of the developer's workstation - follow [this how-to](https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux/5/html/Virtualization/sect-Virtualization-Troubleshooting-Enabling_Intel_VT_and_AMD_V_virtualization_hardware_extensions_in_BIOS.html) to get started.
+* It is recommended to disable Internet Service Provider (ISP) Domain Name System (DNS) helpers, such as opting out of the [Verizon DNS Assitance](https://www.verizon.com/support/residential/internet/home-network/settings/opt-out-of-dns-assist).
 * Using a VPN client during usage of LocalDev may result in lost communication between your workstation and the guests, requiring a `vagrant reload` to regain communication.
 
 ## Developer Setup ##
 
-Catapult is controlled via Vagrant and the command line of a developer's workstation - below is a list of required software that will need to be installed.
+Catapult uses Vagrant and the command line of a developer's workstation, below is a list of required software that will need to be installed.
 
 * macOS workstations: Compatible and supported
 * Linux workstations: Compatible and supported
@@ -283,9 +283,7 @@ Catapult is controlled via Vagrant and the command line of a developer's worksta
     * **Using Linux?**
         1. Git commandline is included in the base distribution in most cases.
         1. For a streamlined Git GUI, download and install SmartGit from http://www.syntevo.com/smartgit/
-4. **Git Credential Caching**
-    1. Follow the instructions outlined for your system to store your Git credentials https://docs.github.com/en/github/using-git/caching-your-github-credentials-in-git
-5. **VirtualBox**
+4. **VirtualBox**
     * **Using macOS?**
         1. Download and install the latest version of VirtualBox from https://www.virtualbox.org/wiki/Downloads
     * **Using Windows?**
@@ -294,7 +292,7 @@ Catapult is controlled via Vagrant and the command line of a developer's worksta
         1. Download and install the latest version of VirtualBox using Advanced Packaging Tool (APT) `sudo apt-get install virtualbox`
     * **Using Linux (Fedora, Red Hat, Suse)?**
         1. Download and install the latest version of VirtualBox using Yellowdog Updater, Modifed (yum) `sudo yum install virtualbox`
-6. **Vagrant**
+5. **Vagrant**
     * **Using macOS?**
         1. Ensure Xcode Command Line Tools are installed by running `xcode-select --install` from Terminal
         2. Download and install the latest version of Vagrant v2.x from https://releases.hashicorp.com/vagrant/
@@ -307,8 +305,19 @@ Catapult is controlled via Vagrant and the command line of a developer's worksta
     * **Using Linux (Fedora, Red Hat, Suse)?**
         1. Download the latest version of Vagrant v2.x respective to your architecture from https://releases.hashicorp.com/vagrant/ by running e.g. `wget https://releases.hashicorp.com/vagrant/2.2.9/vagrant_2.2.9_x86_64.rpm`
         2. Install Vagrant using yum e.g. `sudo yum install vagrant_2.2.9_x86_64.rpm`
-7. **Java SE Development Kit**
+6. **Java SE Development Kit**
     1. Follow the instructions outlined for your system http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html
+7. **Verification**
+    1. To verify that everything has been properly installed, please run a `vagrant status`
+8. **Instance Configuration**
+    1. If you are a Catapult admin:
+       1. Set `~/secrets/configuration-user.yml["settings"]["admin"]` to `true`
+       2. Enable Git credential caching by following the instructions outlined for your system to [store your Git credentials](https://docs.github.com/en/github/using-git/caching-your-github-credentials-in-git)
+       3. If you are setting up a new Catapult instance, continue on to the [Instance Setup](#instance-setup) step
+    2. If you are a Catapult user:
+       1. Set `~/secrets/configuration-user.yml["settings"]["admin"]` to `false`
+       2. Contact your Catapult admin for your Catapult instance's `~/secrets/configuration-user.yml["settings"]["gpg_key"]`
+       3. You may stop at this point and contact your Catapult admin for next steps. The [Instance Setup](#instance-setup) and [Services Setup](#services-setup) will be, or have been, completed by your Catapult admin.
 
 ## Instance Setup ##
 
