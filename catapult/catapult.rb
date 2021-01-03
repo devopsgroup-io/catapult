@@ -164,7 +164,7 @@ module Catapult
         catapult_exception("VBoxManage is not installed at /usr/bin/vboxmanage")
       end
       # define required vagrant plugins
-      vagrant_plugins(["highline","vagrant-aws","vagrant-digitalocean","vagrant-hostmanager","vagrant-vbguest","winrm-elevated"]);
+      vagrant_plugins(["highline","vagrant-aws","vagrant-digitalocean","vagrant-hostmanager","vagrant-vbguest"]);
     else
       catapult_exception("Cannot detect your operating system, please submit an issue at https://github.com/devopsgroup-io/catapult")
     end
