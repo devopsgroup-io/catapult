@@ -147,7 +147,7 @@ Catapult orchestrates the following key components of DevOps to provide you with
     - [Website Concurrency Maximum](#website-concurrency-maximum)
     - [Interpreting Apache AB Results](#interpreting-apache-ab-results)
 - [How-to](#how-to)
-    - [Rotating Credentials](#rotating-credentials)
+    - [Rotating Secrets](#rotating-secrets)
 - [Troubleshooting](#troubleshooting)
 - [Contributing](#contributing)
     - [Releases](#releases)
@@ -1649,9 +1649,9 @@ Percentage of the requests served within a certain time (ms)
 This section outlines Catapult maintenance tasks.
 
 
-## Rotating Credentials ##
+## Rotating Secrets ##
 
-As your team changes, there may be a need to rotate Catapult credentials. The following is the recommended method and order to do so.
+As your team members change, there may be a need to rotate Catapult secrets. The following is the recommended method and order to do so.
 
 1. **GPG Passphrase**
    1. Disable all Bamboo build plans
