@@ -446,7 +446,7 @@ module Catapult
       `#{@git} reset -- secrets/id_rsa.gpg`
       `#{@git} reset -- secrets/id_rsa.pub.gpg`
     elsif "#{branch}" == "develop"
-      if @configuration_user["settings"]["gpg_edit"]
+      if @configuration_user["settings"]["gpg_edit"] && @configuration_user["settings"]["admin"]
         puts " * GPG Edit Mode is enabled at secrets/configuration-user.yml[\"settings\"][\"gpg_edit\"], if there are changes to secrets/configuration.yml, secrets/id_rsa, or secrets/id_rsa.pub, they will be re-encrypted."
         puts " * You are on the develop branch, this branch contains your unique secrets/configuration.yml.gpg, secrets/id_rsa.gpg, and secrets/id_rsa.pub.gpg secrets/configuration."
         puts " * The develop branch is running in the localdev and test environments, please first test then commit your configuration to the develop branch."
@@ -459,7 +459,7 @@ module Catapult
       if File.zero?("secrets/configuration.yml.gpg")
         `gpg --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml.gpg --armor --cipher-algo AES256 --symmetric catapult/installers/templates/configuration.yml.template`
       end
-      if @configuration_user["settings"]["gpg_edit"]
+      if @configuration_user["settings"]["gpg_edit"] && @configuration_user["settings"]["admin"]
         unless File.exist?("secrets/configuration.yml")
           # decrypt secrets/configuration.yml.gpg as secrets/configuration.yml
           `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/configuration.yml --decrypt secrets/configuration.yml.gpg`
@@ -524,7 +524,7 @@ module Catapult
           `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/id_rsa.pub.gpg --armor --cipher-algo AES256 --symmetric secrets/id_rsa.pub`
         end
       end
-      if @configuration_user["settings"]["gpg_edit"]
+      if @configuration_user["settings"]["gpg_edit"] && @configuration_user["settings"]["admin"]
         unless File.exist?("secrets/id_rsa")
           `gpg --verbose --batch --yes --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --output secrets/id_rsa --decrypt secrets/id_rsa.gpg`
         end
@@ -572,10 +572,10 @@ module Catapult
 
 
     # validate @configuration["company"]
-    if @configuration_user["settings"]["admin"]
+    if ["provision","status"].include?(ARGV[0]) && @configuration_user["settings"]["admin"]
       puts "\nVerification of configuration[\"company\"]:\n".color(Colors::WHITE)
       if @configuration["company"]["catapult_repo"] == nil
-        if @configuration_user["settings"]["gpg_edit"] == false
+        if @configuration_user["settings"]["gpg_edit"] == false && @configuration_user["settings"]["admin"]
           confirm = ask("You have outstanding configuration that needs to be set in configuration.yml and the gpg_edit setting in your configuration-user.yml file is set to false, would you like to set it to true? [y/n]".color(Colors::YELLOW)) { |yn| yn.limit = 1, yn.validate = /[yn]/i }
           if confirm.downcase == 'y'
             @configuration_user["settings"]["gpg_edit"] = true
@@ -584,7 +584,7 @@ module Catapult
           end
         end
       else
-        if @configuration_user["settings"]["gpg_edit"] == true
+        if @configuration_user["settings"]["gpg_edit"] == true && @configuration_user["settings"]["admin"]
           confirm = ask("The gpg_edit setting in your configuration-user.yml file is set to true, would you like to set it to false? [y/n]".color(Colors::YELLOW)) { |yn| yn.limit = 1, yn.validate = /[yn]/i }
           if confirm.downcase == 'y'
             @configuration_user["settings"]["gpg_edit"] = false
@@ -1497,7 +1497,7 @@ module Catapult
 
 
     # validate @configuration["environments"]
-    if @configuration_user["settings"]["admin"]
+    if ["provision","status"].include?(ARGV[0]) && @configuration_user["settings"]["admin"]
       puts "\nVerification of configuration[\"environments\"]:".color(Colors::WHITE)
       # get virualbox machines
       if File.exist?(File.expand_path("~/.vagrant.d/data/machine-index/index"))
