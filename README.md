@@ -308,7 +308,7 @@ Catapult uses Vagrant and the command line of a developer's workstation, below i
         1. Download the latest version of Vagrant v2.x respective to your architecture from https://releases.hashicorp.com/vagrant/ by running e.g. `wget https://releases.hashicorp.com/vagrant/2.2.9/vagrant_2.2.9_x86_64.rpm`
         2. Install Vagrant using yum e.g. `sudo yum install vagrant_2.2.9_x86_64.rpm`
 6. **Java SE Development Kit**
-    1. Follow the instructions outlined for your system http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html
+    1. Download the respective Java SE Development Kit for your system http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html
 7. **Instance Configuration**
     1. **If you are a Catapult admin**:
        1. If you are setting up a new Catapult instance, continue on to the [Instance Setup](#instance-setup) step. If you are configuring a new workstation with an existing Catapult instance, ensure the following is completed:
