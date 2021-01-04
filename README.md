@@ -314,12 +314,12 @@ Catapult uses Vagrant and the command line of a developer's workstation, below i
        1. If you are setting up a new Catapult instance, continue on to the [Instance Setup](#instance-setup) step. If you are configuring a new workstation with an existing Catapult instance, ensure the following is completed:
            1. Run `vagrant status` to verify the correct workstation software is installed and to generate your Catapult user files
            2. Set `~/secrets/configuration-user.yml["settings"]["admin"]` to `true`
-           3. Enable Git credential caching by following the instructions outlined for your system to [store your Git credentials](https://docs.github.com/en/github/using-git/caching-your-github-credentials-in-git)
+           3. Enable Git credential caching by following the instructions outlined for your system to [store your Git credentials](https://docs.github.com/en/github/using-git/caching-your-github-credentials-in-git). This will allow you to push changes to your Catapult instance without prompt for credentials.
     2. **If you are a Catapult user**:
        1. Using Git, clone your team's Catapult instance repository
        2. Once cloned, from your workstation's terminal, change directory into the root of the newly cloned Catapult repository
        3. Run `vagrant status` to verify the correct workstation software is installed and to generate your Catapult user files
-       4. Contact your Catapult admin for your Catapult instance's `~/secrets/configuration-user.yml["settings"]["gpg_key"]`
+       4. Contact your Catapult admin for your Catapult instance's GPG passphrase and place at `~/secrets/configuration-user.yml["settings"]["gpg_key"]`
        5. You may stop at this point and contact your Catapult admin for next steps. The following [Instance Setup](#instance-setup) and [Services Setup](#services-setup) will be, or have been, completed by your Catapult admin
 
 ## Instance Setup ##
