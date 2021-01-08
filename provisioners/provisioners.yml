@@ -27,12 +27,12 @@ redhat:
       multithreading_persistent: false
       persistent: true
     cloudflare_dns:
-      description: "Manages CloudfFlare DNS records for websites."
+      description: "Manages CloudFlare DNS records for websites."
       multithreading: true
       multithreading_persistent: false
       persistent: false
     cloudflare_zones:
-      description: "Manages CloudfFlare zones for websites."
+      description: "Manages CloudFlare zones for websites."
       multithreading: true
       multithreading_persistent: false
       persistent: false
@@ -168,10 +168,10 @@ redhat:
 windows:
   modules:
     cloudflare_dns:
-      description: "Manages CloudfFlare DNS A records for websites."
+      description: "Manages CloudFlare DNS A records for websites."
       multithreading: true
     cloudflare_zones:
-      description: "Manages CloudfFlare zones for websites."
+      description: "Manages CloudFlare zones for websites."
       multithreading: true
     git:
       description: "Manages Git repositories for websites."
