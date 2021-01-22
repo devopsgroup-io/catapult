@@ -85,7 +85,11 @@ if [ -d "/var/www/repositories/apache/${domain}/.git" ]; then
             # loop through each file store as a way to reduce repository size and avoid limits
             if [ ! -z "$(provisioners_array software.apache.${software}.file_stores)" ]; then
                 for file_store in $(provisioners_array software.apache.${software}.file_stores); do
+                    file_store_relative="${file_store}"
                     file_store="/var/www/repositories/apache/${domain}/${webroot}${file_store}"
+                    for file_stores_rsync_exclude in $(provisioners_array software.apache.${software}.file_stores_rsync_exclude); do
+                        sudo bash -c "echo \"${file_stores_rsync_exclude}\" >> \"${file_store}/.gitignore\""
+                    done
                     # confirm the file store exists
                     if [ -d "${file_store}" ]; then
                         # get the file store size
