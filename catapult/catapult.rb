@@ -163,6 +163,12 @@ module Catapult
       else
         catapult_exception("VBoxManage is not installed at /usr/bin/vboxmanage")
       end
+      if (RbConfig::CONFIG['host_os'] =~ /mac os/)
+        working_dir = Dir.pwd.downcase()
+        if (working_dir =~ /desktop|documents|downloads/)
+          catapult_exception("The current installation location (#{working_dir}) is not supported. Catapult should not reside within Desktop, Downloads, or Documents directories. Consider moving the instance to your home directory.")
+        end
+      end
       # define required vagrant plugins
       vagrant_plugins(["highline","vagrant-aws","vagrant-digitalocean","vagrant-hostmanager","vagrant-vbguest"]);
     else
