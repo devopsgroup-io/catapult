@@ -195,6 +195,7 @@ windows:
 
 # file_store_containers: directories that the software needs write access to
 # file_stores: directories that will grow over time with user-generated content (may be duplicitive with the above)
+# file_stores_rsync_exclude: directories within file stores to exclude from rsync (typically, these are caches)
 
 software:
   apache:
@@ -358,6 +359,7 @@ software:
       database_config_file: "src/config.php"
       file_store_containers: ["data","internal_data","src"]
       file_stores: ["data","internal_data"]
+      file_stores_rsync_exclude: ["code_cache","oembed_cache","page_cache"]
       php_version: "7.1"
       version: [2]
     zendframework2:
