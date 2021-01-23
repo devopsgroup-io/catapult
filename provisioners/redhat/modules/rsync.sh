@@ -78,7 +78,7 @@ else
                 echo -e "- test:upstream file store does not exist"
             else
                 echo -e "- test:upstream file store size: $(( ${file_store_size} / 1024 ))MB"
-                cd "/var/www/repositories/apache/${domain}" && git check-ignore --quiet "${file_store}"
+                cd "/var/www/repositories/apache/${domain}" && git check-ignore --quiet "${file_store}" &> /dev/null
                 if [ $? -ne 0 ]; then
                     echo -e "- this file store is tracked in git"
                     if [ "${file_store_size}" -gt "${directory_size_maximum}" ]; then
