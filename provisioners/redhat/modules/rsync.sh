@@ -30,11 +30,13 @@ else
     # create temp file to define rsync exclusions
     tmpfile_rsync_exclusions=$(mktemp /tmp/catapult.rsync.$domain.XXXXXXXXXX)
 
-    cat "/catapult/provisioners/provisioners.yml" | shyaml get-values-0 software.apache.$(catapult websites.apache.$5.software).file_stores_rsync_exclude |
-    while read -r -d $'\0' file_stores_rsync_exclude; do
-        echo -e "exclude from file store sync: ${file_stores_rsync_exclude}"
-        echo "${file_stores_rsync_exclude}" >> "$tmpfile_rsync_exclusions"
-    done
+    if [ "$(provisioners_array software.apache.${software}.file_stores_rsync_exclude)" ]; then
+        cat "/catapult/provisioners/provisioners.yml" | shyaml get-values-0 software.apache.$(catapult websites.apache.$5.software).file_stores_rsync_exclude |
+        while read -r -d $'\0' file_stores_rsync_exclude; do
+            echo -e "exclude from file store sync: ${file_stores_rsync_exclude}"
+            echo "${file_stores_rsync_exclude}" >> "$tmpfile_rsync_exclusions"
+        done
+    fi
 
     # loop through each software file store
     cat "/catapult/provisioners/provisioners.yml" | shyaml get-values-0 software.apache.$(catapult websites.apache.$5.software).file_stores |
