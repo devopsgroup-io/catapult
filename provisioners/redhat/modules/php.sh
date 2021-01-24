@@ -64,7 +64,7 @@ sudo yum install -y rh-php72-php-gmp rh-php72-php-mysqlnd
 # https://blog.remirepo.net/post/2017/02/23/Additional-PHP-packages-for-RHSCL
 curl --output /etc/yum.repos.d/rhscl-centos-release-scl-epel-7.repo wget https://copr.fedorainfracloud.org/coprs/rhscl/centos-release-scl/repo/epel-7/rhscl-centos-release-scl-epel-7.repo
 # These extensions are available from » PECL. They may require external libraries. More PECL extensions exist but they are not documented in the PHP manual yet.
-sudo yum install -y sclo-php72-php-pecl-geoip sclo-php72-php-pecl-imagick sclo-php72-php-pecl-uploadprogress
+sudo yum install -y sclo-php72-php-pecl-imagick sclo-php72-php-pecl-uploadprogress
 
 #################
 # PHP 7.1 PHP_FPM
@@ -124,7 +124,7 @@ sudo yum install -y rh-php71-php-gmp rh-php71-php-mysqlnd
 # https://blog.remirepo.net/post/2017/02/23/Additional-PHP-packages-for-RHSCL
 curl --output /etc/yum.repos.d/rhscl-centos-release-scl-epel-7.repo wget https://copr.fedorainfracloud.org/coprs/rhscl/centos-release-scl/repo/epel-7/rhscl-centos-release-scl-epel-7.repo
 # These extensions are available from » PECL. They may require external libraries. More PECL extensions exist but they are not documented in the PHP manual yet.
-sudo yum install -y sclo-php71-php-pecl-geoip sclo-php71-php-pecl-imagick sclo-php71-php-mcrypt sclo-php71-php-pecl-uploadprogress
+sudo yum install -y sclo-php71-php-pecl-imagick sclo-php71-php-mcrypt sclo-php71-php-pecl-uploadprogress
 
 #################
 # PHP 5.4 MOD_PHP AND PHP_FPM
@@ -199,13 +199,6 @@ fi
 sudo yum install -y libyaml-devel
 echo autodetect | sudo pecl upgrade yaml-1.3.1
 #################
-# pecl extension: geoip
-# https://pecl.php.net/package/geoip
-sudo yum install -y geoip-devel
-# this is a beta release but includes a 3 year gap of bug fixes and new functions
-sudo pecl install geoip-1.1.0
-echo autodetect | sudo pecl upgrade geoip
-#################
 # pecl extension: imagick
 # http://pecl.php.net/package/imagick
 # this version of ImageMagic was associated with the Remi repo and needs to be removed to successfully install the new version maintained by Red hat
@@ -222,19 +215,6 @@ sudo pecl upgrade uploadprogress
 #################
 # output installed pecl extensions once finished
 sudo pecl list
-
-
-#################
-# GEOIP DATA FILES
-#################
-
-# http://dev.maxmind.com/geoip/legacy/geolite/
-curl --silent --show-error --connect-timeout 10 --max-time 20 --retry 5 --output "/usr/share/GeoIP/GeoIP.dat.gz" --request GET "http://geolite.maxmind.com/download/geoip/database/GeoLiteCountry/GeoIP.dat.gz"
-sudo gunzip --force "/usr/share/GeoIP/GeoIP.dat.gz"
-curl --silent --show-error --connect-timeout 10 --max-time 20 --retry 5 --output "/usr/share/GeoIP/GeoIPCity.dat.gz" --request GET "http://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz"
-sudo gunzip --force "/usr/share/GeoIP/GeoIPCity.dat.gz"
-curl --silent --show-error --connect-timeout 10 --max-time 20 --retry 5 --output "/usr/share/GeoIP/GeoIPASNum.dat.gz" --request GET "http://download.maxmind.com/download/geoip/database/asnum/GeoIPASNum.dat.gz"
-sudo gunzip --force "/usr/share/GeoIP/GeoIPASNum.dat.gz"
 
 
 
