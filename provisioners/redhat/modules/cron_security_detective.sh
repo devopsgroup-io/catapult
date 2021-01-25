@@ -11,7 +11,7 @@
 
 /bin/echo -e "\nhere are recent ip addresses blocked by fail2ban (/var/log/fail2ban.log*)"
 /bin/echo -e "----------------------------------------"
-/bin/tac /var/log/fail2ban.log* | /bin/grep --extended-regexp --max-count=20 --regexp="(Ban)" | while read line ; do echo $line [$(/usr/bin/geoiplookup -f /usr/share/GeoIP/GeoIP.dat -i $(/bin/echo $line | /usr/bin/awk '{ print $8 }') | /usr/bin/head -1  | sed -r 's/GeoIP Country Edition: //g' )] ; done
+/bin/tac /var/log/fail2ban.log* | /bin/grep --extended-regexp --max-count=20 --regexp="(Ban)" | while read line ; do echo $line [$(/usr/bin/whois $(/bin/echo $line | /usr/bin/awk '{ print $8 }') | /bin/grep Country | /bin/sed -r 's/Country:\s+//g' )] ; done
 
 if [ -f "/var/log/httpd/access_log" ]; then
 

@@ -5,6 +5,7 @@ source "/catapult/provisioners/redhat/modules/catapult.sh"
 # security: preventive
 cat "/catapult/provisioners/redhat/modules/cron_security_preventive.sh" > "/etc/cron.weekly/00catapult-security-preventive.cron"
 # security: detective
+sudo yum install -y whois
 cat "/catapult/provisioners/redhat/modules/cron_security_detective.sh" > "/etc/cron.weekly/01catapult-security-detective.cron"
 # security: corrective
 if ([ "${4}" == "apache" ]); then
