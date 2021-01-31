@@ -17,6 +17,18 @@ softwareroot=$(provisioners software.apache.${software}.softwareroot)
 shopt -s expand_aliases
 source ~/.bashrc
 
+# set version of php to use per software definition
+if ([ ! -z "${software}" ]); then
+    software_php_version=$(provisioners software.apache.${software}.php_version)
+    echo -e "* using PHP version ${software_php_version}..."
+    software_php_version=$(echo ${software_php_version} | sed -e 's/\.//g')
+    if [ -f "/opt/rh/rh-php${software_php_version}/root/usr/bin/php" ]; then
+        php_path="/opt/rh/rh-php${software_php_version}/root/usr/bin/php"
+    else
+        php_path="/usr/bin/php"
+    fi
+fi
+
 # set website software site email address
 # set website software admin credentials, email address, and role
 if ([ ! -z "${software}" ]); then
@@ -52,7 +64,7 @@ elif [ "${software}" = "drupal7" ]; then
     
     cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && drush --always-set variable-set site_mail $(catapult company.email)
 
-    password_hash=$(cd "/var/www/repositories/apache/${domain}/${webroot}" && php ./scripts/password-hash.sh $(catapult environments.${1}.software.drupal.admin_password))
+    password_hash=$(cd "/var/www/repositories/apache/${domain}/${webroot}" && $php_path ./scripts/password-hash.sh $(catapult environments.${1}.software.drupal.admin_password))
     password_hash=$(echo "${password_hash}" | awk '{ print $4 }' | tr -d " " | tr -d "\n")
     mysql --defaults-extra-file=$dbconf ${1}_${domain_valid_db_name} -e "
         INSERT INTO ${software_dbprefix}users (uid, pass, mail, status)
@@ -120,7 +132,7 @@ elif [ "${software}" = "mediawiki1" ]; then
         VALUES ('1', 'Admin', '$(catapult company.email)')
         ON DUPLICATE KEY UPDATE user_name='Admin', user_email='$(catapult company.email)';
     "
-    cd "/var/www/repositories/apache/${domain}/${webroot}" && php maintenance/changePassword.php --userid="1" --password="$(catapult environments.${1}.software.admin_password)"
+    cd "/var/www/repositories/apache/${domain}/${webroot}" && $php_path maintenance/changePassword.php --userid="1" --password="$(catapult environments.${1}.software.admin_password)"
     mysql --defaults-extra-file=$dbconf ${1}_${domain_valid_db_name} -e "
         INSERT INTO ${software_dbprefix}user_groups (ug_user, ug_group)
         VALUES ('1', 'sysop')
@@ -143,7 +155,7 @@ elif [ "${software}" = "silverstripe3" ]; then
         WHERE ID='1';
     "
     # a hack to encrypt the plain text password that we just set, wahoo!
-    cd "/var/www/repositories/apache/${domain}/${webroot}" && php framework/cli-script.php dev/tasks/EncryptAllPasswordsTask
+    cd "/var/www/repositories/apache/${domain}/${webroot}" && $php_path framework/cli-script.php dev/tasks/EncryptAllPasswordsTask
 
 elif [ "${software}" = "suitecrm7" ]; then
     
@@ -299,7 +311,7 @@ fi
 
 if [ "${software}" = "codeigniter2" ]; then
 
-    result=$(cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && php index.php migrate)
+    result=$(cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && $php_path index.php migrate)
     if echo $result | grep --extended-regexp --quiet --regexp="<html" --regexp="<\?"; then
         echo -e "Migrations are not configured"
     else
@@ -308,7 +320,7 @@ if [ "${software}" = "codeigniter2" ]; then
 
 elif [ "${software}" = "codeigniter3" ]; then
     
-    result=$(cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && php index.php migrate)
+    result=$(cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && $php_path index.php migrate)
     if echo $result | grep --extended-regexp --quiet --regexp="<html" --regexp="<\?"; then
         echo -e "Migrations are not configured"
     else
@@ -372,38 +384,38 @@ elif [ "${software}" = "expressionengine3" ]; then
 
 elif [ "${software}" = "joomla3" ]; then
 
-    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && php cli/garbagecron.php
-    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && php cli/update_cron.php
-    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && php cli/finder_indexer.php
-    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && php cli/deletefiles.php
+    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && $php_path cli/garbagecron.php
+    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && $php_path cli/update_cron.php
+    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && $php_path cli/finder_indexer.php
+    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && $php_path cli/deletefiles.php
 
 elif [ "${software}" = "laravel5" ]; then
 
-    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && php artisan key:generate
-    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && php artisan migrate
-    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && php artisan cache:clear
-    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && php artisan clear-compiled
-    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && php artisan optimize
+    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && $php_path artisan key:generate
+    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && $php_path artisan migrate
+    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && $php_path artisan cache:clear
+    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && $php_path artisan clear-compiled
+    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && $php_path artisan optimize
 
 elif [ "${software}" = "mediawiki1" ]; then
 
-    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && php maintenance/update.php
-    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && php maintenance/runJobs.php
-    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && php maintenance/rebuildall.php
+    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && $php_path maintenance/update.php
+    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && $php_path maintenance/runJobs.php
+    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && $php_path maintenance/rebuildall.php
 
 elif [ "${software}" = "moodle3" ]; then
 
-    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && php admin/cli/cron.php
-    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && php admin/cli/purge_caches.php
+    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && $php_path admin/cli/cron.php
+    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && $php_path admin/cli/purge_caches.php
 
 elif [ "${software}" = "silverstripe3" ]; then
 
-    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && php framework/cli-script.php dev/tasks/MigrationTask
-    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && php framework/cli-script.php dev/build "flush=1"
+    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && $php_path framework/cli-script.php dev/tasks/MigrationTask
+    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && $php_path framework/cli-script.php dev/build "flush=1"
 
 elif [ "${software}" = "suitecrm7" ]; then
 
-    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && php cron.php
+    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && $php_path cron.php
 
 elif [ "${software}" = "wordpress4" ]; then
 
@@ -452,14 +464,14 @@ elif [ "${software}" = "xenforo1" ]; then
 elif [ "${software}" = "xenforo2" ]; then
 
     # @todo need to enable development mode
-    #cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && php cmd.php xf-dev:recompile
-    #cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && php cmd.php xf-dev:recompile-phrases
-    #cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && php cmd.php xf-dev:recompile-style-properties
-    #cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && php cmd.php xf-dev:recompile-templates
-    #cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && php cmd.php xf-rebuild:forums
-    #cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && php cmd.php xf-rebuild:search
-    #cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && php cmd.php xf-rebuild:threads
-    #cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && php cmd.php xf-rebuild:users
+    #cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && $php_path cmd.php xf-dev:recompile
+    #cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && $php_path cmd.php xf-dev:recompile-phrases
+    #cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && $php_path cmd.php xf-dev:recompile-style-properties
+    #cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && $php_path cmd.php xf-dev:recompile-templates
+    #cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && $php_path cmd.php xf-rebuild:forums
+    #cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && $php_path cmd.php xf-rebuild:search
+    #cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && $php_path cmd.php xf-rebuild:threads
+    #cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && $php_path cmd.php xf-rebuild:users
     : #no-op
 
 elif [ "${software}" = "zendframework2" ]; then
