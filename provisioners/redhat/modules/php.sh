@@ -208,6 +208,11 @@ if yum list installed | grep ImageMagic | grep -q 6.7.8; then
 fi
 sudo yum install -y ImageMagick ImageMagick-devel
 echo autodetect | sudo pecl upgrade imagick
+# This package provides the imagick.so extension for native PHP (5.4)
+sudo yum install -y php-pecl-imagick.x86_64
+# Remove the original imagick.so extension declaration from /etc/php.ini since the php-pecl-imagick.x86_64 package adds /etc/php.d/imagick.ini
+sed -i '/extension=\"imagick.so\"/d' "/etc/php.ini"
+
 #################
 # pecl extension: uploadprogress
 # http://pecl.php.net/package/uploadprogress
