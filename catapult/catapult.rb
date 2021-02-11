@@ -73,35 +73,42 @@ module Catapult
     end
 
 
-    # function: check for and install vagrant plugins
+    # function: check for, install, and attempt to update vagrant plugins
     def Command::vagrant_plugins(plugins)
       logger = Vagrant::UI::Colored.new
-      result = false
+      bundler = Vagrant::Bundler.new()
+      pm = Vagrant::Plugin::Manager.new(
+        Vagrant::Plugin::Manager.user_plugins_file
+      )
+      # install
+      installed = false
       plugins.each do |p|
-        pm = Vagrant::Plugin::Manager.new(
-          Vagrant::Plugin::Manager.user_plugins_file
-        )
         plugin_hash = pm.installed_plugins
         next if plugin_hash.has_key?(p)
-        result = true
         logger.warn("Installing plugin #{p}")
         pm.install_plugin(p, sources: ["https://rubygems.org"])
+        installed = true
       end
-      plugins.each do |p|
-        bundler = Vagrant::Bundler.new()
-        logger.warn("Checking for updates to plugin #{p}")
-        pm = Vagrant::Plugin::Manager.new(
-          Vagrant::Plugin::Manager.user_plugins_file
-        )
-        plugin_hash = pm.installed_plugins
-        if plugin_hash.has_key?(p)
-          bundler.update(plugin_hash, p, sources: ["https://rubygems.org"])
-        end
+      if installed
+        catapult_exception('Required Vagrant plugins were installed, please re-run your Vagrant command for the plugin installations to take effect.')
       end
-      if result
-        catapult_exception('Required Vagrant plugins were installed, please re-run your Vagrant command for the plugins to take effect.')
-      end
+      # update
+      #manager = Vagrant::Plugin::Manager.instance
+      #installed_plugins = manager.installed_plugins
+      #new_specs = manager.update_plugins(plugins)
+      #updated_plugins = manager.installed_plugins
+      #updated = {}
+      #installed_plugins.each do |name, info|
+      #  update = updated_plugins[name]
+      #  if update && update["installed_gem_version"] != info["installed_gem_version"]
+      #    updated[name] = update["installed_gem_version"]
+      #  end
+      #end
+      #if !updated.empty?
+      #  catapult_exception('Vagrant plugins were updated, please re-run your Vagrant command for the plugin updates to take effect.')
+      #end
     end
+
 
     # function: format bytes to megabytes and color code response based on soft and hard repo size limits
     def Command::format_repo_size(repo_size)
@@ -232,23 +239,24 @@ module Catapult
     version_virtualbox = `#{@vboxmanage} --version`.strip
     repo = `#{@git} config --get remote.origin.url`.strip
     branch = `#{@git} rev-parse --abbrev-ref HEAD`.strip
-    puts "=> CATAPULT VERSION: #{version["version"]}"
-    puts "=> CATAPULT GIT REPO: #{repo}"
-    puts "=> GIT BRANCH: #{branch}"
+    puts "==> CATAPULT VERSION: #{version["version"]}"
+    puts "==> CATAPULT GIT REPO: #{repo}"
+    puts "==> GIT BRANCH: #{branch}"
     puts "\n"
-    puts "==> WORKSTATION INFORMATION"
-    puts "=> OPERATING SYSTEM: #{RbConfig::CONFIG['host_os']}"
-    puts "=> GIT VERSION: #{version_git}"
-    puts "=> RUBY VERSION: #{RUBY_VERSION}"
-    puts "=> VAGRANT VERSION: #{Vagrant::VERSION}"
+    puts "[Workstation Information]"
+    puts " * Operating system: #{RbConfig::CONFIG['host_os']}"
+    puts " * Git version: #{version_git}"
+    puts " * Ruby version: #{RUBY_VERSION}"
+    puts " * Vagrant version: #{Vagrant::VERSION}"
+    puts " * Vagrant plugin versions:"
     pm = Vagrant::Plugin::Manager.new(
       Vagrant::Plugin::Manager.user_plugins_file
     )
     plugin_hash = pm.installed_plugins
     plugin_hash.each do |p|
-      puts "==> PLUGIN #{p[0]} VERSION: #{p[1]['installed_gem_version']}"
+      puts "   - #{p[0]} #{p[1]['installed_gem_version']}"
     end
-    puts "=> VIRTUALBOX VERSION: #{version_virtualbox}"
+    puts " * VirtualBox version: #{version_virtualbox}"
 
 
     # configure catapult and git
