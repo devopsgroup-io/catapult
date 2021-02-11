@@ -30,11 +30,13 @@ else
     # create temp file to define rsync exclusions
     tmpfile_rsync_exclusions=$(mktemp /tmp/catapult.rsync.$domain.XXXXXXXXXX)
 
-    cat "/catapult/provisioners/provisioners.yml" | shyaml get-values-0 software.apache.$(catapult websites.apache.$5.software).file_stores_rsync_exclude |
-    while read -r -d $'\0' file_stores_rsync_exclude; do
-        echo -e "exclude from file store sync: ${file_stores_rsync_exclude}"
-        echo "${file_stores_rsync_exclude}" >> "$tmpfile_rsync_exclusions"
-    done
+    if [ "$(provisioners_array software.apache.${software}.file_stores_rsync_exclude)" ]; then
+        cat "/catapult/provisioners/provisioners.yml" | shyaml get-values-0 software.apache.$(catapult websites.apache.$5.software).file_stores_rsync_exclude |
+        while read -r -d $'\0' file_stores_rsync_exclude; do
+            echo -e "exclude from file store sync: ${file_stores_rsync_exclude}"
+            echo "${file_stores_rsync_exclude}" >> "$tmpfile_rsync_exclusions"
+        done
+    fi
 
     # loop through each software file store
     cat "/catapult/provisioners/provisioners.yml" | shyaml get-values-0 software.apache.$(catapult websites.apache.$5.software).file_stores |
@@ -52,7 +54,7 @@ else
                 echo -e "- production:downstream file store does not exist"
             else
                 echo -e "- production:downstream file store size: $(( ${file_store_size} / 1024 ))MB"
-                cd "/var/www/repositories/apache/${domain}" && git check-ignore --quiet "${file_store}"
+                cd "/var/www/repositories/apache/${domain}" && git check-ignore --quiet "${file_store}" &> /dev/null
                 if [ $? -ne 0 ]; then
                     echo -e "- this file store is tracked in git"
                     if [ "${file_store_size}" -gt "${directory_size_maximum}" ]; then
@@ -76,7 +78,7 @@ else
                 echo -e "- test:upstream file store does not exist"
             else
                 echo -e "- test:upstream file store size: $(( ${file_store_size} / 1024 ))MB"
-                cd "/var/www/repositories/apache/${domain}" && git check-ignore --quiet "${file_store}"
+                cd "/var/www/repositories/apache/${domain}" && git check-ignore --quiet "${file_store}" &> /dev/null
                 if [ $? -ne 0 ]; then
                     echo -e "- this file store is tracked in git"
                     if [ "${file_store_size}" -gt "${directory_size_maximum}" ]; then

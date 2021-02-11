@@ -87,6 +87,17 @@ module Catapult
         logger.warn("Installing plugin #{p}")
         pm.install_plugin(p, sources: ["https://rubygems.org"])
       end
+      plugins.each do |p|
+        bundler = Vagrant::Bundler.new()
+        logger.warn("Checking for updates to plugin #{p}")
+        pm = Vagrant::Plugin::Manager.new(
+          Vagrant::Plugin::Manager.user_plugins_file
+        )
+        plugin_hash = pm.installed_plugins
+        if plugin_hash.has_key?(p)
+          bundler.update(plugin_hash, p, sources: ["https://rubygems.org"])
+        end
+      end
       if result
         catapult_exception('Required Vagrant plugins were installed, please re-run your Vagrant command for the plugins to take effect.')
       end
@@ -230,6 +241,13 @@ module Catapult
     puts "=> GIT VERSION: #{version_git}"
     puts "=> RUBY VERSION: #{RUBY_VERSION}"
     puts "=> VAGRANT VERSION: #{Vagrant::VERSION}"
+    pm = Vagrant::Plugin::Manager.new(
+      Vagrant::Plugin::Manager.user_plugins_file
+    )
+    plugin_hash = pm.installed_plugins
+    plugin_hash.each do |p|
+      puts "==> PLUGIN #{p[0]} VERSION: #{p[1]['installed_gem_version']}"
+    end
     puts "=> VIRTUALBOX VERSION: #{version_virtualbox}"
 
 
