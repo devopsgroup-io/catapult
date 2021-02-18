@@ -451,7 +451,7 @@ Bitbucket provides free private repositories and GitHub provides free public rep
 
 **Bamboo Configuration**
 
-To avoid having to manually configure the Bamboo project, plans, stages, jobs, and tasks configuration, you may optionally install and purchase the "Bob Swift Atlassian Add-ons - Bamboo CLI Connector" Bamboo add-on. Otherwise, the manual setup configuration steps are outlined below:
+To avoid having to manually configure the Bamboo project, plans, stages, jobs, and tasks configuration, you may optionally install and purchase the "Bob Swift Atlassian Add-ons - Bamboo Command Line Interface (CLI)" Bamboo add-on. Otherwise, the manual setup configuration steps are outlined below:
 
 1. Place your Bamboo username at `~/secrets/configuration.yml["company"]["bamboo_username"]`
     * Normally root for Bamboo Server

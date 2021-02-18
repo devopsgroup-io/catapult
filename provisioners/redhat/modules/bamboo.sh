@@ -1,5 +1,5 @@
 # define our bamboo version
-bamboo_version="5.15.7"
+bamboo_version="7.2.2"
 
 # install pywinrm for windows deployment support
 sudo pip install pywinrm --upgrade
@@ -20,29 +20,26 @@ if [ ! -d /usr/local/src/bamboo/atlassian-bamboo-${bamboo_version}/atlassian-bam
     mkdir --parents /usr/local/src/bamboo
     cd /usr/local/src/bamboo && curl --silent --show-error --connect-timeout 5 --output bamboo.tar.gz --retry 5 --location --url https://www.atlassian.com/software/bamboo/downloads/binary/atlassian-bamboo-${bamboo_version}.tar.gz
     cd /usr/local/src/bamboo && tar -xzf bamboo.tar.gz
-
+    rm -f /usr/local/src/bamboo/bamboo.tar.gz
 fi
 
-mkdir --parents /usr/local/src/bamboo/atlassian-bamboo
+mkdir --parents /usr/local/src/bamboo/bamboo-home/atlassian-bamboo-${bamboo_version}
 sudo cat > "/usr/local/src/bamboo/atlassian-bamboo-${bamboo_version}/atlassian-bamboo/WEB-INF/classes/bamboo-init.properties" << EOF
-    bamboo.home=/usr/local/src/bamboo/atlassian-bamboo
+    bamboo.home=/usr/local/src/bamboo/bamboo-home/atlassian-bamboo-${bamboo_version}
 EOF
 
 # run bamboo as port 80
-sed --in-place 's/:8085//g' /usr/local/src/bamboo/atlassian-bamboo/xml-data/configuration/administration.xml
 sed --in-place 's/port="8085"/port="80"/g' /usr/local/src/bamboo/atlassian-bamboo-${bamboo_version}/conf/server.xml
 
 # increase jvm maximum memory
 # https://confluence.atlassian.com/bamboo/configuring-your-system-properties-289277345.html
-sed --in-place --expression='s/JVM_MINIMUM_MEMORY="512m"/JVM_MINIMUM_MEMORY="768m"/g' /usr/local/src/bamboo/atlassian-bamboo-${bamboo_version}/bin/setenv.sh
-sed --in-place --expression='s/JVM_MAXIMUM_MEMORY="1024m"/JVM_MAXIMUM_MEMORY="2048m"/g' /usr/local/src/bamboo/atlassian-bamboo-${bamboo_version}/bin/setenv.sh
-sed --in-place --expression='s/JVM_REQUIRED_ARGS=""/JVM_REQUIRED_ARGS="-Datlassian.darkfeature.bamboo.experimental.rest.admin.enabled=true"/g' /usr/local/src/bamboo/atlassian-bamboo-${bamboo_version}/bin/setenv.sh
+sed --in-place --expression='s/JVM_MAXIMUM_MEMORY:=1024m/JVM_MAXIMUM_MEMORY:=2048m/g' /usr/local/src/bamboo/atlassian-bamboo-${bamboo_version}/bin/setenv.sh
 bash /usr/local/src/bamboo/atlassian-bamboo-${bamboo_version}/bin/setenv.sh
 
 # run bamboo as as service
 # https://confluence.atlassian.com/bamboo/running-bamboo-as-a-linux-service-416056046.html
 sudo sed "s/BAMBOO_VERSION/${bamboo_version}/g" "/catapult/provisioners/redhat/installers/bamboo/bamboo.sh" > "/etc/init.d/bamboo"
-# the damon may need to be reloaded for an upgrade
+# the daemon may need to be reloaded for an upgrade
 sudo systemctl daemon-reload
 # make the bamboo init script executable
 chmod a+x /etc/init.d/bamboo
@@ -50,9 +47,9 @@ chmod a+x /etc/init.d/bamboo
 sudo /sbin/chkconfig --add bamboo
 # enable bamboo on startup
 sudo systemctl enable bamboo
-# start bamboo
+# restart bamboo (rather than start in order to support version upgrades)
 #bash /usr/local/src/bamboo/atlassian-bamboo-${bamboo_version}/bin/start-bamboo.sh
-sudo systemctl start bamboo
+sudo systemctl restart bamboo
 
 # sleep a few seconds to allow start-bamboo.sh to start
 sleep 5
@@ -68,4 +65,4 @@ done
 echo "Bamboo successfully started"
 
 # echo out configuration, which includes the IP address of the bamboo instance
-cat /usr/local/src/bamboo/atlassian-bamboo/bamboo.cfg.xml
+cat /usr/local/src/bamboo/bamboo-home/atlassian-bamboo-${bamboo_version}/bamboo.cfg.xml

@@ -1,0 +1,7 @@
+Copyright (c) 2005, 2020 Appfire Technologies, LLC.
+All rights reserved.
+
+This software is licensed under the provisions of the "Bob Swift Atlassian App EULA"
+(https://bobswift.atlassian.net/wiki/x/WoDXBQ) as well as under the provisions of
+the "Standard EULA" from the "Atlassian Marketplace Terms of Use" as a "Marketplace Product"
+(http://www.atlassian.com/licensing/marketplace/termsofuse).
