@@ -1006,7 +1006,7 @@ module Catapult
             end
           end
           # configure: project/plan
-          api_bamboo_cli_result_plan = `#{@api_bamboo_cli} --server #{@configuration["company"]["bamboo_base_url"]} --password #{@configuration["company"]["bamboo_password"]} --user #{@configuration["company"]["bamboo_username"]} --action createPlan --projectName "Catapult" --plan "#{plan}" #{@api_bamboo_cli_redirect}`; result=$?.success?
+          api_bamboo_cli_result_plan = `#{@api_bamboo_cli} --server #{@configuration["company"]["bamboo_base_url"]} --password #{@configuration["company"]["bamboo_password"]} --user #{@configuration["company"]["bamboo_username"]} --action createPlan --projectName "Catapult" --plan "#{plan}" --options addDefaultJob #{@api_bamboo_cli_redirect}`; result=$?.success?
           if ! api_bamboo_cli_result_plan.strip.include?("error")
             puts "   - #{api_bamboo_cli_result_plan.strip}"
           end
@@ -1029,16 +1029,6 @@ module Catapult
               api_bamboo_cli_result_plan_triggers = `#{@api_bamboo_cli} --server #{@configuration["company"]["bamboo_base_url"]} --password #{@configuration["company"]["bamboo_password"]} --user #{@configuration["company"]["bamboo_username"]} --action addTrigger --plan "#{plan}" --type "remote" --ipRestriction "18.205.93.0/25,18.234.32.128/25,13.52.5.0/25,192.30.252.0/22,185.199.108.0/22,140.82.112.0/20" #{@api_bamboo_cli_redirect}`; result=$?.success?
               puts "   - #{api_bamboo_cli_result_plan_triggers.strip}"
             end
-          end
-          # configure: stage
-          api_bamboo_cli_result_stage = `#{@api_bamboo_cli} --server #{@configuration["company"]["bamboo_base_url"]} --password #{@configuration["company"]["bamboo_password"]} --user #{@configuration["company"]["bamboo_username"]} --action addStage --plan "#{plan}" --stage "Default Stage" #{@api_bamboo_cli_redirect}`; result=$?.success?
-          if ! api_bamboo_cli_result_stage.strip.include?("error")
-            puts "   - #{api_bamboo_cli_result_stage.strip}"
-          end
-          # configure: job
-          api_bamboo_cli_result_job = `#{@api_bamboo_cli} --server #{@configuration["company"]["bamboo_base_url"]} --password #{@configuration["company"]["bamboo_password"]} --user #{@configuration["company"]["bamboo_username"]} --action addJob --plan "#{plan}" --stage "Default Stage" --job "Job 1" #{@api_bamboo_cli_redirect}`; result=$?.success?
-          if ! api_bamboo_cli_result_job.strip.include?("error")
-            puts "   - #{api_bamboo_cli_result_job.strip}"
           end
           # configure: tasks
           # https://bobswift.atlassian.net/wiki/display/BCLI/Examples+for+AddTask+Action
@@ -1112,25 +1102,21 @@ module Catapult
         puts " * Could not validate your Bamboo CLI license, please ensure the Bamboo CLI Connector add-on is installed with a valid license. Otherwise, you will need to manually manage the configuration of the Bamboo project, plans, stages, jobs, and tasks.".color(Colors::YELLOW)
       end
       # https://developer.atlassian.com/server/bamboo/rest-apis/
+      # https://docs.atlassian.com/atlassian-bamboo/REST/7.2.2/
       puts "[Bamboo API]"
       if @configuration["company"]["bamboo_base_url"] == nil || @configuration["company"]["bamboo_username"] == nil || @configuration["company"]["bamboo_password"] == nil
         catapult_exception("Please set [\"company\"][\"bamboo_base_url\"] and [\"company\"][\"bamboo_username\"] and [\"company\"][\"bamboo_password\"] in secrets/configuration.yml")
       else
         # global permissions
         begin
-          uri = URI("#{@configuration["company"]["bamboo_base_url"]}rest/admin/latest/permissions/roles?name=ROLE_ANONYMOUS")
+          uri = URI("#{@configuration["company"]["bamboo_base_url"]}rest/api/latest/permissions/global/roles/ANONYMOUS")
           Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
-            request = Net::HTTP::Post.new uri.request_uri
+            request = Net::HTTP::Delete.new uri.request_uri
             request.basic_auth "#{@configuration["company"]["bamboo_username"]}", "#{@configuration["company"]["bamboo_password"]}"
             request.add_field "Content-Type", "application/json"
-            request.body = ""\
-              "{"\
-                "\"self\":\"#{@configuration["company"]["bamboo_base_url"]}rest/admin/latest/permissions/roles?name=ROLE_ANONYMOUS\","\
-                "\"name\":\"ROLE_ANONYMOUS\","\
-                "\"permissions\":[]"\
-              "}"
+            request.body = "[\"READ\"]"
             response = http.request(request)
-            if response.code.to_f.between?(399,499)
+            if response.code.to_f.between?(399,403)
               catapult_exception("#{response.code} The Bamboo Admin API could not authenticate, please verify [\"company\"][\"bamboo_base_url\"] and [\"company\"][\"bamboo_username\"] and [\"company\"][\"bamboo_password\"]. If the credentials are correct, you may need to login to Bamboo #{@configuration["company"]["bamboo_base_url"]} and provide an answer to a CAPTCHA.")
             elsif response.code.to_f === 404
               catapult_exception("#{response.code} The Bamboo Admin API is not enabled, please provision and restart your Bamboo build server.")
@@ -1139,57 +1125,6 @@ module Catapult
             else
               puts " * Bamboo Admin API authenticated successfully."
               puts "   - Successfully configured Bamboo global permissions settings."
-            end
-          end
-        rescue Net::ReadTimeout => ex
-          puts " * The Bamboo API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
-          puts "   - Error was: #{ex.class}".color(Colors::RED)
-        rescue Errno::ETIMEDOUT => ex
-          puts " * The Bamboo API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
-          puts "   - Error was: #{ex.class}".color(Colors::RED)
-        rescue Errno::ECONNREFUSED => ex
-          puts " * The Bamboo API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
-          puts "   - Error was: #{ex.class}".color(Colors::RED)
-        end
-        #uri = URI("#{@configuration["company"]["bamboo_base_url"]}rest/admin/latest/permissions/roles?name=ROLE_ANONYMOUS")
-        #Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
-        #  request = Net::HTTP::Get.new uri.request_uri
-        #  request.basic_auth "#{@configuration["company"]["bamboo_username"]}", "#{@configuration["company"]["bamboo_password"]}"
-        #  response = http.request(request)
-        #  puts response.body
-        #end
-        # smtp
-        # https://jira.atlassian.com/browse/BAM-9344?page=com.atlassian.jira.plugin.system.issuetabpanels%3Acomment-tabpanel&showAll=true
-        begin
-          uri = URI("#{@configuration["company"]["bamboo_base_url"]}rest/admin/latest/config/mailServer")
-          Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
-            request = Net::HTTP::Put.new uri.request_uri
-            request.basic_auth "#{@configuration["company"]["bamboo_username"]}", "#{@configuration["company"]["bamboo_password"]}"
-            request.add_field "Content-Type", "application/json"
-            request.body = ""\
-              "{"\
-                "\"self\":\"#{@configuration["company"]["bamboo_base_url"]}rest/admin/latest/config/mailServer\","\
-                "\"name\":\"Bamboo\","\
-                "\"fromAddress\":\"#{@configuration["company"]["email"]}\","\
-                "\"subjectPrefix\":\"[Bamboo]\","\
-                "\"precedenceBulkHeaderExcluded\":false,"\
-                "\"emailSetting\":\"SMTP\","\
-                "\"smtpServer\":\"smtp.sendgrid.net\","\
-                "\"smtpPort\":\"587\","\
-                "\"smtpUsername\":\"#{@configuration["company"]["sendgrid_username"]}\","\
-                "\"smtpPassword\":\"#{@configuration["company"]["sendgrid_password"]}\","\
-                "\"tlsEnabled\":true"\
-              "}"
-            response = http.request(request)
-            if response.code.to_f.between?(399,401)
-              catapult_exception("#{response.code} The Bamboo Admin API could not authenticate, please verify [\"company\"][\"bamboo_base_url\"] and [\"company\"][\"bamboo_username\"] and [\"company\"][\"bamboo_password\"]. If the credentials are correct, you may need to login to Bamboo #{@configuration["company"]["bamboo_base_url"]} and provide an answer to a CAPTCHA.")
-            elsif response.code.to_f === 404
-              catapult_exception("#{response.code} The Bamboo Admin API is not enabled, please provision and restart your Bamboo build server.")
-            elsif response.code.to_f.between?(500,600)
-              puts " * Bamboo Admin API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
-            else
-              puts " * Bamboo Admin API authenticated successfully."
-              puts "   - Successfully configured Bamboo SMTP settings."
             end
           end
         rescue Net::ReadTimeout => ex

@@ -441,7 +441,7 @@ Bitbucket provides free private repositories and GitHub provides free public rep
     * The initial `up` will take some time for, please be patient
 4. Login to DigitalOcean to obtain the IP address of the virtual machine to access via URL
     * Place your Bamboo base URL at `~/secrets/configuration.yml["company"]["bamboo_base_url"]`, the format should be http://[digitalocean-ip-here]/
-5. Once your Bamboo Server instance is accessible via URL, you will be prompted with a license prompt, enter your license.
+5. Once your Bamboo Server instance is accessible via URL, you will be prompted with a license prompt, enter your license. Select Express installation.
 6. You will next be prompted to enter the following information:
     * Username (required) - root
     * Password (required) - specify a complex password
@@ -451,14 +451,17 @@ Bitbucket provides free private repositories and GitHub provides free public rep
 
 **Bamboo Configuration**
 
-To avoid having to manually configure the Bamboo project, plans, stages, jobs, and tasks configuration, you may optionally install and purchase the "Bob Swift Atlassian Add-ons - Bamboo Command Line Interface (CLI)" Bamboo add-on. Otherwise, the manual setup configuration steps are outlined below:
-
 1. Place your Bamboo username at `~/secrets/configuration.yml["company"]["bamboo_username"]`
     * Normally root for Bamboo Server
 2. Place your Bamboo password at `~/secrets/configuration.yml["company"]["bamboo_password"]`
-3. Disable anonymous user access by clicking the gear at the top right and going to Overview
+
+To avoid having to manually configure the Bamboo project, plans, stages, jobs, and tasks configuration, you may optionally install and purchase the "Bob Swift Atlassian Add-ons - Bamboo Command Line Interface (CLI)" Bamboo add-on. To install, click the settings gear top right, and click "Manage apps". Once the add-on is installed, by running a `vagrant status`, Catapult will automatically detect its existance and automatically configure settings required.
+
+Otherwise, the manual setup configuration steps are outlined below:
+
+1. Disable anonymous user access by clicking the gear at the top right and going to Overview
     1. Next, under Security, go to Global permissions and remove Access from Anonymous Users
-4. Click Create > Create a new plan from the top navigation:
+2. Click Create > Create a new plan from the top navigation:
     1. **Create Catapult Project and create BUILD Plan**
         * *Project and build plan name*
             1. Project > New Project

@@ -12,7 +12,8 @@ java -version
 if [ ! -d /usr/local/src/bamboo/atlassian-bamboo-${bamboo_version}/atlassian-bamboo ]; then
 
     # stop bamboo to accomodate an upgrade
-    #sudo systemctl stop bamboo
+    sudo systemctl stop bamboo
+
     # if bamboo fails to stop, kill java
     #sleep 60
     #pkill -9 java
