@@ -1,0 +1,66 @@
+
+   For license information, see LICENSE files included with
+   this distribution as well as LICENSE files packaged in
+   the various jar files included with this distribution.
+
+   This product includes software originally developed by
+   Bob Swift and Bob Swift Software, LLC.
+   License is BSD (http://www.opensource.org/licenses/bsd-license.php).
+
+   This distribution includes binary distributions from
+   other providers including, but not limited to, the following:
+
+   This product includes software developed by
+   The Apache Software Foundation (http://www.apache.org/).
+
+   This product includes software developed by
+   Martian Software, Inc. (http://www.martiansoftware.com).
+
+   This product includes software developed by
+   PostgreSQL Global Development Group. (http://jdbc.postgresql.org).
+
+   This product includes software provided by
+   JSON.simple (http://code.google.com/p/json-simple).
+
+   This product includes software provided by
+   Jonathan Hedley (https://github.com/jhy/jsoup).
+
+   This product includes software provided by
+   Atlassian Pty Ltd and Vladimir Schneider (https://github.com/vsch/flexmark-java).
+
+   This product includes software provided by
+   Robin Stocker (https://github.com/robinst/autolink-java).
+
+   This product includes software provided by
+   Sven van der Meer (https://github.com/vdmeer/asciitable).
+
+   This product includes software provided by
+   Antlr.org, Terence Parr and Sam Harwell (http://www.antlr.org/).
+
+   This product includes software provided by
+   javalin.io, David Tipsy and others (https://javalin.io/).
+
+   This product includes software provided by
+   Eclipse Foundation, (https://www.eclipse.org/jetty).
+
+   This product includes software provided by
+   JetBrains, (https://github.com/JetBrains/kotlin).
+
+   This product includes software provided by
+   json-path, (https://github.com/json-path/JsonPath).
+
+   This product includes software provided by
+   org.slf4j, (http://www.slf4j.org/).
+
+   This product includes software provided by
+   net.minidev, (https://github.com/netplex/json-smart-v2).
+
+   This product includes software provided by
+   Google, (https://github.com/google/gson).
+
+   This product includes software provided by
+   Open JS Foundation, (https://nodejs.org/).
+
+   This product includes software provided by
+   various NPM libraries used for the ACLI builder,
+   see LICENSE-BUILDER.txt for more details.

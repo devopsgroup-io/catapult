@@ -1,10 +1,12 @@
 ---
-version: 3.216.17
+version: 4.1.1
 major:
-    description: "Catapult uses Semantic Versioning. During a MAJOR increment, incompatable API changes are made which require a manual upgrade path. Please follow these directions:"
-    notice: "NEW MAJOR VERSION OF CATAPULT AVAILABLE"
-    3:
-        2: "The structure of ~/provisioners/redhat/provisioners.yml has changed. The first time that an existing server receives Catapult v3, the build will fail, and will need to be started again."
-        1: "The structure of ~/provisioners/redhat/provisioners.yml has changed. The first time that an existing server receives Catapult v3, the build will fail, and will need to be started again."
-    2:
-        1: "~/provisioners/redhat/apache.sh and ~/provisioners/redhat/mysql.sh were replaced by the provisioner system. The first time that an existing server receives Catapult v2, the build will fail, and will need to be started again."
+  description: "Catapult uses Semantic Versioning. During a MAJOR increment, incompatable API changes are made which require a manual upgrade path. Please follow these directions:"
+  notice: "NEW MAJOR VERSION OF CATAPULT AVAILABLE"
+  4:
+    1: "Bamboo Server has been upgraded from 5.15.7 to 7.2.2. Once you've merged this major Catapult version into your Catapult's develop branch, please provision your build server. Once provisioned, visit your build server's IP address and follow the Bamboo Configuration instructions in the README."
+  3:
+    2: "The structure of ~/provisioners/redhat/provisioners.yml has changed. The first time that an existing server receives Catapult v3, the build will fail, and will need to be started again."
+    1: "The structure of ~/provisioners/redhat/provisioners.yml has changed. The first time that an existing server receives Catapult v3, the build will fail, and will need to be started again."
+  2:
+    1: "~/provisioners/redhat/apache.sh and ~/provisioners/redhat/mysql.sh were replaced by the provisioner system. The first time that an existing server receives Catapult v2, the build will fail, and will need to be started again."
