@@ -454,6 +454,9 @@ Bitbucket provides free private repositories and GitHub provides free public rep
 1. Place your Bamboo username at `~/secrets/configuration.yml["company"]["bamboo_username"]`
     * Normally root for Bamboo Server
 2. Place your Bamboo password at `~/secrets/configuration.yml["company"]["bamboo_password"]`
+3. Allow anonymous users to trigger remote repository change detection by clicking the gear at the top right and going to Overview
+   1. Next, under Security, go to Security settings and click the Edit button at the bottom
+   2. Check the "Allow anonymous users to trigger remote repository change detection and Bamboo Specs detection" setting and click Save
 
 To avoid having to manually configure the Bamboo project, plans, stages, jobs, and tasks configuration, you may optionally install and purchase the "Bob Swift Atlassian Add-ons - Bamboo Command Line Interface (CLI)" Bamboo add-on. To install, click the settings gear top right, and click "Manage apps". Once the add-on is installed, by running a `vagrant status`, Catapult will automatically detect its existance and automatically configure settings required.
 
