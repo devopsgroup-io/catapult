@@ -48,9 +48,9 @@ chmod a+x /etc/init.d/bamboo
 sudo /sbin/chkconfig --add bamboo
 # enable bamboo on startup
 sudo systemctl enable bamboo
-# restart bamboo (rather than start in order to support version upgrades)
+# start bamboo
 #bash /usr/local/src/bamboo/atlassian-bamboo-${bamboo_version}/bin/start-bamboo.sh
-sudo systemctl restart bamboo
+sudo systemctl start bamboo
 
 # sleep a few seconds to allow start-bamboo.sh to start
 sleep 5

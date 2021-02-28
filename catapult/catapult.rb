@@ -360,6 +360,7 @@ module Catapult
         @version_this = YAML.load_file("VERSION.yml")
         @version_this_integer = @version_this["version"].to_i
         @version_upstream = YAML.load(`#{@git} show upstream/master:VERSION.yml`)
+        @version_upstream_parsed = @version_upstream["version"].split(".")
         @version_upstream_integer = @version_upstream["version"].to_i
         if @version_upstream_integer > @version_this_integer
           puts "\n"
@@ -368,7 +369,7 @@ module Catapult
           puts " * This Catapult instance is version #{@version_this["version"]}"
           puts " * Catapult version #{@version_upstream["version"]} is available"
           puts "The upgrade path warning from MAJOR version #{@version_this["version"].to_i} to #{@version_upstream["version"].to_i} is:"
-          puts " * #{@version_upstream["major"][@version_upstream_integer][@version_this_integer]}"
+          puts " * #{@version_upstream["major"][@version_upstream_parsed[0].to_i][@version_upstream_parsed[1].to_i]}"
           puts "Given that you are prepared for the above, please follow these instructions to upgrade manually from within the root of Catapult:"
           puts " * `#{@git} pull --no-edit --strategy-option=theirs upstream master`"
           puts " * `#{@git} push origin develop`"
