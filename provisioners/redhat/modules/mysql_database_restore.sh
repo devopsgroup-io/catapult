@@ -39,8 +39,8 @@ if ([ ! -z "${software}" ]); then
         else
             echo -e "\t* ~/_sql directory exists, looking for a valid database dump to restore from"
             filenewest_lock=$(ls "/var/www/repositories/apache/${domain}/_sql" | grep -E ^[0-9]{8}\.sql\.lock$ | sort --numeric-sort | tail -1)
-            filenewest=${filenewest_lock::-5}
-            if ([ -f "/var/www/repositories/apache/${domain}/_sql/${filenewest}" ] && [ -f "/var/www/repositories/apache/${domain}/_sql/${filenewest_lock}" ]); then
+            if ([ -f "/var/www/repositories/apache/${domain}/_sql/${filenewest_lock::-5}" ] && [ -f "/var/www/repositories/apache/${domain}/_sql/${filenewest_lock}" ]); then
+                filenewest=${filenewest_lock::-5}
                 # drop the database
                 for database in $(mysql --defaults-extra-file=$dbconf -e "show databases" | egrep -v "Database|mysql|information_schema|performance_schema"); do
                     if [ ${database} = ${1}_${domain_valid_db_name} ]; then
@@ -111,7 +111,7 @@ if ([ ! -z "${software}" ]); then
                  || [ "${software}" = "xenforo1" ] \
                  || [ "${software}" = "xenforo2" ] \
                  || [ "${software}" = "zendframework2" ]); then
-                    echo -e "\t- replacing URLs in the database to align with the enivronment..."
+                    echo -e "\t- replacing URLs in the database to align with the environment..."
                     replacements=$(grep --extended-regexp --only-matching --regexp=":\/\/(www\.)?(dev\.|test\.|qc\.)?(${domain_url_replace})" "/var/www/repositories/apache/${domain}/_sql/${filenewest}" | wc --lines)
                     sed --regexp-extended --expression="s/:\/\/(www\.)?(dev\.|test\.|qc\.)?(${domain_url_replace})/:\/\/\1${domain_url}/g" "/var/www/repositories/apache/${domain}/_sql/${filenewest}" > "/var/www/repositories/apache/${domain}/_sql/${1}.${filenewest}"
                     echo -e "\t- found and replaced ${replacements} occurrences"
@@ -127,11 +127,11 @@ if ([ ! -z "${software}" ]); then
                 # necessary for PHP serialized arrays
                 # for software with a cli tool for database url reference replacements, use cli tool to post-process database and replace url references
                 if ([ "${software}" = "wordpress4" ]); then
-                    echo -e "\t- replacing URLs in the database to align with the enivronment..."
+                    echo -e "\t- replacing URLs in the database to align with the environment..."
                     wp-cli-php71 --allow-root --path="/var/www/repositories/apache/${domain}/${webroot}" search-replace ":\/\/(www\.)?(dev\.|test\.|qc\.)?(${domain_url_replace})" "://\$1${domain_url}" --regex | sed "s/^/\t\t/"
                 fi
                 if ([ "${software}" = "wordpress5" ]); then
-                    echo -e "\t- replacing URLs in the database to align with the enivronment..."
+                    echo -e "\t- replacing URLs in the database to align with the environment..."
                     wp-cli-php72 --allow-root --path="/var/www/repositories/apache/${domain}/${webroot}" search-replace ":\/\/(www\.)?(dev\.|test\.|qc\.)?(${domain_url_replace})" "://\$1${domain_url}" --regex | sed "s/^/\t\t/"
                 fi
             fi
@@ -143,8 +143,8 @@ if ([ ! -z "${software}" ]); then
     # we look for the newest possible _software_dbtable_retain database sql file and restore
     if ([ ! -z "${software}" ] && [ "${software_workflow}" = "upstream" ] && [ "${software_db}" != "" ] && [ "${software_db_tables}" != "0" ]); then
         filenewest_lock=$(ls "/var/www/repositories/apache/${domain}/_sql" | grep -E ^[0-9]{8}_software_dbtable_retain\.sql\.lock$ | sort --numeric-sort | tail -1)
-        filenewest=${filenewest_lock::-5}
-        if ([ -f "/var/www/repositories/apache/${domain}/_sql/${filenewest}" ] && [ -f "/var/www/repositories/apache/${domain}/_sql/${filenewest_lock}" ]); then
+        if ([ -f "/var/www/repositories/apache/${domain}/_sql/${filenewest_lock::-5}" ] && [ -f "/var/www/repositories/apache/${domain}/_sql/${filenewest_lock}" ]); then
+            filenewest=${filenewest_lock::-5}
             echo -e "\t- found ${filenewest_lock}"
             echo -e "\t- found ${filenewest}"
             echo -e "\t- restoring..."
