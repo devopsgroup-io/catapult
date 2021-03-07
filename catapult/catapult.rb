@@ -1025,10 +1025,56 @@ module Catapult
           # https://developer.github.com/changes/2019-03-29-webhooks-ip-changes/
           # https://api.github.com/meta
           if plan.include?("TEST")
-            api_bamboo_cli_result_plan_triggers = `#{@api_bamboo_cli} --server #{@configuration["company"]["bamboo_base_url"]} --password #{@configuration["company"]["bamboo_password"]} --user #{@configuration["company"]["bamboo_username"]} --action getTriggerList --plan "#{plan}" #{@api_bamboo_cli_redirect}`; result=$?.success?
-            if ! api_bamboo_cli_result_plan_triggers.strip.include?("18.205.93.0/25,18.234.32.128/25,13.52.5.0/25,192.30.252.0/22,185.199.108.0/22,140.82.112.0/20")
-              api_bamboo_cli_result_plan_triggers = `#{@api_bamboo_cli} --server #{@configuration["company"]["bamboo_base_url"]} --password #{@configuration["company"]["bamboo_password"]} --user #{@configuration["company"]["bamboo_username"]} --action addTrigger --plan "#{plan}" --type "remote" --ipRestriction "18.205.93.0/25,18.234.32.128/25,13.52.5.0/25,192.30.252.0/22,185.199.108.0/22,140.82.112.0/20" #{@api_bamboo_cli_redirect}`; result=$?.success?
-              puts "   - #{api_bamboo_cli_result_plan_triggers.strip}"
+            @ip_ranges_bitbucket = []
+            uri = URI("https://ip-ranges.atlassian.com/")
+            Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
+              request = Net::HTTP::Get.new uri.request_uri
+              response = http.request(request)
+              if response.code.to_f.between?(399,600)
+                puts "   - BitBucket IP Ranges API appears to be offline.".color(Colors::RED)
+              else
+                puts "   - BitBucket IP Ranges loaded successfully."
+                @api_ip_bitbucket = JSON.parse(response.body)
+                if @api_ip_bitbucket
+                  @api_ip_bitbucket['items'].each do |iprange|
+                    @ip_ranges_bitbucket.push "#{iprange["cidr"]}"
+                  end
+                end
+              end
+            end
+
+            @ip_ranges_github = []
+              uri = URI("https://api.github.com/meta")
+              Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
+                request = Net::HTTP::Get.new uri.request_uri
+                response = http.request(request)
+                if response.code.to_f.between?(399,600)
+                  puts "   - GitHub Meta API appears to be offline.".color(Colors::RED)
+                else
+                  puts "   - GitHub Meta API loaded successfully."
+                  @api_ip_github = JSON.parse(response.body)
+                  if @api_ip_github
+                    @api_ip_github['hooks'].each do |iprange|
+                      @ip_ranges_github.push "#{iprange}"
+                    end
+                  end
+                end
+              end
+
+            @ip_ranges_bitbucket_formatted = @ip_ranges_bitbucket.join(",")
+            @ip_ranges_github_formatted = @ip_ranges_github.join(",")
+
+            # configure webhook ip ranges only when both API calls have succeeded
+            if @ip_ranges_bitbucket_formatted and @ip_ranges_github_formatted
+              @ip_ranges_formatted = @ip_ranges_bitbucket_formatted + "," + @ip_ranges_github_formatted
+
+              api_bamboo_cli_result_plan_triggers = `#{@api_bamboo_cli} --server #{@configuration["company"]["bamboo_base_url"]} --password #{@configuration["company"]["bamboo_password"]} --user #{@configuration["company"]["bamboo_username"]} --action getTriggerList --plan "#{plan}" #{@api_bamboo_cli_redirect}`; result=$?.success?
+              if ! api_bamboo_cli_result_plan_triggers.strip.include?(@ip_ranges_formatted)
+                api_bamboo_cli_result_plan_triggers = `#{@api_bamboo_cli} --server #{@configuration["company"]["bamboo_base_url"]} --password #{@configuration["company"]["bamboo_password"]} --user #{@configuration["company"]["bamboo_username"]} --action addTrigger --plan "#{plan}" --type "remote" --ipRestriction "#{@ip_ranges_formatted}" #{@api_bamboo_cli_redirect}`; result=$?.success?
+                puts "   - #{api_bamboo_cli_result_plan_triggers.strip}"
+              end
+            else
+              puts " - Webhook configuration will be skipped until both IP range APIs are available.".color(Colors::RED)
             end
           end
           # configure: tasks
