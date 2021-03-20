@@ -1,5 +1,5 @@
 /*.lock
-/catapult/installers/run-test-build.rb
+/catapult/calcium-build.rb
 /provisioners/redhat/certs/
 /secrets/configuration.yml
 /secrets/configuration.yml.compare
