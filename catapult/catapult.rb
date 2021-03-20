@@ -2086,7 +2086,7 @@ module Catapult
     end
 
     working_dir = Dir.pwd
-    File.write('catapult/installers/run-test-build.rb',
+    File.write('catapult/catapult-build.rb',
     "#!/usr/bin/env ruby
     require 'yaml'
 
@@ -2121,7 +2121,7 @@ module Catapult
         puts 'The Catapult configuration is not decrypted. Skipping attempt to queue build job for TEST environment...'
     end
     ")
-    File.chmod(0755,'catapult/installers/run-test-build.rb')
+    File.chmod(0755,'catapult/catapult-build.rb')
 
 
 
@@ -2630,7 +2630,7 @@ module Catapult
         FileUtils.mkdir_p("repositories/apache/#{instance['domain']}/.git/hooks")
         File.write("repositories/apache/#{instance['domain']}/.git/hooks/post-commit",
         "#!/usr/bin/env ruby
-        system('#{working_dir}/catapult/installers/run-test-build.rb')
+        system('#{working_dir}/catapult/catapult-build.rb')
         ")
         File.chmod(0777,"repositories/apache/#{instance['domain']}/.git/hooks/post-commit")
       end
@@ -2649,7 +2649,7 @@ module Catapult
         FileUtils.mkdir_p("repositories/iis/#{instance['domain']}/.git/hooks")
         File.write("repositories/iis/#{instance['domain']}/.git/hooks/post-commit",
         "#!/usr/bin/env ruby
-        system('#{working_dir}/catapult/installers/run-test-build.rb')
+        system('#{working_dir}/catapult/catapult-build.rb')
         ")
         File.chmod(0777,"repositories/iis/#{instance['domain']}/.git/hooks/post-commit")
       end
