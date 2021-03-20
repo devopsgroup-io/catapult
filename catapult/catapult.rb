@@ -2145,6 +2145,44 @@ module Catapult
       end
     end
 
+    working_dir = Dir.pwd
+    File.write('catapult/installers/run-test-build.rb',
+    "#!/usr/bin/env ruby
+    require 'yaml'
+
+    if File.exist?(File.expand_path('#{working_dir}/secrets/configuration.yml'))
+      @configuration = YAML.load_file('#{working_dir}/secrets/configuration.yml')
+
+      if (RbConfig::CONFIG['host_os'] =~ /mswin|msys|mingw|cygwin|bccwin|wince|emc/)
+        @environment = :windows
+      else (RbConfig::CONFIG['host_os'] =~ /darwin|mac os|linux|solaris|bsd/)
+        @environment = :posix
+      end
+
+      if @environment == :posix
+        @api_bamboo_cli = '#{working_dir}/catapult/installers/atlassian-cli-9.5.0/acli.sh bamboo'
+        @api_bamboo_cli_redirect = '2>&1'
+      elsif @environment == :windows
+        @api_bamboo_cli = '#{working_dir}/catapult/installers/atlassian-cli-9.5.0/acli.bat bamboo'
+        @api_bamboo_cli_redirect = '2>'
+      end
+
+      api_bamboo_cli_result = `\#{@api_bamboo_cli} --server \#{@configuration['company']['bamboo_base_url']} --password \#{@configuration['company']['bamboo_password']} --user \#{@configuration['company']['bamboo_username']} --action queueBuild --plan CAT-TEST \#{@api_bamboo_cli_redirect}`; result=$?.success?
+      if api_bamboo_cli_result.strip.include?('Connection refused')
+        puts 'The Bamboo CLI seems to be down. Skipping attempt to queue build job for TEST environment...'
+      elsif api_bamboo_cli_result.strip.include?('401')
+        puts \"The Bamboo CLI could not authenticate. This likely means you need to login to Bamboo as \#{@configuration['company']['bamboo_username']} at \#{@configuration['company']['bamboo_base_url']} and provide an answer to a CAPTCHA challenge.\"
+      elsif ! result
+        puts 'The attempt to queue a build for the TEST environment failed. This likely means a build is already running.'
+      else
+        puts \"Bamboo build for test environment queued successfully: \#{api_bamboo_cli_result}\"
+      end
+    else
+        puts 'The Catapult configuration is not decrypted. Skipping attempt to queue build job for TEST environment...'
+    end
+    ")
+    File.chmod(0755,'catapult/installers/run-test-build.rb')
+
 
 
     # remove unique lock file
@@ -2733,7 +2771,7 @@ module Catapult
 
 
 
-    # create arrays of domains for localdev hosts file
+    # create arrays of domains for localdev hosts file & setup post-commit hook to queue test environment build
     @dev_redhat_hosts = Array.new
     unless @configuration["websites"]["apache"] == nil
       @configuration["websites"]["apache"].each do |instance|
@@ -2744,6 +2782,13 @@ module Catapult
           @dev_redhat_hosts.push("dev.#{instance["domain"]}.#{instance["domain_tld_override"]}")
           @dev_redhat_hosts.push("www.dev.#{instance["domain"]}.#{instance["domain_tld_override"]}")
         end
+
+        FileUtils.mkdir_p("repositories/apache/#{instance['domain']}/.git/hooks")
+        File.write("repositories/apache/#{instance['domain']}/.git/hooks/post-commit",
+        "#!/usr/bin/env ruby
+        system('#{working_dir}/catapult/installers/run-test-build.rb')
+        ")
+        File.chmod(0777,"repositories/apache/#{instance['domain']}/.git/hooks/post-commit")
       end
     end
     @dev_windows_hosts = Array.new
@@ -2756,6 +2801,13 @@ module Catapult
           @dev_windows_hosts.push("dev.#{instance["domain"]}.#{instance["domain_tld_override"]}")
           @dev_windows_hosts.push("www.dev.#{instance["domain"]}.#{instance["domain_tld_override"]}")
         end
+
+        FileUtils.mkdir_p("repositories/iis/#{instance['domain']}/.git/hooks")
+        File.write("repositories/iis/#{instance['domain']}/.git/hooks/post-commit",
+        "#!/usr/bin/env ruby
+        system('#{working_dir}/catapult/installers/run-test-build.rb')
+        ")
+        File.chmod(0777,"repositories/iis/#{instance['domain']}/.git/hooks/post-commit")
       end
     end
 
