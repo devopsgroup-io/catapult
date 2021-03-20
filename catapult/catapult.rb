@@ -1017,66 +1017,6 @@ module Catapult
             api_bamboo_cli_result_plan_triggers = `#{@api_bamboo_cli} --server #{@configuration["company"]["bamboo_base_url"]} --password #{@configuration["company"]["bamboo_password"]} --user #{@configuration["company"]["bamboo_username"]} --action addTrigger --plan "#{plan}" --type "scheduled" --schedule "#{@api_bamboo_cli_environment_trigger_time}" --field "custom.triggerrCondition.plansGreen.plan=#{@api_bamboo_cli_environment_trigger_conditions}" #{@api_bamboo_cli_redirect}`; result=$?.success?
             puts "   - #{api_bamboo_cli_result_plan_triggers.strip}"
           end
-          # configure: trigger: remote
-          # bitbucket
-          # https://confluence.atlassian.com/bitbucket/what-are-the-bitbucket-cloud-ip-addresses-i-should-use-to-configure-my-corporate-firewall-343343385.html
-          # https://ip-ranges.atlassian.com/
-          # github
-          # https://developer.github.com/changes/2019-03-29-webhooks-ip-changes/
-          # https://api.github.com/meta
-          if plan.include?("TEST")
-            @ip_ranges_bitbucket = []
-            uri = URI("https://ip-ranges.atlassian.com/")
-            Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
-              request = Net::HTTP::Get.new uri.request_uri
-              response = http.request(request)
-              if response.code.to_f.between?(399,600)
-                puts "   - BitBucket IP Ranges API appears to be offline.".color(Colors::RED)
-              else
-                puts "   - BitBucket IP Ranges loaded successfully."
-                @api_ip_bitbucket = JSON.parse(response.body)
-                if @api_ip_bitbucket
-                  @api_ip_bitbucket['items'].each do |iprange|
-                    @ip_ranges_bitbucket.push "#{iprange["cidr"]}"
-                  end
-                end
-              end
-            end
-
-            @ip_ranges_github = []
-              uri = URI("https://api.github.com/meta")
-              Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
-                request = Net::HTTP::Get.new uri.request_uri
-                response = http.request(request)
-                if response.code.to_f.between?(399,600)
-                  puts "   - GitHub Meta API appears to be offline.".color(Colors::RED)
-                else
-                  puts "   - GitHub Meta API loaded successfully."
-                  @api_ip_github = JSON.parse(response.body)
-                  if @api_ip_github
-                    @api_ip_github['hooks'].each do |iprange|
-                      @ip_ranges_github.push "#{iprange}"
-                    end
-                  end
-                end
-              end
-
-            @ip_ranges_bitbucket_formatted = @ip_ranges_bitbucket.join(",")
-            @ip_ranges_github_formatted = @ip_ranges_github.join(",")
-
-            # configure webhook ip ranges only when both API calls have succeeded
-            if @ip_ranges_bitbucket_formatted and @ip_ranges_github_formatted
-              @ip_ranges_formatted = @ip_ranges_bitbucket_formatted + "," + @ip_ranges_github_formatted
-
-              api_bamboo_cli_result_plan_triggers = `#{@api_bamboo_cli} --server #{@configuration["company"]["bamboo_base_url"]} --password #{@configuration["company"]["bamboo_password"]} --user #{@configuration["company"]["bamboo_username"]} --action getTriggerList --plan "#{plan}" #{@api_bamboo_cli_redirect}`; result=$?.success?
-              if ! api_bamboo_cli_result_plan_triggers.strip.include?(@ip_ranges_formatted)
-                api_bamboo_cli_result_plan_triggers = `#{@api_bamboo_cli} --server #{@configuration["company"]["bamboo_base_url"]} --password #{@configuration["company"]["bamboo_password"]} --user #{@configuration["company"]["bamboo_username"]} --action addTrigger --plan "#{plan}" --type "remote" --ipRestriction "#{@ip_ranges_formatted}" #{@api_bamboo_cli_redirect}`; result=$?.success?
-                puts "   - #{api_bamboo_cli_result_plan_triggers.strip}"
-              end
-            else
-              puts " - Webhook configuration will be skipped until both IP range APIs are available.".color(Colors::RED)
-            end
-          end
           # configure: tasks
           # https://bobswift.atlassian.net/wiki/display/BCLI/Examples+for+AddTask+Action
           if plan.include?("BUILD")
@@ -2193,7 +2133,7 @@ module Catapult
     # validate @configuration["websites"]
     if ["provision","status"].include?(ARGV[0]) && @configuration_user["settings"]["admin"]
       puts "\nVerification of configuration[\"websites\"]:".color(Colors::WHITE)
-      # temporarily add catapult to verify repo and add bamboo webhooks
+      # temporarily add catapult to verify repo
       @configuration["websites"]["catapult"] = *(["domain" => "#{@repo}", "repo" => "#{@repo}"])
       # validate @configuration["websites"]
       @configuration["websites"].each do |service,data|
@@ -2205,7 +2145,7 @@ module Catapult
         domains_sorted = Array.new
         unless @configuration["websites"]["#{service}"] == nil
           puts "\n[#{service}] #{@configuration["websites"]["#{service}"].nil? ? "0" : @configuration["websites"]["#{service}"].length} total"
-          puts "[domain]".ljust(40) + "[repo]".ljust(12) + "[repo size]".ljust(12) + "[repo write access]".ljust(20) + "[develop]".ljust(16) + "[release]".ljust(16) + "[master]".ljust(16) + "[bamboo webhook]".ljust(18)
+          puts "[domain]".ljust(40) + "[repo]".ljust(12) + "[repo size]".ljust(12) + "[repo write access]".ljust(20) + "[develop]".ljust(16) + "[release]".ljust(16) + "[master]".ljust(16)
           puts "\n"
           @configuration["websites"]["#{service}"].each do |instance|
             # start new row
@@ -2654,102 +2594,6 @@ module Catapult
                     catapult_exception("Cannot find the develop branch for #{repo_split_3[0]} GitHub repository, please create it.")
                   else
                     row.push("exists".ljust(15))
-                  end
-                end
-              end
-            end
-            # create bamboo webhook per bitbucket repo
-            if "#{repo_split_2[0]}" == "bitbucket.org"
-              @api_bitbucket_repo_hook = false
-              uri = URI("https://api.bitbucket.org/2.0/repositories/#{repo_split_3[0]}/hooks")
-              Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
-                request = Net::HTTP::Get.new uri.request_uri
-                request.basic_auth "#{@configuration["company"]["bitbucket_username"]}", "#{@configuration["company"]["bitbucket_password"]}"
-                response = http.request(request)
-                if response.code.to_f.between?(399,600)
-                  puts "   - The Bitbucket API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
-                else
-                  api_github_repo_hooks = JSON.parse(response.body)
-                  api_github_repo_hooks["values"].each do |hook|
-                    if hook["description"] == "bamboo:CAT-TEST" && hook["url"] == "#{@configuration["company"]["bamboo_base_url"]}rest/triggers/1.0/remote/changeDetection?planKey=CAT-TEST&skipBranches=false"
-                      @api_bitbucket_repo_hook = true
-                    end
-                  end
-                  unless @api_bitbucket_repo_hook
-                    uri = URI("https://api.bitbucket.org/2.0/repositories/#{repo_split_3[0]}/hooks")
-                    Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
-                      request = Net::HTTP::Post.new uri.request_uri
-                      request.basic_auth "#{@configuration["company"]["bitbucket_username"]}", "#{@configuration["company"]["bitbucket_password"]}"
-                      request.add_field "Content-Type", "application/json"
-                      request.body = ""\
-                        "{"\
-                          "\"description\":\"bamboo:CAT-TEST\","\
-                          "\"url\":\"#{@configuration["company"]["bamboo_base_url"]}rest/triggers/1.0/remote/changeDetection?planKey=CAT-TEST&skipBranches=false\","\
-                          "\"active\":true,"\
-                          "\"events\":"\
-                            "["\
-                              "\"repo:push\""\
-                            "]"\
-                        "}"
-                      response = http.request(request)
-                      if response.code.to_f.between?(500,600)
-                        puts "   - The Bitbucket API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
-                      elsif response.code.to_f.between?(399,499)
-                        catapult_exception("Unable to configure Bitbucket Bamboo webhook for websites => #{service} => domain => #{instance["domain"]}. Ensure the bitbucket_username defined in secrets/configuration.yml has correct access to the repository.")
-                      else
-                        row.push("configured".ljust(17))
-                      end
-                    end
-                  else
-                    row.push("configured".ljust(17))
-                  end
-                end
-              end
-            end
-            # create bamboo webhook per github repo
-            if "#{repo_split_2[0]}" == "github.com"
-              @api_github_repo_hook = false
-              uri = URI("https://api.github.com/repos/#{repo_split_3[0]}/hooks")
-              Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
-                request = Net::HTTP::Get.new uri.request_uri
-                request.basic_auth "#{@configuration["company"]["github_username"]}", "#{@configuration["company"]["github_personal_access_token"]}"
-                response = http.request(request)
-                if response.code.to_f.between?(399,600)
-                  puts "   - The GitHub API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
-                else
-                  api_github_repo_hooks = JSON.parse(response.body)
-                  api_github_repo_hooks.each do |hook|
-                    if hook["config"]["url"] == "#{@configuration["company"]["bamboo_base_url"]}rest/triggers/1.0/remote/changeDetection?planKey=CAT-TEST&skipBranches=false"
-                      @api_github_repo_hook = true
-                    end
-                  end
-                  unless @api_github_repo_hook
-                    uri = URI("https://api.github.com/repos/#{repo_split_3[0]}/hooks")
-                    Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
-                      request = Net::HTTP::Post.new uri.request_uri
-                      request.basic_auth "#{@configuration["company"]["github_username"]}", "#{@configuration["company"]["github_personal_access_token"]}"
-                      request.add_field "Content-Type", "application/json"
-                      request.body = ""\
-                        "{"\
-                          "\"name\":\"web\","\
-                          "\"active\":true,"\
-                          "\"config\":"\
-                            "{"\
-                              "\"url\":\"#{@configuration["company"]["bamboo_base_url"]}rest/triggers/1.0/remote/changeDetection?planKey=CAT-TEST&skipBranches=false \","\
-                              "\"content_type\":\"json\""\
-                            "}"\
-                        "}"
-                      response = http.request(request)
-                      if response.code.to_f.between?(500,600)
-                        puts "   - The GitHub API seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
-                      elsif response.code.to_f.between?(399,499)
-                        catapult_exception("Unable to configure GitHub Bamboo webhook for websites => #{service} => domain => #{instance["domain"]}. Ensure the github_username defined in secrets/configuration.yml has correct access to the repository.")
-                      else
-                        row.push("configured".ljust(17))
-                      end
-                    end
-                  else
-                    row.push("configured".ljust(17))
                   end
                 end
               end
