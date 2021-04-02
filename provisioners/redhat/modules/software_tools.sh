@@ -1,8 +1,9 @@
 source "/catapult/provisioners/redhat/modules/catapult.sh"
 
 
-# install dependancies, relies on php.sh
+# install dependencies, relies on php.sh
 sudo yum install -y mariadb
+sudo yum install -y unzip
 
 
 echo "> configuring composer"
@@ -50,8 +51,8 @@ fi
 # update to specific drush version
 cd /usr/local/src/drush \
     && git fetch \
-    && git checkout --force 8.3.2 \
-    && composer install
+    && git checkout --force 8.4.8 \
+    && composer-php71 install
 # configure php version
 # http://docs.drush.org/en/master/install/
 if ! grep -q "export DRUSH_PHP='/opt/rh/rh-php71/root/usr/bin/php'" ~/.bashrc; then
@@ -70,8 +71,8 @@ fi
 # update to specific drush version
 cd /usr/local/src/drush10 \
     && git fetch \
-    && git checkout --force 10.2.2 \
-    && composer install
+    && git checkout --force 10.4.0 \
+    && composer-php72 install
 if ! grep -q "alias drush10='/opt/rh/rh-php72/root/usr/bin/php /usr/local/src/drush10/drush'" ~/.bashrc; then
     sudo bash -c "echo -e \"\nalias drush10='/opt/rh/rh-php72/root/usr/bin/php /usr/local/src/drush10/drush'\" >> ~/.bashrc"
 fi
