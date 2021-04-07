@@ -339,6 +339,9 @@ if hash composer 2>/dev/null && hash drush 2>/dev/null && hash wp-cli 2>/dev/nul
                 cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && wp-cli-php71 --allow-root plugin install w3-total-cache
                 cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && wp-cli-php71 --allow-root plugin activate w3-total-cache
                 cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && wp-cli-php71 --allow-root w3-total-cache fix_environment apache
+            else
+                sed -i "/\/\*\* Enable W3 Total Cache \*\//d" "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}/wp-config.php"
+                sed -i "/define( 'WP_CACHE' , true ); \/\/ Added by W3 Total Cache/d" "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}/wp-config.php"
             fi
 
         else
@@ -360,6 +363,9 @@ if hash composer 2>/dev/null && hash drush 2>/dev/null && hash wp-cli 2>/dev/nul
                 cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && wp-cli-php72 --allow-root plugin install w3-total-cache
                 cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && wp-cli-php72 --allow-root plugin activate w3-total-cache
                 cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && wp-cli-php72 --allow-root w3-total-cache fix_environment apache
+            else
+                sed -i "/\/\*\* Enable W3 Total Cache \*\//d" "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}/wp-config.php"
+                sed -i "/define( 'WP_CACHE' , true ); \/\/ Added by W3 Total Cache/d" "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}/wp-config.php"
             fi
 
         else
