@@ -1444,15 +1444,15 @@ module Catapult
             "smtp.sendgrid.net",
             587,
             Socket.gethostname,
-            "#{@configuration["company"]["sendgrid_username"]}",
-            "#{@configuration["company"]["sendgrid_password"]}",
+            "apikey",
+            "#{@configuration["company"]["sendgrid_api_key"]}",
             :login
           )
         rescue Net::ReadTimeout => ex
           puts " * The SendGrid API[SMTP] seems to be down, skipping... (this may impact provisioning, deployments, and dashboard reporting)".color(Colors::RED)
           puts "   - Error was: #{ex.class}".color(Colors::RED)
         rescue Net::SMTPAuthenticationError => ex
-          catapult_exception("The SendGrid API[SMTP] could not authenticate, please verify [\"company\"][\"sendgrid_username\"] and [\"company\"][\"sendgrid_password\"].")
+          catapult_exception("The SendGrid API[SMTP] could not authenticate, please verify [\"company\"][\"sendgrid_api_key\"] is correct.")
         end
       end
       puts " * SendGrid API[SMTP] authenticated successfully."
