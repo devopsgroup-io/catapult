@@ -1,4 +1,5 @@
 /*.lock
+/catapult/catapult-build.rb
 /provisioners/redhat/certs/
 /secrets/configuration.yml
 /secrets/configuration.yml.compare
