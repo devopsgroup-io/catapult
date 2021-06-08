@@ -351,11 +351,6 @@ done
 
 
 
-echo -e "\n> system additional repositories"
-sudo yum install -y epel-release centos-release-scl
-
-
-
 echo -e "\n> system yum-cron configuration"
 # install yum-cron to apply updates nightly
 sudo yum install -y yum-cron

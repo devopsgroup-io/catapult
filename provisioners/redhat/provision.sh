@@ -16,11 +16,12 @@ hostnamectl status
 
 echo -e "\n\n\n==> INSTALLING MINIMAL DEPENDENCIES"
 
+# install additional repositories
+sudo yum install -y epel-release centos-release-scl
 # clean the yum cache directory
 sudo yum clean all -y --verbose
 # update packages
 sudo yum update -y --skip-broken
-
 # install git
 sudo yum install -y git
 
