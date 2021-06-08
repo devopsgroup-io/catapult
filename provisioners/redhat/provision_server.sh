@@ -61,10 +61,7 @@ ${output_swap_utilization} \
 
 # install shyaml
 yum install python -y
-yum install python-devel -y
-yum install python-setuptools -y
-sudo easy_install pip
-sudo pip install --upgrade pip
+yum install python-pip -y
 sudo pip install shyaml --upgrade
 
 # run server provision
