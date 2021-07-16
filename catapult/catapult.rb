@@ -2093,6 +2093,16 @@ module Catapult
     if File.exist?(File.expand_path('#{working_dir}/secrets/configuration.yml'))
       @configuration = YAML.load_file('#{working_dir}/secrets/configuration.yml')
 
+      # override bamboo credentials when defined in configuration-user.yml
+      if File.exist?(File.expand_path('/secondary/calcium/secrets/configuration-user.yml'))
+        @configuration_user = YAML.load_file('/secondary/calcium/secrets/configuration-user.yml')
+        api_bamboo_username = @configuration_user['settings']['bamboo_username'] ? @configuration_user['settings']['bamboo_username'] : @configuration['company']['bamboo_username']
+        api_bamboo_password = @configuration_user['settings']['bamboo_password'] ? @configuration_user['settings']['bamboo_password'] : @configuration['company']['bamboo_password']
+      else
+        api_bamboo_username = @configuration['company']['bamboo_username']
+        api_bamboo_password = @configuration['company']['bamboo_password']
+      end
+
       if (RbConfig::CONFIG['host_os'] =~ /mswin|msys|mingw|cygwin|bccwin|wince|emc/)
         @environment = :windows
       else (RbConfig::CONFIG['host_os'] =~ /darwin|mac os|linux|solaris|bsd/)
@@ -2107,11 +2117,11 @@ module Catapult
         @api_bamboo_cli_redirect = '2>'
       end
 
-      api_bamboo_cli_result = `\#{@api_bamboo_cli} --server \#{@configuration['company']['bamboo_base_url']} --password \#{@configuration['company']['bamboo_password']} --user \#{@configuration['company']['bamboo_username']} --action queueBuild --plan CAT-TEST \#{@api_bamboo_cli_redirect}`; result=$?.success?
+      api_bamboo_cli_result = `\#{@api_bamboo_cli} --server \#{@configuration['company']['bamboo_base_url']} --password \#{api_bamboo_password} --user \#{api_bamboo_username} --action queueBuild --plan CAT-TEST \#{@api_bamboo_cli_redirect}`; result=$?.success?
       if api_bamboo_cli_result.strip.include?('Connection refused')
         puts 'The Bamboo CLI seems to be down. Skipping attempt to queue build job for TEST environment...'
       elsif api_bamboo_cli_result.strip.include?('401')
-        puts \"The Bamboo CLI could not authenticate. This likely means you need to login to Bamboo as \#{@configuration['company']['bamboo_username']} at \#{@configuration['company']['bamboo_base_url']} and provide an answer to a CAPTCHA challenge.\"
+        puts \"The Bamboo CLI could not authenticate. This likely means you need to login to Bamboo as \#{api_bamboo_username} at \#{@configuration['company']['bamboo_base_url']} and provide an answer to a CAPTCHA challenge.\"
       elsif ! result
         puts 'The attempt to queue a build for the TEST environment failed. This likely means a build is already running.'
       else

@@ -3,3 +3,6 @@ settings:
   admin: false
   gpg_key: ''
   gpg_edit: false
+  # these optional values can be used to override the company-level bamboo credentials
+  # bamboo_username: ''
+  # bamboo_password: ''

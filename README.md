@@ -321,6 +321,10 @@ Catapult uses Vagrant and the command line of a developer's workstation, below i
        3. Run `vagrant status` to verify the correct workstation software is installed and to generate your Catapult user files
        4. Contact your Catapult admin for your Catapult instance's GPG passphrase and place at `~/secrets/configuration-user.yml["settings"]["gpg_key"]`
        5. You may stop at this point and contact your Catapult admin for next steps. The following [Instance Setup](#instance-setup) and [Services Setup](#services-setup) will be, or have been, completed by your Catapult admin
+    3. **Any role: personal accounts**:
+       1. Users can choose to specify a personal Bamboo user (rather than the company user) for certain Bamboo calls that originate locally
+           1. Set `~/secrets/configuration-user.yml["settings"]["bamboo_username"]` to the username for this Bamboo user
+           2. Set `~/secrets/configuration-user.yml["settings"]["bamboo_password"]` to the password for this Bamboo user
 
 ## Instance Setup ##
 
