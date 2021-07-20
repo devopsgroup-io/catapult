@@ -2094,8 +2094,8 @@ module Catapult
       @configuration = YAML.load_file('#{working_dir}/secrets/configuration.yml')
 
       # override bamboo credentials when defined in configuration-user.yml
-      if File.exist?(File.expand_path('/secondary/calcium/secrets/configuration-user.yml'))
-        @configuration_user = YAML.load_file('/secondary/calcium/secrets/configuration-user.yml')
+      if File.exist?(File.expand_path('#{working_dir}/secrets/configuration-user.yml'))
+        @configuration_user = YAML.load_file('#{working_dir}/secrets/configuration-user.yml')
         api_bamboo_username = @configuration_user['settings']['bamboo_username'] ? @configuration_user['settings']['bamboo_username'] : @configuration['company']['bamboo_username']
         api_bamboo_password = @configuration_user['settings']['bamboo_password'] ? @configuration_user['settings']['bamboo_password'] : @configuration['company']['bamboo_password']
       else
