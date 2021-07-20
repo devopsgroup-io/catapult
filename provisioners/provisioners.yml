@@ -101,11 +101,6 @@ redhat:
       multithreading: false
       multithreading_persistent: false
       persistent: false
-    newrelic_apm_php:
-      description: "Manages New Relic APM PHP daemon."
-      multithreading: false
-      multithreading_persistent: false
-      persistent: false
     newrelic_synthetics:
       description: "Manages New Relic Synthetics monitors for websites."
       multithreading: true
