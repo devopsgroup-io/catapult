@@ -2117,7 +2117,7 @@ module Catapult
         @api_bamboo_cli_redirect = '2>'
       end
 
-      api_bamboo_cli_result = `\#{@api_bamboo_cli} --server \#{@configuration['company']['bamboo_base_url']} --password \#{api_bamboo_password} --user \#{api_bamboo_username} --action queueBuild --plan CAT-TEST \#{@api_bamboo_cli_redirect}`; result=$?.success?
+      api_bamboo_cli_result = `\#{@api_bamboo_cli} --server \#{@configuration['company']['bamboo_base_url']} --password \"\#{api_bamboo_password}\" --user \"\#{api_bamboo_username}\" --action queueBuild --plan CAT-TEST \#{@api_bamboo_cli_redirect}`; result=$?.success?
       if api_bamboo_cli_result.strip.include?('Connection refused')
         puts 'The Bamboo CLI seems to be down. Skipping attempt to queue build job for TEST environment...'
       elsif api_bamboo_cli_result.strip.include?('401')
