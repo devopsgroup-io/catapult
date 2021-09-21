@@ -207,6 +207,23 @@ module Catapult
     require "securerandom"
     require "yaml"
 
+    # provide a convenient interface for dev environment that executes provision or reload against both dev machines
+    if ARGV[1] == 'dev'
+      @configuration_user = YAML.load_file("secrets/configuration-user.yml")
+      @configuration = YAML.load(`gpg --quiet --batch --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --decrypt secrets/configuration.yml.gpg`)
+      unless configuration.key?('company')
+        catapult_exception("The company name could not be loaded from configuration. To use this convenience command, your Catapult configuration needs to be complete.")
+      end
+      case ARGV[0]
+      when "reload"
+        system("vagrant reload #{@configuration['company']['name'].downcase}-dev-redhat")
+        system("vagrant reload #{@configuration['company']['name'].downcase}-dev-redhat-mysql")
+      when "provision"
+        system("vagrant provision #{@configuration['company']['name'].downcase}-dev-redhat")
+        system("vagrant provision #{@configuration['company']['name'].downcase}-dev-redhat-mysql")
+      end
+      exit 0
+    end
 
     # manage a unique lock file to prevent multiple executions occurring at once to prevent operations such as git from causing havoc
     begin
@@ -2634,6 +2651,15 @@ module Catapult
     # remove the temporary catapult entry
     @configuration["websites"].delete("catapult")
 
+
+    # setup post-commit hook to queue test environment build on Catapult changes
+    working_dir = Dir.pwd
+    FileUtils.mkdir_p(".git/hooks")
+    File.write(".git/hooks/post-commit",
+        "#!/usr/bin/env ruby
+        system('#{working_dir}/catapult/catapult-build.rb')
+        ")
+    File.chmod(0777,".git/hooks/post-commit")
 
 
     # create arrays of domains for localdev hosts file & setup post-commit hook to queue test environment build
