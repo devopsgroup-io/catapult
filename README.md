@@ -147,7 +147,7 @@ Catapult orchestrates the following key components of DevOps to provide you with
     - [Website Concurrency Maximum](#website-concurrency-maximum)
     - [Interpreting Apache AB Results](#interpreting-apache-ab-results)
 - [How-to](#how-to)
-    - [Vagrant Convenience Command ](#vagrant-convenience-command)
+    - [Vagrant Convenience Commands](#vagrant-convenience-commands)
     - [Rotating Secrets](#rotating-secrets)
 - [Troubleshooting](#troubleshooting)
 - [Contributing](#contributing)
@@ -1656,9 +1656,9 @@ Percentage of the requests served within a certain time (ms)
 
 This section outlines Catapult usage and maintenance.
 
-## Vagrant Convenience Command ##
+## Vagrant Convenience Commands ##
 
-In the LocalDev environment, a convenience command is provided for use with Vagrant. This allows you to execute `reload` or `provision` against both dev environment VMs with a single command. Simply use `dev` as the machine name; e.g. `vagrant reload dev` or `vagrant provision dev`.
+In the LocalDev environment, convenience commands are provided for use with Vagrant. These allow you to execute `reload`, `provision`, or `up` against both dev environment VMs with a single command. Simply use `dev` as the machine name; e.g. `vagrant reload dev` or `vagrant provision dev`.
 
 
 

@@ -215,12 +215,15 @@ module Catapult
         catapult_exception("The company name could not be loaded from configuration. To use this convenience command, your Catapult configuration needs to be complete.")
       end
       case ARGV[0]
-      when "reload"
-        system("vagrant reload #{@configuration['company']['name'].downcase}-dev-redhat")
-        system("vagrant reload #{@configuration['company']['name'].downcase}-dev-redhat-mysql")
       when "provision"
         system("vagrant provision #{@configuration['company']['name'].downcase}-dev-redhat")
         system("vagrant provision #{@configuration['company']['name'].downcase}-dev-redhat-mysql")
+      when "reload"
+        system("vagrant reload #{@configuration['company']['name'].downcase}-dev-redhat --provision")
+        system("vagrant reload #{@configuration['company']['name'].downcase}-dev-redhat-mysql --provision")
+      when "up"
+        system("vagrant up #{@configuration['company']['name'].downcase}-dev-redhat")
+        system("vagrant up #{@configuration['company']['name'].downcase}-dev-redhat-mysql")
       end
       exit 0
     end
