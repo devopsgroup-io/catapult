@@ -207,6 +207,26 @@ module Catapult
     require "securerandom"
     require "yaml"
 
+    # provide a convenient interface for dev environment that executes provision or reload against both dev machines
+    if ARGV[1] == 'dev'
+      @configuration_user = YAML.load_file("secrets/configuration-user.yml")
+      @configuration = YAML.load(`gpg --quiet --batch --passphrase "#{@configuration_user["settings"]["gpg_key"]}" --decrypt secrets/configuration.yml.gpg`)
+      unless configuration.key?('company')
+        catapult_exception("The company name could not be loaded from configuration. To use this convenience command, your Catapult configuration needs to be complete.")
+      end
+      case ARGV[0]
+      when "provision"
+        system("vagrant provision #{@configuration['company']['name'].downcase}-dev-redhat")
+        system("vagrant provision #{@configuration['company']['name'].downcase}-dev-redhat-mysql")
+      when "reload"
+        system("vagrant reload #{@configuration['company']['name'].downcase}-dev-redhat --provision")
+        system("vagrant reload #{@configuration['company']['name'].downcase}-dev-redhat-mysql --provision")
+      when "up"
+        system("vagrant up #{@configuration['company']['name'].downcase}-dev-redhat")
+        system("vagrant up #{@configuration['company']['name'].downcase}-dev-redhat-mysql")
+      end
+      exit 0
+    end
 
     # manage a unique lock file to prevent multiple executions occurring at once to prevent operations such as git from causing havoc
     begin
@@ -390,6 +410,17 @@ module Catapult
         `#{@git} pull origin develop-catapult`
         `#{@git} pull upstream master`
         `#{@git} push origin develop-catapult`
+      end
+    else
+      # non-admin users must have a clean working copy
+      # @TODO are there exceptions, e.g. develop-catapult branch?
+      `#{@git} diff --no-ext-diff --quiet --exit-code`
+      if $?.exitstatus > 0
+        catapult_exception("There are changes present in your working copy that could impact your Catapult instance configuration. "\
+          "Execute these commands for details or contact your Catapult administrator:"\
+          "\n* #{@git} status"\
+          "\n* #{@git} diff"\
+        "")
       end
     end
     # if on the develop branch, pull updates from origin
@@ -2623,6 +2654,15 @@ module Catapult
     # remove the temporary catapult entry
     @configuration["websites"].delete("catapult")
 
+
+    # setup post-commit hook to queue test environment build on Catapult changes
+    working_dir = Dir.pwd
+    FileUtils.mkdir_p(".git/hooks")
+    File.write(".git/hooks/post-commit",
+        "#!/usr/bin/env ruby
+        system('#{working_dir}/catapult/catapult-build.rb')
+        ")
+    File.chmod(0777,".git/hooks/post-commit")
 
 
     # create arrays of domains for localdev hosts file & setup post-commit hook to queue test environment build
