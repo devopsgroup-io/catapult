@@ -62,7 +62,9 @@ ${output_swap_utilization} \
 # install shyaml
 yum install python -y
 yum install python-pip -y
-sudo pip install shyaml --upgrade
+sudo pip install pathlib --upgrade
+sudo pip install pyyaml==5.4.1
+sudo pip install shyaml==0.6.2
 
 # run server provision
 if [ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-values-0 redhat.servers.$4.modules) ]; then
