@@ -425,7 +425,9 @@ Bitbucket provides free private repositories and GitHub provides free public rep
 1. **Bitbucket** sign-up and configuration
     1. Create an account at https://bitbucket.org
         1. Place the username (not the email address) that you used to sign up for Bitbucket at `~/secrets/configuration.yml["company"]["bitbucket_username"]`
-        2. Place the password of the account for Bitbucket at `~/secrets/configuration.yml["company"]["bitbucket_password"]`
+    2. Create an App password at https://bitbucket.org/account/settings/app-passwords/
+        1. Create an App password with a label of "Catapult" and check off all Read permissions, with the exception of "Repositories", check up to Admin permissions.
+        1. Place the App password at `~/secrets/configuration.yml["company"]["bitbucket_password"]`
     2. Add your newly created `id_rsa.pub` from `~/secrets/id_rsa.pub` key in https://bitbucket.org/account/user/`your-user-here`/ssh-keys/ named "Catapult"
 2. **GitHub** sign-up and configuration
     1. Create an account at https://github.com
