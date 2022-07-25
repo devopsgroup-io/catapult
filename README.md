@@ -247,6 +247,13 @@ See an error or have a suggestion? Email competition@devopsgroup.io - we appreci
 
 Catapult requires a [Developer Setup](#developer-setup), [Instance Setup](#instance-setup), and [Services Setup](#services-setup) as described in the following sections.
 
+There are two roles when using Catapult, Catapult User and Catapult Admin.
+
+* Catapult Users are developers who use Catapult for developing within the websites that the Catapult Admin has added and configured
+* Catapult Admins are administrators who setup their organization's Catapult instance and required services
+
+The Catapult User only needs to complete the [Developer Setup](#developer-setup) and the Catapult Admin completes the [Instance Setup](#instance-setup) and [Services Setup](#services-setup).
+
 **Please Note:**
 * It is advised to turn off any antivirus software that you may have installed during setup and usage of Catapult - tasks such as forwarding ports and writing hosts files may be blocked.
 * Virtualizaion must be enabled in the BIOS of the developer's workstation - follow [this how-to](https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux/5/html/Virtualization/sect-Virtualization-Troubleshooting-Enabling_Intel_VT_and_AMD_V_virtualization_hardware_extensions_in_BIOS.html) to get started.
@@ -326,6 +333,7 @@ Catapult uses Vagrant and the command line of a developer's workstation, below i
        1. Users can choose to specify a personal Bamboo user (rather than the company user) for certain Bamboo calls that originate locally
            1. Set `~/secrets/configuration-user.yml["settings"]["bamboo_username"]` to the username for this Bamboo user
            2. Set `~/secrets/configuration-user.yml["settings"]["bamboo_password"]` to the password for this Bamboo user
+ 8. If you are a Catapult User, contact your Catapult Admin for next steps. If you are a Catapult Admin, continue to the [Instance Setup](#instance-setup) and [Services Setup](#services-setup).
 
 ## Instance Setup ##
 
