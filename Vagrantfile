@@ -57,6 +57,8 @@ Vagrant.configure("2") do |config|
     # disable the default vagrant share
     config.vm.synced_folder ".", "/vagrant", disabled: true
     config.vm.synced_folder ".", "/catapult", mount_options: ["nolock,vers=3,udp,noatime,fsc,actimeo=1"], type: "nfs"
+    # allow virtualbox to install dependencies
+    config.vbguest.installer_options = { allow_kernel_upgrade: true }
     # configure the provisioner
     config.vm.provision "shell", path: "provisioners/redhat/provision.sh", args: ["dev","#{Catapult::Command.repo}","#{Catapult::Command.configuration_user["settings"]["gpg_key"]}","apache"]
     # ensure httpd and haproxy are started once the synced_folder is mounted: fixes https://github.com/devopsgroup-io/catapult/issues/681
@@ -74,6 +76,8 @@ Vagrant.configure("2") do |config|
     # disable the default vagrant share
     config.vm.synced_folder ".", "/vagrant", disabled: true
     config.vm.synced_folder ".", "/catapult", mount_options: ["nolock,vers=3,udp,noatime,fsc,actimeo=1"], type: "nfs"
+    # allow virtualbox to install dependencies
+    config.vbguest.installer_options = { allow_kernel_upgrade: true }
     # configure the provisioner
     config.vm.provision "shell", path: "provisioners/redhat/provision.sh", args: ["dev","#{Catapult::Command.repo}","#{Catapult::Command.configuration_user["settings"]["gpg_key"]}","mysql"]
   end

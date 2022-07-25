@@ -413,14 +413,16 @@ module Catapult
       end
     else
       # non-admin users must have a clean working copy
-      # @TODO are there exceptions, e.g. develop-catapult branch?
-      `#{@git} diff --no-ext-diff --quiet --exit-code`
-      if $?.exitstatus > 0
-        catapult_exception("There are changes present in your working copy that could impact your Catapult instance configuration. "\
-          "Execute these commands for details or contact your Catapult administrator:"\
-          "\n* #{@git} status"\
-          "\n* #{@git} diff"\
-        "")
+      # exclude the develop-catapult branch for development purposes
+      if "#{branch}" != "develop-catapult"
+        `#{@git} diff --no-ext-diff --quiet --exit-code`
+        if $?.exitstatus > 0
+          catapult_exception("There are changes present in your working copy that could impact your Catapult instance configuration. "\
+            "Execute these commands for details or contact your Catapult administrator:"\
+            "\n* #{@git} status"\
+            "\n* #{@git} diff"\
+          "")
+        end
       end
     end
     # if on the develop branch, pull updates from origin
