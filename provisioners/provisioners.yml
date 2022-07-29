@@ -335,12 +335,20 @@ software:
       version: [4]
     wordpress5:
       repo: "https://github.com/WordPress/WordPress.git"
-      branch: "5.0-branch"
+      branch: "5.9-branch"
       database_config_file: "wp-config.php"
       file_store_containers: ["wp-content"]
       file_stores: ["wp-content/languages","wp-content/uploads"]
       php_version: "7.2"
       version: [5]
+    wordpress6:
+      repo: "https://github.com/WordPress/WordPress.git"
+      branch: "6.0-branch"
+      database_config_file: "wp-config.php"
+      file_store_containers: ["wp-content"]
+      file_stores: ["wp-content/languages","wp-content/uploads"]
+      php_version: "7.2"
+      version: [6]
     xenforo1:
       repo: PRIVATE
       database_config_file: "config.php"
