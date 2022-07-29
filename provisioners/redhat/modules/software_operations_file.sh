@@ -357,7 +357,31 @@ if hash composer 2>/dev/null && hash drush 2>/dev/null && hash wp-cli 2>/dev/nul
             if [ "${software_auto_update}" = "true" ]; then
                 cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && wp-cli-php72 --allow-root theme update --all
                 cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && wp-cli-php72 --allow-root plugin update --all
-                cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && wp-cli-php72 --allow-root core update
+                cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && wp-cli-php72 --allow-root core update --version=5.9
+                cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && wp-cli-php72 --allow-root plugin update --all
+                cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && wp-cli-php72 --allow-root theme update --all
+                cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && wp-cli-php72 --allow-root plugin install w3-total-cache
+                cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && wp-cli-php72 --allow-root plugin activate w3-total-cache
+                cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && wp-cli-php72 --allow-root w3-total-cache fix_environment apache
+            else
+                sed -i "/\/\*\* Enable W3 Total Cache \*\//d" "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}/wp-config.php"
+                sed -i "/define( 'WP_CACHE' , true ); \/\/ Added by W3 Total Cache/d" "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}/wp-config.php"
+            fi
+
+        else
+            echo -e "\nSUPPORTED SOFTWARE NOT DETECTED\n"
+        fi
+
+    elif [ "${software}" = "wordpress6" ]; then
+
+        version=$(cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && cat wp-includes/version.php 2>/dev/null | grep "\$wp_version" | grep --extended-regexp --only-matching --regexp="[0-9]\.[0-9][0-9]?[0-9]?(\.[0-9][0-9]?[0-9]?)?" || echo "0")
+        if [[ "${softwareversion_array[@]}" =~ "$(grep --only-matching --regexp="^[0-9]" <<< "${version}")" ]]; then
+            echo -e "\nSUPPORTED SOFTWARE VERSION DETECTED: ${version}\n"
+
+            if [ "${software_auto_update}" = "true" ]; then
+                cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && wp-cli-php72 --allow-root theme update --all
+                cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && wp-cli-php72 --allow-root plugin update --all
+                cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && wp-cli-php72 --allow-root core update --version=6.9
                 cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && wp-cli-php72 --allow-root plugin update --all
                 cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && wp-cli-php72 --allow-root theme update --all
                 cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && wp-cli-php72 --allow-root plugin install w3-total-cache

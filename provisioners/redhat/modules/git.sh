@@ -66,7 +66,7 @@ if [ -d "/var/www/repositories/apache/${domain}/.git" ]; then
                sudo bash -c "echo \"_sql/*.sql\" >> \"/var/www/repositories/apache/${domain}/.gitignore\""
             fi
             # manage software ignores
-            if [ "${software}" = "wordpress4" ] || [ "${software}" = "wordpress5" ]; then
+            if ([ "${software}" = "wordpress4" ] || [ "${software}" = "wordpress5" ] || [ "${software}" = "wordpress6" ]); then
                 git rm -rf --cached "/var/www/repositories/apache/${domain}/${webroot}wp-content/cache"
                 git rm -rf --cached "/var/www/repositories/apache/${domain}/${webroot}wp-content/advanced-cache.php"
                 git rm -rf --cached "/var/www/repositories/apache/${domain}/${webroot}wp-content/w3tc-config/master.php"
