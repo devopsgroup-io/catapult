@@ -173,7 +173,13 @@ while IFS='' read -r -d '' key; do
         force_https_hsts="# HSTS is only enabled when force_https=true"
     fi
     # handle the software php_version setting
-    if [ "${software_php_version}" = "7.2" ]; then
+    if [ "${software_php_version}" = "7.3" ]; then
+        software_php_version_value="
+        <FilesMatch \.php$>
+            SetHandler \"proxy:fcgi://127.0.0.1:9730\"
+        </FilesMatch>
+        "
+    elif [ "${software_php_version}" = "7.2" ]; then
         software_php_version_value="
         <FilesMatch \.php$>
             SetHandler \"proxy:fcgi://127.0.0.1:9720\"

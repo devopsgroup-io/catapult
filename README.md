@@ -179,7 +179,7 @@ SilverStripe 3                    | `silverstripe3`        | 5.3.3  | 5.4 | June
 SuiteCRM 7                        | `suitecrm7`            | 5.5    | 7.1 | October 21, 2013   | [November 15, 2019](http://support.sugarcrm.com/Resources/Supported_Versions/)
 WordPress 4                       | `wordpress4`           | 5.2    | 7.1 | September 4, 2014  |
 WordPress 5                       | `wordpress5`           | 5.6    | 7.2 | December 6, 2018   |
-WordPress 6                       | `wordpress6`           | 5.6    | 7.2 | May 24, 2022       |
+WordPress 6                       | `wordpress6`           | 5.6    | 7.3 | May 24, 2022       |
 XenForo 1                         | `xenforo1`             | 5.2.11 | 5.4 | March 8, 2011      | [December 31, 2019](https://xenforo.com/community/threads/xenforo-1-5-end-of-life-schedule.157679/)
 XenForo 2                         | `xenforo2`             | 5.4.0  | 7.1 | November 28, 2017  |
 Zend Framework 2                  | `zendframework2`       | 5.3.23 | 5.4 | September 5, 2012  |
@@ -196,8 +196,9 @@ Catapult maintains a high level of integrity when it comes to PHP versions, thro
 PHP Version | End-of-Life | Maintainer | Updater
 ------------|-------------|------------|--------
 5.4 | June 30, 2024 | [CentOS](https://wiki.centos.org/FAQ/General#head-fe8a0be91ee3e7dea812e8694491e1dde5b75e6d) | [Red Hat](https://access.redhat.com/security/updates/backporting)
-7.1 | December 1, 2019 | [SCLO](https://www.softwarecollections.org/en/scls/rhscl/rh-php71/) | [Red Hat](https://access.redhat.com/support/policy/updates/rhscl-rhel7)
-7.2 | November 30, 2020 | [SCLO](https://www.softwarecollections.org/en/scls/rhscl/rh-php72/) | [Red Hat](https://access.redhat.com/support/policy/updates/rhscl-rhel7)
+7.1 | December 1, 2019 | [Software Collections](https://www.softwarecollections.org/en/scls/rhscl/rh-php71/) | [Red Hat](https://access.redhat.com/support/policy/updates/rhscl-rhel7)
+7.2 | November 30, 2020 | [Software Collections](https://www.softwarecollections.org/en/scls/rhscl/rh-php72/) | [Red Hat](https://access.redhat.com/support/policy/updates/rhscl-rhel7)
+7.3 | June 30, 2024 | [Jan Staněk](https://www.softwarecollections.org/en/scls/jstanek/rh-php73/) | [Red Hat](https://access.redhat.com/support/policy/updates/rhscl-rhel7)
 
 ### End-of-Life (EOL) ###
 

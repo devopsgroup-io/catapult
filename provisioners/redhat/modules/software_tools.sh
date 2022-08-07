@@ -42,6 +42,18 @@ source ~/.bashrc
 composer-php72 --version
 
 
+echo "> configuring composer-php73"
+# configure php version
+if ! grep -q "alias composer-php73='/opt/rh/rh-php73/root/usr/bin/php /usr/local/src/composer/composer.phar'" ~/.bashrc; then
+    sudo bash -c "echo -e \"\nalias composer-php73='/opt/rh/rh-php73/root/usr/bin/php /usr/local/src/composer/composer.phar'\" >> ~/.bashrc"
+fi
+# expose the alternate software tool version aliases
+shopt -s expand_aliases
+source ~/.bashrc
+# output the version
+composer-php73 --version
+
+
 echo "> configuring drush"
 if [ ! -f /usr/bin/drush ]; then
     mkdir --parents /usr/local/src/drush
@@ -117,3 +129,14 @@ shopt -s expand_aliases
 source ~/.bashrc
 # output the version
 wp-cli-php72 --allow-root cli version
+
+
+echo "> configuring wp-cli-php73"
+if ! grep -q "alias wp-cli-php73='/opt/rh/rh-php73/root/usr/bin/php /usr/local/src/wp-cli/wp-cli.phar'" ~/.bashrc; then
+    sudo bash -c "echo -e \"\nalias wp-cli-php73='/opt/rh/rh-php73/root/usr/bin/php /usr/local/src/wp-cli/wp-cli.phar'\" >> ~/.bashrc"
+fi
+# expose the alternate software tool version aliases
+shopt -s expand_aliases
+source ~/.bashrc
+# output the version
+wp-cli-php73 --allow-root cli version
