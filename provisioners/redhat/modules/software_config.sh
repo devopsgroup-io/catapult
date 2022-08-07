@@ -447,6 +447,36 @@ elif [ "${software}" = "wordpress5" ]; then
         /catapult/provisioners/redhat/installers/software/${software}/wp-config.php > "${file}"
     sudo chmod 0444 "${file}"
 
+elif [ "${software}" = "wordpress6" ]; then
+
+    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && wp-cli-php73 --allow-root plugin is-installed w3-total-cache
+    if [ $? -eq 0 ]; then
+        cache="true"
+    else
+        cache="false"
+    fi
+    if ([ "$1" = "dev" ] || [ "$1" = "test" ]); then
+        debug="true"
+    else
+        debug="false"
+    fi
+    file="/var/www/repositories/apache/${domain}/${webroot}${softwareroot}${database_config_file}"
+    if [ -f "${file}" ]; then
+        sudo chmod 0777 "${file}"
+    else
+        mkdir --parents $(dirname "${file}")
+    fi
+    sed --expression="s/database_name_here/${1}_${domain_valid_db_name}/g" \
+        --expression="s/username_here/${mysql_user}/g" \
+        --expression="s/password_here/${mysql_user_password}/g" \
+        --expression="s/localhost/${redhat_mysql_ip}/g" \
+        --expression="s/'wp_'/'${software_dbprefix}'/g" \
+        --expression="s/'put your unique phrase here'/'${unique_hash}'/g" \
+        --expression="s/'debug_here'/${debug}/g" \
+        --expression="s/'cache_here'/${cache}/g" \
+        /catapult/provisioners/redhat/installers/software/${software}/wp-config.php > "${file}"
+    sudo chmod 0444 "${file}"
+
 elif [ "${software}" = "xenforo1" ]; then
 
     file="/var/www/repositories/apache/${domain}/${webroot}${softwareroot}${database_config_file}"
