@@ -347,7 +347,7 @@ software:
       database_config_file: "wp-config.php"
       file_store_containers: ["wp-content"]
       file_stores: ["wp-content/languages","wp-content/uploads"]
-      php_version: "7.2"
+      php_version: "7.3"
       version: [6]
     xenforo1:
       repo: PRIVATE
