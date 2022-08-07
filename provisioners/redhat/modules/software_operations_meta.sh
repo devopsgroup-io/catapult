@@ -196,7 +196,7 @@ elif [ "${software}" = "wordpress6" ]; then
         VALUES ('1', 'admin', MD5('$(catapult environments.${1}.software.wordpress.admin_password)'), 'admin', '$(catapult company.email)', '0', 'admin')
         ON DUPLICATE KEY UPDATE user_login='admin', user_pass=MD5('$(catapult environments.${1}.software.wordpress.admin_password)'), user_nicename='admin', user_email='$(catapult company.email)', user_status='0', display_name='admin';
     "
-    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && wp-cli-php72 --allow-root user add-role 1 administrator
+    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && wp-cli-php73 --allow-root user add-role 1 administrator
 
 elif [ "${software}" = "xenforo2" ]; then
 
@@ -476,25 +476,25 @@ elif [ "${software}" = "wordpress5" ]; then
 
 elif [ "${software}" = "wordpress6" ]; then
 
-    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && wp-cli-php72 --allow-root core update-db
-    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && wp-cli-php72 --allow-root cache flush
-    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && wp-cli-php72 --allow-root yoast index --reindex --skip-confirmation
-    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && wp-cli-php72 --allow-root w3-total-cache flush all
+    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && wp-cli-php73 --allow-root core update-db
+    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && wp-cli-php73 --allow-root cache flush
+    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && wp-cli-php73 --allow-root yoast index --reindex --skip-confirmation
+    cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && wp-cli-php73 --allow-root w3-total-cache flush all
 
     # caching is always disabled in dev while page cache is enabled in all other environments
     if [ "$1" = "dev" ]; then
-        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && wp-cli-php72 --allow-root w3-total-cache option set pgcache.enabled false --type=boolean
-        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && wp-cli-php72 --allow-root w3-total-cache option set dbcache.enabled false --type=boolean
-        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && wp-cli-php72 --allow-root w3-total-cache option set objectcache.enabled false --type=boolean
-        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && wp-cli-php72 --allow-root w3-total-cache option set browsercache.enabled false --type=boolean
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && wp-cli-php73 --allow-root w3-total-cache option set pgcache.enabled false --type=boolean
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && wp-cli-php73 --allow-root w3-total-cache option set dbcache.enabled false --type=boolean
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && wp-cli-php73 --allow-root w3-total-cache option set objectcache.enabled false --type=boolean
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && wp-cli-php73 --allow-root w3-total-cache option set browsercache.enabled false --type=boolean
         sed -i "/\/\*\* Enable W3 Total Cache \*\//d" "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}/wp-config.php"
         sed -i "/define( 'WP_CACHE' , true ); \/\/ Added by W3 Total Cache/d" "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}/wp-config.php"
     else
-        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && wp-cli-php72 --allow-root w3-total-cache option set pgcache.enabled true --type=boolean
-        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && wp-cli-php72 --allow-root w3-total-cache option set dbcache.enabled false --type=boolean
-        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && wp-cli-php72 --allow-root w3-total-cache option set objectcache.enabled false --type=boolean
-        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && wp-cli-php72 --allow-root w3-total-cache option set browsercache.enabled false --type=boolean
-        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && wp-cli-php72 --allow-root w3-total-cache fix_environment apache
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && wp-cli-php73 --allow-root w3-total-cache option set pgcache.enabled true --type=boolean
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && wp-cli-php73 --allow-root w3-total-cache option set dbcache.enabled false --type=boolean
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && wp-cli-php73 --allow-root w3-total-cache option set objectcache.enabled false --type=boolean
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && wp-cli-php73 --allow-root w3-total-cache option set browsercache.enabled false --type=boolean
+        cd "/var/www/repositories/apache/${domain}/${webroot}${softwareroot}" && wp-cli-php73 --allow-root w3-total-cache fix_environment apache
     fi
 
 elif [ "${software}" = "xenforo1" ]; then
