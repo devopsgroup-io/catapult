@@ -2294,6 +2294,12 @@ module Catapult
                   catapult_exception("There is an error in your secrets/configuration.yml file.\nThe force_ip_exclude for websites => #{service} => domain => #{instance["domain"]} is invalid, it must only include one, some, or all of the following [\"dev\",\"test\",\"qc\",\"production\"].")
                 end
               end
+              # validate idle
+              unless instance["idle"] == nil
+                unless ["true"].include?("#{instance["idle"]}")
+                  catapult_exception("There is an error in your secrets/configuration.yml file.\nThe idle for websites => #{service} => domain => #{instance["domain"]} is invalid, it must be true or removed.")
+                end
+              end
               # validate software
               unless instance["software"] == nil
                 # create an array of available software

@@ -151,9 +151,13 @@ if [ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-values-0 redha
             website_index=0
             # loop through websites and start sub-processes
             while read -r -d $'\0' website; do
-                # if there are no incoming catapult changes, website changes, and there is no need to run persistent modules for this domain
-                if ([ ! -f "/catapult/provisioners/redhat/logs/catapult.changes" ] && [ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-value redhat.modules.${module}.multithreading_persistent) != "True" ] && [ ! -f "/catapult/provisioners/redhat/logs/domain.$(echo "${website}" | shyaml get-value domain).changes" ]); then
-                    echo "> module skipped for this website when there are no catapult repository changes and no website repository changes..." > "/catapult/provisioners/redhat/logs/${module}.$(echo "${website}" | shyaml get-value domain).log"
+                # determine if we need to skip modules
+                idle=$(echo "${website}" | shyaml get-value idle 2>/dev/null )
+                if ([ "${idle}" = "True" ]) && ([ $1 = "dev" ] || [ $1 = "test" ]); then
+                    echo "> skipping module, website is set to idle..." > "/catapult/provisioners/redhat/logs/${module}.$(echo "${website}" | shyaml get-value domain).log"
+                    touch "/catapult/provisioners/redhat/logs/${module}.$(echo "${website}" | shyaml get-value domain).complete"
+                elif ([ ! -f "/catapult/provisioners/redhat/logs/catapult.changes" ] && [ $(cat "/catapult/provisioners/provisioners.yml" | shyaml get-value redhat.modules.${module}.multithreading_persistent) != "True" ] && [ ! -f "/catapult/provisioners/redhat/logs/domain.$(echo "${website}" | shyaml get-value domain).changes" ]); then
+                    echo "> skipping module, there are no catapult or website repository changes..." > "/catapult/provisioners/redhat/logs/${module}.$(echo "${website}" | shyaml get-value domain).log"
                     touch "/catapult/provisioners/redhat/logs/${module}.$(echo "${website}" | shyaml get-value domain).complete"
                 # if there are incoming websites changes, run the persistent module for this domain
                 else
