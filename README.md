@@ -898,6 +898,12 @@ The following options are available:
     * dependency: `force_ip:`
     * example: `force_ip_exclude: ["production"]`
         * array of select environments `["dev","test","qc","production"]` to exclude from the `force_ip` option
+* `idle:`
+    * default: `false`
+    * required: no
+    * option: `idle: true`
+        * turns off all website operations in the dev and test environment, including git pulls and database refreshing
+        * used for websites that are not under active software development
 * `repo:`
     * required: yes
     * example: `repo: git@github.com:devopsgroup-io/devopsgroup-io.git`
