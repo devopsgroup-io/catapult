@@ -2,6 +2,29 @@
 # vi: set ft=ruby :
 
 
+$logger = Log4r::Logger.new('vagrantfile')
+def read_ip_address(machine)
+  command =  "ip a | grep 'inet' | grep -v '127.0.0.1' | cut -d: -f2 | awk '{ print $2 }' | cut -f1 -d\"/\""
+  result  = ""
+
+  $logger.info "Processing #{ machine.name } ... "
+
+  begin
+    # sudo is needed for ifconfig
+    machine.communicate.sudo(command) do |type, data|
+      result << data if type == :stdout
+    end
+    $logger.info "Processing #{ machine.name } ... success"
+  rescue
+    result = "# NOT-UP"
+    $logger.info "Processing #{ machine.name } ... not running"
+  end
+
+  # the second inet is more accurate
+  result.chomp.split("\n").select { |hash| hash != "" }[1]
+end
+
+
 require File.expand_path("../catapult/catapult.rb", __FILE__)
 
 
@@ -13,13 +36,19 @@ Vagrant.configure("2") do |config|
   config.hostmanager.ignore_private_ip = false
   config.hostmanager.include_offline = true
 
+  if Vagrant.has_plugin?("HostManager")
+    config.hostmanager.ip_resolver = proc do |vm, resolving_vm|
+      read_ip_address(vm)
+    end
+  end
+
   # centos
-  # virtualbox    https://app.vagrantup.com/centos/boxes/7
-  # digitalocean  https://developers.digitalocean.com/documentation/v2/#list-all-distribution-images
+  # virtualbox/vmware    https://app.vagrantup.com/centos/boxes/7
+  # digitalocean         https://developers.digitalocean.com/documentation/v2/#list-all-distribution-images
 
   # windows
-  # virtualbox    https://github.com/devopsgroup-io/atlas-vagrant
-  # aws           https://aws.amazon.com/marketplace/pp/B00KQOWCAQ
+  # virtualbox           https://github.com/devopsgroup-io/atlas-vagrant
+  # aws                  https://aws.amazon.com/marketplace/pp/B00KQOWCAQ
 
   # build => bamboo
   config.vm.define "#{Catapult::Command.configuration["company"]["name"].downcase}-build" do |config|
@@ -44,21 +73,31 @@ Vagrant.configure("2") do |config|
   # dev => redhat
   config.vm.define "#{Catapult::Command.configuration["company"]["name"].downcase}-dev-redhat" do |config|
     config.vm.box = "centos/7"
-    config.vm.network "private_network", ip: Catapult::Command.configuration["environments"]["dev"]["servers"]["redhat"]["ip"]
-    config.vm.network "forwarded_port", guest: 80, host: Catapult::Command.configuration["environments"]["dev"]["servers"]["redhat"]["port_80"]
-    config.vm.provider :virtualbox do |provider|
-      provider.memory = 1024
-      provider.cpus = 2
-      provider.customize ["modifyvm", :id, "--audio", "none"]
+    # configure provider
+    if Catapult::Command.configuration_user["settings"]["provider_dev"] == "vmware_fusion"
+      config.vm.provider :vmware_fusion do |provider|
+        provider.vmx["memsize"] = "1024"
+        provider.vmx["numvcpus"] = "2"
+      end
+      config.vm.network "private_network", type: "dhcp"
+    else
+      config.vm.provider :virtualbox do |provider|
+        provider.memory = 1024
+        provider.cpus = 2
+        provider.customize ["modifyvm", :id, "--audio", "none"]
+      end
+      config.vm.network "private_network", ip: Catapult::Command.configuration["environments"]["dev"]["servers"]["redhat"]["ip"]
+      # allow kernel upgrades
+      config.vbguest.installer_options = { allow_kernel_upgrade: true }
     end
+    # configure port forward
+    config.vm.network "forwarded_port", guest: 80, host: Catapult::Command.configuration["environments"]["dev"]["servers"]["redhat"]["port_80"]
     # configure hosts file on both the host and guest
     config.vm.provision :hostmanager
     config.hostmanager.aliases = Catapult::Command.dev_redhat_hosts
     # disable the default vagrant share
     config.vm.synced_folder ".", "/vagrant", disabled: true
     config.vm.synced_folder ".", "/catapult", mount_options: ["nolock,vers=3,udp,noatime,fsc,actimeo=1"], type: "nfs"
-    # allow virtualbox to install dependencies
-    config.vbguest.installer_options = { allow_kernel_upgrade: true }
     # configure the provisioner
     config.vm.provision "shell", path: "provisioners/redhat/provision.sh", args: ["dev","#{Catapult::Command.repo}","#{Catapult::Command.configuration_user["settings"]["gpg_key"]}","apache"]
     # ensure httpd and haproxy are started once the synced_folder is mounted: fixes https://github.com/devopsgroup-io/catapult/issues/681
@@ -67,17 +106,26 @@ Vagrant.configure("2") do |config|
   end
   config.vm.define "#{Catapult::Command.configuration["company"]["name"].downcase}-dev-redhat-mysql" do |config|
     config.vm.box = "centos/7"
-    config.vm.network "private_network", ip: Catapult::Command.configuration["environments"]["dev"]["servers"]["redhat_mysql"]["ip"]
-    config.vm.provider :virtualbox do |provider|
-      provider.memory = 1024
-      provider.cpus = 2
-      provider.customize ["modifyvm", :id, "--audio", "none"]
+    # configure provider
+    if Catapult::Command.configuration_user["settings"]["provider_dev"] == "vmware_fusion"
+      config.vm.provider :vmware_fusion do |provider|
+        provider.vmx["memsize"] = "1024"
+        provider.vmx["numvcpus"] = "2"
+      end
+      config.vm.network "private_network", type: "dhcp"
+    else
+      config.vm.provider :virtualbox do |provider|
+        provider.memory = 1024
+        provider.cpus = 2
+        provider.customize ["modifyvm", :id, "--audio", "none"]
+      end
+      config.vm.network "private_network", ip: Catapult::Command.configuration["environments"]["dev"]["servers"]["redhat_mysql"]["ip"]
+      # allow kernel upgrades
+      config.vbguest.installer_options = { allow_kernel_upgrade: true }
     end
     # disable the default vagrant share
     config.vm.synced_folder ".", "/vagrant", disabled: true
     config.vm.synced_folder ".", "/catapult", mount_options: ["nolock,vers=3,udp,noatime,fsc,actimeo=1"], type: "nfs"
-    # allow virtualbox to install dependencies
-    config.vbguest.installer_options = { allow_kernel_upgrade: true }
     # configure the provisioner
     config.vm.provision "shell", path: "provisioners/redhat/provision.sh", args: ["dev","#{Catapult::Command.repo}","#{Catapult::Command.configuration_user["settings"]["gpg_key"]}","mysql"]
   end

@@ -60,7 +60,7 @@ Catapult orchestrates the following key components of DevOps to provide you with
     * Vagrant
 * **Environment Virtualization**
     * **Local**
-        * VirtualBox - Red Hat and Windows
+        * VirtualBox and VMware Fusion - Red Hat and Windows
     * **Cloud**
         * DigitalOcean - Red Hat
         * Amazon Web Services (AWS) - Windows
@@ -295,7 +295,9 @@ Catapult uses Vagrant and the command line of a developer's workstation, below i
     * **Using Linux?**
         1. Git commandline is included in the base distribution in most cases.
         1. For a streamlined Git GUI, download and install SmartGit from http://www.syntevo.com/smartgit/
-4. **VirtualBox**
+4. **Hypervisor**
+    * **Using macOS with [Apple silicon](https://support.apple.com/en-us/HT211814)?**
+        1. Download and install the latest version of VMware Fusion Player from https://customerconnect.vmware.com/en/evalcenter?p=fusion-player-personal-13
     * **Using macOS?**
         1. Download and install the latest version of VirtualBox from https://www.virtualbox.org/wiki/Downloads
     * **Using Windows?**
@@ -308,6 +310,8 @@ Catapult uses Vagrant and the command line of a developer's workstation, below i
     * **Using macOS?**
         1. Ensure Xcode Command Line Tools are installed by running `xcode-select --install` from Terminal
         2. Download and install the latest version of Vagrant v2.x from https://releases.hashicorp.com/vagrant/
+    * **Using macOS with [Apple silicon](https://support.apple.com/en-us/HT211814)?**
+        1. Download and install the latest version of Vagrant VMware Utility from https://developer.hashicorp.com/vagrant/downloads/vmware
     * **Using Windows?**
         1. Download and install the latest version of Vagrant v2.x from https://releases.hashicorp.com/vagrant/
     * **Using Linux (Debian, Ubuntu)?**
@@ -586,7 +590,7 @@ To start using Catapult you will need to [Provision Environments](#provision-env
 
 Environment | LocalDev | Test | QC | Production
 ------------|----------|------|----|-----------
-**Server Provider** | Locally via VirtualBox | Hosted via DigitalOcean | Hosted via DigitalOcean | Hosted via DigitalOcean
+**Server Provider** | Locally via VirtualBox and VMware Fusion | Hosted via DigitalOcean | Hosted via DigitalOcean | Hosted via DigitalOcean
 **Server Provisioning** | Manually via Vagrant | Manually via Vagrant | Manually via Vagrant | Manually via Vagrant
 
 For each **Environment** you will need to:
@@ -1716,6 +1720,9 @@ As your team members change, there may be a need to rotate Catapult secrets. The
 # Troubleshooting #
 
 Below is a log of service related troubleshooting. If you're having issues related to Catapult, [submit a GitHub Issue](https://github.com/devopsgroup-io/catapult/issues/new).
+
+* **Apple Silicon (M1 and M2 chips)**
+   * When using Catapult with a Mac computer with [Apple silicon](https://support.apple.com/en-us/HT211814), you will need to set `~/secrets/configuration-user.yml["settings"]["provider_dev"]` to `vmware_fusion`
 
 * **Vagrant**
    * When upgrading Vagrant you may run into errors - the most common issue are mismatched plugins, running this command has a good chance of success `sudo rm -Rf ~/.vagrant.d/gems/ && sudo rm ~/.vagrant.d/plugins.json`
