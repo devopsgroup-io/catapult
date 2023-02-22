@@ -188,7 +188,7 @@ module Catapult
         end
       end
       # define required vagrant plugins
-      vagrant_plugins(["highline","vagrant-aws","vagrant-digitalocean","vagrant-hostmanager","vagrant-vbguest"]);
+      vagrant_plugins(["highline","vagrant-aws","vagrant-digitalocean","vagrant-hostmanager","vagrant-vbguest","vagrant-vmware-desktop"]);
     else
       catapult_exception("Cannot detect your operating system, please submit an issue at https://github.com/devopsgroup-io/catapult")
     end

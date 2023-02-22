@@ -3,6 +3,8 @@ settings:
   admin: false
   gpg_key: ''
   gpg_edit: false
+  # this optional value can be used to change your localdev virtualization provider
+  # provider_dev: 'vmware_fusion'
   # these optional values can be used to override the company-level bamboo credentials
   # bamboo_username: ''
   # bamboo_password: ''
