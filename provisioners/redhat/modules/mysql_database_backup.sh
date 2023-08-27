@@ -23,7 +23,7 @@ if ([ ! -z "${software}" ]); then
             # create the _sql directory if it does not exist
             mkdir --parents "/var/www/repositories/apache/${domain}/_sql"
             # dump the database
-            mysqldump --defaults-extra-file=$dbconf --single-transaction --quick ${1}_${domain_valid_db_name} > /var/www/repositories/apache/${domain}/_sql/$(date +"%Y%m%d").sql
+            mysqldump --defaults-extra-file=$dbconf --lock-tables=false --single-transaction --quick ${1}_${domain_valid_db_name} > /var/www/repositories/apache/${domain}/_sql/$(date +"%Y%m%d").sql
             # write out a sql lock file for use in controlling what is restored in other environments
             touch "/var/www/repositories/apache/${domain}/_sql/$(date +"%Y%m%d").sql.lock"
             # ensure no more than 250mb or at least the one, newest, YYYYMMDD.sql file exists
