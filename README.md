@@ -7,7 +7,7 @@ Catapult defines a best-practice infrastructure and release management workflow,
 
 :boom: **Catapult** is a complete website and workflow management platform built from leading and affordable technologies.
 
-:earth_americas: **Our mission** is to create a lean platform which orchestrates DevOps for website lifecycles with familiar technologies.
+:earth_americas: **Our mission** is to create a lean platform that orchestrates DevOps for website lifecycles with familiar technologies.
 
 :rocket: **Our vision** is to afford organizations reduced risk and improved performance while lowering barriers to entry.
 
@@ -27,13 +27,13 @@ Catapult defines a best-practice infrastructure and release management workflow,
 
 **What makes Catapult different?**
 
-* Catapult is an open source, complete, and distributed architecture
+* Catapult is an open-source, complete, and distributed architecture
 * Catapult only orchestrates - it is not required to run your infrastructure
 * Catapult uses platform native shell scripting rather than configuration management tools such as Chef, Puppet, or Salt
 * Catapult features Gitflow workflow while enforcing exactly matching, branch-driven environments
 * Catapult features a unique software workflow model - upstream or downstream
 * Catapult overlays seamlessly with Scrum methodology
-* Catapult is very cost effective
+* Catapult is very cost-effective
 
 *Go ahead, give* **Catapult** *a* **shot**.
 
@@ -272,11 +272,11 @@ Catapult uses Vagrant and the command line of a developer's workstation, below i
 
 1. **Terminal**
     * **Using macOS?**
-        1. The terminal in the base distrubitions are 100% compatible.
+        1. The terminal in the base distributions are 100% compatible.
     * **Using Windows?**
         1. Run all Vagrant commands from Command Prompt as Administrator by right-clicking and selecting "Open as Administrator"
     * **Using Linux?**
-        1. The terminal in the base distrubitions are 100% compatible.
+        1. The terminal in the base distributions are 100% compatible.
 2. **GPG2**
     * **Using macOS?**
         1. Download and install GPG Suite from https://gpgtools.org
@@ -293,7 +293,7 @@ Catapult uses Vagrant and the command line of a developer's workstation, below i
         1. Download and install Git from https://git-scm.com/download/win
         1. Download and install SourceTree from https://www.sourcetreeapp.com/
     * **Using Linux?**
-        1. Git commandline is included in the base distribution in most cases.
+        1. Git command line is included in the base distribution in most cases.
         1. For a streamlined Git GUI, download and install SmartGit from http://www.syntevo.com/smartgit/
 4. **Hypervisor**
     * **Using macOS with [Apple silicon](https://support.apple.com/en-us/HT211814)?**
@@ -305,10 +305,10 @@ Catapult uses Vagrant and the command line of a developer's workstation, below i
     * **Using Linux (Debian, Ubuntu)?**
         1. Download and install the latest version of VirtualBox using Advanced Packaging Tool (APT) `sudo apt-get install virtualbox`
     * **Using Linux (Fedora, Red Hat, Suse)?**
-        1. Download and install the latest version of VirtualBox using Yellowdog Updater, Modifed (yum) `sudo yum install virtualbox`
+        1. Download and install the latest version of VirtualBox using Yellowdog Updater, Modified (yum) `sudo yum install virtualbox`
 5. **Vagrant**
     * **Using macOS?**
-        1. Ensure Xcode Command Line Tools are installed by running `xcode-select --install` from Terminal
+        1. Ensure Xcode Command Line Tools are installed by running `xcode-select --install` from the Terminal
         2. Download and install the latest version of Vagrant v2.x from https://releases.hashicorp.com/vagrant/
     * **Using macOS with [Apple silicon](https://support.apple.com/en-us/HT211814)?**
         1. Download and install the latest version of Vagrant VMware Utility from https://developer.hashicorp.com/vagrant/downloads/vmware
@@ -328,13 +328,13 @@ Catapult uses Vagrant and the command line of a developer's workstation, below i
        1. If you are setting up a new Catapult instance, continue on to the [Instance Setup](#instance-setup) step. If you are configuring a new workstation with an existing Catapult instance, ensure the following is completed:
            1. Run `vagrant status` to verify the correct workstation software is installed and to generate your Catapult user files
            2. Set `~/secrets/configuration-user.yml["settings"]["admin"]` to `true`
-           3. Enable Git credential caching by following the instructions outlined for your system to [store your Git credentials](https://docs.github.com/en/github/using-git/caching-your-github-credentials-in-git). This will allow you to push changes to your Catapult instance without prompt for credentials.
+           3. Enable Git credential caching by following the instructions outlined for your system to [store your Git credentials](https://docs.github.com/en/github/using-git/caching-your-github-credentials-in-git). This will allow you to push changes to your Catapult instance without a prompt for credentials.
     2. **If you are a Catapult user**:
        1. Using Git, clone your team's Catapult instance repository
-       2. Once cloned, from your workstation's terminal, change directory into the root of the newly cloned Catapult repository
+       2. Once cloned, from your workstation's terminal, change the directory into the root of the newly cloned Catapult repository
        3. Run `vagrant status` to verify the correct workstation software is installed and to generate your Catapult user files
        4. Contact your Catapult admin for your Catapult instance's GPG passphrase and place at `~/secrets/configuration-user.yml["settings"]["gpg_key"]`
-       5. You may stop at this point and contact your Catapult admin for next steps. The following [Instance Setup](#instance-setup) and [Services Setup](#services-setup) will be, or have been, completed by your Catapult admin
+       5. You may stop at this point and contact your Catapult admin for the next steps. The following [Instance Setup](#instance-setup) and [Services Setup](#services-setup) will be or have been, completed by your Catapult admin
     3. **Any role: personal accounts**:
        1. Users can choose to specify a personal Bamboo user (rather than the company user) for certain Bamboo calls that originate locally
            1. Set `~/secrets/configuration-user.yml["settings"]["bamboo_username"]` to the username for this Bamboo user
@@ -351,7 +351,7 @@ Catapult is quick to setup. You have the option of using GitHub (public) or Bitb
     * **BitBucket (private)**
         1. From BitBucket, create a new repository and import https://github.com/devopsgroup-io/catapult. Then clone via SourceTree or the Git utility of your choice.
 2. **Admin Mode**
-    1. Once cloned, from your workstation's terminal, change directory into the root of the newly cloned Catapult repository
+    1. Once cloned, from your workstation's terminal, change the directory into the root of the newly cloned Catapult repository
     2. Run `vagrant status` to verify the correct workstation software is installed and to generate your Catapult user files
     3. Set `~/secrets/configuration-user.yml["settings"]["admin"]` to `true`
     4. Enable Git credential caching by following the instructions outlined for your system to [store your Git credentials](https://docs.github.com/en/github/using-git/caching-your-github-credentials-in-git)
@@ -368,7 +368,7 @@ Catapult is quick to setup. You have the option of using GitHub (public) or Bitb
         2. Place the newly created *passwordless* SSH key pair `id_rsa` and `id_rsa.pub` in the `~/secrets/` folder.
 5. **GPG Passphrase**
     1. Generate a GPG passphrase 
-        1. This passphrase is used to encrypt and descrypt your Catapult instance's configuration file.
+        1. This passphrase is used to encrypt and decrypt your Catapult instance's configuration file.
         2. NEVER SHARE THE PASSPHRASE WITH ANYONE OTHER THAN YOUR TEAM.
         3. Spaces are not permitted and must be at least 20 characters.
         4. To create a strong passphrase, please visit https://xkpasswd.net/
@@ -394,7 +394,7 @@ DNS | CloudFlare | Cloud DNS | Free
 Monitoring | New Relic Application Performance Monitoring (APM), Browser, Server, and \**Synthetics | Performance and Infrastructure Monitoring | Free
 **Total** | | | &dagger;$45+
 
-&dagger; Only one platform (Red Hat or Windows) is required to have a full-featured infrastructure. Generally speaking, the industry standard Red Hat platform will be used.
+&dagger; Only one platform (Red Hat or Windows) is required to have a full-featured infrastructure. Generally speaking, the industry-standard Red Hat platform will be used.
 
 \* Depending on load, resources may need to be increased, starting at an additional [$5 per month per server](https://www.digitalocean.com/pricing/).
 
@@ -440,7 +440,7 @@ Bitbucket provides free private repositories and GitHub provides free public rep
     1. Create an account at https://bitbucket.org
         1. Place the username (not the email address) that you used to sign up for Bitbucket at `~/secrets/configuration.yml["company"]["bitbucket_username"]`
     2. Create an App password at https://bitbucket.org/account/settings/app-passwords/
-        1. Create an App password with a label of "Catapult" and check off all Read permissions, with the exception of "Repositories", check up to Admin permissions.
+        1. Create an App password with the label of "Catapult" and check off all Read permissions, with the exception of "Repositories", check up to Admin permissions.
         1. Place the App password at `~/secrets/configuration.yml["company"]["bitbucket_password"]`
     2. Add your newly created `id_rsa.pub` from `~/secrets/id_rsa.pub` key in https://bitbucket.org/account/user/`your-user-here`/ssh-keys/ named "Catapult"
 2. **GitHub** sign-up and configuration
@@ -459,7 +459,7 @@ Bitbucket provides free private repositories and GitHub provides free public rep
 1. Sign up for an Atlassian account at https://my.atlassian.com/
 2. Purchase the $10 Bamboo Server license from https://www.atlassian.com/purchase/product/bamboo 
 3. It's now time to bring up your build server, please run `vagrant up ~/secrets/configuration.yml["company"]["name"]-build`
-    * The initial `up` will take some time for, please be patient
+    * The initial `up` will take some time, please be patient
 4. Login to DigitalOcean to obtain the IP address of the virtual machine to access via URL
     * Place your Bamboo base URL at `~/secrets/configuration.yml["company"]["bamboo_base_url"]`, the format should be http://[digitalocean-ip-here]/
 5. Once your Bamboo Server instance is accessible via URL, you will be prompted with a license prompt, enter your license. Select Express installation.
@@ -479,7 +479,7 @@ Bitbucket provides free private repositories and GitHub provides free public rep
    1. Next, under Security, go to Security settings and click the Edit button at the bottom
    2. Check the "Allow anonymous users to trigger remote repository change detection and Bamboo Specs detection" setting and click Save
 
-To avoid having to manually configure the Bamboo project, plans, stages, jobs, and tasks configuration, you may optionally install and purchase the "Bob Swift Atlassian Add-ons - Bamboo Command Line Interface (CLI)" Bamboo add-on. To install, click the settings gear top right, and click "Manage apps". Once the add-on is installed, by running a `vagrant status`, Catapult will automatically detect its existance and automatically configure settings required.
+To avoid having to manually configure the Bamboo project, plans, stages, jobs, and tasks configuration, you may optionally install and purchase the "Bob Swift Atlassian Add-ons - Bamboo Command Line Interface (CLI)" Bamboo add-on. To install, click the settings gear top right, and click "Manage apps". Once the add-on is installed, by running a `vagrant status`, Catapult will automatically detect its existence and automatically configure the settings required.
 
 Otherwise, the manual setup configuration steps are outlined below:
 
@@ -552,7 +552,7 @@ Otherwise, the manual setup configuration steps are outlined below:
     1. Create a CloudFlare account at https://www.cloudflare.com
     2. Sign in to your new CloudFlare account
     3. Visit your My Account section at https://www.cloudflare.com/a/account/my-account and scroll down to your Global API Key and place the token value at `~/secrets/configuration.yml["company"]["cloudflare_api_key"]`
-    4. Place the email address of the email address that you used to sign up for CloudFlare at `~/secrets/configuration.yml["company"]["cloudflare_email"]`
+    4. Place the email address of the email address that you used to sign up for Cloudflare at `~/secrets/configuration.yml["company"]["cloudflare_email"]`
 
 ### 5. **Monitoring:**
 1. **New Relic** sign-up and configuration
@@ -576,7 +576,7 @@ Otherwise, the manual setup configuration steps are outlined below:
         2. Place the API key at `~/secrets/configuration.yml["company"]["sendgrid_password"]`
 
 ### 7. **Verify Configuration:**
-1. To verify all of the configuration that you just set, open your command line and change directory into your fork of Catapult, then run `vagrant status`. Catapult will confirm connection to all of the Services and inform you of any problems.
+1. To verify all of the configurations that you just set, open your command line and change the directory into your fork of Catapult, then run `vagrant status`. Catapult will confirm the connection to all of the Services and inform you of any problems.
 
 
 
@@ -906,8 +906,9 @@ The following options are available:
     * default: `false`
     * required: no
     * option: `idle: true`
-        * turns off all website operations in the dev and test environment, including git pulls and database refreshing
         * used for websites that are not under active software development
+        * turns off all website operations in the dev and test environment, including git pulls and database refreshing
+        * turns off nightly database backups in the test (upstream software workflow) and production (downstream software workflow) environments, hosting provider snapshots should be used for backups
 * `repo:`
     * required: yes
     * example: `repo: git@github.com:devopsgroup-io/devopsgroup-io.git`
@@ -927,7 +928,7 @@ The following options are available:
         * database migrations
         * database backups and restores
         * url references in database
-        * admininistrator account integrity
+        * administrator account integrity
     * option: `software: codeigniter2`
     * option: `software: codeigniter3`
     * option: `software: concrete58`
@@ -953,7 +954,7 @@ The following options are available:
     * required: no
     * dependency: `software:`
     * option: `software_auto_update: true`
-        * manages software core and pluggable component (plugins, modules, etc) updates to the latest compatible versions using the software's CLI tool or similiar method
+        * manages software core and pluggable component (plugins, modules, etc.) updates to the latest compatible versions using the software's CLI tool or similar method
         * updates only occur in the `software_workflow` environment
         * not all `software` is supported, see [Software Auto Updates](#software-auto-updates)
 * `software_dbprefix:`
@@ -971,7 +972,7 @@ The following options are available:
     * example: `software_dbtable_retain: ["comments","commentmeta"]`
         * array of tables, excluding the `software_dbprefix:`, to retain from the Production environment when `software_workflow:` is set to `upstream`
         * this will backup and commit a `YYYYMMDD_software_dbtable_retain.sql` file to `~/_sql`
-        * this is useful in a content regulated situation when moving a database upstream is necessary, however, needing to retain a table that includes, for example, a table of contact form submissions
+        * this is useful in a content-regulated situation when moving a database upstream is necessary, however, needing to retain a table that includes, for example, a table of contact form submissions
 * `software_workflow:`
     * required: yes
     * dependency: `software:`
@@ -982,7 +983,7 @@ The following options are available:
     * option: `software_workflow: upstream`
         * this option is useful for launching a new website or maintaining a regulated website
         * specifies the Test environment and the `develop` branch as the source and automated save point for software files and database
-        * REMINDER: websites with this option will have its Production instance overwritten with software files and datbase from the `master` branch - see [Release Management](#release-management)
+        * REMINDER: websites with this option will have their Production instance overwritten with software files and database from the `master` branch - see [Release Management](#release-management)
 * `webroot:`
     * default: `/`
     * required: no
@@ -994,15 +995,15 @@ The following options are available:
 
 ## Website Development ##
 
-Website development is done on the developer's workstation using the LocalDev environment for local and realtime software development in an environment that is exactly matchinng to upstream environments.
+Website development is done on the developer's workstation using the LocalDev environment for local and real-time software development in an environment that is exactly matching to upstream environments.
 
 ### Website Repositories ###
 
-Once websites are added to your configuration and you have performed a provision of your LocalDev environment, repositories for websites are cloned into your Catapult instance at `~/repositories` and into the respective `apache` or `iis` folder, listed by domain name. Website repository folders are linked between the developer's workstation (host) and the LocalDev environment (guest) for realtime development.
+Once websites are added to your configuration and you have performed a provision of your LocalDev environment, repositories for websites are cloned into your Catapult instance at `~/repositories` and into the respective `apache` or `iis` folder, listed by the domain name. Website repository folders are linked between the developer's workstation (host) and the LocalDev environment (guest) for real-time development.
 
 ### Software Fresh Installs ###
 
-Catapult enforces software configuration best practice for software fresh installs. A typical software fresh install workflow would be to fork the software project on GitHub and add then add a new website entry to your `~/configuration.yml` file. Given the broad spectrum of software requirements there are minor configuration caveats worth noting:
+Catapult enforces software configuration best practices for software fresh installs. A typical software fresh install workflow would be to fork the software project on GitHub and add then add a new website entry to your `~/configuration.yml` file. Given the broad spectrum of software requirements there are minor configuration caveats worth noting:
 
 Software | Install Approach | Install Notes
 ---------|------------------|--------------
@@ -1012,13 +1013,13 @@ Software | Install Approach | Install Notes
 `drupal6`           | Drush    | `drush pm-download drupal-6`
 `drupal7`           | Drush    | `drush pm-download drupal-7`
 `drupal8`           | Drush    | `drush pm-download drupal-8`
-`elgg1`             | Fork     | Follow the installation [Overview](http://learn.elgg.org/en/2.0/intro/install.html). Catapult requires the `dataroot` directory to be within the webroot, it's pertinant to create a `.gitignore` to ignore and `.htaccess` to deny access to this directory.
-`elgg2`             | Fork     | Follow the installation [Overview](http://learn.elgg.org/en/2.0/intro/install.html). Catapult requires the `dataroot` directory to be within the webroot, it's pertinant to create a `.gitignore` to ignore and `.htaccess` to deny access to this directory.
+`elgg1`             | Fork     | Follow the installation [Overview](http://learn.elgg.org/en/2.0/intro/install.html). Catapult requires the `dataroot` directory to be within the webroot, it's pertinent to create a `.gitignore` to ignore and `.htaccess` to deny access to this directory.
+`elgg2`             | Fork     | Follow the installation [Overview](http://learn.elgg.org/en/2.0/intro/install.html). Catapult requires the `dataroot` directory to be within the webroot, it's pertinent to create a `.gitignore` to ignore and `.htaccess` to deny access to this directory.
 `expressionengine3` | Download |
 `joomla3`           | Fork     |
 `laravel5`          | Composer | Follow the [Composer Create-Project](https://laravel.com/docs/5.0/installation) documentation.
 `mediawiki1`        | Fork     |
-`moodle3`           | Fork     | Catapult requires the `moodledata` directory to be within the webroot, it's pertinant to create a `.gitignore` to ignore and `.htaccess` to deny access to this directory.
+`moodle3`           | Fork     | Catapult requires the `moodledata` directory to be within the webroot, it's pertinent to create a `.gitignore` to ignore and `.htaccess` to deny access to this directory.
 `silverstripe3`     | Composer | Follow the [Installing and Upgrading with Composer](https://docs.silverstripe.org/en/3.4/getting_started/composer/). During a fresh install, the database config file `mysite/_config.php` will need to be given 0777 permissions.
 `suitecrm7`         | Fork     |
 `wordpress4`        | Fork     |
@@ -1026,11 +1027,11 @@ Software | Install Approach | Install Notes
 `wordpress6`        | Fork     |
 `xenforo1`          | Download |
 `xenforo2`          | Download |
-`zendframework2`    | Fork     | Your best bet is to start from the [zendframework/ZendSkeletonApplication](https://github.com/zendframework/ZendSkeletonApplication) GitHub project. Catapult assumes Zend Framwork is at the root of your repo and writes a database config file at `config/autoload/global.php`, you will also need to set `webroot: public/` in your Catapult configuration.
+`zendframework2`    | Fork     | Your best bet is to start from the [zendframework/ZendSkeletonApplication](https://github.com/zendframework/ZendSkeletonApplication) GitHub project. Catapult assumes Zend Framework is at the root of your repo and writes a database config file at `config/autoload/global.php`, you will also need to set `webroot: public/` in your Catapult configuration.
 
 ### Software Auto Updates ###
 
-The below table outlines what software is supported for the `software_auto_update` website option. When this option is set to `true`, Catapult manages software core and pluggable component (plugins, modules, etc) updates to the latest compatible versions using the software's CLI tool or similiar method.
+The below table outlines what software is supported for the `software_auto_update` website option. When this option is set to `true`, Catapult manages software core and pluggable component (plugins, modules, etc.) updates to the latest compatible versions using the software's CLI tool or similar method.
 
 Software | `software_auto_update` Support
 ---------|--------------------------------
@@ -1068,7 +1069,7 @@ In the scenario where an update may overwrite customizations to a file that is e
 
 Catapult manages free Domain Validation (DV) certificates compliments of Cloudflare and Let's Encrypt automatically for all of your websites and optionally manages purchased certificates.
 
-It's important to note that certificates are not dependent on protocols. Many vendors tend to use the phrase "SSL/TLS certificate", it may be more accurate to call them "certificates for use with SSL and TLS", since the protocols are determined by your server configuration, not the certificates themselves. It's likely you will continue to see certificates referred to as SSL certificates because at this point that’s the term more people are familiar, however, we're just calling them "certificates".
+It's important to note that certificates are not dependent on protocols. Many vendors tend to use the phrase "SSL/TLS certificate", it may be more accurate to call them "certificates for use with SSL and TLS" since the protocols are determined by your server configuration, not the certificates themselves. It's likely you will continue to see certificates referred to as SSL certificates because at this point that’s the term more people are familiar with, however, we're just calling them "certificates".
 
 **Browser Compatibility**
 
@@ -1082,7 +1083,7 @@ Catapult tracks Mozilla's Operations Security (OpSec) team Security/Server Side 
 
 **Purchased Certificates**
 
-Depending on your compliance needs you may need to purchase custom certificates unique to your orginization. Below is a table of the three different types of certificates that should be taken into account when auditing your compliance needs.
+Depending on your compliance needs you may need to purchase custom certificates unique to your organization. Below is a table of the three different types of certificates that should be taken into account when auditing your compliance needs.
 
 Feature                                        | Domain Validation (DV certificates)                                                          | Organization Validation (OV certificates)                                                   | Extended Validation (EV certificates)
 -----------------------------------------------|----------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------
@@ -1109,14 +1110,14 @@ Catapult optionally manages custom certificates purchased and issued by a Certif
     * Your Certificate Signing Request file
     * Your private key file
 
-Here is an example of a certificate implemenation for example.com:
+Here is an example of a certificate implementation for example.com:
 
 * `reporoot/_cert/example_com/example_com.ca-bundle`
 * `reporoot/_cert/example_com/example_com.crt`
 * `reporoot/_cert/example_com/server.csr`
 * `reporoot/_cert/example_com/server.key`
 
-Here is an example of a certificate implemenation for dev.example.com:
+Here is an example of a certificate implementation for dev.example.com:
 
 * `reporoot/_cert/dev_example_com/dev_example_com.ca-bundle`
 * `reporoot/_cert/dev_example_com/dev_example_com.crt`
@@ -1127,7 +1128,7 @@ Here is an example of a certificate implemenation for dev.example.com:
 
 ### Forcing www ###
 
-Forcing www is generally software specific, unlike forcing the https protocol, which is environment specific and driven by the `force_https` option. To force www ([why force www?](http://www.yes-www.org/)), please follow the respective guides per `software` below.
+Forcing www is generally software-specific, unlike forcing the HTTPS protocol, which is environment-specific and driven by the `force_https` option. To force www ([why force www?](http://www.yes-www.org/)), please follow the respective guides per `software` below.
 
 For `software` that does not have specific documentation, please follow this generic `.htaccess` approach http://stackoverflow.com/a/4958847/4838803
 
@@ -1156,7 +1157,7 @@ Software | Approach | Documentation
 
 ### Debug Output ###
 
-Debug output, unlike logging, is a configuration that outputs exceptions on-screen of your website while you're developing in LocalDev for convenience. It also aligns with the testing activies as defined in [Release Management](#release-management). Debug output is configured at two levels; PHP and software specific, the below chart provides a breakdown.
+Debug output, unlike logging, is a configuration that outputs exceptions on-screen of your website while you're developing in LocalDev for convenience. It also aligns with the testing activies as defined in [Release Management](#release-management). Debug output is configured at two levels; PHP and software-specific, the below chart provides a breakdown.
 
 | LocalDev | Test | QC | Production
 |----------|------|----|-----------
@@ -1173,7 +1174,7 @@ Ready to deploy a new release? Update the version number and the cache will be "
 
 `<link rel="stylesheet" href="/css/style.min.css?v=3.4.2">`
 
-A more complicated, yet effective method of cache busting is by using versioned folders. Resources with a "?" in the URL are not cached by some proxy caching servers. Here is an example of URL path cache busting:
+A more complicated, yet effective method of cache-busting is by using versioned folders. Resources with a "?" in the URL are not cached by some proxy caching servers. Here is an example of URL path cache busting:
 
 `<link rel="stylesheet" href="/css/3.4.1/style.min.css">`
 
@@ -1190,12 +1191,12 @@ Progressive Web App (PWA), in general, is a term used to denote web apps that us
 
 **SMTP: SendGrid**
 
-Email delivery is an art, there are many considerations when trying to get an email into someone's inbox. Some considerations include, message encryption, authentication, IP reputation, bounce management, analytics visibility, [and more](https://sendgrid.com/email-delivery/). For that reason, Catapult requires setup of the managed SMTP relay provider, SendGrid. To configure SendGrid with your website's software, please set the SMTP configuration to the following:
+Email delivery is an art, there are many considerations when trying to get an email into someone's inbox. Some considerations include message encryption, authentication, IP reputation, bounce management, analytics visibility, [and more](https://sendgrid.com/email-delivery/). For that reason, Catapult requires the setup of the managed SMTP relay provider, SendGrid. To configure SendGrid with your website's software, please set the SMTP configuration to the following:
 
 * SMTP host: `smtp.sendgrid.net`
 * SMTP port: `587`
 * Encryption: `TLS`
-* Authenticaion: `yes`
+* Authentication: `yes`
 * Username: `~/secrets/configuration.yml["company"]["sendgrid_username"]`
 * Password: `~/secrets/configuration.yml["company"]["sendgrid_password"]`
 
@@ -1205,7 +1206,7 @@ An example implementation would be the [WP Mail SMTP](https://wordpress.org/plug
 
 If you do not use SendGrid as your SMTP relay provider in your website software SMTP configuration, then the following default configurations will apply to assist with email deliverability:
 
-* SPF DNS record: If your website's domain is configured to use Cloudflare, Catapult will automatically configure a SPF record for each environment.
+* SPF DNS record: If your website's domain is configured to use Cloudflare, Catapult will automatically configure an SPF record for each environment.
 * TLS message encryption: If the receiving mail server supports it, the message will be TLS encrypted.
 
 **Bounce Management**
@@ -1235,7 +1236,7 @@ If you are experiencing `401` or `413` HTTP response codes it may be due to the 
 
 ### Database Migrations ###
 
-The best way to handle changes to the software's database schema is through a migrations system. Database migrations are software specific and are invoked via Catapult for you, here we outline the specifics:
+The best way to handle changes to the software's database schema is through a migrations system. Database migrations are software-specific and are invoked via Catapult for you, here we outline the specifics:
 
 Software | Tool | Command | Documentation
 ---------|------|---------|--------------
@@ -1267,10 +1268,10 @@ Software | Tool | Command | Documentation
 
 ### Connecting to Databases ###
 
-Oracle SQL Developer is the recommended tool, to connect to and work with, databases. It is free, commercially supported, cross-platform, and supports multiple database types.
+Oracle SQL Developer is the recommended tool, to connect to and work with databases. It is free, commercially supported, cross-platform, and supports multiple database types.
 
 * **Download and install** [Oracle SQL Developer](http://www.oracle.com/technetwork/developer-tools/sql-developer/downloads/index.html), some platforms require the [Java SE Development Kit](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
-* **Install third party JDBC drivers**: Oracle SQL Developer uses JDBC, via a .jar file, to connect to different database types. To install a new JDBC connector, download the respective .jar file then from Oracle SQL Developer > Preferences > Database > Third Party JDBC Drivers, click Add Entry.<sup>[4](#references)</sup>
+* **Install third-party JDBC drivers**: Oracle SQL Developer uses JDBC, via a .jar file, to connect to different database types. To install a new JDBC connector, download the respective .jar file then from Oracle SQL Developer > Preferences > Database > Third Party JDBC Drivers, click Add Entry.<sup>[4](#references)</sup>
     * **MySQL** http://dev.mysql.com/downloads/connector/j/5.0.html
         * For convenience, you may also use `~/catapult/installers/mysql-connector-java-5.0.8-bin.jar`
     * **MSSQL** https://sourceforge.net/projects/jtds/files/jtds/
@@ -1293,7 +1294,7 @@ Ask key stakeholders the following questions and assign a 1 or 0 for the answer,
 
 * What is the organizational risk?
     * High = 1 or Low = 0
-* How many users does this effect?
+* How many users does this affect?
     * Many = 1 or Few = 0
 * Is there a workaround?
     * No = 1 or Yes = 0
@@ -1363,7 +1364,7 @@ Production  | 2:00 AM
 
 ## Maintenance Cycle ##
 
-A maintenance cycle is scheduled for defined times within the timezone that is defined within `~/secrets/configuration.yml` at the `timezone_redhat` and `timezone_windows` value of the [Company](#company) entry. This ensures system and website software is patched and other security controls are run within your infrastructure to automatically mitigate security vulnerabilites.
+A maintenance cycle is scheduled for defined times within the timezone that is defined within `~/secrets/configuration.yml` at the `timezone_redhat` and `timezone_windows` values of the [Company](#company) entry. This ensures system and website software are patched and other security controls are run within your infrastructure to automatically mitigate security vulnerabilities.
 
 ### Daily ###
 Daily maintenance occurs:
@@ -1375,7 +1376,7 @@ Daily maintenance includes:
 
 * Updating Operating System and server software
 * Rotating logs
-* Discovering mail which has failed to send
+* Discovering mail that has failed to send
 
 ### Weekly ###
 
@@ -1406,7 +1407,7 @@ Being able to react to disasters immediately and consistently is crucial - Catap
 
 ### Server Rebuilding ###
 
-* LocalDev is rebuildable by running `vagrant destroy` then `vagrant up` for the respective virtual machine.
+* LocalDev is rebuildable by running `vagrant destroy` and then `vagrant up` for the respective virtual machine.
 * Test, QC, and Production are rebuildable by running `vagrant rebuild` for the respective virtual machine - this is necessary (rather than a destroy and up) to retain the IP addresses of the machine.
 
 ### Website Rollbacks ###
@@ -1430,7 +1431,7 @@ Being able to react to disasters immediately and consistently is crucial - Catap
 
 # Security #
 
-Catapult enforces many security best practices that are important for you to be aware of and understand. These controls avoid, detect, counteract, or minimize security risks to the platform and visitors. The [Lynis](https://cisofy.com/lynis/) security auditing tool is used to evaluate and harden configuration of the system.
+Catapult enforces many security best practices that are important for you to be aware of and understand. These controls avoid, detect, counteract, or minimize security risks to the platform and visitors. The [Lynis](https://cisofy.com/lynis/) security auditing tool is used to evaluate and harden the configuration of the system.
 
 ## Preventive Controls ##
 
@@ -1466,7 +1467,7 @@ Catapult enforces many security best practices that are important for you to be 
 * ARPwatch (Address Resolution Protocol) notifies of changed MAC/IP pairings
 * Fail2Ban filters for sshd, sshd-ddos, and apache-botsearch
 * SysStat collects and stores system performance and usage activity
-* Weekly report of 404s and error keywords targeteted at the server and virtual hosts
+* Weekly report of 404s and error keywords targeted at the server and virtual hosts
 
 ## Corrective Controls ##
 
@@ -1474,7 +1475,7 @@ Catapult enforces many security best practices that are important for you to be 
 
 ## Data Protection ##
 
-Catapult introduces many best practice data protection measures, however, security of personal data is ultimately your responsibility. Generally speaking, if personal information is compromised, you are required by law to notify the party. Laws vary country-by-country and state-by-state, and can be enforcable in the state or country where the individual is physically located when the data is collected. This means that, even if your website is hosted within the U.S., you could potentially be subject to another country's data protection laws. The main principles of data protection, include:
+Catapult introduces many best practice data protection measures, however, the security of personal data is ultimately your responsibility. Generally speaking, if personal information is compromised, you are required by law to notify the party. Laws vary country-by-country and state-by-state and can be enforceable in the state or country where the individual is physically located when the data is collected. This means that, even if your website is hosted within the U.S., you could potentially be subject to another country's data protection laws. The main principles of data protection include:
 
 * Privacy by design
 * Right to access
@@ -1484,7 +1485,7 @@ Catapult introduces many best practice data protection measures, however, securi
 
 ### United States ###
 
-Personally identifiable information (PII), in the U.S., is generally classified as **an individual's first and last name in combination with a Social Security number, driver's license number, or financial account number**. For more information, please see [this list](http://www.itgovernanceusa.com/data-breach-notification-laws.aspx) of data breach laws by U.S. state compiled by IT Governence.
+Personally identifiable information (PII), in the U.S., is generally classified as **an individual's first and last name in combination with a Social Security number, driver's license number, or financial account number**. For more information, please see [this list](http://www.itgovernanceusa.com/data-breach-notification-laws.aspx) of data breach laws by U.S. states compiled by IT Governance.
 
 ### Europe ###
 
@@ -1493,7 +1494,7 @@ The General Data Protection Regulation (GDPR) is a regulation in E.U. law on dat
 
 # Compliance #
 
-There are many complex compliance and audit standards that are your responsibility to understand and execute. Each Catapult instance is independant to you - including the required services that you signed up for during [Services Setup](#services-setup).
+There are many complex compliance and audit standards that are your responsibility to understand and execute. Each Catapult instance is independent to you - including the required services that you signed up for during [Services Setup](#services-setup).
 
 ## Cloud Compliance ##
 
@@ -1547,16 +1548,16 @@ Caching is enabled for many layers of your website including storing pre-interpr
   * [https://secure.php.net/manual/en/intro.opcache.php](https://secure.php.net/manual/en/intro.opcache.php)
 * Page caching is enabled for the website's software type if available.
   * [https://github.com/devopsgroup-io/catapult/blob/master/provisioners/redhat/modules/software_operations_meta.sh](https://github.com/devopsgroup-io/catapult/blob/master/provisioners/redhat/modules/software_operations_meta.sh)
-* HTTP Cache-Control headers are set to expire browser cached files after a default of 7 days; longer for specific file types.
+* HTTP Cache-Control headers are set to expire browser-cached files after a default of 7 days; longer for specific file types.
   * [https://github.com/devopsgroup-io/catapult/blob/master/provisioners/redhat/modules/apache_vhosts.sh](https://github.com/devopsgroup-io/catapult/blob/master/provisioners/redhat/modules/apache_vhosts.sh)
-* HTTP ETag headers are set for all files, the ETag is a unique value based on the files modified time and size in bytes. If the ETag value is unchanged then a cached version is served if available. This saves network bandwidth.
+* HTTP ETag headers are set for all files, the ETag is a unique value based on the file modified time and size in bytes. If the ETag value is unchanged then a cached version is served if available. This saves network bandwidth.
   * [https://github.com/devopsgroup-io/catapult/blob/master/provisioners/redhat/modules/apache_vhosts.sh](https://github.com/devopsgroup-io/catapult/blob/master/provisioners/redhat/modules/apache_vhosts.sh)
 
 ## Geographic Optimizations ##
 
-Shortening the physical distance between the server and visitor can trim priceless milliseconds from page loading time. (One might use this as an argument as to why browser caching and your overall caching strategy is so important.)
+Shortening the physical distance between the server and the visitor can trim priceless milliseconds from page loading time. (One might use this as an argument as to why browser caching and your overall caching strategy is so important.)
 
-* If your website's name servers are set to Cloudflare, you will take advantage of files being cached accross their global network, bringing it closer to visitors from every region.
+* If your website's name servers are set to Cloudflare, you will take advantage of files being cached across their global network, bringing it closer to visitors from every region.
   * [https://support.cloudflare.com/hc/en-us/articles/200172516-Which-file-extensions-does-Cloudflare-cache-for-static-content-](https://support.cloudflare.com/hc/en-us/articles/200172516-Which-file-extensions-does-Cloudflare-cache-for-static-content-)
 
 ## Recommended Optimizations ##
@@ -1585,11 +1586,11 @@ Google's [PageSpeed Insights](https://developers.google.com/speed/pagespeed/insi
 
 # Capacity #
 
-Your website's capacity potential is defined by two key elements; 1) your website's average resource requirement per request and 2) server resources available. We recommend to first [Performance](#performance) optmize your website and *then* consider your website's capacity potential through [Performance and Capacity Testing](#performance-and-capacity-testing).
+Your website's capacity potential is defined by two key elements; 1) your website's average resource requirement per request and 2) server resources available. We recommend to first [Performance](#performance) optimize your website and *then* consider your website's capacity potential through [Performance and Capacity Testing](#performance-and-capacity-testing).
 
 ## Increasing Capacity ##
 
-Catapult defines horizontal scaling through adding additional servers, this affords you increased capacity. Currently, only the Red Hat stack supports horizontal scaling and only one (1) additional server is supported. Each Red Hat environment (LocalDev, Test, QC, and Production) support horizontal scaling independently. To spin up the additional server per environment, please run the following command:
+Catapult defines horizontal scaling by adding additional servers, this affords you increased capacity. Currently, only the Red Hat stack supports horizontal scaling and only one (1) additional server is supported. Each Red Hat environment (LocalDev, Test, QC, and Production) supports horizontal scaling independently. To spin up the additional server per environment, please run the following command:
 
     * `vagrant up ~/secrets/configuration.yml["company"]["name"]-dev-redhat1`
     * `vagrant up ~/secrets/configuration.yml["company"]["name"]-test-redhat1`
@@ -1598,17 +1599,17 @@ Catapult defines horizontal scaling through adding additional servers, this affo
     
 ## Load Balancer
 
-HAProxy is used to facilitate capacity management by means of a layer 7 load-balancer. The HAProxy status dashboard is made available to you for each environment by visiting port 32700 at the respective environment's `-redhat` server `ip` address as defined in `~/secrets/configuration.yml`. As example, `42.67.232.56:32700`. The username to login is `admin` and the password is the password as defined at the respective environment's `["software"]["admin_password"]` entry.
+HAProxy is used to facilitate capacity management by means of a layer 7 load balancer. The HAProxy status dashboard is made available to you for each environment by visiting port 32700 at the respective environment's `-redhat` server `ip` address as defined in `~/secrets/configuration.yml`. As example, `42.67.232.56:32700`. The username to log in is `admin` and the password is the password as defined at the respective environment's `["software"]["admin_password"]` entry.
 
 
 
 # Performance and Capacity Testing #
 
-Often disregarded, performance and capacity testing are a crucial component of quality assurance. The risks of neglecting performance and capacity testing include downtime, SEO impacts, gaps in analytics, poor user experience, and unknown ability to scale.
+Often disregarded, performance and capacity testing are crucial components of quality assurance. The risks of neglecting performance and capacity testing include downtime, SEO impacts, gaps in analytics, poor user experience, and unknown ability to scale.
 
 With Catapult's exactly duplicated configuration, even the Test environment can accurately represent the performance and capacity potential of the Production environment. [ApacheBench](https://httpd.apache.org/docs/2.4/programs/ab.html) is a powerful tool to test request performance and concurrency - macOS includes ApacheBench out of the box, while [this StackOverflow post](http://stackoverflow.com/a/7407602/4838803) details how to get up and running on Windows.
 
-ApacheBench enables us to perform both performance and capacity testing. Each website has it's own unique resource requirements and knowing these requirements are paramount to the performance, capacity, and uptime of your website. 
+ApacheBench enables us to perform both performance and capacity testing. Each website has its own unique resource requirements and knowing these requirements are paramount to the performance, capacity, and uptime of your website. 
 
 * **Performance testing**
   * *Definition*: Testing for the time it takes for a client to request a web page from the server.
@@ -1622,9 +1623,9 @@ ApacheBench enables us to perform both performance and capacity testing. Each we
 
 ## Website Concurrency Maximum ##
 
-Using a website with historical Google Analytics data, access the Audience Overview and find the busiest Pageview day from the past 30-days and then drill into that date. Find the hour with the most Pageviews, then the accompanying Avg. Session Duration. Using the following formula, we are able to find the Concurrency Maxiumum.
+Using a website with historical Google Analytics data, access the Audience Overview and find the busiest Pageview day from the past 30 days, and then drill into that date. Find the hour with the most page views, and then the accompanying Avg. Session Duration. Using the following formula, we are able to find the Concurrency Maxiumum.
 
-*(Pageviews x Avg. Session Duration in seconds) / 3,600 seconds* = **Concurrency Maxiumum**
+*(Pageviews x Avg. Session Duration in seconds) / 3,600 seconds* = **Concurrency Maximum**
 
 <img src="https://cdn.rawgit.com/devopsgroup-io/catapult/master/catapult/installers/images/catapult_website_concurrency_maximum.png" alt="Catapult Website Concurrency Maximum">
 
@@ -1632,7 +1633,7 @@ Using a website with historical Google Analytics data, access the Audience Overv
 
 Take a website with an average of 500 pageviews per hour, or 365,000 pageviews per month, which has a busiest hour of 1,000 pageviews.
 
-Pageviews | Avg. Session Duration | Total Session Seconds | Concurrency Maxiumum
+Pageviews | Avg. Session Duration | Total Session Seconds | Concurrency Maximum
 ----------|-----------------------|-----------------------|---------------------
 1,000 | 60 minutes (3,600 seconds) | 3,600,000 | **1,000**
 1,000 | 10 minutes (600 seconds) | 600,000 | **166**
@@ -1648,7 +1649,7 @@ ab -l -r -n 1000 -c 100 -H "Accept-Encoding: gzip, deflate" http://test.drupal7.
 
 Take a website with an average of 20 pageviews per hour, or 14,600 pageviews per month, which has a busiest hour of 100 pageviews.
 
-Pageviews | Avg. Session Duration | Total Session Seconds | Concurrency Maxiumum
+Pageviews | Avg. Session Duration | Total Session Seconds | Concurrency Maximum
 ----------|-----------------------|-----------------------|---------------------
 100 | 60 minutes (3,600 seconds) | 36,000 | **1,000**
 100 | 10 minutes (600 seconds) | 60,000 | **16**
@@ -1662,7 +1663,7 @@ ab -l -r -n 100 -c 10 -H "Accept-Encoding: gzip, deflate" http://test.drupal7.de
 
 ## Interpreting Apache AB Results ##
 
-Using a satisifed [Apdex](https://en.wikipedia.org/wiki/Apdex) of 7 seconds, we can see that 98% of users would be satisfied.
+Using a satisfied [Apdex](https://en.wikipedia.org/wiki/Apdex) of 7 seconds, we can see that 98% of users would be satisfied.
 
 ```
 Percentage of the requests served within a certain time (ms)
@@ -1695,7 +1696,7 @@ As your team members change, there may be a need to rotate Catapult secrets. The
 
 1. **GPG Passphrase**
    1. Disable all Bamboo build plans
-   2. Generate a new GPG passphrase, as described in the [Instance Setup](#instance-setup), and place at `~/secrets/configuration-user.yml["settings"]["gpg_key"]`
+   2. Generate a new GPG passphrase, as described in the [Instance Setup](#instance-setup), and place it at `~/secrets/configuration-user.yml["settings"]["gpg_key"]`
    3. Encrypt the file `~secrets/configuration.yml` with the new GPG passphrase: `gpg --verbose --batch --yes --passphrase "[insert newly generated passphrase here]" --output secrets/configuration.yml.gpg --armor --cipher-algo AES256 --symmetric secrets/configuration.yml`
    4. Encrypt the file `~secrets/id_rsa` with the new GPG passphrase: `gpg --verbose --batch --yes --passphrase "[insert newly generated passphrase here]" --output secrets/id_rsa.gpg --armor --cipher-algo AES256 --symmetric secrets/id_rsa`
    5. Encrypt the file `~secrets/secrets/id_rsa.pub` with the new GPG passphrase: `gpg --verbose --batch --yes --passphrase "[insert newly generated passphrase here]" --output secrets/id_rsa.pub.gpg --armor --cipher-algo AES256 --symmetric secrets/id_rsa.pub`
@@ -1719,19 +1720,19 @@ As your team members change, there may be a need to rotate Catapult secrets. The
 
 # Troubleshooting #
 
-Below is a log of service related troubleshooting. If you're having issues related to Catapult, [submit a GitHub Issue](https://github.com/devopsgroup-io/catapult/issues/new).
+Below is a log of service-related troubleshooting. If you're having issues related to Catapult, [submit a GitHub Issue](https://github.com/devopsgroup-io/catapult/issues/new).
 
 * **Apple Silicon (M1 and M2 chips)**
    * When using Catapult with a Mac computer with [Apple silicon](https://support.apple.com/en-us/HT211814), you will need to set `~/secrets/configuration-user.yml["settings"]["provider_dev"]` to `vmware_fusion`
 
 * **Vagrant**
-   * When upgrading Vagrant you may run into errors - the most common issue are mismatched plugins, running this command has a good chance of success `sudo rm -Rf ~/.vagrant.d/gems/ && sudo rm ~/.vagrant.d/plugins.json`
+   * When upgrading Vagrant you may run into errors - the most common issue is mismatched plugins, running this command has a good chance of success `sudo rm -Rf ~/.vagrant.d/gems/ && sudo rm ~/.vagrant.d/plugins.json`
 
 
 
 # Contributing #
 
-Here are some ways which we welcome you to contribute to Catapult:
+Here are some ways in which we welcome you to contribute to Catapult:
 
   * Submit a pull request
   * Report an issue
@@ -1739,7 +1740,7 @@ Here are some ways which we welcome you to contribute to Catapult:
   * Improve documentation in the README
   * Share your experiences with Catapult
 
-When you first setup Catapult, a `develop-catapult` branch is created for you under your forked repository with the git remote upstream set to `https://github.com/devopsgroup-io/catapult.git` so that you can easily create a pull request. Also keep in mind when closing issues to submit a pull request that includes [GitHub's: Closing issues via commit messages](https://help.github.com/articles/closing-issues-via-commit-messages/).
+When you first set Catapult, a `develop-catapult` branch is created for you under your forked repository with the git remote upstream set to `https://github.com/devopsgroup-io/catapult.git` so that you can easily create a pull request. Also keep in mind when closing issues to submit a pull request that includes [GitHub's: Closing issues via commit messages](https://help.github.com/articles/closing-issues-via-commit-messages/).
 
 
 
@@ -1749,7 +1750,7 @@ Releases are driven by the devopsgroup.io team and occur when accepting new pull
 
 * MAJOR version when you make incompatible API changes,
 * MINOR version when you add functionality in a backwards-compatible manner, and
-* PATCH version when you make backwards-compatible bug fixes.
+* PATCH version when you make backward-compatible bug fixes.
 
 In addition, the release version number will be prefaced with a `v` (v1.0.0) to conform to standard practice.
 
@@ -1765,9 +1766,9 @@ As part of a new release, the version number in `~/VERSION.yml` will be incremen
 
 The Catapult team values partnerships and continuous improvement.
 
-* [06-03-2016] New Relic creates request on Catapult's behalf for a free entry point for the New Relic Synthetics API
+* [06-03-2016] New Relic creates a request on Catapult's behalf for a free entry point for the New Relic Synthetics API
 * [01-28-2016] Pantheon provides feedback
-* [01-22-2016] New Relic provides private beta access to their Synthetics API along side Breather, Carfax, Ring Central, Rackspace, and IBM.
+* [01-22-2016] New Relic provides private beta access to their Synthetics API alongside Breather, Carfax, Ring Central, Rackspace, and IBM.
 
 
 
