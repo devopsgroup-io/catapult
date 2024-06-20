@@ -1727,6 +1727,9 @@ Below is a log of service-related troubleshooting. If you're having issues relat
 
 * **Vagrant**
    * When upgrading Vagrant you may run into errors - the most common issue is mismatched plugins, running this command has a good chance of success `sudo rm -Rf ~/.vagrant.d/gems/ && sudo rm ~/.vagrant.d/plugins.json`
+   * Mac OS Sonoma is locked to Vagrant 2.3.4 and the following Vagrant plugins:
+     - `vagrant plugin install faraday --plugin-version=2.7.4`
+     - `vagrant plugin install nokogiri --plugin-version=1.14.3`
 
 
 
