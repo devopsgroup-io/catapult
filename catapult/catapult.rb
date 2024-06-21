@@ -125,8 +125,9 @@ module Catapult
     end
 
 
-    # define the minimum vagrant version
-    Vagrant.require_version "> 1.4.0"
+    # define the vagrant version
+    # vagrant 2.3.5 moved to ruby 3, which is incompatible with some catapult-required vagrant plugins and catapult.rb
+    Vagrant.require_version "> 1.4.0", "<= 2.3.4"
 
 
     # ensure the user is in the correct directory when running vagrant commands to prevent git from pulling in catapult upstream master into repositories
@@ -1774,7 +1775,7 @@ module Catapult
             end
             # type
             if instance != nil
-              row.push(instance.at("item instanceType").text.ljust(12))
+              row.push(instance.at("item instanceType").text.slice!(0, 12).ljust(12))
               # write type to secrets/configuration.yml
               if !defined?(@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["type"]) || (@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["type"].nil?) || (@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["type"] != instance.at("item instanceType").text)
                 if !defined?(@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["type"])
@@ -1848,7 +1849,7 @@ module Catapult
             end
             # type
             if droplet != nil
-              row.push("#{droplet["size"]["slug"]}".ljust(12))
+              row.push("#{droplet["size"]["slug"]}".slice!(0, 12).ljust(12))
               # write slug to secrets/configuration.yml
               if !defined?(@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["slug"]) || (@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["slug"].nil?) || (@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["slug"] != droplet["size"]["slug"])
                 if !defined?(@configuration["environments"]["#{environment}"]["servers"]["#{server}"]["slug"])
@@ -2765,7 +2766,7 @@ module Catapult
                 environment = "#{environment}."
               end
               begin
-                def Command::http_response(uri_str, limit = 10)
+                def Command::http_response(uri_str, limit = 3)
                   if limit == 0
                     row.push("loop")
                   else
@@ -2807,7 +2808,7 @@ module Catapult
               rescue Net::ReadTimeout
                 row.push("down".ljust(4).color(Colors::RED))
               rescue OpenSSL::SSL::SSLError
-                row.push("err".ljust(4).color(Colors::RED))
+                row.push("cert".ljust(4).color(Colors::RED))
               rescue Exception => ex
                 row.push("#{ex.class}".slice!(0, 4).ljust(4).color(Colors::RED))
               end
