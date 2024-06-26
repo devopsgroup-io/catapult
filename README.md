@@ -856,7 +856,9 @@ The following options are available:
     * required: no
     * example: `domain_tld_override: mycompany.com`
         * a domain name under your [name server authority](https://en.wikipedia.org/wiki/Domain_Name_System#Authoritative_name_server) to append to the top-level-domain (e.g. `.com`)
-            * useful when you cannot or do not wish to host the Test/QC website at the `domain`
+            * configures a vhost at the `domain` and `domain`.`domain_tld_override`
+            * useful when you do not have DNS control of the `domain`, but want to have a quick option to point DNS to `domain` if needed
+            * if DNS is pointed to `domain`, you may remove the `domain_tld_override`. please caution note below
         * appends the `domain_tld_override` for Environments
             * `dev.example.com.mycompany.com`, `test.example.com.mycompany.com`, `qc.example.com.mycompany.com`, `example.com.mycompany.com`
             * `www.dev.example.com.mycompany.com`, `www.test.example.com.mycompany.com`, `www.qc.example.com.mycompany.com`, `www.example.com.mycompany.com`
