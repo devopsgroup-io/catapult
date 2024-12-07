@@ -170,7 +170,7 @@ module Catapult
         catapult_exception("There is an issue with Vagrant v1.8.1 on Windows, please install a lesser or greater version.")
       end
       # define required vagrant plugins
-      vagrant_plugins(["highline","vagrant-aws","vagrant-digitalocean","vagrant-hostmanager","vagrant-vbguest","vagrant-winnfsd"]);
+      vagrant_plugins(["highline","vagrant-digitalocean","vagrant-hostmanager","vagrant-vbguest","vagrant-winnfsd"]);
     # others
     elsif (RbConfig::CONFIG['host_os'] =~ /darwin|mac os|linux|solaris|bsd/)
       @environment = :posix
@@ -189,7 +189,7 @@ module Catapult
         end
       end
       # define required vagrant plugins
-      vagrant_plugins(["highline","vagrant-aws","vagrant-digitalocean","vagrant-hostmanager","vagrant-vbguest","vagrant-vmware-desktop"]);
+      vagrant_plugins(["highline","vagrant-digitalocean","vagrant-hostmanager","vagrant-vbguest","vagrant-vmware-desktop"]);
     else
       catapult_exception("Cannot detect your operating system, please submit an issue at https://github.com/devopsgroup-io/catapult")
     end
