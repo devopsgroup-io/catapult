@@ -18,6 +18,10 @@ echo -e "\n\n\n==> INSTALLING MINIMAL DEPENDENCIES"
 
 # install additional repositories
 sudo yum install -y epel-release centos-release-scl
+# update repo urls
+sed -i s/mirror.centos.org/vault.centos.org/g /etc/yum.repos.d/CentOS-*.repo
+sed -i s/^#.*baseurl=http/baseurl=http/g /etc/yum.repos.d/CentOS-*.repo
+sed -i s/^mirrorlist=http/#mirrorlist=http/g /etc/yum.repos.d/CentOS-*.repo
 # clean the yum cache directory
 sudo yum clean all -y --verbose
 # update packages
