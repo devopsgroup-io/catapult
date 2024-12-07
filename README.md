@@ -1725,13 +1725,14 @@ As your team members change, there may be a need to rotate Catapult secrets. The
 Below is a log of service-related troubleshooting. If you're having issues related to Catapult, [submit a GitHub Issue](https://github.com/devopsgroup-io/catapult/issues/new).
 
 * **Apple Silicon (M1 and M2 chips)**
-   * When using Catapult with a Mac computer with [Apple silicon](https://support.apple.com/en-us/HT211814), you will need to set `~/secrets/configuration-user.yml["settings"]["provider_dev"]` to `vmware_fusion`
+  * When using Catapult with a Mac computer with [Apple silicon](https://support.apple.com/en-us/HT211814), you will need to set `~/secrets/configuration-user.yml["settings"]["provider_dev"]` to `vmware_fusion`
 
 * **Vagrant**
-   * When upgrading Vagrant you may run into errors - the most common issue is mismatched plugins, running this command has a good chance of success `sudo rm -Rf ~/.vagrant.d/gems/ && sudo rm ~/.vagrant.d/plugins.json`
-   * Mac OS Sonoma is locked to Vagrant 2.3.4 and the following Vagrant plugins:
-     - `vagrant plugin install faraday --plugin-version=2.7.4`
-     - `vagrant plugin install nokogiri --plugin-version=1.14.3`
+  * When upgrading Vagrant you may run into errors - the most common issue is mismatched plugins, running this command has a good chance of success `sudo rm -Rf ~/.vagrant.d/gems/ && sudo rm ~/.vagrant.d/plugins.json`
+  * Mac OS Sonoma is locked to Vagrant 2.3.4 and the following Vagrant plugins:
+    - `vagrant plugin install highline --plugin-version=2.1.0`
+    - `vagrant plugin install faraday --plugin-version=2.7.4`
+    - `vagrant plugin install vagrant-digitalocean --plugin-version=0.9.6`
 
 
 
