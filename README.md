@@ -557,14 +557,11 @@ Otherwise, the manual setup configuration steps are outlined below:
 ### 5. **Monitoring:**
 1. **New Relic** sign-up and configuration
     1. Create a New Relic account at http://newrelic.com/
-        * [Free Stuff] Sign-up up for New Relic and get a Data Nerd shirt! http://newrelic.com/lp/datanerd
-        * [Free Stuff] Refer Catapult and get a New Relic hoodie! http://newrelic.com/referral
     2. Sign in to your New Relic account
-    3. Go to your Account Settings > Integrations > API keys.
-    4. Generate and place your REST API key at `~/secrets/configuration.yml["company"]["newrelic_api_key"]`
-    5. Generate and place your Admin API key at `~/secrets/configuration.yml["company"]["newrelic_admin_api_key"]`
-    6. Go to your Account Settings > Account > Summary.
-    7. Place your License key at `~/secrets/configuration.yml["company"]["newrelic_license_key"]`
+    3. Go to your Account Settings > API keys.
+    4. Generate and place a User API key at `~/secrets/configuration.yml["company"]["newrelic_api_key"]`
+    7. Generate and place another User API key at `~/secrets/configuration.yml["company"]["newrelic_admin_api_key"]`
+    6. Generate and place an Ingest - License key at `~/secrets/configuration.yml["company"]["newrelic_license_key"]`
 
 ### 6. **Email:**
 1. **SendGrid** sign-up and configuration
