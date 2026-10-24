@@ -19,7 +19,7 @@ newrelic_monitors=$(echo "${newrelic_monitors}" | sed -e 's/HTTPSTATUS\:.*//g')
 # asia
     # AWS_AP_NORTHEAST_1: Tokyo, JP
 # australia
-    # AWS_AP_SOUTHEAST_2: Syndney, AU
+    # AWS_AP_SOUTHEAST_2: Sydney, AU
 # antarctica
     # none available
 
